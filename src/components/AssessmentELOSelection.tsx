@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Trash2, Plus } from 'lucide-react';
 import { generateCourseOutcomes } from '../pages/api';
+import { useToast } from '@/hooks/use-toast';
 
 interface ItemConfigRow {
   id: string;
@@ -40,6 +41,7 @@ interface AssessmentELOSelectionProps {
 const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComplete }: AssessmentELOSelectionProps) => {
   const [chapterELOs, setChapterELOs] = useState<{ [key: string]: ELO[] }>({});
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   // Item configuration options
   const bloomsLevels = [
@@ -173,12 +175,20 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
     const currentTotalMarks = currentELO.itemConfigRows.reduce((sum, row) => sum + (row.noOfItems * row.marksPerItem), 0);
 
     if (currentTotalItems >= currentELO.maxItems) {
-      alert(`Cannot add more items. ELO limit: ${currentELO.maxItems} items`);
+      toast({
+        title: "Item Limit Exceeded",
+        description: `Cannot add more items. ELO limit: ${currentELO.maxItems} items`,
+        variant: "destructive"
+      });
       return;
     }
 
     if (currentTotalMarks >= currentELO.maxMarks) {
-      alert(`Cannot add more items. ELO limit: ${currentELO.maxMarks} marks`);
+      toast({
+        title: "Mark Limit Exceeded", 
+        description: `Cannot add more items. ELO limit: ${currentELO.maxMarks} marks`,
+        variant: "destructive"
+      });
       return;
     }
 
@@ -230,12 +240,20 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
       });
 
       if (totalItems > currentELO.maxItems) {
-        alert(`Cannot exceed ELO limit of ${currentELO.maxItems} items`);
+        toast({
+          title: "Item Limit Exceeded",
+          description: `Cannot exceed ELO limit of ${currentELO.maxItems} items`,
+          variant: "destructive"
+        });
         return;
       }
 
       if (totalMarks > currentELO.maxMarks) {
-        alert(`Cannot exceed ELO limit of ${currentELO.maxMarks} marks`);
+        toast({
+          title: "Mark Limit Exceeded",
+          description: `Cannot exceed ELO limit of ${currentELO.maxMarks} marks`,
+          variant: "destructive"
+        });
         return;
       }
     }
@@ -345,26 +363,26 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                           {chapterELOs[chapter.chapterId]?.filter(elo => elo.selected).length || 0} selected
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-6 bg-gradient-to-r from-blue-50 to-cyan-50 px-4 py-2 rounded-lg border border-blue-200/50">
                         <div className="flex items-center gap-2">
-                          <label className="text-sm font-medium">No. of Items:</label>
+                          <span className="text-sm font-semibold text-blue-800">No. of Items:</span>
                           <Input
                             type="number"
                             min="1"
                             defaultValue="10"
                             onClick={(e) => e.stopPropagation()}
-                            className="h-8 w-20"
+                            className="h-8 w-20 border-blue-300 focus:border-blue-500 bg-white font-medium"
                           />
                         </div>
                         
                         <div className="flex items-center gap-2">
-                          <label className="text-sm font-medium">Total Marks:</label>
+                          <span className="text-sm font-semibold text-blue-800">Total Marks:</span>
                           <Input
                             type="number"
                             min="1"
                             defaultValue="20"
                             onClick={(e) => e.stopPropagation()}
-                            className="h-8 w-20"
+                            className="h-8 w-20 border-blue-300 focus:border-blue-500 bg-white font-medium"
                           />
                         </div>
                       </div>
