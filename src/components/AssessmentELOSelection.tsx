@@ -388,6 +388,14 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
                                       <h4 className="font-medium text-foreground">{elo.title}</h4>
+                                      <div className="flex items-center gap-2">
+                                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                          {totalItems}/{elo.maxItems} items
+                                        </Badge>
+                                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                                          {totalMarks}/{elo.maxMarks} marks
+                                        </Badge>
+                                      </div>
                                       {elo.previousAssessments && elo.previousAssessments.length > 0 && (
                                         <div className="flex gap-1">
                                           {elo.previousAssessments.map(assessment => (
