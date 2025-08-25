@@ -319,7 +319,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
       <Card className="border border-border/50 bg-white">
         <CardHeader className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-t-lg">
           <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-            Expected Learning Outcomes by Chapter
+            Test Blueprint Creation
           </CardTitle>
           <p className="text-muted-foreground">
             Select the learning outcomes you want to include in your assessment
@@ -608,7 +608,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
             onClick={onComplete}
             className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold px-12 py-4 h-auto text-lg rounded-xl border border-blue-400/20 hover:scale-105 transition-all duration-300 transform"
           >
-            Continue to Item Configuration
+            Continue to Blueprint Creation
           </Button>
         </div>
       )}
