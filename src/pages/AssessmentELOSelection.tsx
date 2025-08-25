@@ -18,6 +18,8 @@ interface ELO {
   description: string;
   selected: boolean;
   itemConfigRows: ItemConfigRow[];
+  maxItems: number;
+  maxMarks: number;
 }
 
 interface ItemConfigRow {
@@ -30,8 +32,8 @@ interface ItemConfigRow {
   marksPerItem: number;
 }
 
-interface ChapterLimits {
-  [chapterId: string]: {
+interface ELOLimits {
+  [eloId: string]: {
     maxItems: number;
     maxMarks: number;
   };
@@ -43,7 +45,7 @@ const AssessmentELOSelection = () => {
   const { formData, selectedChapters, gradeName, subjectName } = location.state || {};
 
   const [chapterELOs, setChapterELOs] = useState<{ [key: string]: ELO[] }>({});
-  const [chapterLimits, setChapterLimits] = useState<ChapterLimits>({});
+  const [eloLimits, setELOLimits] = useState<ELOLimits>({});
   const [loading, setLoading] = useState(false);
 
   // Mock data - in real app, this would come from API
@@ -63,15 +65,7 @@ const AssessmentELOSelection = () => {
       return;
     }
     
-    // Initialize chapter limits
-    const initialLimits: ChapterLimits = {};
-    selectedChapters.forEach((chapter: any) => {
-      initialLimits[chapter.chapterId] = {
-        maxItems: 10,
-        maxMarks: 20
-      };
-    });
-    setChapterLimits(initialLimits);
+    // Initialize ELO limits will be done after ELOs are generated
     
     // Generate ELOs for each chapter
     generateELOsForChapters();
@@ -97,7 +91,9 @@ const AssessmentELOSelection = () => {
             title: outcome.co_title || `ELO ${index + 1}`,
             description: outcome.co_description || 'Learning outcome description',
             selected: false,
-            itemConfigRows: []
+            itemConfigRows: [],
+            maxItems: 10,
+            maxMarks: 20
           }));
           newChapterELOs[chapter.chapterId] = elos;
         } else {
@@ -122,21 +118,27 @@ const AssessmentELOSelection = () => {
         title: 'Define key concepts and terminology',
         description: 'Students will be able to define and explain the fundamental concepts and terminology related to this chapter.',
         selected: false,
-        itemConfigRows: []
+        itemConfigRows: [],
+        maxItems: 10,
+        maxMarks: 20
       },
       {
         id: `${chapterId}-2`,
         title: 'Analyze relationships and patterns',
         description: 'Students will be able to analyze relationships between different elements and identify patterns.',
         selected: false,
-        itemConfigRows: []
+        itemConfigRows: [],
+        maxItems: 10,
+        maxMarks: 20
       },
       {
         id: `${chapterId}-3`,
         title: 'Apply knowledge to solve problems',
         description: 'Students will be able to apply their understanding to solve real-world problems and scenarios.',
         selected: false,
-        itemConfigRows: []
+        itemConfigRows: [],
+        maxItems: 10,
+        maxMarks: 20
       }
     ];
   };
@@ -151,42 +153,35 @@ const AssessmentELOSelection = () => {
     setChapterELOs(updatedChapterELOs);
   };
 
-  const updateChapterLimits = (chapterId: string, field: 'maxItems' | 'maxMarks', value: number) => {
-    setChapterLimits(prev => ({
-      ...prev,
-      [chapterId]: {
-        ...prev[chapterId],
-        [field]: value
-      }
-    }));
+  const updateELOLimits = (eloId: string, field: 'maxItems' | 'maxMarks', value: number) => {
+    const updatedChapterELOs = { ...chapterELOs };
+    Object.keys(updatedChapterELOs).forEach(chapterId => {
+      updatedChapterELOs[chapterId] = updatedChapterELOs[chapterId].map(elo =>
+        elo.id === eloId ? { ...elo, [field]: value } : elo
+      );
+    });
+    setChapterELOs(updatedChapterELOs);
   };
 
   const addItemConfigRow = (eloId: string) => {
-    const chapterId = eloId.split('-')[0];
-    const chapter = chapterLimits[chapterId];
-    
-    if (!chapter) return;
-
-    // Calculate current totals for this chapter
-    const currentChapterELOs = Object.values(chapterELOs)
+    // Find the specific ELO
+    const currentELO = Object.values(chapterELOs)
       .flat()
-      .filter(elo => elo.id.startsWith(chapterId));
+      .find(elo => elo.id === eloId);
     
-    const currentTotalItems = currentChapterELOs.reduce((sum, elo) => 
-      sum + elo.itemConfigRows.reduce((eloSum, row) => eloSum + row.noOfItems, 0), 0
-    );
-    
-    const currentTotalMarks = currentChapterELOs.reduce((sum, elo) => 
-      sum + elo.itemConfigRows.reduce((eloSum, row) => eloSum + (row.noOfItems * row.marksPerItem), 0), 0
-    );
+    if (!currentELO) return;
 
-    if (currentTotalItems >= chapter.maxItems) {
-      alert(`Cannot add more items. Chapter limit: ${chapter.maxItems} items`);
+    // Calculate current totals for this ELO
+    const currentTotalItems = currentELO.itemConfigRows.reduce((sum, row) => sum + row.noOfItems, 0);
+    const currentTotalMarks = currentELO.itemConfigRows.reduce((sum, row) => sum + (row.noOfItems * row.marksPerItem), 0);
+
+    if (currentTotalItems >= currentELO.maxItems) {
+      alert(`Cannot add more items. ELO limit: ${currentELO.maxItems} items`);
       return;
     }
 
-    if (currentTotalMarks >= chapter.maxMarks) {
-      alert(`Cannot add more items. Chapter limit: ${chapter.maxMarks} marks`);
+    if (currentTotalMarks >= currentELO.maxMarks) {
+      alert(`Cannot add more items. ELO limit: ${currentELO.maxMarks} marks`);
       return;
     }
 
@@ -211,43 +206,39 @@ const AssessmentELOSelection = () => {
   };
 
   const updateItemConfigRow = (eloId: string, rowId: string, field: keyof ItemConfigRow, value: any) => {
-    const chapterId = eloId.split('-')[0];
-    const chapter = chapterLimits[chapterId];
+    // Find the specific ELO
+    const currentELO = Object.values(chapterELOs)
+      .flat()
+      .find(elo => elo.id === eloId);
     
-    if (!chapter) return;
+    if (!currentELO) return;
 
     const updatedChapterELOs = { ...chapterELOs };
     
     // Check limits before updating
     if (field === 'noOfItems' || field === 'marksPerItem') {
-      const currentChapterELOs = Object.values(updatedChapterELOs)
-        .flat()
-        .filter(elo => elo.id.startsWith(chapterId));
-      
       let totalItems = 0;
       let totalMarks = 0;
       
-      currentChapterELOs.forEach(elo => {
-        elo.itemConfigRows.forEach(row => {
-          if (elo.id === eloId && row.id === rowId) {
-            const newNoOfItems = field === 'noOfItems' ? value : row.noOfItems;
-            const newMarksPerItem = field === 'marksPerItem' ? value : row.marksPerItem;
-            totalItems += newNoOfItems;
-            totalMarks += newNoOfItems * newMarksPerItem;
-          } else {
-            totalItems += row.noOfItems;
-            totalMarks += row.noOfItems * row.marksPerItem;
-          }
-        });
+      currentELO.itemConfigRows.forEach(row => {
+        if (row.id === rowId) {
+          const newNoOfItems = field === 'noOfItems' ? value : row.noOfItems;
+          const newMarksPerItem = field === 'marksPerItem' ? value : row.marksPerItem;
+          totalItems += newNoOfItems;
+          totalMarks += newNoOfItems * newMarksPerItem;
+        } else {
+          totalItems += row.noOfItems;
+          totalMarks += row.noOfItems * row.marksPerItem;
+        }
       });
 
-      if (totalItems > chapter.maxItems) {
-        alert(`Cannot exceed chapter limit of ${chapter.maxItems} items`);
+      if (totalItems > currentELO.maxItems) {
+        alert(`Cannot exceed ELO limit of ${currentELO.maxItems} items`);
         return;
       }
 
-      if (totalMarks > chapter.maxMarks) {
-        alert(`Cannot exceed chapter limit of ${chapter.maxMarks} marks`);
+      if (totalMarks > currentELO.maxMarks) {
+        alert(`Cannot exceed ELO limit of ${currentELO.maxMarks} marks`);
         return;
       }
     }
@@ -282,6 +273,12 @@ const AssessmentELOSelection = () => {
     setChapterELOs(updatedChapterELOs);
   };
 
+  const calculateELOTotals = (elo: ELO) => {
+    const totalItems = elo.itemConfigRows.reduce((sum, row) => sum + row.noOfItems, 0);
+    const totalMarks = elo.itemConfigRows.reduce((sum, row) => sum + (row.noOfItems * row.marksPerItem), 0);
+    return { totalItems, totalMarks };
+  };
+
   const calculateChapterTotals = (chapterId: string) => {
     const chapterELOsList = chapterELOs[chapterId] || [];
     const totalItems = chapterELOsList.reduce((sum, elo) => 
@@ -313,7 +310,6 @@ const AssessmentELOSelection = () => {
         formData,
         selectedChapters,
         selectedELOs,
-        chapterLimits,
         gradeName,
         subjectName
       }
@@ -379,7 +375,6 @@ const AssessmentELOSelection = () => {
                   <Accordion type="multiple" className="w-full">
                     {selectedChapters.map((chapter: any) => {
                       const { totalItems, totalMarks } = calculateChapterTotals(chapter.chapterId);
-                      const limits = chapterLimits[chapter.chapterId];
                       
                       return (
                         <AccordionItem key={chapter.chapterId} value={chapter.chapterId}>
@@ -391,171 +386,183 @@ const AssessmentELOSelection = () => {
                                   {chapterELOs[chapter.chapterId]?.filter(elo => elo.selected).length || 0} ELOs
                                 </Badge>
                                 <Badge variant="outline">
-                                  {totalItems}/{limits?.maxItems || 0} items
+                                  {totalItems} items
                                 </Badge>
                                 <Badge variant="outline">
-                                  {totalMarks}/{limits?.maxMarks || 0} marks
+                                  {totalMarks} marks
                                 </Badge>
                               </div>
                             </div>
                           </AccordionTrigger>
                           <AccordionContent>
-                            <div className="space-y-6 pt-4">
-                              {/* Chapter Limits */}
-                              <div className="bg-muted/20 p-4 rounded-lg">
-                                <h4 className="font-medium mb-3">Chapter Limits</h4>
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="text-sm font-medium block mb-2">Max Items</label>
-                                    <Input
-                                      type="number"
-                                      min="1"
-                                      value={limits?.maxItems || 10}
-                                      onChange={(e) => updateChapterLimits(chapter.chapterId, 'maxItems', parseInt(e.target.value) || 10)}
-                                      className="h-9"
-                                    />
-                                  </div>
-                                  <div>
-                                    <label className="text-sm font-medium block mb-2">Total Marks</label>
-                                    <Input
-                                      type="number"
-                                      min="1"
-                                      value={limits?.maxMarks || 20}
-                                      onChange={(e) => updateChapterLimits(chapter.chapterId, 'maxMarks', parseInt(e.target.value) || 20)}
-                                      className="h-9"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* ELOs */}
-                              <div className="space-y-4">
-                                {chapterELOs[chapter.chapterId]?.map(elo => (
-                                  <div key={elo.id} className="border rounded-lg p-4">
-                                    <div className="flex items-start space-x-3 mb-4">
-                                      <Checkbox
-                                        checked={elo.selected}
-                                        onCheckedChange={(checked) => handleELOSelection(elo, checked as boolean)}
-                                      />
-                                      <div className="flex-1">
-                                        <h4 className="font-medium text-foreground">{elo.title}</h4>
-                                        <p className="text-sm text-muted-foreground mt-1">{elo.description}</p>
-                                      </div>
-                                    </div>
-
-                                    {/* ELO Item Configuration Table */}
-                                    {elo.selected && (
-                                      <div className="mt-4 space-y-4">
-                                        <div className="border rounded-lg overflow-hidden">
-                                          <div className="bg-muted/30 px-4 py-3 grid grid-cols-7 gap-4 font-medium text-sm">
-                                            <div>Bloom's Level</div>
-                                            <div>Item Type</div>
-                                            <div>Item Sub-type</div>
-                                            <div>Difficulty</div>
-                                            <div>No. of Items</div>
-                                            <div>Marks/Item</div>
-                                            <div>Actions</div>
+                            <div className="space-y-4 pt-4">
+                              {/* ELOs as Accordions */}
+                              <Accordion type="multiple" className="w-full">
+                                {chapterELOs[chapter.chapterId]?.map(elo => {
+                                  const { totalItems, totalMarks } = calculateELOTotals(elo);
+                                  
+                                  return (
+                                    <AccordionItem key={elo.id} value={elo.id} className="border rounded-lg mb-4">
+                                      <AccordionTrigger 
+                                        className="text-left px-4"
+                                        onClick={() => handleELOSelection(elo, !elo.selected)}
+                                      >
+                                        <div className="flex items-center justify-between w-full">
+                                          <div className="flex-1">
+                                            <h4 className="font-medium text-foreground">{elo.title}</h4>
+                                            <p className="text-sm text-muted-foreground mt-1">{elo.description}</p>
                                           </div>
-                                          {elo.itemConfigRows.map(row => (
-                                            <div key={row.id} className="px-4 py-3 grid grid-cols-7 gap-4 border-t">
-                                              <Select
-                                                value={row.bloomsLevel}
-                                                onValueChange={(value) => updateItemConfigRow(elo.id, row.id, 'bloomsLevel', value)}
-                                              >
-                                                <SelectTrigger className="h-9">
-                                                  <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  {bloomsLevels.map(level => (
-                                                    <SelectItem key={level} value={level}>{level}</SelectItem>
-                                                  ))}
-                                                </SelectContent>
-                                              </Select>
-
-                                              <Select
-                                                value={row.itemType}
-                                                onValueChange={(value) => updateItemConfigRow(elo.id, row.id, 'itemType', value)}
-                                              >
-                                                <SelectTrigger className="h-9">
-                                                  <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  {itemTypes.map(type => (
-                                                    <SelectItem key={type} value={type}>{type}</SelectItem>
-                                                  ))}
-                                                </SelectContent>
-                                              </Select>
-
-                                              <div>
-                                                {row.itemType === 'Others' ? (
-                                                  <Textarea
-                                                    placeholder="Enter item sub-type..."
-                                                    value={row.itemSubType || ''}
-                                                    onChange={(e) => updateItemConfigRow(elo.id, row.id, 'itemSubType', e.target.value)}
-                                                    className="h-9 resize-none"
-                                                    rows={1}
-                                                  />
-                                                ) : (
-                                                  <div className="h-9 flex items-center text-muted-foreground text-sm">-</div>
-                                                )}
-                                              </div>
-
-                                              <Select
-                                                value={row.difficulty}
-                                                onValueChange={(value) => updateItemConfigRow(elo.id, row.id, 'difficulty', value)}
-                                              >
-                                                <SelectTrigger className="h-9">
-                                                  <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                  {difficultyLevels.map(level => (
-                                                    <SelectItem key={level} value={level}>{level}</SelectItem>
-                                                  ))}
-                                                </SelectContent>
-                                              </Select>
-
-                                              <Input
-                                                type="number"
-                                                min="1"
-                                                value={row.noOfItems}
-                                                onChange={(e) => updateItemConfigRow(elo.id, row.id, 'noOfItems', parseInt(e.target.value) || 1)}
-                                                className="h-9"
-                                              />
-
-                                              <Input
-                                                type="number"
-                                                min="1"
-                                                value={row.marksPerItem}
-                                                onChange={(e) => updateItemConfigRow(elo.id, row.id, 'marksPerItem', parseInt(e.target.value) || 1)}
-                                                className="h-9"
-                                              />
-
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => removeItemConfigRow(elo.id, row.id)}
-                                                className="h-9 w-9 p-0"
-                                              >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                              </Button>
-                                            </div>
-                                          ))}
+                                          <div className="flex items-center gap-4 mr-4">
+                                            <Badge variant="outline">
+                                              {totalItems}/{elo.maxItems} items
+                                            </Badge>
+                                            <Badge variant="outline">
+                                              {totalMarks}/{elo.maxMarks} marks
+                                            </Badge>
+                                          </div>
                                         </div>
+                                      </AccordionTrigger>
+                                      <AccordionContent className="px-4 pb-4">
+                                        <div className="space-y-4">
+                                          {/* ELO Limits */}
+                                          <div className="bg-muted/20 p-4 rounded-lg">
+                                            <h5 className="font-medium mb-3">ELO Limits</h5>
+                                            <div className="grid grid-cols-2 gap-4">
+                                              <div>
+                                                <label className="text-sm font-medium block mb-2">No. of Items</label>
+                                                <Input
+                                                  type="number"
+                                                  min="1"
+                                                  value={elo.maxItems}
+                                                  onChange={(e) => updateELOLimits(elo.id, 'maxItems', parseInt(e.target.value) || 10)}
+                                                  className="h-9"
+                                                />
+                                              </div>
+                                              <div>
+                                                <label className="text-sm font-medium block mb-2">Total Marks</label>
+                                                <Input
+                                                  type="number"
+                                                  min="1"
+                                                  value={elo.maxMarks}
+                                                  onChange={(e) => updateELOLimits(elo.id, 'maxMarks', parseInt(e.target.value) || 20)}
+                                                  className="h-9"
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
 
-                                        <Button
-                                          variant="outline"
-                                          size="sm"
-                                          onClick={() => addItemConfigRow(elo.id)}
-                                          className="flex items-center gap-2"
-                                        >
-                                          <Plus className="h-4 w-4" />
-                                          Add Item Configuration
-                                        </Button>
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
+                                          {/* ELO Item Configuration Table */}
+                                          <div className="border rounded-lg overflow-hidden">
+                                            <div className="bg-muted/30 px-4 py-3 grid grid-cols-7 gap-4 font-medium text-sm">
+                                              <div>Bloom's Level</div>
+                                              <div>Item Type</div>
+                                              <div>Item Sub-type</div>
+                                              <div>Difficulty</div>
+                                              <div>No. of Items</div>
+                                              <div>Marks/Item</div>
+                                              <div>Actions</div>
+                                            </div>
+                                            {elo.itemConfigRows.map(row => (
+                                              <div key={row.id} className="px-4 py-3 grid grid-cols-7 gap-4 border-t">
+                                                <Select
+                                                  value={row.bloomsLevel}
+                                                  onValueChange={(value) => updateItemConfigRow(elo.id, row.id, 'bloomsLevel', value)}
+                                                >
+                                                  <SelectTrigger className="h-9">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    {bloomsLevels.map(level => (
+                                                      <SelectItem key={level} value={level}>{level}</SelectItem>
+                                                    ))}
+                                                  </SelectContent>
+                                                </Select>
+
+                                                <Select
+                                                  value={row.itemType}
+                                                  onValueChange={(value) => updateItemConfigRow(elo.id, row.id, 'itemType', value)}
+                                                >
+                                                  <SelectTrigger className="h-9">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    {itemTypes.map(type => (
+                                                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                                                    ))}
+                                                  </SelectContent>
+                                                </Select>
+
+                                                <div>
+                                                  {row.itemType === 'Others' ? (
+                                                    <Textarea
+                                                      placeholder="Enter item sub-type..."
+                                                      value={row.itemSubType || ''}
+                                                      onChange={(e) => updateItemConfigRow(elo.id, row.id, 'itemSubType', e.target.value)}
+                                                      className="h-9 resize-none"
+                                                      rows={1}
+                                                    />
+                                                  ) : (
+                                                    <div className="h-9 flex items-center text-muted-foreground text-sm">-</div>
+                                                  )}
+                                                </div>
+
+                                                <Select
+                                                  value={row.difficulty}
+                                                  onValueChange={(value) => updateItemConfigRow(elo.id, row.id, 'difficulty', value)}
+                                                >
+                                                  <SelectTrigger className="h-9">
+                                                    <SelectValue placeholder="Select" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    {difficultyLevels.map(level => (
+                                                      <SelectItem key={level} value={level}>{level}</SelectItem>
+                                                    ))}
+                                                  </SelectContent>
+                                                </Select>
+
+                                                <Input
+                                                  type="number"
+                                                  min="1"
+                                                  value={row.noOfItems}
+                                                  onChange={(e) => updateItemConfigRow(elo.id, row.id, 'noOfItems', parseInt(e.target.value) || 1)}
+                                                  className="h-9"
+                                                />
+
+                                                <Input
+                                                  type="number"
+                                                  min="1"
+                                                  value={row.marksPerItem}
+                                                  onChange={(e) => updateItemConfigRow(elo.id, row.id, 'marksPerItem', parseInt(e.target.value) || 1)}
+                                                  className="h-9"
+                                                />
+
+                                                <Button
+                                                  variant="ghost"
+                                                  size="sm"
+                                                  onClick={() => removeItemConfigRow(elo.id, row.id)}
+                                                  className="h-9 w-9 p-0"
+                                                >
+                                                  <Trash2 className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                              </div>
+                                            ))}
+                                          </div>
+
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => addItemConfigRow(elo.id)}
+                                            className="flex items-center gap-2"
+                                          >
+                                            <Plus className="h-4 w-4" />
+                                            Add Item Configuration
+                                          </Button>
+                                        </div>
+                                      </AccordionContent>
+                                    </AccordionItem>
+                                  );
+                                })}
+                              </Accordion>
                             </div>
                           </AccordionContent>
                         </AccordionItem>
