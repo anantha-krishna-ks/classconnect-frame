@@ -40,6 +40,7 @@ interface AssessmentELOSelectionProps {
 
 const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComplete }: AssessmentELOSelectionProps) => {
   const [chapterELOs, setChapterELOs] = useState<{ [key: string]: ELO[] }>({});
+  const [chapterLimits, setChapterLimits] = useState<{ [key: string]: { maxItems: number; maxMarks: number } }>({});
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -57,6 +58,12 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
   useEffect(() => {
     if (assessmentData.selectedChapters && assessmentData.selectedChapters.length > 0) {
       generateELOsForChapters();
+      // Initialize chapter limits
+      const limits: { [key: string]: { maxItems: number; maxMarks: number } } = {};
+      assessmentData.selectedChapters.forEach((chapter: any) => {
+        limits[chapter.chapterId] = { maxItems: 10, maxMarks: 20 };
+      });
+      setChapterLimits(limits);
     }
   }, [assessmentData.selectedChapters]);
 
@@ -163,30 +170,35 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
   };
 
   const addItemConfigRow = (eloId: string) => {
-    // Find the specific ELO
-    const currentELO = Object.values(chapterELOs)
-      .flat()
-      .find(elo => elo.id === eloId);
-    
+    // Find the specific ELO and its chapter
+    const currentELO = Object.values(chapterELOs).flat().find(elo => elo.id === eloId);
     if (!currentELO) return;
 
-    // Calculate current totals for this ELO
-    const currentTotalItems = currentELO.itemConfigRows.reduce((sum, row) => sum + row.noOfItems, 0);
-    const currentTotalMarks = currentELO.itemConfigRows.reduce((sum, row) => sum + (row.noOfItems * row.marksPerItem), 0);
+    const chapterId = Object.keys(chapterELOs).find(cId => 
+      chapterELOs[cId].some(elo => elo.id === eloId)
+    );
+    if (!chapterId) return;
 
-    if (currentTotalItems >= currentELO.maxItems) {
+    const chapterLimit = chapterLimits[chapterId];
+    if (!chapterLimit) return;
+
+    // Calculate current chapter totals from all selected ELOs
+    const chapterTotals = calculateChapterTotals(chapterId);
+    
+    // Check if adding one more item would exceed chapter limits
+    if (chapterTotals.totalItems >= chapterLimit.maxItems) {
       toast({
-        title: "Item Limit Exceeded",
-        description: `Cannot add more items. ELO limit: ${currentELO.maxItems} items`,
+        title: "Chapter Item Limit Exceeded",
+        description: `Cannot add more items. Chapter limit: ${chapterLimit.maxItems} items`,
         variant: "destructive"
       });
       return;
     }
 
-    if (currentTotalMarks >= currentELO.maxMarks) {
+    if (chapterTotals.totalMarks >= chapterLimit.maxMarks) {
       toast({
-        title: "Mark Limit Exceeded", 
-        description: `Cannot add more items. ELO limit: ${currentELO.maxMarks} marks`,
+        title: "Chapter Mark Limit Exceeded", 
+        description: `Cannot add more items. Chapter limit: ${chapterLimit.maxMarks} marks`,
         variant: "destructive"
       });
       return;
@@ -213,50 +225,61 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
   };
 
   const updateItemConfigRow = (eloId: string, rowId: string, field: keyof ItemConfigRow, value: any) => {
-    // Find the specific ELO
-    const currentELO = Object.values(chapterELOs)
-      .flat()
-      .find(elo => elo.id === eloId);
-    
+    // Find the specific ELO and its chapter
+    const currentELO = Object.values(chapterELOs).flat().find(elo => elo.id === eloId);
     if (!currentELO) return;
 
-    const updatedChapterELOs = { ...chapterELOs };
-    
+    const chapterId = Object.keys(chapterELOs).find(cId => 
+      chapterELOs[cId].some(elo => elo.id === eloId)
+    );
+    if (!chapterId) return;
+
+    const chapterLimit = chapterLimits[chapterId];
+    if (!chapterLimit) return;
+
     // Check limits before updating
     if (field === 'noOfItems' || field === 'marksPerItem') {
-      let totalItems = 0;
-      let totalMarks = 0;
+      // Calculate what the new chapter totals would be
+      let chapterTotalItems = 0;
+      let chapterTotalMarks = 0;
       
-      currentELO.itemConfigRows.forEach(row => {
-        if (row.id === rowId) {
-          const newNoOfItems = field === 'noOfItems' ? value : row.noOfItems;
-          const newMarksPerItem = field === 'marksPerItem' ? value : row.marksPerItem;
-          totalItems += newNoOfItems;
-          totalMarks += newNoOfItems * newMarksPerItem;
-        } else {
-          totalItems += row.noOfItems;
-          totalMarks += row.noOfItems * row.marksPerItem;
-        }
+      // Sum from all selected ELOs in this chapter
+      chapterELOs[chapterId].forEach(elo => {
+        if (!elo.selected) return;
+        
+        elo.itemConfigRows.forEach(row => {
+          if (elo.id === eloId && row.id === rowId) {
+            const newNoOfItems = field === 'noOfItems' ? value : row.noOfItems;
+            const newMarksPerItem = field === 'marksPerItem' ? value : row.marksPerItem;
+            chapterTotalItems += newNoOfItems;
+            chapterTotalMarks += newNoOfItems * newMarksPerItem;
+          } else {
+            chapterTotalItems += row.noOfItems;
+            chapterTotalMarks += row.noOfItems * row.marksPerItem;
+          }
+        });
       });
 
-      if (totalItems > currentELO.maxItems) {
+      if (chapterTotalItems > chapterLimit.maxItems) {
         toast({
-          title: "Item Limit Exceeded",
-          description: `Cannot exceed ELO limit of ${currentELO.maxItems} items`,
+          title: "Chapter Item Limit Exceeded",
+          description: `Cannot exceed chapter limit of ${chapterLimit.maxItems} items`,
           variant: "destructive"
         });
         return;
       }
 
-      if (totalMarks > currentELO.maxMarks) {
+      if (chapterTotalMarks > chapterLimit.maxMarks) {
         toast({
-          title: "Mark Limit Exceeded",
-          description: `Cannot exceed ELO limit of ${currentELO.maxMarks} marks`,
+          title: "Chapter Mark Limit Exceeded",
+          description: `Cannot exceed chapter limit of ${chapterLimit.maxMarks} marks`,
           variant: "destructive"
         });
         return;
       }
     }
+
+    const updatedChapterELOs = { ...chapterELOs };
 
     Object.keys(updatedChapterELOs).forEach(chapterId => {
       updatedChapterELOs[chapterId] = updatedChapterELOs[chapterId].map(elo =>
@@ -300,6 +323,33 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
 
   const getTotalCount = () => {
     return Object.values(chapterELOs).flat().length;
+  };
+
+  const calculateChapterTotals = (chapterId: string) => {
+    const chapterELOList = chapterELOs[chapterId] || [];
+    let totalItems = 0;
+    let totalMarks = 0;
+    
+    chapterELOList.forEach(elo => {
+      if (elo.selected) {
+        elo.itemConfigRows.forEach(row => {
+          totalItems += row.noOfItems;
+          totalMarks += row.noOfItems * row.marksPerItem;
+        });
+      }
+    });
+    
+    return { totalItems, totalMarks };
+  };
+
+  const updateChapterLimit = (chapterId: string, field: 'maxItems' | 'maxMarks', value: number) => {
+    setChapterLimits(prev => ({
+      ...prev,
+      [chapterId]: {
+        ...prev[chapterId],
+        [field]: value
+      }
+    }));
   };
 
   return (
@@ -366,24 +416,38 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                       <div className="flex items-center gap-6 bg-gradient-to-r from-blue-50 to-cyan-50 px-4 py-2 rounded-lg border border-blue-200/50">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold text-blue-800">No. of Items:</span>
-                          <Input
-                            type="number"
-                            min="1"
-                            defaultValue="10"
-                            onClick={(e) => e.stopPropagation()}
-                            className="h-8 w-20 border-blue-300 focus:border-blue-500 bg-white font-medium"
-                          />
+                          <div className="flex items-center gap-1">
+                            <span className="text-lg font-bold text-blue-900 min-w-[2rem] text-center">
+                              {calculateChapterTotals(chapter.chapterId).totalItems}
+                            </span>
+                            <span className="text-blue-600 text-sm">/</span>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={chapterLimits[chapter.chapterId]?.maxItems || 10}
+                              onChange={(e) => updateChapterLimit(chapter.chapterId, 'maxItems', parseInt(e.target.value) || 10)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="h-8 w-16 border-blue-300 focus:border-blue-500 bg-white font-medium text-center"
+                            />
+                          </div>
                         </div>
                         
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold text-blue-800">Total Marks:</span>
-                          <Input
-                            type="number"
-                            min="1"
-                            defaultValue="20"
-                            onClick={(e) => e.stopPropagation()}
-                            className="h-8 w-20 border-blue-300 focus:border-blue-500 bg-white font-medium"
-                          />
+                          <div className="flex items-center gap-1">
+                            <span className="text-lg font-bold text-blue-900 min-w-[2rem] text-center">
+                              {calculateChapterTotals(chapter.chapterId).totalMarks}
+                            </span>
+                            <span className="text-blue-600 text-sm">/</span>
+                            <Input
+                              type="number"
+                              min="1"
+                              value={chapterLimits[chapter.chapterId]?.maxMarks || 20}
+                              onChange={(e) => updateChapterLimit(chapter.chapterId, 'maxMarks', parseInt(e.target.value) || 20)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="h-8 w-16 border-blue-300 focus:border-blue-500 bg-white font-medium text-center"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
