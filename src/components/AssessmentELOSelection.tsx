@@ -354,11 +354,12 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                           
                           return (
                             <AccordionItem key={elo.id} value={elo.id} className="border rounded-lg mb-4">
-                              <AccordionTrigger 
-                                className="text-left px-4"
-                                onClick={() => handleELOSelection(elo, !elo.selected)}
-                              >
-                                <div className="flex items-center justify-between w-full">
+                              <div className="flex items-center justify-between p-4">
+                                <div className="flex items-center gap-3 flex-1">
+                                  <Checkbox
+                                    checked={elo.selected}
+                                    onCheckedChange={(checked) => handleELOSelection(elo, checked as boolean)}
+                                  />
                                   <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
                                       <h4 className="font-medium text-foreground">{elo.title}</h4>
@@ -374,45 +375,53 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                     </div>
                                     <p className="text-sm text-muted-foreground">{elo.description}</p>
                                   </div>
-                                  <div className="flex items-center gap-4 mr-4">
-                                    <Badge variant="outline">
+                                </div>
+                                
+                                <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-2">
+                                    <label className="text-sm font-medium">No. of Items:</label>
+                                    <Input
+                                      type="number"
+                                      min="1"
+                                      value={elo.maxItems}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        updateELOLimits(elo.id, 'maxItems', parseInt(e.target.value) || 10);
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="h-8 w-20"
+                                    />
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2">
+                                    <label className="text-sm font-medium">Total Marks:</label>
+                                    <Input
+                                      type="number"
+                                      min="1"
+                                      value={elo.maxMarks}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        updateELOLimits(elo.id, 'maxMarks', parseInt(e.target.value) || 20);
+                                      }}
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="h-8 w-20"
+                                    />
+                                  </div>
+                                  
+                                  <div className="flex items-center gap-2">
+                                    <Badge variant="outline" className="text-xs">
                                       {totalItems}/{elo.maxItems} items
                                     </Badge>
-                                    <Badge variant="outline">
+                                    <Badge variant="outline" className="text-xs">
                                       {totalMarks}/{elo.maxMarks} marks
                                     </Badge>
                                   </div>
+                                  
+                                  <AccordionTrigger className="w-6 h-6 p-0" />
                                 </div>
-                              </AccordionTrigger>
+                              </div>
                               <AccordionContent className="px-4 pb-4">
                                 <div className="space-y-4">
-                                  {/* ELO Limits */}
-                                  <div className="bg-muted/20 p-4 rounded-lg">
-                                    <h5 className="font-medium mb-3">ELO Limits</h5>
-                                    <div className="grid grid-cols-2 gap-4">
-                                      <div>
-                                        <label className="text-sm font-medium block mb-2">No. of Items</label>
-                                        <Input
-                                          type="number"
-                                          min="1"
-                                          value={elo.maxItems}
-                                          onChange={(e) => updateELOLimits(elo.id, 'maxItems', parseInt(e.target.value) || 10)}
-                                          className="h-9"
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-sm font-medium block mb-2">Total Marks</label>
-                                        <Input
-                                          type="number"
-                                          min="1"
-                                          value={elo.maxMarks}
-                                          onChange={(e) => updateELOLimits(elo.id, 'maxMarks', parseInt(e.target.value) || 20)}
-                                          className="h-9"
-                                        />
-                                      </div>
-                                    </div>
-                                  </div>
-
                                   {/* ELO Item Configuration Table */}
                                   <div className="border rounded-lg overflow-hidden">
                                     <div className="bg-muted/30 px-4 py-3 grid grid-cols-7 gap-4 font-medium text-sm">
