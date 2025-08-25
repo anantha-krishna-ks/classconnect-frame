@@ -480,14 +480,14 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                             className="h-9"
                                           />
 
-                                          <Button
-                                            variant="default"
-                                            size="sm"
-                                            onClick={() => addItemConfigRow(elo.id)}
-                                            className="h-9 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium px-3 rounded-lg hover-scale transition-all duration-200 shadow-md hover:shadow-lg"
-                                          >
-                                            <Plus className="h-4 w-4" />
-                                          </Button>
+                                            <Button
+                                              variant="default"
+                                              size="sm"
+                                              onClick={() => addItemConfigRow(elo.id)}
+                                              className="h-9 px-3"
+                                            >
+                                              <Plus className="h-4 w-4" />
+                                            </Button>
                                         </div>
                                       )}
                                       
@@ -574,14 +574,14 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                             >
                                               <Trash2 className="h-4 w-4 text-destructive" />
                                             </Button>
-                                            <Button
-                                              variant="default"
-                                              size="sm"
-                                              onClick={() => addItemConfigRow(elo.id)}
-                                              className="h-9 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium px-3 rounded-lg hover-scale transition-all duration-200 shadow-md hover:shadow-lg"
-                                            >
-                                              <Plus className="h-4 w-4" />
-                                            </Button>
+                                             <Button
+                                               variant="default"
+                                               size="sm"
+                                               onClick={() => addItemConfigRow(elo.id)}
+                                               className="h-9 px-3"
+                                             >
+                                               <Plus className="h-4 w-4" />
+                                             </Button>
                                           </div>
                                         </div>
                                       ))}
