@@ -339,10 +339,35 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                 <AccordionItem key={chapter.chapterId} value={chapter.chapterId}>
                   <AccordionTrigger className="text-left hover:no-underline">
                     <div className="flex items-center justify-between w-full pr-4">
-                      <span className="font-medium text-lg">{chapter.chapterName}</span>
-                      <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                        {chapterELOs[chapter.chapterId]?.filter(elo => elo.selected).length || 0} selected
-                      </Badge>
+                      <div className="flex items-center gap-4">
+                        <span className="font-medium text-lg">{chapter.chapterName}</span>
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                          {chapterELOs[chapter.chapterId]?.filter(elo => elo.selected).length || 0} selected
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm font-medium">No. of Items:</label>
+                          <Input
+                            type="number"
+                            min="1"
+                            defaultValue="10"
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-8 w-20"
+                          />
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <label className="text-sm font-medium">Total Marks:</label>
+                          <Input
+                            type="number"
+                            min="1"
+                            defaultValue="20"
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-8 w-20"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent>
@@ -378,38 +403,6 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                 </div>
                                 
                                 <div className="flex items-center gap-4">
-                                  <div className="flex items-center gap-2">
-                                    <label className="text-sm font-medium">No. of Items:</label>
-                                    <Input
-                                      type="number"
-                                      min="1"
-                                      value={elo.maxItems}
-                                      placeholder={`Current: ${totalItems}`}
-                                      onChange={(e) => {
-                                        e.stopPropagation();
-                                        updateELOLimits(elo.id, 'maxItems', parseInt(e.target.value) || 10);
-                                      }}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="h-8 w-20"
-                                    />
-                                  </div>
-                                  
-                                  <div className="flex items-center gap-2">
-                                    <label className="text-sm font-medium">Total Marks:</label>
-                                    <Input
-                                      type="number"
-                                      min="1"
-                                      value={elo.maxMarks}
-                                      placeholder={`Current: ${totalMarks}`}
-                                      onChange={(e) => {
-                                        e.stopPropagation();
-                                        updateELOLimits(elo.id, 'maxMarks', parseInt(e.target.value) || 20);
-                                      }}
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="h-8 w-20"
-                                    />
-                                  </div>
-                                  
                                   <AccordionTrigger className="w-6 h-6 p-0" />
                                 </div>
                               </div>
