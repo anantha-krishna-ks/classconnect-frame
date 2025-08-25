@@ -513,10 +513,10 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                   </div>
 
                                   <Button
-                                    variant="outline"
+                                    variant="default"
                                     size="sm"
                                     onClick={() => addItemConfigRow(elo.id)}
-                                    className="flex items-center gap-2"
+                                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-medium px-4 py-2 rounded-lg hover-scale transition-all duration-200 shadow-md hover:shadow-lg"
                                   >
                                     <Plus className="h-4 w-4" />
                                     Add Item Configuration
