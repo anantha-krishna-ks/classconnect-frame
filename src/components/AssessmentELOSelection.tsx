@@ -384,6 +384,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                       type="number"
                                       min="1"
                                       value={elo.maxItems}
+                                      placeholder={`Current: ${totalItems}`}
                                       onChange={(e) => {
                                         e.stopPropagation();
                                         updateELOLimits(elo.id, 'maxItems', parseInt(e.target.value) || 10);
@@ -399,6 +400,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                       type="number"
                                       min="1"
                                       value={elo.maxMarks}
+                                      placeholder={`Current: ${totalMarks}`}
                                       onChange={(e) => {
                                         e.stopPropagation();
                                         updateELOLimits(elo.id, 'maxMarks', parseInt(e.target.value) || 20);
@@ -406,15 +408,6 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                       onClick={(e) => e.stopPropagation()}
                                       className="h-8 w-20"
                                     />
-                                  </div>
-                                  
-                                  <div className="flex items-center gap-2">
-                                    <Badge variant="outline" className="text-xs">
-                                      {totalItems}/{elo.maxItems} items
-                                    </Badge>
-                                    <Badge variant="outline" className="text-xs">
-                                      {totalMarks}/{elo.maxMarks} marks
-                                    </Badge>
                                   </div>
                                   
                                   <AccordionTrigger className="w-6 h-6 p-0" />
