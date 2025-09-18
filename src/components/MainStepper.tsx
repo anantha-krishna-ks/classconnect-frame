@@ -11,7 +11,6 @@ import Assessment from './Assessment';
 import axios from 'axios';
 import { PageLoader } from "@/components/ui/loader"
 import LearningExperience from './LearningExperience';
-import FiveEDesigner from './FiveEDesigner';
 import config from '@/config';
 
 
@@ -208,9 +207,8 @@ const MainStepper = ({
     { number: 3, title: 'Expected Learning Outcomes', description: 'Define learning outcomes', icon: FileCheck },
     { number: 4, title: 'Objective Mapping', description: 'Connect objectives to outcomes', icon: Target },
     { number: 5, title: 'Assessment', description: 'Create assessment items for ELOs', icon: FileBarChart },
-    { number: 6, title: 'Learning Experience', description: 'Design learning activities', icon: Lightbulb },
-    { number: 7, title: '5E Model Design', description: 'Organize activities using 5E model', icon: Sparkles },
-    { number: 8, title: 'Review & Create', description: 'Finalize your lesson plan', icon: CheckCircle2 }
+    { number: 6, title: 'Learning Experience & 5E Model', description: 'Design learning activities using 5E model', icon: Lightbulb },
+    { number: 7, title: 'Review & Create', description: 'Finalize your lesson plan', icon: CheckCircle2 }
   ];
 
   const isStepCompleted = (stepNumber: number) => completedSteps.includes(stepNumber);
@@ -616,57 +614,17 @@ return (
                 setIsLearningExperienceGenerated(true);
                 markStepComplete(6);
               }}
-            />
-          </div>
-        </section>
-
-        {/* Section 7: 5E Model Design */}
-        <section 
-          ref={(el) => { if (el) sectionRefs.current[6] = el; }}
-          className="relative bg-gradient-to-br from-purple-50/50 to-white py-16"
-        >
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-200 to-transparent"></div>
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center space-y-6 mb-12">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-3xl flex items-center justify-center mx-auto shadow-lg shadow-purple-500/25">
-                <Lightbulb className="h-10 w-10 text-white drop-shadow-sm" />
-              </div>
-              <div className="space-y-2">
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-800 bg-clip-text text-transparent">
-                  5E Model Design
-                </h1>
-                <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-                  Organize learning activities using the 5E instructional model
-                </p>
-              </div>
-            </div>
-            
-            <FiveEDesigner 
-              elos={
-                Array.isArray(eloApiResponse)
-                  ? eloApiResponse.flatMap(co =>
-                      Array.isArray(co.elos)
-                        ? co.elos.map((elo: any) =>
-                            typeof elo === "string"
-                              ? elo
-                              : elo.elo // handle both string and object
-                          )
-                        : []
-                    )
-                  : []
-              }
               onFiveEChange={(data) => {
                 setFiveEData(data);
                 setIsFiveEGenerated(true);
-                markStepComplete(7);
               }}
             />
           </div>
         </section>
 
-        {/* Section 8: Review & Create - Enhanced */}
+        {/* Section 7: Review & Create - Enhanced */}
         <section 
-          ref={(el) => { if (el) sectionRefs.current[7] = el; }}
+          ref={(el) => { if (el) sectionRefs.current[6] = el; }}
           className="relative bg-gradient-to-br from-amber-50/50 via-yellow-50/30 to-white py-16"
         >
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent"></div>
@@ -771,7 +729,7 @@ return (
             <div className="flex justify-center mt-12">
               <Button
                 onClick={() => {
-                  markStepComplete(8);
+                  markStepComplete(7);
                   generateUnitPlan();
                 }}
                 disabled={!isLearningExperienceGenerated || !isFiveEGenerated}

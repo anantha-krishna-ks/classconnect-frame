@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { X, Brain } from 'lucide-react';
 import axios from 'axios';
 import config from '@/config';
+import FiveEDesigner from './FiveEDesigner';
 
 interface LearningExperienceProps {
   elos: string[];
@@ -19,6 +20,7 @@ interface LearningExperienceProps {
   chapter: string;
   courseOutcomes: any[]; // Accepts array of course outcomes with skills, factor, competencies, etc.
   onLearningExperienceChange: (data: any) => void;
+  onFiveEChange: (data: any) => void;
 }
 
 const LearningExperience: React.FC<LearningExperienceProps> = ({
@@ -28,7 +30,8 @@ const LearningExperience: React.FC<LearningExperienceProps> = ({
   subject = '',
   chapter = '',
   courseOutcomes = [],
-  onLearningExperienceChange
+  onLearningExperienceChange,
+  onFiveEChange
 }) => {
   const [selectedApproaches, setSelectedApproaches] = useState<string[]>([]);
   const [customSkills, setCustomSkills] = useState<string>('');
@@ -372,6 +375,25 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                 );
               })()}
             </Card>
+          </div>
+        )}
+
+        {/* 5E Model Design Section */}
+        {showLearningContent && learningExperience && (
+          <div className="mt-12">
+            <div className="mb-8">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-800 bg-clip-text text-transparent mb-2">
+                5E Model Design
+              </h3>
+              <p className="text-muted-foreground">
+                Organize your learning activities using the 5E instructional model
+              </p>
+            </div>
+            
+            <FiveEDesigner 
+              elos={elos}
+              onFiveEChange={onFiveEChange}
+            />
           </div>
         )}
       </div>
