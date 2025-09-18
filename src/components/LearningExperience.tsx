@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X, Brain } from 'lucide-react';
 import axios from 'axios';
 import config from '@/config';
@@ -31,6 +32,7 @@ const LearningExperience: React.FC<LearningExperienceProps> = ({
 }) => {
   const [selectedApproaches, setSelectedApproaches] = useState<string[]>([]);
   const [customSkills, setCustomSkills] = useState<string>('');
+  const [selectedLearningModel, setSelectedLearningModel] = useState<string>('5E');
   // Hardcode all intelligence types for Learning Experience intelligence integration
 const allIntelligenceTypes = [
   'Visual-spatial',
@@ -141,6 +143,33 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
       <div className="bg-gray-50 p-4 rounded-lg">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Learning Experience</h3>
         <p className="text-sm text-gray-600 mb-4">By default, all ELOs are selected</p>
+        
+        {/* Learning Model Selection */}
+        <div className="mb-6">
+          <h4 className="text-sm font-medium text-gray-700 mb-2">Select Learning Model</h4>
+          <Select value={selectedLearningModel} onValueChange={setSelectedLearningModel}>
+            <SelectTrigger className="w-full bg-white">
+              <SelectValue placeholder="Select a learning model" />
+            </SelectTrigger>
+            <SelectContent className="bg-white border shadow-lg z-50">
+              <SelectItem value="5-Part" disabled className="text-gray-400 cursor-not-allowed">
+                5-Part
+              </SelectItem>
+              <SelectItem value="4-Part" disabled className="text-gray-400 cursor-not-allowed">
+                4-Part
+              </SelectItem>
+              <SelectItem value="5E" className="cursor-pointer hover:bg-blue-50">
+                5E
+              </SelectItem>
+              <SelectItem value="Inquiry-Based" disabled className="text-gray-400 cursor-not-allowed">
+                Inquiry-Based
+              </SelectItem>
+              <SelectItem value="Universal design for Learning(UDL)" disabled className="text-gray-400 cursor-not-allowed">
+                Universal design for Learning(UDL)
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         
         <div className="flex justify-end mb-6">
           <Button
