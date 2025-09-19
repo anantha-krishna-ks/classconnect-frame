@@ -121,12 +121,12 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange 
         
         {elos.length > 0 ? (
           <Tabs value={activeELO} onValueChange={setActiveELO}>
-            <TabsList className="flex flex-wrap gap-2 bg-transparent p-0 mb-6 justify-start">
+            <TabsList className="inline-flex h-12 items-center justify-start rounded-none bg-white border-b border-gray-200 w-full p-0 mb-6">
               {elos.map((elo, index) => (
                 <TabsTrigger 
                   key={index} 
                   value={elo}
-                  className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 data-[state=active]:text-white rounded-full px-6 py-3 font-medium transition-all duration-200 shadow-sm hover:shadow-md border-0 min-w-fit"
+                  className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-all duration-200 rounded-none bg-transparent"
                 >
                   ELO {index + 1}
                 </TabsTrigger>
