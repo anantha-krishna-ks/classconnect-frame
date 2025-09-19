@@ -93,9 +93,12 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange 
   return (
     <div className="space-y-8">
       {/* Available 5E Steps for Dragging */}
-      <Card className="p-6 bg-white border-2 border-dashed border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Available 5E Steps</h3>
-        <p className="text-sm text-gray-600 mb-4">Drag and drop these steps into the ELO tabs below</p>
+      <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+        <h3 className="text-lg font-semibold text-blue-800 mb-2 flex items-center">
+          <GripVertical className="w-5 h-5 mr-2" />
+          Available 5E Steps
+        </h3>
+        <p className="text-sm text-blue-600 mb-4">Drag and drop these steps into the ELO tabs below to create your learning sequence</p>
         
         <div className="flex flex-wrap gap-3">
           {fiveESteps.map((step) => (
@@ -103,9 +106,9 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange 
               key={step.name}
               draggable
               onDragStart={(e) => handleDragStart(e, step)}
-              className={`${step.color} cursor-grab active:cursor-grabbing px-4 py-2 text-sm font-medium border-2 hover:shadow-md transition-shadow`}
+              className={`${step.color} cursor-grab active:cursor-grabbing px-5 py-3 text-sm font-semibold border-2 hover:shadow-lg hover:scale-105 transition-all duration-200 rounded-full flex items-center gap-2`}
             >
-              <GripVertical className="w-3 h-3 mr-1" />
+              <GripVertical className="w-4 h-4" />
               {step.name}
             </Badge>
           ))}
@@ -118,12 +121,12 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange 
         
         {elos.length > 0 ? (
           <Tabs value={activeELO} onValueChange={setActiveELO}>
-            <TabsList className="flex overflow-x-auto bg-muted/30 p-1 rounded-lg mb-6 gap-1">
+            <TabsList className="flex flex-wrap gap-2 bg-transparent p-0 mb-6 justify-start">
               {elos.map((elo, index) => (
                 <TabsTrigger 
                   key={index} 
                   value={elo}
-                  className="whitespace-nowrap px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm hover:bg-background/50 transition-all min-w-fit flex-shrink-0"
+                  className="bg-blue-500 text-white hover:bg-blue-600 data-[state=active]:bg-blue-700 data-[state=active]:text-white rounded-full px-6 py-3 font-medium transition-all duration-200 shadow-sm hover:shadow-md border-0 min-w-fit"
                 >
                   ELO {index + 1}
                 </TabsTrigger>
@@ -139,11 +142,14 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange 
 
                 {/* Drop Zone for 5E Steps */}
                 <div 
-                  className="min-h-[200px] border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50/50"
+                  className="min-h-[200px] border-2 border-dashed border-blue-300 rounded-xl p-6 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 hover:border-blue-400 hover:bg-blue-50/70 transition-all duration-200"
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, elo)}
                 >
-                  <h4 className="text-sm font-medium text-gray-700 mb-4">5E Learning Sequence</h4>
+                  <h4 className="text-sm font-semibold text-blue-700 mb-4 flex items-center">
+                    <Plus className="w-4 h-4 mr-2" />
+                    5E Learning Sequence
+                  </h4>
                   
                   {droppedSteps[elo] && droppedSteps[elo].length > 0 ? (
                     <div className="space-y-4">
