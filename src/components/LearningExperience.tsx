@@ -184,6 +184,25 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
           </Button>
         </div>
 
+        {/* 5E Model Design Section - Show after pedagogical approaches are generated */}
+        {selectedApproaches.length > 0 && (
+          <div className="mb-8">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-800 bg-clip-text text-transparent mb-2">
+                5E Model Design
+              </h3>
+              <p className="text-muted-foreground">
+                Organize your learning activities using the 5E instructional model
+              </p>
+            </div>
+            
+            <FiveEDesigner 
+              elos={elos}
+              onFiveEChange={onFiveEChange}
+            />
+          </div>
+        )}
+
         {/* Pedagogical Approaches Results */}
         {pedagogicalError && (
           <div className="text-red-500 mb-4">{pedagogicalError}</div>
@@ -378,24 +397,6 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
           </div>
         )}
 
-        {/* 5E Model Design Section */}
-        {showLearningContent && learningExperience && (
-          <div className="mt-12">
-            <div className="mb-8">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-800 bg-clip-text text-transparent mb-2">
-                5E Model Design
-              </h3>
-              <p className="text-muted-foreground">
-                Organize your learning activities using the 5E instructional model
-              </p>
-            </div>
-            
-            <FiveEDesigner 
-              elos={elos}
-              onFiveEChange={onFiveEChange}
-            />
-          </div>
-        )}
       </div>
     </div>
   );
