@@ -199,6 +199,7 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
             <FiveEDesigner 
               elos={elos}
               onFiveEChange={onFiveEChange}
+              pedagogicalApproaches={selectedApproaches}
             />
           </div>
         )}

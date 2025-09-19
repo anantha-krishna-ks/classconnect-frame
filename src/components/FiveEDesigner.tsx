@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { GripVertical, Plus, X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { GripVertical, Plus, X, Merge } from 'lucide-react';
 
 interface FiveEDesignerProps {
   elos: string[];
   onFiveEChange: (data: any) => void;
+  pedagogicalApproaches?: string[];
 }
 
 interface FiveEStep {
@@ -26,14 +28,37 @@ const fiveESteps: FiveEStep[] = [
   { id: 'evaluate', name: 'Evaluate', description: '', color: 'bg-purple-100 text-purple-800 border-purple-200' },
 ];
 
-const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange }) => {
+const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange, pedagogicalApproaches = [] }) => {
   const [activeELO, setActiveELO] = useState<string>(elos[0] || '');
   const [droppedSteps, setDroppedSteps] = useState<{[key: string]: FiveEStep[]}>({});
   const [stepDescriptions, setStepDescriptions] = useState<{[key: string]: {[stepId: string]: string}}>({});
   const [draggedStep, setDraggedStep] = useState<FiveEStep | null>(null);
+  const [draggedApproach, setDraggedApproach] = useState<string | null>(null);
+  const [selectedELOsToMerge, setSelectedELOsToMerge] = useState<string[]>([]);
+  
+  // Pre-populate all 5E steps for each ELO on mount
+  useEffect(() => {
+    if (elos.length > 0 && Object.keys(droppedSteps).length === 0) {
+      const initialSteps: {[key: string]: FiveEStep[]} = {};
+      elos.forEach(elo => {
+        initialSteps[elo] = fiveESteps.map((step, index) => ({
+          ...step,
+          id: `${step.id}_${elo}_${index}`
+        }));
+      });
+      setDroppedSteps(initialSteps);
+    }
+  }, [elos]);
 
   const handleDragStart = (e: React.DragEvent, step: FiveEStep) => {
     setDraggedStep(step);
+    setDraggedApproach(null);
+    e.dataTransfer.effectAllowed = 'copy';
+  };
+
+  const handleApproachDragStart = (e: React.DragEvent, approach: string) => {
+    setDraggedApproach(approach);
+    setDraggedStep(null);
     e.dataTransfer.effectAllowed = 'copy';
   };
 
@@ -52,6 +77,17 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange 
       [eloIndex]: [...(prev[eloIndex] || []), newStep]
     }));
     setDraggedStep(null);
+  };
+
+  const handleApproachDropOnTextarea = (e: React.DragEvent, eloIndex: string, stepId: string) => {
+    e.preventDefault();
+    if (!draggedApproach) return;
+
+    const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
+    const newDescription = currentDescription ? `${currentDescription}\n• ${draggedApproach}` : `• ${draggedApproach}`;
+    
+    updateStepDescription(eloIndex, stepId, newDescription);
+    setDraggedApproach(null);
   };
 
   const removeStep = (eloIndex: string, stepId: string) => {
@@ -79,8 +115,55 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange 
     }));
   };
 
+  const mergeELOs = () => {
+    if (selectedELOsToMerge.length < 2) return;
+    
+    const mergedELOText = selectedELOsToMerge.join(' + ');
+    
+    // Merge the steps and descriptions
+    const mergedSteps: FiveEStep[] = [];
+    const mergedDescriptions: {[stepId: string]: string} = {};
+    
+    selectedELOsToMerge.forEach(elo => {
+      const eloSteps = droppedSteps[elo] || [];
+      eloSteps.forEach(step => {
+        const existingStep = mergedSteps.find(s => s.name === step.name);
+        if (existingStep) {
+          const existingDesc = mergedDescriptions[existingStep.id] || '';
+          const newDesc = stepDescriptions[elo]?.[step.id] || '';
+          if (newDesc) {
+            mergedDescriptions[existingStep.id] = existingDesc ? `${existingDesc}\n\n${newDesc}` : newDesc;
+          }
+        } else {
+          const newStep = { ...step, id: `${step.id}_merged_${Date.now()}` };
+          mergedSteps.push(newStep);
+          mergedDescriptions[newStep.id] = stepDescriptions[elo]?.[step.id] || '';
+        }
+      });
+    });
+    
+    // Update state with merged data
+    const newDroppedSteps = { ...droppedSteps };
+    const newStepDescriptions = { ...stepDescriptions };
+    
+    selectedELOsToMerge.forEach(elo => {
+      delete newDroppedSteps[elo];
+      delete newStepDescriptions[elo];
+    });
+    
+    newDroppedSteps[mergedELOText] = mergedSteps;
+    newStepDescriptions[mergedELOText] = mergedDescriptions;
+    
+    setDroppedSteps(newDroppedSteps);
+    setStepDescriptions(newStepDescriptions);
+    setSelectedELOsToMerge([]);
+    setActiveELO(mergedELOText);
+  };
+
   const saveFiveEData = () => {
-    const fiveEData = elos.map(elo => ({
+    // Use the keys from droppedSteps which represent the current ELOs (including merged ones)
+    const currentELOs = Object.keys(droppedSteps);
+    const fiveEData = currentELOs.map(elo => ({
       elo,
       steps: (droppedSteps[elo] || []).map(step => ({
         ...step,
@@ -115,9 +198,91 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange 
         </div>
       </Card>
 
+      {/* Pedagogical Approaches for Dragging */}
+      {pedagogicalApproaches.length > 0 && (
+        <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200">
+          <h3 className="text-lg font-semibold text-green-800 mb-2 flex items-center">
+            <GripVertical className="w-5 h-5 mr-2" />
+            Pedagogical Approaches
+          </h3>
+          <p className="text-sm text-green-600 mb-4">Drag and drop these approaches into the activity description areas</p>
+          
+          <div className="flex flex-wrap gap-3">
+            {pedagogicalApproaches.map((approach, index) => (
+              <Badge
+                key={index}
+                draggable
+                onDragStart={(e) => handleApproachDragStart(e, approach)}
+                className="bg-green-100 text-green-800 border-green-200 cursor-grab active:cursor-grabbing px-5 py-3 text-sm font-semibold border-2 hover:shadow-lg hover:scale-105 transition-all duration-200 rounded-full flex items-center gap-2"
+              >
+                <GripVertical className="w-4 h-4" />
+                {approach}
+              </Badge>
+            ))}
+          </div>
+        </Card>
+      )}
+
       {/* ELO Tabs with Drop Zones */}
       <Card className="p-6 bg-white border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">5E Model Design by ELO</h3>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-gray-800">5E Model Design by ELO</h3>
+          
+          {/* Merge ELOs Dropdown */}
+          {elos.length > 1 && (
+            <div className="flex items-center gap-3">
+              <Select value="" onValueChange={(value) => {
+                if (value && !selectedELOsToMerge.includes(value)) {
+                  setSelectedELOsToMerge([...selectedELOsToMerge, value]);
+                }
+              }}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Select ELOs to merge" />
+                </SelectTrigger>
+                <SelectContent>
+                  {elos.map((elo, index) => (
+                    <SelectItem key={index} value={elo} disabled={selectedELOsToMerge.includes(elo)}>
+                      ELO {index + 1}: {elo.substring(0, 50)}...
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              {selectedELOsToMerge.length > 1 && (
+                <Button
+                  onClick={mergeELOs}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Merge className="w-4 h-4" />
+                  Merge ({selectedELOsToMerge.length})
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {selectedELOsToMerge.length > 0 && (
+          <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-700 mb-2">Selected ELOs for merging:</p>
+            <div className="flex flex-wrap gap-2">
+              {selectedELOsToMerge.map((elo, index) => (
+                <Badge key={index} variant="outline" className="text-xs">
+                  ELO {elos.findIndex(e => e === elo) + 1}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedELOsToMerge(selectedELOsToMerge.filter(e => e !== elo))}
+                    className="ml-1 h-auto p-0 text-red-500 hover:text-red-700"
+                  >
+                    <X className="w-3 h-3" />
+                  </Button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
         
         {elos.length > 0 ? (
           <Tabs value={activeELO} onValueChange={setActiveELO}>
@@ -169,12 +334,23 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange 
                             </Button>
                           </div>
                           
-                          <Textarea
-                            placeholder={`Describe the ${step.name} activities for this ELO...`}
-                            value={stepDescriptions[elo]?.[step.id] || ''}
-                            onChange={(e) => updateStepDescription(elo, step.id, e.target.value)}
-                            className="min-h-[100px] resize-none"
-                          />
+                           <div
+                             className="relative"
+                             onDragOver={handleDragOver}
+                             onDrop={(e) => handleApproachDropOnTextarea(e, elo, step.id)}
+                           >
+                             <Textarea
+                               placeholder={`Describe the ${step.name} activities for this ELO... (You can also drag pedagogical approaches here)`}
+                               value={stepDescriptions[elo]?.[step.id] || ''}
+                               onChange={(e) => updateStepDescription(elo, step.id, e.target.value)}
+                               className="min-h-[100px] resize-none border-dashed border-2 border-gray-300 hover:border-green-400 transition-colors duration-200"
+                             />
+                             {draggedApproach && (
+                               <div className="absolute inset-0 bg-green-50 bg-opacity-75 border-2 border-green-400 border-dashed rounded-md flex items-center justify-center pointer-events-none">
+                                 <p className="text-green-700 font-medium">Drop pedagogical approach here</p>
+                               </div>
+                             )}
+                           </div>
                         </Card>
                       ))}
                     </div>
