@@ -5,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { GripVertical, Plus, X, Merge } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { GripVertical, Plus, X, Merge, ChevronDown } from 'lucide-react';
 
 interface FiveEDesignerProps {
   elos: string[];
@@ -33,7 +34,6 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [droppedSteps, setDroppedSteps] = useState<{[key: string]: FiveEStep[]}>({});
   const [stepDescriptions, setStepDescriptions] = useState<{[key: string]: {[stepId: string]: string}}>({});
   const [draggedStep, setDraggedStep] = useState<FiveEStep | null>(null);
-  const [draggedApproach, setDraggedApproach] = useState<string | null>(null);
   const [selectedELOsToMerge, setSelectedELOsToMerge] = useState<string[]>([]);
   
   // Pre-populate all 5E steps for each ELO on mount
@@ -52,13 +52,6 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
 
   const handleDragStart = (e: React.DragEvent, step: FiveEStep) => {
     setDraggedStep(step);
-    setDraggedApproach(null);
-    e.dataTransfer.effectAllowed = 'copy';
-  };
-
-  const handleApproachDragStart = (e: React.DragEvent, approach: string) => {
-    setDraggedApproach(approach);
-    setDraggedStep(null);
     e.dataTransfer.effectAllowed = 'copy';
   };
 
@@ -79,15 +72,10 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     setDraggedStep(null);
   };
 
-  const handleApproachDropOnTextarea = (e: React.DragEvent, eloIndex: string, stepId: string) => {
-    e.preventDefault();
-    if (!draggedApproach) return;
-
+  const addApproachToDescription = (eloIndex: string, stepId: string, approach: string) => {
     const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
-    const newDescription = currentDescription ? `${currentDescription}\n• ${draggedApproach}` : `• ${draggedApproach}`;
-    
+    const newDescription = currentDescription ? `${currentDescription}\n• ${approach}` : `• ${approach}`;
     updateStepDescription(eloIndex, stepId, newDescription);
-    setDraggedApproach(null);
   };
 
   const removeStep = (eloIndex: string, stepId: string) => {
@@ -198,24 +186,21 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
         </div>
       </Card>
 
-      {/* Pedagogical Approaches for Dragging */}
+      {/* Pedagogical Approaches Reference */}
       {pedagogicalApproaches.length > 0 && (
         <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200">
           <h3 className="text-lg font-semibold text-green-800 mb-2 flex items-center">
-            <GripVertical className="w-5 h-5 mr-2" />
-            Pedagogical Approaches
+            <Plus className="w-5 h-5 mr-2" />
+            Available Pedagogical Approaches
           </h3>
-          <p className="text-sm text-green-600 mb-4">Drag and drop these approaches into the activity description areas</p>
+          <p className="text-sm text-green-600 mb-4">Use the "Add Approach" buttons next to each activity description to include these approaches</p>
           
           <div className="flex flex-wrap gap-3">
             {pedagogicalApproaches.map((approach, index) => (
               <Badge
                 key={index}
-                draggable
-                onDragStart={(e) => handleApproachDragStart(e, approach)}
-                className="bg-green-100 text-green-800 border-green-200 cursor-grab active:cursor-grabbing px-5 py-3 text-sm font-semibold border-2 hover:shadow-lg hover:scale-105 transition-all duration-200 rounded-full flex items-center gap-2"
+                className="bg-green-100 text-green-800 border-green-200 px-4 py-2 text-sm font-medium border hover:bg-green-200 transition-colors duration-200 rounded-full"
               >
-                <GripVertical className="w-4 h-4" />
                 {approach}
               </Badge>
             ))}
@@ -334,22 +319,44 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
                             </Button>
                           </div>
                           
-                           <div
-                             className="relative"
-                             onDragOver={handleDragOver}
-                             onDrop={(e) => handleApproachDropOnTextarea(e, elo, step.id)}
-                           >
+                           <div className="space-y-2">
+                             <div className="flex items-center justify-between">
+                               <label className="text-sm font-medium text-gray-700">Activity Description</label>
+                               {pedagogicalApproaches.length > 0 && (
+                                 <Popover>
+                                   <PopoverTrigger asChild>
+                                     <Button variant="outline" size="sm" className="text-xs">
+                                       <Plus className="w-3 h-3 mr-1" />
+                                       Add Approach
+                                       <ChevronDown className="w-3 h-3 ml-1" />
+                                     </Button>
+                                   </PopoverTrigger>
+                                   <PopoverContent className="w-80 p-0" align="end">
+                                     <div className="p-3 border-b">
+                                       <h4 className="font-medium text-sm text-gray-900">Select Pedagogical Approach</h4>
+                                       <p className="text-xs text-gray-500 mt-1">Click to add to the description</p>
+                                     </div>
+                                     <div className="max-h-60 overflow-y-auto">
+                                       {pedagogicalApproaches.map((approach, index) => (
+                                         <button
+                                           key={index}
+                                           onClick={() => addApproachToDescription(elo, step.id, approach)}
+                                           className="w-full text-left px-3 py-2 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 last:border-b-0"
+                                         >
+                                           {approach}
+                                         </button>
+                                       ))}
+                                     </div>
+                                   </PopoverContent>
+                                 </Popover>
+                               )}
+                             </div>
                              <Textarea
-                               placeholder={`Describe the ${step.name} activities for this ELO... (You can also drag pedagogical approaches here)`}
+                               placeholder={`Describe the ${step.name} activities for this ELO...`}
                                value={stepDescriptions[elo]?.[step.id] || ''}
                                onChange={(e) => updateStepDescription(elo, step.id, e.target.value)}
-                               className="min-h-[100px] resize-none border-dashed border-2 border-gray-300 hover:border-green-400 transition-colors duration-200"
+                               className="min-h-[100px] resize-none"
                              />
-                             {draggedApproach && (
-                               <div className="absolute inset-0 bg-green-50 bg-opacity-75 border-2 border-green-400 border-dashed rounded-md flex items-center justify-center pointer-events-none">
-                                 <p className="text-green-700 font-medium">Drop pedagogical approach here</p>
-                               </div>
-                             )}
                            </div>
                         </Card>
                       ))}
