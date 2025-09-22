@@ -186,27 +186,6 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
         </div>
       </Card>
 
-      {/* Pedagogical Approaches Reference */}
-      {pedagogicalApproaches.length > 0 && (
-        <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200">
-          <h3 className="text-lg font-semibold text-green-800 mb-2 flex items-center">
-            <Plus className="w-5 h-5 mr-2" />
-            Available Pedagogical Approaches
-          </h3>
-          <p className="text-sm text-green-600 mb-4">Use the "Add Approach" buttons next to each activity description to include these approaches</p>
-          
-          <div className="flex flex-wrap gap-3">
-            {pedagogicalApproaches.map((approach, index) => (
-              <Badge
-                key={index}
-                className="bg-green-100 text-green-800 border-green-200 px-4 py-2 text-sm font-medium border hover:bg-green-200 transition-colors duration-200 rounded-full"
-              >
-                {approach}
-              </Badge>
-            ))}
-          </div>
-        </Card>
-      )}
 
       {/* ELO Tabs with Drop Zones */}
       <Card className="p-6 bg-white border border-gray-200">
