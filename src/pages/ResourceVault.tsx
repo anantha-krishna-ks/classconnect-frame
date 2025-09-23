@@ -313,9 +313,9 @@ const ResourceVault = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
       {/* Main Header */}
-      <header className="border-b border-gray-100 px-6 py-3" style={{ backgroundColor: '#3B54A5' }}>
+      <header className="border-b border-gray-100 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <img 
             src="/lovable-uploads/c278e3c9-20de-45b8-a466-41c546111a8a.png" 
@@ -327,7 +327,7 @@ const ResourceVault = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-white hover:bg-white/20 hover:text-white border border-white/20 hover:border-white/40 transition-all duration-200"
+                className="text-white hover:bg-white/20 hover:text-white border border-white/20 hover:border-white/40 transition-all duration-300 hover:scale-105"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout
@@ -352,25 +352,25 @@ const ResourceVault = () => {
       </header>
 
       {/* Breadcrumbs Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+      <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <nav className="flex items-center space-x-2 text-sm text-gray-500">
             <Home className="w-4 h-4" />
             <span className="mx-2">/</span>
             <button 
               onClick={handleBack}
-              className="text-blue-600 hover:text-blue-800 font-medium"
+              className="text-purple-600 hover:text-purple-800 font-medium transition-colors duration-200 hover:underline"
             >
               Student Dashboard
             </button>
             <span className="mx-2">/</span>
-            <span className="text-blue-600 font-medium">Resource Vault</span>
+            <span className="text-purple-600 font-medium">Resource Vault</span>
           </nav>
           <Button
             variant="outline"
             size="sm"
             onClick={handleBack}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 hover:bg-purple-50 hover:border-purple-200 transition-all duration-200"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
@@ -378,41 +378,47 @@ const ResourceVault = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 bg-gray-50/50">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Page Header */}
-        <div className="mb-8">
+        <div className="mb-8 animate-fade-in">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-white" />
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300">
+              <BookOpen className="w-8 h-8 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Resource Vault</h1>
-              <p className="text-gray-600">Access all your study materials and get help with any concept</p>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Resource Vault
+              </h1>
+              <p className="text-gray-600 text-lg">Access all your study materials and get help with any concept</p>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Resource Finder */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Find Resources by Subject & Chapter</CardTitle>
-              <CardDescription>
-                Select your subject and chapter to access relevant study materials
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Subject</label>
+          <Card className="overflow-hidden border-0 shadow-xl bg-white/70 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 animate-fade-in">
+            <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 p-1">
+              <CardHeader className="bg-white/80 backdrop-blur-sm">
+                <CardTitle className="text-2xl bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  Find Resources by Subject & Chapter
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  Select your subject and chapter to access relevant study materials
+                </CardDescription>
+              </CardHeader>
+            </div>
+            <CardContent className="space-y-6 p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-700">Subject</label>
                   <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-purple-300 focus:border-purple-500 transition-colors duration-200">
                       <SelectValue placeholder="Select a subject" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-2 border-gray-200 shadow-xl">
                       {subjects.map((subject) => (
-                        <SelectItem key={subject.id} value={subject.id}>
+                        <SelectItem key={subject.id} value={subject.id} className="hover:bg-purple-50 transition-colors duration-200">
                           {subject.name}
                         </SelectItem>
                       ))}
@@ -420,19 +426,19 @@ const ResourceVault = () => {
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Chapter</label>
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-700">Chapter</label>
                   <Select 
                     value={selectedChapter} 
                     onValueChange={setSelectedChapter}
                     disabled={!selectedSubject}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 border-2 border-gray-200 hover:border-purple-300 focus:border-purple-500 transition-colors duration-200">
                       <SelectValue placeholder="Select a chapter" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white border-2 border-gray-200 shadow-xl">
                       {selectedSubject && chapters[selectedSubject as keyof typeof chapters]?.map((chapter) => (
-                        <SelectItem key={chapter.id} value={chapter.id}>
+                        <SelectItem key={chapter.id} value={chapter.id} className="hover:bg-purple-50 transition-colors duration-200">
                           {chapter.name}
                         </SelectItem>
                       ))}
@@ -444,31 +450,40 @@ const ResourceVault = () => {
               <Button 
                 onClick={handleProvideResources}
                 disabled={!selectedSubject || !selectedChapter}
-                className="w-full bg-purple-500 hover:bg-purple-600"
+                className="w-full h-12 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
               >
+                <BookOpen className="w-5 h-5 mr-2" />
                 Provide Resources
               </Button>
             </CardContent>
           </Card>
 
           {/* Search by Topic */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Search by Concept or Topic</CardTitle>
-              <CardDescription>
-                Type any specific concept or phrase to find related resources
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
+          <Card className="overflow-hidden border-0 shadow-xl bg-white/70 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 animate-fade-in">
+            <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 p-1">
+              <CardHeader className="bg-white/80 backdrop-blur-sm">
+                <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  Search by Concept or Topic
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  Type any specific concept or phrase to find related resources
+                </CardDescription>
+              </CardHeader>
+            </div>
+            <CardContent className="p-8">
+              <div className="flex gap-3">
                 <Input
                   placeholder="Enter a concept, topic, or phrase..."
                   value={searchTopic}
                   onChange={(e) => setSearchTopic(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleTopicSearch()}
+                  className="h-12 border-2 border-gray-200 hover:border-blue-300 focus:border-blue-500 transition-colors duration-200"
                 />
-                <Button onClick={handleTopicSearch} className="bg-purple-500 hover:bg-purple-600">
-                  <Search className="w-4 h-4" />
+                <Button 
+                  onClick={handleTopicSearch} 
+                  className="h-12 px-6 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+                >
+                  <Search className="w-5 h-5" />
                 </Button>
               </div>
             </CardContent>
@@ -477,35 +492,51 @@ const ResourceVault = () => {
 
         {/* Resources Display */}
         {resources.length > 0 && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Available Resources</CardTitle>
-              <CardDescription>
-                Found {resources.length} resources for your selection
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {resources.map((resource) => {
+          <Card className="mt-8 overflow-hidden border-0 shadow-xl bg-white/70 backdrop-blur-sm animate-fade-in">
+            <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-1">
+              <CardHeader className="bg-white/80 backdrop-blur-sm">
+                <CardTitle className="text-2xl bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                  Available Resources
+                </CardTitle>
+                <CardDescription className="text-gray-600">
+                  Found {resources.length} resources for your selection
+                </CardDescription>
+              </CardHeader>
+            </div>
+            <CardContent className="p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {resources.map((resource, index) => {
                   const IconComponent = getResourceIcon(resource.type);
                   return (
                     <div 
                       key={resource.id} 
-                      className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                      className="group border-2 border-gray-100 rounded-2xl p-6 hover:shadow-xl hover:border-purple-200 transition-all duration-300 cursor-pointer bg-gradient-to-br from-white to-gray-50/50 hover:scale-105 animate-fade-in"
+                      style={{ animationDelay: `${index * 100}ms` }}
                       onClick={() => setSelectedResource(resource)}
                     >
-                      <div className="flex items-start gap-3 mb-3">
-                        <IconComponent className="w-5 h-5 text-purple-500 mt-1" />
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">{resource.title}</h4>
-                          <p className="text-sm text-gray-600 mt-1">{resource.description}</p>
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <IconComponent className="w-6 h-6 text-purple-600" />
                         </div>
-                        <Badge variant="secondary">{resource.type}</Badge>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors duration-200">
+                            {resource.title}
+                          </h4>
+                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{resource.description}</p>
+                        </div>
+                        <Badge variant="secondary" className="bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors duration-200">
+                          {resource.type}
+                        </Badge>
                       </div>
-                      <Button variant="outline" size="sm" className="w-full" onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedResource(resource);
-                      }}>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full border-2 border-purple-200 text-purple-600 hover:bg-purple-50 hover:border-purple-300 transition-all duration-200" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedResource(resource);
+                        }}
+                      >
                         <Download className="w-4 h-4 mr-2" />
                         View Details
                       </Button>
@@ -624,10 +655,10 @@ const ResourceVault = () => {
       <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
         <SheetTrigger asChild>
           <Button
-            className="fixed bottom-6 right-6 rounded-full w-14 h-14 bg-purple-500 hover:bg-purple-600 shadow-lg"
+            className="fixed bottom-6 right-6 rounded-full w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 shadow-2xl hover:shadow-purple-500/25 transform hover:scale-110 transition-all duration-300"
             size="icon"
           >
-            <MessageSquare className="w-6 h-6 text-white" />
+            <MessageSquare className="w-7 h-7 text-white" />
           </Button>
         </SheetTrigger>
         <SheetContent className="w-full sm:max-w-lg flex flex-col h-screen">
