@@ -1457,69 +1457,86 @@ Students use the story framework to reflect on:
             </Badge>
           </div>
           
-          <div className="space-y-4">
-            {Object.entries(generatedContentData).map(([stepKey, content]) => {
-              const [eloIndex, stepId] = stepKey.split('_');
-              const step = fiveESteps.find(s => s.id === stepId);
-              if (!step) return null;
-              
-              return (
-                <Card key={stepKey} className="border border-emerald-200 bg-white/70 backdrop-blur-sm">
-                  <div className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        <Badge className={step.color + " font-medium"}>
-                          {step.name}
-                        </Badge>
-                        <span className="text-sm font-medium text-gray-600">
-                          ELO: {eloIndex}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => editGeneratedContent(stepKey)}
-                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
-                        >
-                          <Edit3 className="w-4 h-4 mr-1" />
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => deleteGeneratedContent(stepKey)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
+          <div className="space-y-6">
+            {/* Group generated content by ELO */}
+            {Object.entries(
+              Object.entries(generatedContentData).reduce((acc, [stepKey, content]) => {
+                const [eloIndex, stepId] = stepKey.split('_');
+                if (!acc[eloIndex]) acc[eloIndex] = [];
+                acc[eloIndex].push({ stepKey, content, stepId });
+                return acc;
+              }, {} as Record<string, Array<{ stepKey: string; content: string; stepId: string }>>)
+            ).map(([eloIndex, eloContent]) => (
+              <div key={eloIndex} className="space-y-4">
+                {/* ELO Header */}
+                <div className="bg-emerald-100 p-3 rounded-lg border border-emerald-200">
+                  <h4 className="font-medium text-emerald-800">ELO: {eloIndex}</h4>
+                  <p className="text-sm text-emerald-600 mt-1">{eloContent.length} content item(s) generated</p>
+                </div>
+                
+                {/* Content items for this ELO */}
+                <div className="space-y-3 ml-4">
+                  {eloContent.map(({ stepKey, content, stepId }) => {
+                    const step = fiveESteps.find(s => s.id === stepId);
+                    if (!step) return null;
                     
-                    <div className="bg-white rounded-lg border border-gray-200 p-4 max-h-64 overflow-y-auto">
-                      <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
-                        {content.length > 500 ? (
-                          <div>
-                            {content.substring(0, 500)}...
-                            <div className="mt-2 text-xs text-gray-500">
-                              Content truncated. Click Edit to see full content.
+                    return (
+                      <Card key={stepKey} className="border border-emerald-200 bg-white/70 backdrop-blur-sm">
+                        <div className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center space-x-3">
+                              <Badge className={step.color + " font-medium"}>
+                                {step.name}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => editGeneratedContent(stepKey)}
+                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
+                              >
+                                <Edit3 className="w-4 h-4 mr-1" />
+                                Edit
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => deleteGeneratedContent(stepKey)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                              >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Delete
+                              </Button>
                             </div>
                           </div>
-                        ) : (
-                          content
-                        )}
-                      </pre>
-                    </div>
-                    
-                    <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
-                      <span>Generated content for {step.name} phase</span>
-                      <span>{content.length} characters</span>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
+                          
+                          <div className="bg-white rounded-lg border border-gray-200 p-4 max-h-64 overflow-y-auto">
+                            <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
+                              {content.length > 500 ? (
+                                <div>
+                                  {content.substring(0, 500)}...
+                                  <div className="mt-2 text-xs text-gray-500">
+                                    Content truncated. Click Edit to see full content.
+                                  </div>
+                                </div>
+                              ) : (
+                                content
+                              )}
+                            </pre>
+                          </div>
+                          
+                          <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+                            <span>Generated content for {step.name} phase</span>
+                            <span>{content.length} characters</span>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
           
           <div className="mt-6 p-4 bg-white/50 rounded-lg border border-emerald-200">
