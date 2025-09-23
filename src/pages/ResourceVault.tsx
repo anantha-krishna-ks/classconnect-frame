@@ -51,6 +51,7 @@ const ResourceVault = () => {
   const [searchTopic, setSearchTopic] = useState('');
   const [chatMessage, setChatMessage] = useState('');
   const [showStudyPal, setShowStudyPal] = useState(false);
+  const [selectedResource, setSelectedResource] = useState<any>(null);
   const [resources, setResources] = useState<any[]>([]);
   const [chatHistory, setChatHistory] = useState<any[]>([]);
 
@@ -90,39 +91,101 @@ const ResourceVault = () => {
     ]
   };
 
-  // Mock resources data
+  // Mock resources data with detailed content
   const mockResources = [
     {
       id: 1,
-      title: 'NCERT Mathematics Textbook',
+      title: 'NCERT Mathematics Textbook - Chapter 1: Real Numbers',
       type: 'PDF',
       description: 'Official NCERT textbook for Class 10 Mathematics',
       icon: FileText,
-      link: '#'
+      link: '#',
+      content: {
+        summary: 'This chapter introduces the concept of real numbers, including rational and irrational numbers, their decimal expansions, and fundamental properties.',
+        keyTopics: [
+          'Euclid\'s Division Lemma',
+          'The Fundamental Theorem of Arithmetic',
+          'Revisiting Irrational Numbers',
+          'Revisiting Rational Numbers and Their Decimal Expansions'
+        ],
+        examples: [
+          'Finding HCF and LCM using prime factorization',
+          'Proving √2 is irrational',
+          'Decimal expansion of rational numbers'
+        ],
+        exercises: '1.1 to 1.4 with solutions',
+        difficulty: 'Intermediate'
+      }
     },
     {
       id: 2,
-      title: 'Khan Academy - Algebra Basics',
+      title: 'Khan Academy - Algebra Basics: Linear Equations',
       type: 'Video',
       description: 'Comprehensive video series on algebra fundamentals',
       icon: Video,
-      link: '#'
+      link: '#',
+      content: {
+        summary: 'Master the fundamentals of linear equations through step-by-step video explanations and practice problems.',
+        keyTopics: [
+          'What is a linear equation?',
+          'Solving one-step equations',
+          'Solving multi-step equations',
+          'Equations with variables on both sides'
+        ],
+        duration: '2 hours 15 minutes',
+        exercises: '25 practice problems with instant feedback',
+        difficulty: 'Beginner to Intermediate',
+        transcript: 'Full transcript available with timestamps'
+      }
     },
     {
       id: 3,
-      title: 'RD Sharma Solutions',
+      title: 'RD Sharma Solutions - Quadratic Equations',
       type: 'PDF',
       description: 'Step-by-step solutions for RD Sharma problems',
       icon: FileText,
-      link: '#'
+      link: '#',
+      content: {
+        summary: 'Complete solutions manual for RD Sharma\'s Quadratic Equations chapter with detailed explanations.',
+        keyTopics: [
+          'Introduction to Quadratic Equations',
+          'Solution of Quadratic Equations by Factorisation',
+          'Solution of Quadratic Equations by Completing the Square',
+          'Nature of Roots'
+        ],
+        examples: [
+          '150+ solved problems',
+          'Multiple solution methods for each problem',
+          'Conceptual explanations for each step'
+        ],
+        exercises: 'Exercise 8.1 to 8.6 fully solved',
+        difficulty: 'Intermediate to Advanced'
+      }
     },
     {
       id: 4,
-      title: 'Interactive Geometry Tool',
+      title: 'Interactive Geometry Tool - Circle Properties',
       type: 'Link',
       description: 'Online tool for geometric constructions and visualizations',
       icon: ExternalLink,
-      link: '#'
+      link: '#',
+      content: {
+        summary: 'Interactive web application to explore circle properties, construct geometric figures, and visualize theorems.',
+        keyTopics: [
+          'Circle construction and properties',
+          'Tangent and chord relationships',
+          'Angle theorems in circles',
+          'Arc length and sector area calculations'
+        ],
+        features: [
+          'Drag-and-drop construction tools',
+          'Real-time measurements',
+          'Step-by-step construction guides',
+          'Export constructions as images'
+        ],
+        exercises: '20+ interactive activities',
+        difficulty: 'All levels'
+      }
     }
   ];
 
@@ -344,7 +407,11 @@ const ResourceVault = () => {
                 {resources.map((resource) => {
                   const IconComponent = getResourceIcon(resource.type);
                   return (
-                    <div key={resource.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div 
+                      key={resource.id} 
+                      className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => setSelectedResource(resource)}
+                    >
                       <div className="flex items-start gap-3 mb-3">
                         <IconComponent className="w-5 h-5 text-purple-500 mt-1" />
                         <div className="flex-1">
@@ -353,9 +420,12 @@ const ResourceVault = () => {
                         </div>
                         <Badge variant="secondary">{resource.type}</Badge>
                       </div>
-                      <Button variant="outline" size="sm" className="w-full">
+                      <Button variant="outline" size="sm" className="w-full" onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedResource(resource);
+                      }}>
                         <Download className="w-4 h-4 mr-2" />
-                        Access Resource
+                        View Details
                       </Button>
                     </div>
                   );
@@ -390,6 +460,112 @@ const ResourceVault = () => {
           </Card>
         )}
       </div>
+
+      {/* Resource Detail Modal */}
+      <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          {selectedResource && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3 text-xl">
+                  {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-500" })}
+                  {selectedResource.title}
+                </DialogTitle>
+                <div className="flex items-center gap-2 mt-2">
+                  <Badge variant="secondary">{selectedResource.type}</Badge>
+                  {selectedResource.content.difficulty && (
+                    <Badge variant="outline">{selectedResource.content.difficulty}</Badge>
+                  )}
+                </div>
+              </DialogHeader>
+              
+              <div className="space-y-6 mt-6">
+                {/* Summary */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Overview</h3>
+                  <p className="text-gray-600">{selectedResource.content.summary}</p>
+                </div>
+
+                {/* Key Topics */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-3">Key Topics Covered</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {selectedResource.content.keyTopics.map((topic: string, index: number) => (
+                      <div key={index} className="flex items-center gap-2 p-2 bg-purple-50 rounded">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-sm">{topic}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Examples or Features */}
+                {selectedResource.content.examples && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Examples & Applications</h3>
+                    <ul className="space-y-2">
+                      {selectedResource.content.examples.map((example: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <span className="text-purple-500 mt-1">•</span>
+                          <span className="text-sm text-gray-600">{example}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {selectedResource.content.features && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Features</h3>
+                    <ul className="space-y-2">
+                      {selectedResource.content.features.map((feature: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2">
+                          <span className="text-purple-500 mt-1">•</span>
+                          <span className="text-sm text-gray-600">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Additional Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                  {selectedResource.content.duration && (
+                    <div>
+                      <span className="font-medium text-sm">Duration:</span>
+                      <p className="text-sm text-gray-600">{selectedResource.content.duration}</p>
+                    </div>
+                  )}
+                  {selectedResource.content.exercises && (
+                    <div>
+                      <span className="font-medium text-sm">Exercises:</span>
+                      <p className="text-sm text-gray-600">{selectedResource.content.exercises}</p>
+                    </div>
+                  )}
+                  {selectedResource.content.transcript && (
+                    <div>
+                      <span className="font-medium text-sm">Additional:</span>
+                      <p className="text-sm text-gray-600">{selectedResource.content.transcript}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button className="flex-1 bg-purple-500 hover:bg-purple-600">
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Learning
+                  </Button>
+                  <Button variant="outline" className="flex-1">
+                    <Download className="w-4 h-4 mr-2" />
+                    Download Resource
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* StudyPal Floating Chatbot */}
       <Dialog open={showStudyPal} onOpenChange={setShowStudyPal}>
