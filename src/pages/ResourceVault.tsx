@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { 
   Search, 
@@ -249,96 +248,87 @@ const ResourceVault = () => {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="finder" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="finder">My Resource Finder</TabsTrigger>
-            <TabsTrigger value="search">Search by Topic</TabsTrigger>
-          </TabsList>
-
-          {/* Resource Finder Tab */}
-          <TabsContent value="finder" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Find Resources by Subject & Chapter</CardTitle>
-                <CardDescription>
-                  Select your subject and chapter to access relevant study materials
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Subject</label>
-                    <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a subject" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {subjects.map((subject) => (
-                          <SelectItem key={subject.id} value={subject.id}>
-                            {subject.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Chapter</label>
-                    <Select 
-                      value={selectedChapter} 
-                      onValueChange={setSelectedChapter}
-                      disabled={!selectedSubject}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a chapter" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {selectedSubject && chapters[selectedSubject as keyof typeof chapters]?.map((chapter) => (
-                          <SelectItem key={chapter.id} value={chapter.id}>
-                            {chapter.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+        <div className="space-y-6">
+          {/* Resource Finder */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Find Resources by Subject & Chapter</CardTitle>
+              <CardDescription>
+                Select your subject and chapter to access relevant study materials
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Subject</label>
+                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a subject" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subjects.map((subject) => (
+                        <SelectItem key={subject.id} value={subject.id}>
+                          {subject.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <Button 
-                  onClick={handleProvideResources}
-                  disabled={!selectedSubject || !selectedChapter}
-                  className="w-full bg-pink-500 hover:bg-pink-600"
-                >
-                  Provide Resources
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Chapter</label>
+                  <Select 
+                    value={selectedChapter} 
+                    onValueChange={setSelectedChapter}
+                    disabled={!selectedSubject}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a chapter" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedSubject && chapters[selectedSubject as keyof typeof chapters]?.map((chapter) => (
+                        <SelectItem key={chapter.id} value={chapter.id}>
+                          {chapter.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Button 
+                onClick={handleProvideResources}
+                disabled={!selectedSubject || !selectedChapter}
+                className="w-full bg-pink-500 hover:bg-pink-600"
+              >
+                Provide Resources
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Search by Topic */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Search by Concept or Topic</CardTitle>
+              <CardDescription>
+                Type any specific concept or phrase to find related resources
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter a concept, topic, or phrase..."
+                  value={searchTopic}
+                  onChange={(e) => setSearchTopic(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleTopicSearch()}
+                />
+                <Button onClick={handleTopicSearch} className="bg-pink-500 hover:bg-pink-600">
+                  <Search className="w-4 h-4" />
                 </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Search by Topic Tab */}
-          <TabsContent value="search" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Search by Concept or Topic</CardTitle>
-                <CardDescription>
-                  Type any specific concept or phrase to find related resources
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Enter a concept, topic, or phrase..."
-                    value={searchTopic}
-                    onChange={(e) => setSearchTopic(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleTopicSearch()}
-                  />
-                  <Button onClick={handleTopicSearch} className="bg-pink-500 hover:bg-pink-600">
-                    <Search className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Resources Display */}
         {resources.length > 0 && (
