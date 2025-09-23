@@ -8,7 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { GripVertical, Plus, X, Merge, ChevronDown, Brain, Loader2 } from 'lucide-react';
+import { GripVertical, Plus, X, Merge, ChevronDown, Brain, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface FiveEDesignerProps {
   elos: string[];
@@ -32,6 +34,7 @@ const fiveESteps: FiveEStep[] = [
 ];
 
 const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange, pedagogicalApproaches = [] }) => {
+  const { toast } = useToast();
   const [activeELO, setActiveELO] = useState<string>(elos[0] || '');
   const [droppedSteps, setDroppedSteps] = useState<{[key: string]: FiveEStep[]}>({});
   const [stepDescriptions, setStepDescriptions] = useState<{[key: string]: {[stepId: string]: string}}>({});
@@ -43,6 +46,7 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [generatingContent, setGeneratingContent] = useState<{[key: string]: boolean}>({});
   const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [contentGenerated, setContentGenerated] = useState<{[key: string]: boolean}>({});
   
   // Resources for each 5E step
   const getResourcesForStep = (stepName: string): string[] => {
@@ -232,26 +236,94 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   };
 
   const saveFiveEData = async () => {
-    if (!perplexityApiKey) {
+    console.log('Starting save process...');
+    
+    if (!perplexityApiKey.trim()) {
+      toast({
+        title: "API Key Required",
+        description: "Please enter your Perplexity API key to generate content.",
+        variant: "destructive"
+      });
       setShowApiKeyInput(true);
       return;
     }
 
+    // Validate API key format
+    if (!perplexityApiKey.startsWith('pplx-')) {
+      toast({
+        title: "Invalid API Key",
+        description: "Perplexity API keys should start with 'pplx-'",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSaving(true);
+    let generatedCount = 0;
+    let errorCount = 0;
     
     try {
       // Use the keys from droppedSteps which represent the current ELOs (including merged ones)
       const currentELOs = Object.keys(droppedSteps);
+      console.log('Current ELOs:', currentELOs);
+      
+      // Check for steps with resources
+      let stepsToGenerate = 0;
+      for (const elo of currentELOs) {
+        const steps = droppedSteps[elo] || [];
+        for (const step of steps) {
+          const currentDescription = stepDescriptions[elo]?.[step.id] || '';
+          console.log(`Checking step ${step.name} in ${elo}:`, currentDescription);
+          
+          // Check for resources in multiple formats
+          const hasResources = currentDescription.includes('•') || 
+                              currentDescription.toLowerCase().includes('resource:') ||
+                              currentDescription.toLowerCase().includes('quiz') ||
+                              currentDescription.toLowerCase().includes('worksheet') ||
+                              currentDescription.toLowerCase().includes('experiment') ||
+                              currentDescription.toLowerCase().includes('discussion') ||
+                              currentDescription.toLowerCase().includes('story');
+          
+          if (hasResources) {
+            stepsToGenerate++;
+          }
+        }
+      }
+      
+      if (stepsToGenerate === 0) {
+        toast({
+          title: "No Resources Found",
+          description: "Please add resources to at least one step before generating content.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      console.log(`Found ${stepsToGenerate} steps with resources to generate content for`);
       
       // Generate content for all steps first
       for (const elo of currentELOs) {
         const steps = droppedSteps[elo] || [];
         for (const step of steps) {
           const currentDescription = stepDescriptions[elo]?.[step.id] || '';
-          const resourcesInDescription = currentDescription.split('\n').filter(line => line.trim().startsWith('•'));
           
-          if (resourcesInDescription.length > 0) {
-            await generateContentForStep(elo, step.id, step.name);
+          // Check for resources in multiple formats
+          const hasResources = currentDescription.includes('•') || 
+                              currentDescription.toLowerCase().includes('resource:') ||
+                              currentDescription.toLowerCase().includes('quiz') ||
+                              currentDescription.toLowerCase().includes('worksheet') ||
+                              currentDescription.toLowerCase().includes('experiment') ||
+                              currentDescription.toLowerCase().includes('discussion') ||
+                              currentDescription.toLowerCase().includes('story');
+          
+          if (hasResources) {
+            console.log(`Generating content for ${step.name} in ${elo}`);
+            const success = await generateContentForStep(elo, step.id, step.name);
+            if (success) {
+              generatedCount++;
+            } else {
+              errorCount++;
+            }
           }
         }
       }
@@ -266,24 +338,49 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
       }));
       
       onFiveEChange(fiveEData);
+      
+      // Show success message
+      if (generatedCount > 0) {
+        toast({
+          title: "Content Generated Successfully",
+          description: `Generated content for ${generatedCount} step(s)${errorCount > 0 ? ` (${errorCount} failed)` : ''}`,
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error in save process:', error);
+      toast({
+        title: "Generation Failed",
+        description: "An error occurred while generating content. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
   // Content generation function using Perplexity API
-  const generateContentForStep = async (eloIndex: string, stepId: string, stepName: string) => {
-    if (!perplexityApiKey) {
-      setShowApiKeyInput(true);
-      return;
-    }
-
+  const generateContentForStep = async (eloIndex: string, stepId: string, stepName: string): Promise<boolean> => {
     const stepKey = `${eloIndex}_${stepId}`;
     setGeneratingContent(prev => ({ ...prev, [stepKey]: true }));
+    console.log(`Starting content generation for step: ${stepName} in ELO: ${eloIndex}`);
 
     try {
       const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
-      const resourcesInDescription = currentDescription.split('\n').filter(line => line.trim().startsWith('•'));
+      console.log('Current description:', currentDescription);
+      
+      // Extract resources from description (support multiple formats)
+      const resourceLines = currentDescription.split('\n').filter(line => 
+        line.trim().startsWith('•') || 
+        line.toLowerCase().includes('resource:') ||
+        line.toLowerCase().includes('quiz') ||
+        line.toLowerCase().includes('worksheet') ||
+        line.toLowerCase().includes('experiment') ||
+        line.toLowerCase().includes('discussion') ||
+        line.toLowerCase().includes('story')
+      );
+      
+      console.log('Found resources:', resourceLines);
       
       // Build context for content generation
       const stepContext = {
@@ -299,21 +396,24 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
 Context:
 - ELO: ${eloIndex}
 - Phase Purpose: ${stepContext[stepName as keyof typeof stepContext]}
-- Selected Resources: ${resourcesInDescription.join(', ')}
+- Current Description: ${currentDescription}
+- Available Resources: ${resourceLines.join(', ')}
 - Pedagogical Approaches: ${pedagogicalApproaches.join(', ')}
 
 Requirements:
-- If "Quiz" is mentioned, generate 5 multiple-choice questions with answers
-- If "Worksheet" is mentioned, create worksheet activities
-- If "Experiment" is mentioned, provide step-by-step experimental procedures
-- If "Story" is mentioned, create engaging educational stories
-- If "Discussion" is mentioned, provide discussion questions and talking points
+- If "Quiz" is mentioned, generate 5 multiple-choice questions with detailed answers and explanations
+- If "Worksheet" is mentioned, create structured worksheet activities with clear instructions
+- If "Experiment" is mentioned, provide detailed step-by-step experimental procedures with materials list
+- If "Story" is mentioned, create engaging educational stories that connect to the learning objective
+- If "Discussion" is mentioned, provide thought-provoking discussion questions and talking points
 - Make content age-appropriate and aligned with the ELO
-- Provide practical, actionable content that teachers can directly use
-- Format the response in a clear, structured manner
+- Provide practical, actionable content that teachers can directly use in their classroom
+- Format the response clearly with headings and bullet points where appropriate
+- Include time estimates for activities where relevant
 
-Generate comprehensive educational content for this ${stepName} phase:`;
+Generate comprehensive, ready-to-use educational content for this ${stepName} phase:`;
 
+      console.log('Sending API request...');
       const response = await fetch('https://api.perplexity.ai/chat/completions', {
         method: 'POST',
         headers: {
@@ -325,7 +425,7 @@ Generate comprehensive educational content for this ${stepName} phase:`;
           messages: [
             {
               role: 'system',
-              content: 'You are an expert educational content creator. Generate detailed, practical educational materials for teachers. Be specific and actionable.'
+              content: 'You are an expert educational content creator specializing in the 5E instructional model. Generate detailed, practical educational materials for teachers. Be specific, actionable, and classroom-ready. Always format your response clearly with appropriate headings and structure.'
             },
             {
               role: 'user',
@@ -334,29 +434,58 @@ Generate comprehensive educational content for this ${stepName} phase:`;
           ],
           temperature: 0.3,
           top_p: 0.9,
-          max_tokens: 1500,
+          max_tokens: 2000,
           return_images: false,
           return_related_questions: false,
         }),
       });
 
+      console.log('API response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`API request failed with status ${response.status}`);
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('API response received:', data);
+      
       const generatedContent = data.choices?.[0]?.message?.content || 'Failed to generate content';
       
+      if (generatedContent === 'Failed to generate content') {
+        console.error('No content in API response');
+        throw new Error('No content received from API');
+      }
+      
       // Update the description with generated content
-      const updatedDescription = currentDescription + '\n\n=== AI Generated Content ===\n' + generatedContent;
+      const separator = '\n\n' + '='.repeat(50) + '\n🤖 AI GENERATED CONTENT\n' + '='.repeat(50) + '\n\n';
+      const updatedDescription = currentDescription + separator + generatedContent;
       updateStepDescription(eloIndex, stepId, updatedDescription);
+      
+      // Mark as generated
+      setContentGenerated(prev => ({ ...prev, [stepKey]: true }));
+      
+      console.log('Content generated successfully');
+      return true;
 
     } catch (error) {
       console.error('Error generating content:', error);
+      
       // Show error in description
-      const errorMessage = '\n\n=== Error ===\nFailed to generate content. Please check your API key and try again.';
+      const errorMessage = '\n\n❌ ERROR: Failed to generate content\n' + 
+                          `Details: ${error instanceof Error ? error.message : 'Unknown error'}\n` + 
+                          'Please check your API key and internet connection, then try again.';
       const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
       updateStepDescription(eloIndex, stepId, currentDescription + errorMessage);
+      
+      toast({
+        title: "Generation Failed",
+        description: `Failed to generate content for ${stepName}. ${error instanceof Error ? error.message : 'Unknown error'}`,
+        variant: "destructive"
+      });
+      
+      return false;
     } finally {
       setGeneratingContent(prev => ({ ...prev, [stepKey]: false }));
     }
