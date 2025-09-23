@@ -195,6 +195,38 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                 Organize your learning activities using the 5E instructional model
               </p>
             </div>
+
+            {/* Pedagogical Approaches Results */}
+            {pedagogicalError && (
+              <div className="text-red-500 mb-4">{pedagogicalError}</div>
+            )}
+            <div className="mb-8 flex flex-wrap gap-2">
+              {selectedApproaches.map((approach) => (
+                <Badge
+                  key={approach}
+                  variant="secondary"
+                  className="bg-blue-100 text-blue-800 hover:bg-blue-200 cursor-pointer flex items-center gap-1 px-3 py-1"
+                  onClick={() => removeApproach(approach)}
+                >
+                  {approach}
+                  <X className="h-3 w-3" />
+                </Badge>
+              ))}
+            </div>
+
+            {/* Custom Skills Input */}
+            <div className="mb-6">
+              <h4 className="text-sm font-medium text-gray-700 mb-2">
+                Add custom pedagogical approaches (comma, space, or enter separated)
+              </h4>
+              <Input
+                value={customSkills}
+                onChange={(e) => handleCustomSkillsChange(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Type custom pedagogical approaches and press Enter, comma, or space to add..."
+                className="w-full"
+              />
+            </div>
             
             <FiveEDesigner 
               elos={elos}
@@ -203,41 +235,6 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
             />
           </div>
         )}
-
-        {/* Pedagogical Approaches Results */}
-        {pedagogicalError && (
-          <div className="text-red-500 mb-4">{pedagogicalError}</div>
-        )}
-        {selectedApproaches.length > 0 && (
-          <div className="mb-8 flex flex-wrap gap-2">
-            {selectedApproaches.map((approach) => (
-              <Badge
-                key={approach}
-                variant="secondary"
-                className="bg-blue-100 text-blue-800 hover:bg-blue-200 cursor-pointer flex items-center gap-1 px-3 py-1"
-                onClick={() => removeApproach(approach)}
-              >
-                {approach}
-                <X className="h-3 w-3" />
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        
-        {/* Custom Skills Input */}
-        <div className="mb-6">
-          <h4 className="text-sm font-medium text-gray-700 mb-2">
-            Add custom pedagogical approaches (comma, space, or enter separated)
-          </h4>
-          <Input
-            value={customSkills}
-            onChange={(e) => handleCustomSkillsChange(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Type custom pedagogical approaches and press Enter, comma, or space to add..."
-            className="w-full"
-          />
-        </div>
 
         {/* Generate Learning Experience Button */}
         <div className="flex justify-center">
