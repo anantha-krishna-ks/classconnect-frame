@@ -39,6 +39,7 @@ import ParentLogin from "./pages/ParentLogin";
 import AdminComingSoon from "./pages/AdminComingSoon";
 import StudentComingSoon from "./pages/StudentComingSoon";
 import ParentComingSoon from "./pages/ParentComingSoon";
+import ResourceVault from "./pages/ResourceVault";
 
 
 const queryClient = new QueryClient();
@@ -102,7 +103,7 @@ const App = () => (
           <Route path="/confidence-tracker" element={<StudentComingSoon />} />
           <Route path="/exam-prep" element={<StudentComingSoon />} />
           <Route path="/mock-test" element={<StudentComingSoon />} />
-          <Route path="/resource-vault" element={<StudentComingSoon />} />
+          <Route path="/resource-vault" element={<ResourceVault />} />
           <Route path="/announcements" element={<StudentComingSoon />} />
           <Route path="/calendar" element={<StudentComingSoon />} />
           <Route path="/mood-mirror" element={<StudentComingSoon />} />
