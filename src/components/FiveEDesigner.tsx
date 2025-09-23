@@ -4,9 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { GripVertical, Plus, X, Merge, ChevronDown } from 'lucide-react';
+import { GripVertical, Plus, X, Merge, ChevronDown, Brain, Loader2 } from 'lucide-react';
 
 interface FiveEDesignerProps {
   elos: string[];
@@ -35,6 +37,11 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [stepDescriptions, setStepDescriptions] = useState<{[key: string]: {[stepId: string]: string}}>({});
   const [draggedStep, setDraggedStep] = useState<FiveEStep | null>(null);
   const [selectedELOsToMerge, setSelectedELOsToMerge] = useState<string[]>([]);
+  
+  // New states for content generation
+  const [perplexityApiKey, setPerplexityApiKey] = useState<string>('');
+  const [generatingContent, setGeneratingContent] = useState<{[key: string]: boolean}>({});
+  const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(false);
   
   // Resources for each 5E step
   const getResourcesForStep = (stepName: string): string[] => {
@@ -236,8 +243,129 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     onFiveEChange(fiveEData);
   };
 
+  // Content generation function using Perplexity API
+  const generateContentForStep = async (eloIndex: string, stepId: string, stepName: string) => {
+    if (!perplexityApiKey) {
+      setShowApiKeyInput(true);
+      return;
+    }
+
+    const stepKey = `${eloIndex}_${stepId}`;
+    setGeneratingContent(prev => ({ ...prev, [stepKey]: true }));
+
+    try {
+      const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
+      const resourcesInDescription = currentDescription.split('\n').filter(line => line.trim().startsWith('•'));
+      
+      // Build context for content generation
+      const stepContext = {
+        'Engage/Elicit': 'Create engaging activities to hook students and elicit prior knowledge.',
+        'Explore': 'Design hands-on exploration activities for students to discover concepts.',
+        'Explain': 'Provide clear explanations and introduce formal concepts.',
+        'Elaborate': 'Extend learning with additional activities and real-world applications.',
+        'Evaluate': 'Assess student understanding through various evaluation methods.'
+      };
+
+      const prompt = `Generate detailed educational content for the ${stepName} phase of the 5E learning model.
+
+Context:
+- ELO: ${eloIndex}
+- Phase Purpose: ${stepContext[stepName as keyof typeof stepContext]}
+- Selected Resources: ${resourcesInDescription.join(', ')}
+- Pedagogical Approaches: ${pedagogicalApproaches.join(', ')}
+
+Requirements:
+- If "Quiz" is mentioned, generate 5 multiple-choice questions with answers
+- If "Worksheet" is mentioned, create worksheet activities
+- If "Experiment" is mentioned, provide step-by-step experimental procedures
+- If "Story" is mentioned, create engaging educational stories
+- If "Discussion" is mentioned, provide discussion questions and talking points
+- Make content age-appropriate and aligned with the ELO
+- Provide practical, actionable content that teachers can directly use
+- Format the response in a clear, structured manner
+
+Generate comprehensive educational content for this ${stepName} phase:`;
+
+      const response = await fetch('https://api.perplexity.ai/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${perplexityApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-sonar-small-128k-online',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert educational content creator. Generate detailed, practical educational materials for teachers. Be specific and actionable.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.3,
+          top_p: 0.9,
+          max_tokens: 1500,
+          return_images: false,
+          return_related_questions: false,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      const generatedContent = data.choices?.[0]?.message?.content || 'Failed to generate content';
+      
+      // Update the description with generated content
+      const updatedDescription = currentDescription + '\n\n=== AI Generated Content ===\n' + generatedContent;
+      updateStepDescription(eloIndex, stepId, updatedDescription);
+
+    } catch (error) {
+      console.error('Error generating content:', error);
+      // Show error in description
+      const errorMessage = '\n\n=== Error ===\nFailed to generate content. Please check your API key and try again.';
+      const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
+      updateStepDescription(eloIndex, stepId, currentDescription + errorMessage);
+    } finally {
+      setGeneratingContent(prev => ({ ...prev, [stepKey]: false }));
+    }
+  };
+
   return (
     <div className="space-y-8">
+      {/* API Key Input - Show if not connected to Supabase */}
+      {showApiKeyInput && (
+        <Card className="p-4 bg-orange-50 border-orange-200">
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-orange-800">
+              Perplexity API Key Required
+            </Label>
+            <p className="text-xs text-orange-700">
+              Enter your Perplexity API key to generate contextual content for each 5E phase.
+            </p>
+            <div className="flex gap-2">
+              <Input
+                type="password"
+                placeholder="Enter your Perplexity API key"
+                value={perplexityApiKey}
+                onChange={(e) => setPerplexityApiKey(e.target.value)}
+                className="flex-1"
+              />
+              <Button
+                onClick={() => setShowApiKeyInput(false)}
+                variant="outline"
+                size="sm"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </Card>
+      )}
+
       {/* ELO Tabs with Drop Zones */}
       <Card className="p-6 bg-white border border-gray-200">
         <div className="flex justify-between items-center mb-4">
@@ -341,7 +469,7 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
                             </Badge>
                           </div>
                           
-                           <div className="space-y-4">
+                            <div className="space-y-4">
                               <div className="flex items-center justify-between gap-4">
                                 <div className="flex-1">
                                   <label className="text-sm font-medium text-gray-700">Activity Description</label>
@@ -389,6 +517,29 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
                                onChange={(e) => updateStepDescription(elo, step.id, e.target.value)}
                                className="min-h-[100px] resize-none"
                              />
+                             
+                             {/* Generate Content Button */}
+                             <div className="flex justify-end">
+                               <Button
+                                 onClick={() => generateContentForStep(elo, step.id, step.name)}
+                                 disabled={generatingContent[`${elo}_${step.id}`]}
+                                 variant="outline"
+                                 size="sm"
+                                 className="text-xs bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 border-green-200"
+                               >
+                                 {generatingContent[`${elo}_${step.id}`] ? (
+                                   <>
+                                     <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                                     Generating...
+                                   </>
+                                 ) : (
+                                   <>
+                                     <Brain className="w-3 h-3 mr-1" />
+                                     Generate {step.name} Content
+                                   </>
+                                 )}
+                               </Button>
+                             </div>
                            </div>
                         </Card>
                       ))}
