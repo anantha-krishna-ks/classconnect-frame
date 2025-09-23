@@ -655,145 +655,184 @@ const ResourceVault = () => {
             <MessageSquare className="w-6 h-6 text-white" />
           </Button>
         </SheetTrigger>
-        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-          <SheetHeader>
+        <SheetContent className="w-full sm:max-w-lg flex flex-col h-full">
+          <SheetHeader className="pb-4 border-b">
             <SheetTitle className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-purple-500" />
-              StudyPal - Your Learning Assistant
+              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                <MessageCircle className="w-4 h-4 text-white" />
+              </div>
+              StudyPal
             </SheetTitle>
             <SheetDescription>
-              Ask me anything about the concepts you're studying or get help with understanding difficult topics!
+              Your AI learning assistant is here to help!
             </SheetDescription>
           </SheetHeader>
           
-          <div className="space-y-6 mt-6">
-            {/* Resource Feedback Section */}
-            {resources.length > 0 && !resourceFeedback && (
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <h4 className="font-medium mb-3">Were the provided resources useful?</h4>
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleResourceFeedback('yes')}
-                    className="flex-1"
-                  >
-                    <ThumbsUp className="w-4 h-4 mr-2" />
-                    Yes, helpful
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleResourceFeedback('no')}
-                    className="flex-1"
-                  >
-                    <ThumbsDown className="w-4 h-4 mr-2" />
-                    Not helpful
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Quick Test Section */}
-            {resources.length > 0 && (
-              <div className="p-4 border rounded-lg">
-                <h4 className="font-medium mb-2">Test Your Understanding</h4>
-                <p className="text-sm text-gray-600 mb-3">
-                  Take a quick 5-question test on the concepts you've been studying
-                </p>
-                <Button 
-                  onClick={handleQuickTest} 
-                  className="w-full bg-blue-500 hover:bg-blue-600"
-                  disabled={showQuickTest}
-                >
-                  <Brain className="w-4 h-4 mr-2" />
-                  Take Quick Test
-                </Button>
-              </div>
-            )}
-
-            {/* Quick Test Display */}
-            {showQuickTest && (
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="font-medium">Question {currentQuestion + 1} of {mockQuestions.length}</h4>
-                  <Badge variant="outline">{currentQuestion + 1}/{mockQuestions.length}</Badge>
-                </div>
-                <div className="space-y-3">
-                  <p className="font-medium">{mockQuestions[currentQuestion].question}</p>
-                  <div className="space-y-2">
-                    {mockQuestions[currentQuestion].options.map((option, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        className="w-full text-left justify-start"
-                        onClick={() => handleTestAnswer(index)}
-                      >
-                        {String.fromCharCode(65 + index)}. {option}
-                      </Button>
-                    ))}
+          <div className="flex-1 flex flex-col">
+            {/* Chat Messages Area */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {chatHistory.length === 0 ? (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Brain className="w-8 h-8 text-purple-500" />
+                    </div>
+                    <h3 className="font-medium text-gray-900 mb-2">Hello! I'm StudyPal</h3>
+                    <p className="text-sm text-gray-500 max-w-xs">
+                      I'm here to help you understand any concept you're struggling with. Just ask me anything!
+                    </p>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Chat History */}
-            <div className="space-y-4">
-              <h4 className="font-medium">Chat with StudyPal</h4>
-              <div className="max-h-60 overflow-y-auto space-y-3 p-3 bg-gray-50 rounded-lg">
-                {chatHistory.length === 0 ? (
-                  <div className="text-center text-gray-500 py-4">
-                    <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Start a conversation! Ask me about any concept you're struggling with.</p>
-                  </div>
-                ) : (
-                  chatHistory.map((chat) => (
-                    <div key={chat.id} className="space-y-2">
-                      <div className="bg-blue-100 p-3 rounded-lg">
-                        <div className="flex items-start gap-2">
-                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                            U
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">You</p>
-                            <p className="text-sm">{chat.user}</p>
-                          </div>
+              ) : (
+                <>
+                  {chatHistory.map((chat) => (
+                    <div key={chat.id} className="space-y-3">
+                      {/* User Message */}
+                      <div className="flex justify-end">
+                        <div className="max-w-[80%] bg-purple-500 text-white rounded-2xl rounded-br-md px-4 py-2">
+                          <p className="text-sm">{chat.user}</p>
                         </div>
                       </div>
-                      <div className="bg-purple-100 p-3 rounded-lg">
-                        <div className="flex items-start gap-2">
-                          <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                            S
+                      
+                      {/* Bot Message */}
+                      <div className="flex justify-start">
+                        <div className="flex items-start gap-2 max-w-[80%]">
+                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Brain className="w-4 h-4 text-purple-500" />
                           </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">StudyPal</p>
-                            <p className="text-sm">{chat.bot}</p>
+                          <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-2">
+                            <p className="text-sm text-gray-800">{chat.bot}</p>
                           </div>
                         </div>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
+                  ))}
+                  
+                  {/* Resource Feedback Section - Show after conversation */}
+                  {chatHistory.length > 0 && resources.length > 0 && !resourceFeedback && (
+                    <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
+                      <div className="flex items-start gap-2 mb-3">
+                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Brain className="w-4 h-4 text-purple-500" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-1">Quick Feedback</h4>
+                          <p className="text-sm text-gray-600 mb-3">Were the resources I provided helpful for your learning?</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleResourceFeedback('yes')}
+                          className="flex-1 border-green-200 text-green-700 hover:bg-green-50"
+                        >
+                          <ThumbsUp className="w-4 h-4 mr-2" />
+                          Yes, helpful
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleResourceFeedback('no')}
+                          className="flex-1 border-red-200 text-red-700 hover:bg-red-50"
+                        >
+                          <ThumbsDown className="w-4 h-4 mr-2" />
+                          Not helpful
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Quick Test Section - Show after conversation */}
+                  {chatHistory.length > 0 && resources.length > 0 && (
+                    <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                      <div className="flex items-start gap-2 mb-3">
+                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Brain className="w-4 h-4 text-blue-500" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-gray-900 mb-1">Test Your Knowledge</h4>
+                          <p className="text-sm text-gray-600 mb-3">
+                            Ready to test what you've learned? Take a quick 5-question quiz!
+                          </p>
+                        </div>
+                      </div>
+                      <Button 
+                        onClick={handleQuickTest} 
+                        className="w-full bg-blue-500 hover:bg-blue-600"
+                        disabled={showQuickTest}
+                      >
+                        <Brain className="w-4 h-4 mr-2" />
+                        Start Quick Test
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Quick Test Display */}
+              {showQuickTest && (
+                <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-medium text-gray-900">Question {currentQuestion + 1}</h4>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-1 bg-gray-200 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-blue-500 transition-all duration-300"
+                          style={{ width: `${((currentQuestion + 1) / mockQuestions.length) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs text-gray-500">{currentQuestion + 1}/{mockQuestions.length}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <p className="font-medium text-gray-900">{mockQuestions[currentQuestion].question}</p>
+                    <div className="space-y-2">
+                      {mockQuestions[currentQuestion].options.map((option, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          className="w-full text-left justify-start hover:bg-indigo-50 hover:border-indigo-200"
+                          onClick={() => handleTestAnswer(index)}
+                        >
+                          <span className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-medium mr-3">
+                            {String.fromCharCode(65 + index)}
+                          </span>
+                          {option}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
-            {/* Message Input */}
-            <div className="space-y-3">
-              <Textarea
-                placeholder="Ask me about any concept you don't understand... For example: 'Can you explain quadratic equations in simple terms?' or 'I'm confused about the Pythagorean theorem'"
-                value={chatMessage}
-                onChange={(e) => setChatMessage(e.target.value)}
-                rows={3}
-                className="resize-none"
-              />
-              <Button 
-                onClick={handleStudyPalMessage} 
-                className="w-full bg-purple-500 hover:bg-purple-600"
-                disabled={!chatMessage.trim()}
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Send Message
-              </Button>
+            {/* Message Input Area */}
+            <div className="border-t p-4 bg-white">
+              <div className="flex gap-2">
+                <Textarea
+                  placeholder="Ask me about any concept you're struggling with..."
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  rows={2}
+                  className="resize-none flex-1"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleStudyPalMessage();
+                    }
+                  }}
+                />
+                <Button 
+                  onClick={handleStudyPalMessage} 
+                  className="bg-purple-500 hover:bg-purple-600 px-4"
+                  disabled={!chatMessage.trim()}
+                  size="icon"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">Press Enter to send, Shift+Enter for new line</p>
             </div>
           </div>
         </SheetContent>
