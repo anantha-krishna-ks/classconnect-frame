@@ -268,17 +268,11 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
       for (const elo of currentELOs) {
         const steps = droppedSteps[elo] || [];
         for (const step of steps) {
-          const currentDescription = stepDescriptions[elo]?.[step.id] || '';
-          console.log(`Checking step ${step.name} in ${elo}:`, currentDescription);
+          const selectedResourcesForStep = selectedResources[elo]?.[step.id] || [];
+          console.log(`Checking step ${step.name} in ${elo}:`, selectedResourcesForStep);
           
-          // Check for resources in multiple formats
-          const hasResources = currentDescription.includes('•') || 
-                              currentDescription.toLowerCase().includes('resource:') ||
-                              currentDescription.toLowerCase().includes('quiz') ||
-                              currentDescription.toLowerCase().includes('worksheet') ||
-                              currentDescription.toLowerCase().includes('experiment') ||
-                              currentDescription.toLowerCase().includes('discussion') ||
-                              currentDescription.toLowerCase().includes('story');
+          // Check if there are any selected resources for this step
+          const hasResources = selectedResourcesForStep.length > 0;
           
           if (hasResources) {
             stepsToGenerate++;
