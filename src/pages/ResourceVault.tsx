@@ -42,6 +42,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 
 const ResourceVault = () => {
@@ -54,6 +62,10 @@ const ResourceVault = () => {
   const [selectedResource, setSelectedResource] = useState<any>(null);
   const [resources, setResources] = useState<any[]>([]);
   const [chatHistory, setChatHistory] = useState<any[]>([]);
+  const [showQuickTest, setShowQuickTest] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [testAnswers, setTestAnswers] = useState<number[]>([]);
+  const [resourceFeedback, setResourceFeedback] = useState<string | null>(null);
 
   const handleLogout = () => {
     navigate('/student-login');
@@ -209,16 +221,86 @@ const ResourceVault = () => {
       const newMessage = {
         id: Date.now(),
         user: chatMessage,
-        bot: "I understand you're looking for help with this concept. Let me provide a simpler explanation with examples..."
+        bot: "I understand you're looking for help with this concept. Let me provide a simpler explanation with examples and suggest some additional resources that might help clarify this topic for you."
       };
       setChatHistory([...chatHistory, newMessage]);
       setChatMessage('');
     }
   };
 
+  const handleResourceFeedback = (feedback: string) => {
+    setResourceFeedback(feedback);
+    if (feedback === 'no') {
+      const helpMessage = {
+        id: Date.now(),
+        user: 'The resources were not helpful',
+        bot: "I'm sorry the resources weren't helpful. Can you tell me specifically what concept you're struggling with? I can provide alternative explanations or suggest different learning approaches."
+      };
+      setChatHistory([...chatHistory, helpMessage]);
+    }
+  };
+
+  // Mock MCQ questions
+  const mockQuestions = [
+    {
+      id: 1,
+      question: "What is the square root of 144?",
+      options: ["10", "12", "14", "16"],
+      correct: 1
+    },
+    {
+      id: 2,
+      question: "Which of the following is an irrational number?",
+      options: ["√4", "√9", "√2", "√16"],
+      correct: 2
+    },
+    {
+      id: 3,
+      question: "What is the value of 3² + 4²?",
+      options: ["25", "24", "49", "14"],
+      correct: 0
+    },
+    {
+      id: 4,
+      question: "In the equation 2x + 5 = 13, what is the value of x?",
+      options: ["3", "4", "5", "6"],
+      correct: 1
+    },
+    {
+      id: 5,
+      question: "What is the perimeter of a rectangle with length 8 and width 5?",
+      options: ["26", "40", "13", "30"],
+      correct: 0
+    }
+  ];
+
   const handleQuickTest = () => {
-    // Navigate to a quick test page or show inline test
-    alert('Quick Test feature will be implemented soon!');
+    setShowQuickTest(true);
+    setCurrentQuestion(0);
+    setTestAnswers([]);
+  };
+
+  const handleTestAnswer = (answerIndex: number) => {
+    const newAnswers = [...testAnswers];
+    newAnswers[currentQuestion] = answerIndex;
+    setTestAnswers(newAnswers);
+    
+    if (currentQuestion < mockQuestions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    } else {
+      // Test completed
+      const score = newAnswers.reduce((acc, answer, index) => {
+        return acc + (answer === mockQuestions[index].correct ? 1 : 0);
+      }, 0);
+      
+      const resultMessage = {
+        id: Date.now(),
+        user: 'Quick test completed',
+        bot: `Great job! You scored ${score}/${mockQuestions.length}. ${score >= 3 ? 'Well done! You have a good understanding of these concepts.' : 'Keep practicing! I can help explain the concepts you found challenging.'}`
+      };
+      setChatHistory([...chatHistory, resultMessage]);
+      setShowQuickTest(false);
+    }
   };
 
   const getResourceIcon = (type: string) => {
@@ -563,57 +645,159 @@ const ResourceVault = () => {
         </DialogContent>
       </Dialog>
 
-      {/* StudyPal Floating Chatbot */}
-      <Dialog open={showStudyPal} onOpenChange={setShowStudyPal}>
-        <DialogTrigger asChild>
+      {/* StudyPal Right Side Drawer */}
+      <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
+        <SheetTrigger asChild>
           <Button
             className="fixed bottom-6 right-6 rounded-full w-14 h-14 bg-purple-500 hover:bg-purple-600 shadow-lg"
             size="icon"
           >
             <MessageSquare className="w-6 h-6 text-white" />
           </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-md max-h-96">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+        </SheetTrigger>
+        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
               <MessageCircle className="w-5 h-5 text-purple-500" />
-              StudyPal
-            </DialogTitle>
-            <DialogDescription>
-              Ask me anything about the concepts you're studying!
-            </DialogDescription>
-          </DialogHeader>
+              StudyPal - Your Learning Assistant
+            </SheetTitle>
+            <SheetDescription>
+              Ask me anything about the concepts you're studying or get help with understanding difficult topics!
+            </SheetDescription>
+          </SheetHeader>
           
-          <div className="space-y-4">
-            {/* Chat History */}
-            <div className="max-h-40 overflow-y-auto space-y-2">
-              {chatHistory.map((chat) => (
-                <div key={chat.id} className="space-y-2">
-                  <div className="bg-blue-50 p-2 rounded text-sm">
-                    <strong>You:</strong> {chat.user}
-                  </div>
-                  <div className="bg-purple-50 p-2 rounded text-sm">
-                    <strong>StudyPal:</strong> {chat.bot}
+          <div className="space-y-6 mt-6">
+            {/* Resource Feedback Section */}
+            {resources.length > 0 && !resourceFeedback && (
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <h4 className="font-medium mb-3">Were the provided resources useful?</h4>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleResourceFeedback('yes')}
+                    className="flex-1"
+                  >
+                    <ThumbsUp className="w-4 h-4 mr-2" />
+                    Yes, helpful
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleResourceFeedback('no')}
+                    className="flex-1"
+                  >
+                    <ThumbsDown className="w-4 h-4 mr-2" />
+                    Not helpful
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Quick Test Section */}
+            {resources.length > 0 && (
+              <div className="p-4 border rounded-lg">
+                <h4 className="font-medium mb-2">Test Your Understanding</h4>
+                <p className="text-sm text-gray-600 mb-3">
+                  Take a quick 5-question test on the concepts you've been studying
+                </p>
+                <Button 
+                  onClick={handleQuickTest} 
+                  className="w-full bg-blue-500 hover:bg-blue-600"
+                  disabled={showQuickTest}
+                >
+                  <Brain className="w-4 h-4 mr-2" />
+                  Take Quick Test
+                </Button>
+              </div>
+            )}
+
+            {/* Quick Test Display */}
+            {showQuickTest && (
+              <div className="p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="font-medium">Question {currentQuestion + 1} of {mockQuestions.length}</h4>
+                  <Badge variant="outline">{currentQuestion + 1}/{mockQuestions.length}</Badge>
+                </div>
+                <div className="space-y-3">
+                  <p className="font-medium">{mockQuestions[currentQuestion].question}</p>
+                  <div className="space-y-2">
+                    {mockQuestions[currentQuestion].options.map((option, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        className="w-full text-left justify-start"
+                        onClick={() => handleTestAnswer(index)}
+                      >
+                        {String.fromCharCode(65 + index)}. {option}
+                      </Button>
+                    ))}
                   </div>
                 </div>
-              ))}
+              </div>
+            )}
+
+            {/* Chat History */}
+            <div className="space-y-4">
+              <h4 className="font-medium">Chat with StudyPal</h4>
+              <div className="max-h-60 overflow-y-auto space-y-3 p-3 bg-gray-50 rounded-lg">
+                {chatHistory.length === 0 ? (
+                  <div className="text-center text-gray-500 py-4">
+                    <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Start a conversation! Ask me about any concept you're struggling with.</p>
+                  </div>
+                ) : (
+                  chatHistory.map((chat) => (
+                    <div key={chat.id} className="space-y-2">
+                      <div className="bg-blue-100 p-3 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            U
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">You</p>
+                            <p className="text-sm">{chat.user}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-purple-100 p-3 rounded-lg">
+                        <div className="flex items-start gap-2">
+                          <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            S
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">StudyPal</p>
+                            <p className="text-sm">{chat.bot}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
             
             {/* Message Input */}
-            <div className="space-y-2">
+            <div className="space-y-3">
               <Textarea
-                placeholder="Type your question or concept you need help with..."
+                placeholder="Ask me about any concept you don't understand... For example: 'Can you explain quadratic equations in simple terms?' or 'I'm confused about the Pythagorean theorem'"
                 value={chatMessage}
                 onChange={(e) => setChatMessage(e.target.value)}
                 rows={3}
+                className="resize-none"
               />
-              <Button onClick={handleStudyPalMessage} className="w-full bg-purple-500 hover:bg-purple-600">
+              <Button 
+                onClick={handleStudyPalMessage} 
+                className="w-full bg-purple-500 hover:bg-purple-600"
+                disabled={!chatMessage.trim()}
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
                 Send Message
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
