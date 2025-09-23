@@ -42,6 +42,7 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [perplexityApiKey, setPerplexityApiKey] = useState<string>('');
   const [generatingContent, setGeneratingContent] = useState<{[key: string]: boolean}>({});
   const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   
   // Resources for each 5E step
   const getResourcesForStep = (stepName: string): string[] => {
@@ -230,17 +231,44 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     setActiveELO(mergedELOText);
   };
 
-  const saveFiveEData = () => {
-    // Use the keys from droppedSteps which represent the current ELOs (including merged ones)
-    const currentELOs = Object.keys(droppedSteps);
-    const fiveEData = currentELOs.map(elo => ({
-      elo,
-      steps: (droppedSteps[elo] || []).map(step => ({
-        ...step,
-        description: stepDescriptions[elo]?.[step.id] || ''
-      }))
-    }));
-    onFiveEChange(fiveEData);
+  const saveFiveEData = async () => {
+    if (!perplexityApiKey) {
+      setShowApiKeyInput(true);
+      return;
+    }
+
+    setIsSaving(true);
+    
+    try {
+      // Use the keys from droppedSteps which represent the current ELOs (including merged ones)
+      const currentELOs = Object.keys(droppedSteps);
+      
+      // Generate content for all steps first
+      for (const elo of currentELOs) {
+        const steps = droppedSteps[elo] || [];
+        for (const step of steps) {
+          const currentDescription = stepDescriptions[elo]?.[step.id] || '';
+          const resourcesInDescription = currentDescription.split('\n').filter(line => line.trim().startsWith('•'));
+          
+          if (resourcesInDescription.length > 0) {
+            await generateContentForStep(elo, step.id, step.name);
+          }
+        }
+      }
+      
+      // Prepare final data
+      const fiveEData = currentELOs.map(elo => ({
+        elo,
+        steps: (droppedSteps[elo] || []).map(step => ({
+          ...step,
+          description: stepDescriptions[elo]?.[step.id] || ''
+        }))
+      }));
+      
+      onFiveEChange(fiveEData);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Content generation function using Perplexity API
@@ -517,29 +545,6 @@ Generate comprehensive educational content for this ${stepName} phase:`;
                                onChange={(e) => updateStepDescription(elo, step.id, e.target.value)}
                                className="min-h-[100px] resize-none"
                              />
-                             
-                             {/* Generate Content Button */}
-                             <div className="flex justify-end">
-                               <Button
-                                 onClick={() => generateContentForStep(elo, step.id, step.name)}
-                                 disabled={generatingContent[`${elo}_${step.id}`]}
-                                 variant="outline"
-                                 size="sm"
-                                 className="text-xs bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 border-green-200"
-                               >
-                                 {generatingContent[`${elo}_${step.id}`] ? (
-                                   <>
-                                     <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                                     Generating...
-                                   </>
-                                 ) : (
-                                   <>
-                                     <Brain className="w-3 h-3 mr-1" />
-                                     Generate {step.name} Content
-                                   </>
-                                 )}
-                               </Button>
-                             </div>
                            </div>
                         </Card>
                       ))}
@@ -565,10 +570,20 @@ Generate comprehensive educational content for this ${stepName} phase:`;
           <div className="flex justify-center mt-8">
             <Button 
               onClick={saveFiveEData}
+              disabled={isSaving}
               className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base rounded-lg"
             >
-              <Plus className="w-5 h-5 mr-2" />
-              Save 5E Design
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Generating Content & Saving...
+                </>
+              ) : (
+                <>
+                  <Plus className="w-5 h-5 mr-2" />
+                  Save 5E Design & Generate Content
+                </>
+              )}
             </Button>
           </div>
         )}
