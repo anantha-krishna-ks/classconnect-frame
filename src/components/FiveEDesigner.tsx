@@ -1152,10 +1152,7 @@ Students use the story framework to reflect on:
         allGeneratedContent += content + '\n\n' + '—'.repeat(40) + '\n\n';
       }
       
-      // Update the description with generated content
-      const separator = '\n\n' + '='.repeat(50) + '\n🎓 EDUCATIONAL CONTENT GENERATED\n' + '='.repeat(50) + '\n\n';
-      const updatedDescription = currentDescription + separator + allGeneratedContent.trim();
-      updateStepDescription(eloIndex, stepId, updatedDescription);
+      // Don't update the textarea - keep generated content separate
       
       // Store generated content separately for management
       setGeneratedContentData(prev => ({ ...prev, [stepKey]: allGeneratedContent.trim() }));
@@ -1169,11 +1166,8 @@ Students use the story framework to reflect on:
     } catch (error) {
       console.error('Error generating content:', error);
       
-      // Show error in description
-      const errorMessage = '\n\n❌ ERROR: Failed to generate content\n' + 
-                          `Details: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
-      updateStepDescription(eloIndex, stepId, currentDescription + errorMessage);
+      // Don't show error in textarea - keep it separate
+      console.error('Error details:', error);
       
       return false;
     } finally {
@@ -1544,28 +1538,6 @@ Students use the story framework to reflect on:
         </Card>
       )}
 
-      {/* Save Button */}
-      {elos.length > 0 && (
-        <div className="flex justify-center mt-8">
-          <Button 
-            onClick={saveFiveEData}
-            disabled={isSaving}
-            className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base rounded-lg"
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                Generating Content & Saving...
-              </>
-            ) : (
-              <>
-                <Plus className="w-5 h-5 mr-2" />
-                Save 5E Design & Generate Content
-              </>
-            )}
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
