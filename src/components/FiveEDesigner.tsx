@@ -163,30 +163,6 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
 
   return (
     <div className="space-y-8">
-      {/* Available 5E Steps for Dragging */}
-      <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
-        <h3 className="text-lg font-semibold text-blue-800 mb-2 flex items-center">
-          <GripVertical className="w-5 h-5 mr-2" />
-          Available 5E Steps
-        </h3>
-        <p className="text-sm text-blue-600 mb-4">Drag and drop these steps into the ELO tabs below to create your learning sequence</p>
-        
-        <div className="flex flex-wrap gap-3">
-          {fiveESteps.map((step) => (
-            <Badge
-              key={step.name}
-              draggable
-              onDragStart={(e) => handleDragStart(e, step)}
-              className={`${step.color} cursor-grab active:cursor-grabbing px-5 py-3 text-sm font-semibold border-2 hover:shadow-lg hover:scale-105 transition-all duration-200 rounded-full flex items-center gap-2`}
-            >
-              <GripVertical className="w-4 h-4" />
-              {step.name}
-            </Badge>
-          ))}
-        </div>
-      </Card>
-
-
       {/* ELO Tabs with Drop Zones */}
       <Card className="p-6 bg-white border border-gray-200">
         <div className="flex justify-between items-center mb-4">
