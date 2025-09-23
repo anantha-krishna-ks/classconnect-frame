@@ -552,11 +552,7 @@ const ResourceVault = () => {
 
                 {/* Action Buttons */}
                 <div className="flex gap-3 pt-4 border-t">
-                  <Button className="flex-1 bg-purple-500 hover:bg-purple-600">
-                    <Play className="w-4 h-4 mr-2" />
-                    Start Learning
-                  </Button>
-                  <Button variant="outline" className="flex-1">
+                  <Button variant="outline" className="w-full">
                     <Download className="w-4 h-4 mr-2" />
                     Download Resource
                   </Button>
