@@ -516,31 +516,6 @@ const ResourceVault = () => {
             </CardContent>
           </Card>
         )}
-
-        {/* Resource Usefulness Feedback */}
-        {resources.length > 0 && (
-          <Card className="mt-6">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">Were these resources useful?</p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    <ThumbsUp className="w-4 h-4 mr-2" />
-                    Yes
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <ThumbsDown className="w-4 h-4 mr-2" />
-                    No
-                  </Button>
-                  <Button onClick={handleQuickTest} className="bg-blue-500 hover:bg-blue-600" size="sm">
-                    <Brain className="w-4 h-4 mr-2" />
-                    Take a Quick Test
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
       </div>
 
       {/* Resource Detail Modal */}
