@@ -237,7 +237,7 @@ const ResourceVault = () => {
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-pink-500 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center">
               <BookOpen className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -299,7 +299,7 @@ const ResourceVault = () => {
               <Button 
                 onClick={handleProvideResources}
                 disabled={!selectedSubject || !selectedChapter}
-                className="w-full bg-pink-500 hover:bg-pink-600"
+                className="w-full bg-purple-500 hover:bg-purple-600"
               >
                 Provide Resources
               </Button>
@@ -322,7 +322,7 @@ const ResourceVault = () => {
                   onChange={(e) => setSearchTopic(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleTopicSearch()}
                 />
-                <Button onClick={handleTopicSearch} className="bg-pink-500 hover:bg-pink-600">
+                <Button onClick={handleTopicSearch} className="bg-purple-500 hover:bg-purple-600">
                   <Search className="w-4 h-4" />
                 </Button>
               </div>
@@ -346,7 +346,7 @@ const ResourceVault = () => {
                   return (
                     <div key={resource.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-start gap-3 mb-3">
-                        <IconComponent className="w-5 h-5 text-pink-500 mt-1" />
+                        <IconComponent className="w-5 h-5 text-purple-500 mt-1" />
                         <div className="flex-1">
                           <h4 className="font-medium text-gray-900">{resource.title}</h4>
                           <p className="text-sm text-gray-600 mt-1">{resource.description}</p>
@@ -395,7 +395,7 @@ const ResourceVault = () => {
       <Dialog open={showStudyPal} onOpenChange={setShowStudyPal}>
         <DialogTrigger asChild>
           <Button
-            className="fixed bottom-6 right-6 rounded-full w-14 h-14 bg-pink-500 hover:bg-pink-600 shadow-lg"
+            className="fixed bottom-6 right-6 rounded-full w-14 h-14 bg-purple-500 hover:bg-purple-600 shadow-lg"
             size="icon"
           >
             <MessageSquare className="w-6 h-6 text-white" />
@@ -404,7 +404,7 @@ const ResourceVault = () => {
         <DialogContent className="max-w-md max-h-96">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-pink-500" />
+              <MessageCircle className="w-5 h-5 text-purple-500" />
               StudyPal
             </DialogTitle>
             <DialogDescription>
@@ -420,7 +420,7 @@ const ResourceVault = () => {
                   <div className="bg-blue-50 p-2 rounded text-sm">
                     <strong>You:</strong> {chat.user}
                   </div>
-                  <div className="bg-pink-50 p-2 rounded text-sm">
+                  <div className="bg-purple-50 p-2 rounded text-sm">
                     <strong>StudyPal:</strong> {chat.bot}
                   </div>
                 </div>
@@ -435,7 +435,7 @@ const ResourceVault = () => {
                 onChange={(e) => setChatMessage(e.target.value)}
                 rows={3}
               />
-              <Button onClick={handleStudyPalMessage} className="w-full bg-pink-500 hover:bg-pink-600">
+              <Button onClick={handleStudyPalMessage} className="w-full bg-purple-500 hover:bg-purple-600">
                 Send Message
               </Button>
             </div>

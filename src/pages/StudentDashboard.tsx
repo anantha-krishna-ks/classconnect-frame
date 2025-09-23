@@ -108,8 +108,8 @@ const StudentDashboard = () => {
       title: 'Resource Vault',
       description: 'Access all school-approved study materials, notes, and video lessons in one place.',
       icon: FolderOpen,
-      color: 'bg-pink-500',
-      buttonColor: 'bg-pink-500 hover:bg-pink-600',
+      color: 'bg-purple-500',
+      buttonColor: 'bg-purple-500 hover:bg-purple-600',
       route: '/resource-vault'
     },
     {
