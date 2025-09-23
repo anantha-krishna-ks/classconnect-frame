@@ -38,6 +38,7 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [activeELO, setActiveELO] = useState<string>(elos[0] || '');
   const [droppedSteps, setDroppedSteps] = useState<{[key: string]: FiveEStep[]}>({});
   const [stepDescriptions, setStepDescriptions] = useState<{[key: string]: {[stepId: string]: string}}>({});
+  const [selectedResources, setSelectedResources] = useState<{[key: string]: {[stepId: string]: string[]}}>({});
   const [draggedStep, setDraggedStep] = useState<FiveEStep | null>(null);
   const [selectedELOsToMerge, setSelectedELOsToMerge] = useState<string[]>([]);
   
@@ -161,9 +162,23 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   };
 
   const addApproachToDescription = (eloIndex: string, stepId: string, approach: string) => {
-    const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
-    const newDescription = currentDescription ? `${currentDescription}\n• ${approach}` : `• ${approach}`;
-    updateStepDescription(eloIndex, stepId, newDescription);
+    setSelectedResources(prev => ({
+      ...prev,
+      [eloIndex]: {
+        ...prev[eloIndex],
+        [stepId]: [...(prev[eloIndex]?.[stepId] || []), approach]
+      }
+    }));
+  };
+
+  const removeResource = (eloIndex: string, stepId: string, resourceIndex: number) => {
+    setSelectedResources(prev => ({
+      ...prev,
+      [eloIndex]: {
+        ...prev[eloIndex],
+        [stepId]: (prev[eloIndex]?.[stepId] || []).filter((_, index) => index !== resourceIndex)
+      }
+    }));
   };
 
   const removeStep = (eloIndex: string, stepId: string) => {
@@ -1377,7 +1392,7 @@ Students use the story framework to reflect on:
                                     <PopoverContent className="w-80 p-0" align="end">
                                       <div className="p-3 border-b">
                                         <h4 className="font-medium text-sm text-gray-900">Select {step.name} Resources</h4>
-                                        <p className="text-xs text-gray-500 mt-1">Click to add to the description</p>
+                                        <p className="text-xs text-gray-500 mt-1">Click to add as resource</p>
                                       </div>
                                       <div className="max-h-60 overflow-y-auto">
                                         {getResourcesForStep(step.name).map((resource, index) => (
@@ -1394,13 +1409,30 @@ Students use the story framework to reflect on:
                                   </Popover>
                                 </div>
                               </div>
-                             <Textarea
-                               placeholder={`Describe the ${step.name} activities for this ELO...`}
-                               value={stepDescriptions[elo]?.[step.id] || ''}
-                               onChange={(e) => updateStepDescription(elo, step.id, e.target.value)}
-                               className="min-h-[100px] resize-none"
-                             />
-                           </div>
+                              
+                              {/* Selected Resources Display */}
+                              {selectedResources[elo]?.[step.id]?.length > 0 && (
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium text-gray-700">Selected Resources:</label>
+                                  <div className="space-y-1">
+                                    {selectedResources[elo][step.id].map((resource, index) => (
+                                      <div key={index} className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+                                        <span className="text-sm text-gray-800">• {resource}</span>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => removeResource(elo, step.id, index)}
+                                          className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                                        >
+                                          <X className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              
+                            </div>
                         </Card>
                       ))}
                     </div>
