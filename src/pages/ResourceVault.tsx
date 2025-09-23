@@ -505,7 +505,7 @@ const ResourceVault = () => {
                   return (
                     <div 
                       key={resource.id} 
-                      className="group border border-slate-200/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
+                      className="group border-2 border-slate-200/80 hover:border-purple-300/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
                       style={{ animationDelay: `${index * 100}ms` }}
                       onClick={() => setSelectedResource(resource)}
                     >
