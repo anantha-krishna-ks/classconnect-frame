@@ -341,35 +341,47 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
                             </Badge>
                           </div>
                           
-                           <div className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-gray-700">Activity Description</label>
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <Button variant="outline" size="sm" className="text-xs">
-                                      <Plus className="w-3 h-3 mr-1" />
-                                      Add Resources
-                                      <ChevronDown className="w-3 h-3 ml-1" />
-                                    </Button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-80 p-0" align="end">
-                                    <div className="p-3 border-b">
-                                      <h4 className="font-medium text-sm text-gray-900">Select {step.name} Resources</h4>
-                                      <p className="text-xs text-gray-500 mt-1">Click to add to the description</p>
-                                    </div>
-                                    <div className="max-h-60 overflow-y-auto">
-                                      {getResourcesForStep(step.name).map((resource, index) => (
-                                        <button
-                                          key={index}
-                                          onClick={() => addApproachToDescription(elo, step.id, resource)}
-                                          className="w-full text-left px-3 py-2 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 last:border-b-0"
-                                        >
-                                          {resource}
-                                        </button>
-                                      ))}
-                                    </div>
-                                  </PopoverContent>
-                                </Popover>
+                           <div className="space-y-4">
+                              <div className="flex items-center justify-between gap-4">
+                                <div className="flex-1">
+                                  <label className="text-sm font-medium text-gray-700">Activity Description</label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <label className="text-sm font-medium text-gray-700">Time:</label>
+                                    <input
+                                      type="text"
+                                      placeholder="30 mins"
+                                      className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    />
+                                  </div>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <Button variant="outline" size="sm" className="text-xs">
+                                        <Plus className="w-3 h-3 mr-1" />
+                                        Add Resources
+                                        <ChevronDown className="w-3 h-3 ml-1" />
+                                      </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-80 p-0" align="end">
+                                      <div className="p-3 border-b">
+                                        <h4 className="font-medium text-sm text-gray-900">Select {step.name} Resources</h4>
+                                        <p className="text-xs text-gray-500 mt-1">Click to add to the description</p>
+                                      </div>
+                                      <div className="max-h-60 overflow-y-auto">
+                                        {getResourcesForStep(step.name).map((resource, index) => (
+                                          <button
+                                            key={index}
+                                            onClick={() => addApproachToDescription(elo, step.id, resource)}
+                                            className="w-full text-left px-3 py-2 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 last:border-b-0"
+                                          >
+                                            {resource}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    </PopoverContent>
+                                  </Popover>
+                                </div>
                               </div>
                              <Textarea
                                placeholder={`Describe the ${step.name} activities for this ELO...`}
