@@ -655,8 +655,8 @@ const ResourceVault = () => {
             <MessageSquare className="w-6 h-6 text-white" />
           </Button>
         </SheetTrigger>
-        <SheetContent className="w-full sm:max-w-lg flex flex-col h-full">
-          <SheetHeader className="pb-4 border-b">
+        <SheetContent className="w-full sm:max-w-lg flex flex-col h-screen">
+          <SheetHeader className="pb-4 border-b flex-shrink-0">
             <SheetTitle className="flex items-center gap-2">
               <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
                 <MessageCircle className="w-4 h-4 text-white" />
@@ -668,11 +668,11 @@ const ResourceVault = () => {
             </SheetDescription>
           </SheetHeader>
           
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-h-0">
             {/* Chat Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ maxHeight: 'calc(100vh - 200px)' }}>
               {chatHistory.length === 0 ? (
-                <div className="flex-1 flex items-center justify-center">
+                <div className="h-full flex items-center justify-center">
                   <div className="text-center">
                     <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                       <Brain className="w-8 h-8 text-purple-500" />
@@ -808,7 +808,7 @@ const ResourceVault = () => {
             </div>
             
             {/* Message Input Area */}
-            <div className="border-t p-4 bg-white">
+            <div className="border-t p-4 bg-white flex-shrink-0">
               <div className="flex gap-2">
                 <Textarea
                   placeholder="Ask me about any concept you're struggling with..."
