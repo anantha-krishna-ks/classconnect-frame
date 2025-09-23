@@ -1152,7 +1152,12 @@ Students use the story framework to reflect on:
         allGeneratedContent += content + '\n\n' + '—'.repeat(40) + '\n\n';
       }
       
-      // Store generated content separately for management (don't add to textarea)
+      // Update the description with generated content
+      const separator = '\n\n' + '='.repeat(50) + '\n🎓 EDUCATIONAL CONTENT GENERATED\n' + '='.repeat(50) + '\n\n';
+      const updatedDescription = currentDescription + separator + allGeneratedContent.trim();
+      updateStepDescription(eloIndex, stepId, updatedDescription);
+      
+      // Store generated content separately for management
       setGeneratedContentData(prev => ({ ...prev, [stepKey]: allGeneratedContent.trim() }));
       
       // Mark as generated
@@ -1178,14 +1183,28 @@ Students use the story framework to reflect on:
 
   // Helper functions for generated content management
   const editGeneratedContent = (stepKey: string) => {
-    // Open content for editing in a modal or expand it in place
-    toast({
-      title: "Edit Mode",
-      description: "Content editing - modify the content in the expanded view below.",
-    });
+    const content = generatedContentData[stepKey] || '';
+    // Set content in textarea for editing - could be enhanced with a modal
+    const [eloIndex, stepId] = stepKey.split('_');
+    const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
+    
+    // Remove the generated content section and replace with editable version
+    const separator = '\n\n' + '='.repeat(50) + '\n🎓 EDUCATIONAL CONTENT GENERATED\n' + '='.repeat(50) + '\n\n';
+    const baseDescription = currentDescription.split(separator)[0];
+    
+    updateStepDescription(eloIndex, stepId, baseDescription + separator + content);
   };
 
   const deleteGeneratedContent = (stepKey: string) => {
+    const [eloIndex, stepId] = stepKey.split('_');
+    const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
+    
+    // Remove the generated content section
+    const separator = '\n\n' + '='.repeat(50) + '\n🎓 EDUCATIONAL CONTENT GENERATED\n' + '='.repeat(50) + '\n\n';
+    const baseDescription = currentDescription.split(separator)[0];
+    
+    updateStepDescription(eloIndex, stepId, baseDescription);
+    
     // Remove from generated content tracking
     setGeneratedContentData(prev => {
       const updated = { ...prev };
@@ -1485,15 +1504,18 @@ Students use the story framework to reflect on:
                     </div>
                     
                     <div className="bg-white rounded-lg border border-gray-200 p-4 max-h-64 overflow-y-auto">
-                      <Textarea
-                        value={generatedContentData[stepKey] || ''}
-                        onChange={(e) => setGeneratedContentData(prev => ({ 
-                          ...prev, 
-                          [stepKey]: e.target.value 
-                        }))}
-                        className="w-full min-h-[150px] border-0 p-0 resize-none focus:ring-0 focus:outline-none bg-transparent"
-                        placeholder="Generated content will appear here..."
-                      />
+                      <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
+                        {content.length > 500 ? (
+                          <div>
+                            {content.substring(0, 500)}...
+                            <div className="mt-2 text-xs text-gray-500">
+                              Content truncated. Click Edit to see full content.
+                            </div>
+                          </div>
+                        ) : (
+                          content
+                        )}
+                      </pre>
                     </div>
                     
                     <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
@@ -1520,6 +1542,29 @@ Students use the story framework to reflect on:
             </div>
           </div>
         </Card>
+      )}
+
+      {/* Save Button */}
+      {elos.length > 0 && (
+        <div className="flex justify-center mt-8">
+          <Button 
+            onClick={saveFiveEData}
+            disabled={isSaving}
+            className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base rounded-lg"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Generating Content & Saving...
+              </>
+            ) : (
+              <>
+                <Plus className="w-5 h-5 mr-2" />
+                Save 5E Design & Generate Content
+              </>
+            )}
+          </Button>
+        </div>
       )}
     </div>
   );
