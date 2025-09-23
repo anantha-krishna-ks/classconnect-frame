@@ -301,16 +301,10 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
       for (const elo of currentELOs) {
         const steps = droppedSteps[elo] || [];
         for (const step of steps) {
-          const currentDescription = stepDescriptions[elo]?.[step.id] || '';
+          const selectedResourcesForStep = selectedResources[elo]?.[step.id] || [];
           
-          // Check for resources in multiple formats
-          const hasResources = currentDescription.includes('•') || 
-                              currentDescription.toLowerCase().includes('resource:') ||
-                              currentDescription.toLowerCase().includes('quiz') ||
-                              currentDescription.toLowerCase().includes('worksheet') ||
-                              currentDescription.toLowerCase().includes('experiment') ||
-                              currentDescription.toLowerCase().includes('discussion') ||
-                              currentDescription.toLowerCase().includes('story');
+          // Check if there are any selected resources for this step
+          const hasResources = selectedResourcesForStep.length > 0;
           
           if (hasResources) {
             console.log(`Generating content for ${step.name} in ${elo}`);
@@ -1122,6 +1116,23 @@ Students use the story framework to reflect on:
            `**${stepName} Activity: ${resourceType}**\n\nCustom content for ${eloIndex} using ${resourceType} in the ${stepName} phase.\n\nThis is a placeholder template. Please customize this content based on your specific learning objectives and student needs.`;
   };
 
+  // Helper function to map dropdown resource names to content template keys
+  const mapResourceToType = (resourceName: string): string | null => {
+    const resourceLower = resourceName.toLowerCase();
+    
+    if (resourceLower.includes('quiz') || resourceLower.includes('questions')) return 'quiz';
+    if (resourceLower.includes('worksheet') || resourceLower.includes('assessment')) return 'worksheet';
+    if (resourceLower.includes('experiment') || resourceLower.includes('hands-on')) return 'experiment';
+    if (resourceLower.includes('discussion') || resourceLower.includes('debate')) return 'discussion';
+    if (resourceLower.includes('story') || resourceLower.includes('reading') || resourceLower.includes('anecdote')) return 'story';
+    
+    // Default mappings for common resource types
+    if (resourceLower.includes('scenario') || resourceLower.includes('problem')) return 'worksheet';
+    if (resourceLower.includes('video') || resourceLower.includes('demonstration')) return 'discussion';
+    
+    return 'worksheet'; // Default fallback
+  };
+
   // Content generation function using predefined templates
   const generateContentForStep = async (eloIndex: string, stepId: string, stepName: string): Promise<boolean> => {
     const stepKey = `${eloIndex}_${stepId}`;
@@ -1132,30 +1143,24 @@ Students use the story framework to reflect on:
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     try {
-      const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
-      console.log('Current description:', currentDescription);
+      // Get selected resources for this step
+      const selectedResourcesForStep = selectedResources[eloIndex]?.[stepId] || [];
+      console.log('Selected resources for step:', selectedResourcesForStep);
       
-      // Extract resources from description (support multiple formats)
-      const descriptionLower = currentDescription.toLowerCase();
+      // Map selected resources to content template types
       let resourceTypes: string[] = [];
       
-      if (descriptionLower.includes('quiz')) resourceTypes.push('quiz');
-      if (descriptionLower.includes('worksheet')) resourceTypes.push('worksheet');
-      if (descriptionLower.includes('experiment')) resourceTypes.push('experiment');
-      if (descriptionLower.includes('discussion')) resourceTypes.push('discussion');
-      if (descriptionLower.includes('story')) resourceTypes.push('story');
-      
-      // If no specific resources found, check for bullet points
-      const bulletPoints = currentDescription.split('\n').filter(line => line.trim().startsWith('•'));
-      if (bulletPoints.length > 0 && resourceTypes.length === 0) {
-        // Default to worksheet for bullet point lists
-        resourceTypes.push('worksheet');
+      for (const resource of selectedResourcesForStep) {
+        const mappedType = mapResourceToType(resource);
+        if (mappedType && !resourceTypes.includes(mappedType)) {
+          resourceTypes.push(mappedType);
+        }
       }
       
-      console.log('Found resource types:', resourceTypes);
+      console.log('Mapped resource types:', resourceTypes);
       
       if (resourceTypes.length === 0) {
-        console.log('No resources found to generate content for');
+        console.log('No valid resource types found to generate content for');
         return false;
       }
       
