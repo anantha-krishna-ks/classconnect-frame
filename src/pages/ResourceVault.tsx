@@ -395,7 +395,7 @@ const ResourceVault = () => {
         {/* Main Content */}
         <div className="space-y-8">
           {/* Resource Finder */}
-          <Card className="border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01] bg-white/90 backdrop-blur-sm">
+          <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <CardTitle className="text-slate-800 flex items-center gap-2">
                 <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
@@ -456,7 +456,7 @@ const ResourceVault = () => {
           </Card>
 
           {/* Search by Topic */}
-          <Card className="border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 hover:scale-[1.01] bg-white/90 backdrop-blur-sm">
+          <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm">
             <CardHeader className="pb-4">
               <CardTitle className="text-slate-800 flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
@@ -488,7 +488,7 @@ const ResourceVault = () => {
 
         {/* Resources Display */}
         {resources.length > 0 && (
-          <Card className="mt-8 border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 bg-white/90 backdrop-blur-sm animate-fade-in">
+          <Card className="mt-8 border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm animate-fade-in">
             <CardHeader className="pb-4">
               <CardTitle className="text-slate-800 flex items-center gap-2">
                 <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
