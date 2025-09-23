@@ -36,6 +36,81 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [draggedStep, setDraggedStep] = useState<FiveEStep | null>(null);
   const [selectedELOsToMerge, setSelectedELOsToMerge] = useState<string[]>([]);
   
+  // Resources for each 5E step
+  const getResourcesForStep = (stepName: string): string[] => {
+    const stepKey = stepName.toLowerCase().replace('/', '').replace(' ', '');
+    const resourceMap: {[key: string]: string[]} = {
+      'engageelicit': [
+        'Paragraph reading',
+        'Driving question with Image(s)',
+        'Scenario based',
+        'Provocative Questions and Discussions (open ended question)',
+        'Debates and polls',
+        'Think, pair, share',
+        'Driving question on Pre-requisite',
+        'Previous class quiz questions',
+        'Discrepant Events and Demonstrations',
+        'Unexpected phenomena or magic tricks',
+        'Simple experiments',
+        'Short videos or video clips',
+        'Intriguing images or photos',
+        'Infographics or data visualizations',
+        'Personal anecdotes and stories',
+        'Problem scenarios or case studies',
+        'Relevant object presentation',
+        'Newspaper articles',
+        'Charts and graphic organizers',
+        'Brainstorming sessions',
+        'Writing prompts'
+      ],
+      'explore': [
+        'Showcase the ELO dealt',
+        'Create word wall',
+        'Grammar aspects',
+        'Real time examples',
+        'Place holders for files from teachers',
+        'Hands-on Experiments',
+        'Investigate scenarios',
+        'Interactive activities'
+      ],
+      'explain': [
+        'Word wall for introduction of new words',
+        'Lecturing',
+        'Story telling',
+        'Flip learning',
+        'Extra information relevant to the topic',
+        'Analogy',
+        'Story board',
+        'Concept explanations'
+      ],
+      'elaborate': [
+        'Experiments',
+        'Suggesting books to read',
+        'Short stories',
+        'Scenario demonstrations',
+        'Visual and Multimedia Resources',
+        'Placeholder for simulations',
+        'Olabs and manim resources',
+        'Phet simulations',
+        'Extended activities'
+      ],
+      'evaluate': [
+        'Quiz',
+        'Exit card',
+        'Questions',
+        'Concept maps',
+        'Puzzles',
+        'Jigsaw activities',
+        'Worksheet',
+        'Provision to upload customized worksheets',
+        'Assessment rubrics',
+        'Peer evaluation'
+      ]
+    };
+    
+    return resourceMap[stepKey] || [];
+  };
+  
   // Pre-populate all 5E steps for each ELO on mount
   useEffect(() => {
     if (elos.length > 0 && Object.keys(droppedSteps).length === 0) {
@@ -267,37 +342,35 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
                           </div>
                           
                            <div className="space-y-2">
-                             <div className="flex items-center justify-between">
-                               <label className="text-sm font-medium text-gray-700">Activity Description</label>
-                               {pedagogicalApproaches.length > 0 && (
-                                 <Popover>
-                                   <PopoverTrigger asChild>
-                                     <Button variant="outline" size="sm" className="text-xs">
-                                       <Plus className="w-3 h-3 mr-1" />
-                                       Add Approach
-                                       <ChevronDown className="w-3 h-3 ml-1" />
-                                     </Button>
-                                   </PopoverTrigger>
-                                   <PopoverContent className="w-80 p-0" align="end">
-                                     <div className="p-3 border-b">
-                                       <h4 className="font-medium text-sm text-gray-900">Select Pedagogical Approach</h4>
-                                       <p className="text-xs text-gray-500 mt-1">Click to add to the description</p>
-                                     </div>
-                                     <div className="max-h-60 overflow-y-auto">
-                                       {pedagogicalApproaches.map((approach, index) => (
-                                         <button
-                                           key={index}
-                                           onClick={() => addApproachToDescription(elo, step.id, approach)}
-                                           className="w-full text-left px-3 py-2 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 last:border-b-0"
-                                         >
-                                           {approach}
-                                         </button>
-                                       ))}
-                                     </div>
-                                   </PopoverContent>
-                                 </Popover>
-                               )}
-                             </div>
+                              <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-gray-700">Activity Description</label>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button variant="outline" size="sm" className="text-xs">
+                                      <Plus className="w-3 h-3 mr-1" />
+                                      Add Resources
+                                      <ChevronDown className="w-3 h-3 ml-1" />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-80 p-0" align="end">
+                                    <div className="p-3 border-b">
+                                      <h4 className="font-medium text-sm text-gray-900">Select {step.name} Resources</h4>
+                                      <p className="text-xs text-gray-500 mt-1">Click to add to the description</p>
+                                    </div>
+                                    <div className="max-h-60 overflow-y-auto">
+                                      {getResourcesForStep(step.name).map((resource, index) => (
+                                        <button
+                                          key={index}
+                                          onClick={() => addApproachToDescription(elo, step.id, resource)}
+                                          className="w-full text-left px-3 py-2 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 last:border-b-0"
+                                        >
+                                          {resource}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </PopoverContent>
+                                </Popover>
+                              </div>
                              <Textarea
                                placeholder={`Describe the ${step.name} activities for this ELO...`}
                                value={stepDescriptions[elo]?.[step.id] || ''}
