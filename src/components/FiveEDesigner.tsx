@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { GripVertical, Plus, X, Merge, ChevronDown, Brain, Loader2, AlertCircle, CheckCircle } from 'lucide-react';
+import { GripVertical, Plus, X, Merge, ChevronDown, Brain, Loader2, AlertCircle, CheckCircle, Edit3, Trash2, Save, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -47,6 +47,7 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [contentGenerated, setContentGenerated] = useState<{[key: string]: boolean}>({});
+  const [generatedContentData, setGeneratedContentData] = useState<{[key: string]: string}>({});
   
   // Resources for each 5E step
   const getResourcesForStep = (stepName: string): string[] => {
@@ -1156,6 +1157,9 @@ Students use the story framework to reflect on:
       const updatedDescription = currentDescription + separator + allGeneratedContent.trim();
       updateStepDescription(eloIndex, stepId, updatedDescription);
       
+      // Store generated content separately for management
+      setGeneratedContentData(prev => ({ ...prev, [stepKey]: allGeneratedContent.trim() }));
+      
       // Mark as generated
       setContentGenerated(prev => ({ ...prev, [stepKey]: true }));
       
@@ -1175,6 +1179,48 @@ Students use the story framework to reflect on:
     } finally {
       setGeneratingContent(prev => ({ ...prev, [stepKey]: false }));
     }
+  };
+
+  // Helper functions for generated content management
+  const editGeneratedContent = (stepKey: string) => {
+    const content = generatedContentData[stepKey] || '';
+    // Set content in textarea for editing - could be enhanced with a modal
+    const [eloIndex, stepId] = stepKey.split('_');
+    const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
+    
+    // Remove the generated content section and replace with editable version
+    const separator = '\n\n' + '='.repeat(50) + '\n🎓 EDUCATIONAL CONTENT GENERATED\n' + '='.repeat(50) + '\n\n';
+    const baseDescription = currentDescription.split(separator)[0];
+    
+    updateStepDescription(eloIndex, stepId, baseDescription + separator + content);
+  };
+
+  const deleteGeneratedContent = (stepKey: string) => {
+    const [eloIndex, stepId] = stepKey.split('_');
+    const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
+    
+    // Remove the generated content section
+    const separator = '\n\n' + '='.repeat(50) + '\n🎓 EDUCATIONAL CONTENT GENERATED\n' + '='.repeat(50) + '\n\n';
+    const baseDescription = currentDescription.split(separator)[0];
+    
+    updateStepDescription(eloIndex, stepId, baseDescription);
+    
+    // Remove from generated content tracking
+    setGeneratedContentData(prev => {
+      const updated = { ...prev };
+      delete updated[stepKey];
+      return updated;
+    });
+    setContentGenerated(prev => {
+      const updated = { ...prev };
+      delete updated[stepKey];
+      return updated;
+    });
+
+    toast({
+      title: "Content Deleted",
+      description: "Generated content has been removed from this step.",
+    });
   };
 
   return (
@@ -1403,6 +1449,123 @@ Students use the story framework to reflect on:
           </div>
         )}
       </Card>
+
+      {/* Generated Content Management Section */}
+      {Object.keys(generatedContentData).length > 0 && (
+        <Card className="p-6 bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-3">
+              <Brain className="w-6 h-6 text-emerald-600" />
+              <h3 className="text-lg font-semibold text-emerald-800">Generated Educational Content</h3>
+            </div>
+            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-emerald-300">
+              {Object.keys(generatedContentData).length} Items Generated
+            </Badge>
+          </div>
+          
+          <div className="space-y-4">
+            {Object.entries(generatedContentData).map(([stepKey, content]) => {
+              const [eloIndex, stepId] = stepKey.split('_');
+              const step = fiveESteps.find(s => s.id === stepId);
+              if (!step) return null;
+              
+              return (
+                <Card key={stepKey} className="border border-emerald-200 bg-white/70 backdrop-blur-sm">
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-3">
+                        <Badge className={step.color + " font-medium"}>
+                          {step.name}
+                        </Badge>
+                        <span className="text-sm font-medium text-gray-600">
+                          ELO: {eloIndex}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => editGeneratedContent(stepKey)}
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
+                        >
+                          <Edit3 className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteGeneratedContent(stepKey)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 max-h-64 overflow-y-auto">
+                      <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
+                        {content.length > 500 ? (
+                          <div>
+                            {content.substring(0, 500)}...
+                            <div className="mt-2 text-xs text-gray-500">
+                              Content truncated. Click Edit to see full content.
+                            </div>
+                          </div>
+                        ) : (
+                          content
+                        )}
+                      </pre>
+                    </div>
+                    
+                    <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
+                      <span>Generated content for {step.name} phase</span>
+                      <span>{content.length} characters</span>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+          
+          <div className="mt-6 p-4 bg-white/50 rounded-lg border border-emerald-200">
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-emerald-700">
+                <p className="font-medium mb-1">Content Management Tips:</p>
+                <ul className="space-y-1 text-xs">
+                  <li>• <strong>Edit:</strong> Modify generated content to better fit your teaching style</li>
+                  <li>• <strong>Delete:</strong> Remove generated content while keeping your original step description</li>
+                  <li>• Content is automatically saved with your 5E design</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* Save Button */}
+      {elos.length > 0 && (
+        <div className="flex justify-center mt-8">
+          <Button 
+            onClick={saveFiveEData}
+            disabled={isSaving}
+            className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold text-base rounded-lg"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                Generating Content & Saving...
+              </>
+            ) : (
+              <>
+                <Plus className="w-5 h-5 mr-2" />
+                Save 5E Design & Generate Content
+              </>
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
