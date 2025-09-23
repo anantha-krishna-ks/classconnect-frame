@@ -381,7 +381,7 @@ const ResourceVault = () => {
       <div className="max-w-7xl mx-auto px-6 py-8 bg-slate-50/30 animate-fade-in">
         {/* Page Header */}
         <div className="mb-10 animate-fade-in">
-          <div className="flex items-center gap-5 mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center gap-5 mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-md">
             <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center border-2 border-purple-200 hover:scale-105 transition-transform duration-200">
               <BookOpen className="w-7 h-7 text-purple-600" />
             </div>
