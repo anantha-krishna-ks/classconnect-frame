@@ -55,6 +55,7 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
   const [loadingLearningExperience, setLoadingLearningExperience] = useState(false);
   const [learningExperienceError, setLearningExperienceError] = useState<string | null>(null);
   const [learningExperience, setLearningExperience] = useState<any>(null);
+  const [fiveEData, setFiveEData] = useState<any>(null);
 
   const pedagogicalApproaches = [
     'Constructivism',
@@ -103,6 +104,88 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
   };
 
   // Intelligence types are hardcoded and not user-modifiable, so this handler is removed.
+
+  // Function to merge 5E content from multiple ELOs
+  const mergeFiveEContent = () => {
+    if (!fiveEData || !fiveEData.eloSteps) return null;
+    
+    // Group content by 5E phases
+    const phaseGroups: { [phase: string]: any[] } = {
+      'Engage/Elicit': [],
+      'Explore': [],
+      'Explain': [],
+      'Elaborate': [],
+      'Evaluate': []
+    };
+
+    // Extract content from each ELO and organize by phase
+    fiveEData.eloSteps.forEach((eloData: any) => {
+      if (eloData.steps && Array.isArray(eloData.steps)) {
+        eloData.steps.forEach((step: any) => {
+          const phaseName = step.name;
+          if (phaseGroups[phaseName]) {
+            const stepKey = `${eloData.elo}_${step.id}`;
+            const generatedContent = fiveEData.generatedContentData[stepKey] || {};
+            
+            phaseGroups[phaseName].push({
+              elo: eloData.elo,
+              stepId: step.id,
+              description: step.description || '',
+              resources: step.resources || [],
+              generatedContent: generatedContent,
+              timeAllocations: step.resourceTimeAllocations || {},
+              stepTime: step.stepTime || ''
+            });
+          }
+        });
+      }
+    });
+
+    // Create merged structure for each phase
+    const mergedContent = Object.entries(phaseGroups).map(([phase, contents]) => {
+      // Combine all resources from all ELOs for this phase
+      const allResources = contents.flatMap(c => c.resources).filter((r, i, arr) => arr.indexOf(r) === i);
+      
+      // Combine all generated content
+      const allGeneratedContent: { [key: string]: string } = {};
+      contents.forEach(content => {
+        Object.entries(content.generatedContent).forEach(([resourceName, contentText]) => {
+          const key = `${content.elo}_${resourceName}`;
+          allGeneratedContent[key] = contentText as string;
+        });
+      });
+      
+      // Combine all descriptions
+      const allDescriptions = contents
+        .map(c => c.description)
+        .filter(d => d && d.trim())
+        .join('\n\n');
+      
+      return {
+        phase,
+        merged_activities: contents,
+        combined_resources: allResources,
+        total_elos: contents.map(c => c.elo),
+        combined_descriptions: allDescriptions,
+        all_generated_content: allGeneratedContent,
+        total_step_time: contents.reduce((total, c) => {
+          const timeStr = c.stepTime || '0';
+          const minutes = parseInt(timeStr) || 0;
+          return total + minutes;
+        }, 0),
+        resource_count: allResources.length
+      };
+    }).filter(phase => phase.merged_activities.length > 0); // Only include phases that have activities
+
+    return {
+      merged_phases: mergedContent,
+      total_elos_count: elos.length,
+      pedagogical_approaches: selectedApproaches,
+      intelligence_types: selectedIntelligenceTypes,
+      total_resources: mergedContent.reduce((total, phase) => total + phase.resource_count, 0),
+      total_time_minutes: mergedContent.reduce((total, phase) => total + phase.total_step_time, 0)
+    };
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
@@ -230,7 +313,10 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
             
             <FiveEDesigner 
               elos={elos}
-              onFiveEChange={onFiveEChange}
+              onFiveEChange={(data) => {
+                setFiveEData(data);
+                onFiveEChange(data);
+              }}
               pedagogicalApproaches={selectedApproaches}
             />
           </div>
@@ -240,6 +326,9 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
         <div className="flex justify-center">
           <Button
             onClick={async () => {
+              // Merge all 5E content from multiple ELOs
+              const mergedFiveEContent = mergeFiveEContent();
+              
               setLoadingLearningExperience(true);
               setLearningExperienceError(null);
               setLearningExperience(null);
@@ -253,7 +342,8 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                     course_outcomes: courseOutcomes,
                     grade,
                     subject,
-                    chapter
+                    chapter,
+                    five_e_content: mergedFiveEContent // Add merged 5E content
                   },
                   { headers: { 'Content-Type': 'application/json' } }
                 );
@@ -286,7 +376,8 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
               selectedApproaches.length === 0 ||
               selectedIntelligenceTypes.length === 0 ||
               !elos.length ||
-              !courseOutcomes.length
+              !courseOutcomes.length ||
+              !fiveEData // Ensure 5E data is available
             }
           >
             {loadingLearningExperience ? (

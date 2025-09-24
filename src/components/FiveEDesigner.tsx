@@ -790,14 +790,25 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
         }
       }
       
-      // Prepare final data
-      const fiveEData = currentELOs.map(elo => ({
-        elo,
-        steps: (droppedSteps[elo] || []).map(step => ({
-          ...step,
-          description: stepDescriptions[elo]?.[step.id] || ''
-        }))
-      }));
+      // Prepare final data with all content, resources, and generated data
+      const fiveEData = {
+        eloSteps: currentELOs.map(elo => ({
+          elo,
+          steps: (droppedSteps[elo] || []).map(step => ({
+            ...step,
+            description: stepDescriptions[elo]?.[step.id] || '',
+            resources: selectedResources[elo]?.[step.id] || [],
+            stepTime: stepTimes[elo]?.[step.id] || '',
+            resourceTimeAllocations: resourceTimeAllocations[elo]?.[step.id] || {},
+          }))
+        })),
+        generatedContentData: generatedContentData,
+        contentGenerated: contentGenerated,
+        selectedResources: selectedResources,
+        stepDescriptions: stepDescriptions,
+        stepTimes: stepTimes,
+        resourceTimeAllocations: resourceTimeAllocations
+      };
       
       onFiveEChange(fiveEData);
       
