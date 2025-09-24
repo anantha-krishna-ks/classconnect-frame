@@ -421,61 +421,109 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                   }
                 }
                 if (parsed && parsed["5E_Model"]) {
-                  return parsed["5E_Model"].map((phaseObj: any, phaseIdx: number) => (
-                    <div key={phaseIdx} className="mb-8">
-                      <h4 className="text-lg font-bold text-primary mb-4">{phaseObj.phase}</h4>
-                      <div className="space-y-6">
-                        {phaseObj.activities.map((activity: any, actIdx: number) => (
-                          <Card key={actIdx} className="p-4 bg-white/90 border border-primary/10 shadow-sm">
-                            <div className="mb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                              <span className="text-base font-semibold text-blue-700">{activity.title}</span>
-                              <span className="text-xs bg-blue-100 text-blue-800 rounded px-2 py-1">{activity.pedagogical_approach}</span>
+                  // Reorganize data by phase first, then by ELO
+                  const phaseOrder = ['Engage/Elicit', 'Explore', 'Explain', 'Elaborate', 'Evaluate'];
+                  const organizedData: { [phase: string]: { [elo: string]: any[] } } = {};
+                  
+                  // Initialize phase structure
+                  phaseOrder.forEach(phase => {
+                    organizedData[phase] = {};
+                    elos.forEach(elo => {
+                      organizedData[phase][elo] = [];
+                    });
+                  });
+                  
+                  // Group activities by phase and ELO
+                  parsed["5E_Model"].forEach((phaseObj: any) => {
+                    const phaseName = phaseObj.phase;
+                    if (organizedData[phaseName]) {
+                      phaseObj.activities.forEach((activity: any) => {
+                        if (activity.elos && Array.isArray(activity.elos)) {
+                          activity.elos.forEach((elo: string) => {
+                            if (organizedData[phaseName][elo]) {
+                              organizedData[phaseName][elo].push(activity);
+                            }
+                          });
+                        } else {
+                          // If no specific ELOs, add to all ELOs
+                          elos.forEach(elo => {
+                            if (organizedData[phaseName][elo]) {
+                              organizedData[phaseName][elo].push(activity);
+                            }
+                          });
+                        }
+                      });
+                    }
+                  });
+                  
+                  return phaseOrder.map((phase) => (
+                    <div key={phase} className="mb-8">
+                      <h4 className="text-xl font-bold text-primary mb-6 border-b-2 border-primary/20 pb-2">
+                        {phase}
+                      </h4>
+                      <div className="space-y-6 ml-4">
+                        {elos.map((elo, eloIdx) => {
+                          const activities = organizedData[phase][elo] || [];
+                          if (activities.length === 0) return null;
+                          
+                          return (
+                            <div key={eloIdx} className="mb-6">
+                              <h5 className="text-lg font-semibold text-secondary-foreground mb-4 bg-muted/50 p-2 rounded">
+                                {elo}:
+                              </h5>
+                              <div className="space-y-4 ml-4">
+                                {activities.map((activity: any, actIdx: number) => (
+                                  <Card key={actIdx} className="p-4 bg-background/50 border border-muted shadow-sm">
+                                    <div className="mb-3">
+                                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+                                        <span className="text-base font-semibold text-foreground">{activity.title}</span>
+                                        <span className="text-xs bg-primary/10 text-primary rounded px-2 py-1">{activity.pedagogical_approach}</span>
+                                      </div>
+                                      <div className="text-muted-foreground leading-relaxed">{activity.description}</div>
+                                    </div>
+                                    
+                                    {activity.intelligence_types && activity.intelligence_types.length > 0 && (
+                                      <div className="flex flex-wrap gap-2 mb-3">
+                                        {activity.intelligence_types.map((type: string, i: number) => (
+                                          <Badge key={i} variant="secondary" className="bg-green-100 text-green-800 text-xs">{type}</Badge>
+                                        ))}
+                                      </div>
+                                    )}
+                                    
+                                    {activity.course_outcomes && activity.course_outcomes.length > 0 && (
+                                      <div className="mb-3">
+                                        <span className="font-medium text-sm text-muted-foreground">Course Outcomes:</span>
+                                        <ul className="list-disc ml-6 text-sm text-foreground mt-1">
+                                          {activity.course_outcomes.map((co: string, i: number) => (
+                                            <li key={i}>{co}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                    
+                                    {activity.materials && activity.materials.length > 0 && (
+                                      <div className="mb-2">
+                                        <span className="font-medium text-sm text-muted-foreground">Materials:</span>
+                                        <ul className="list-disc ml-6 text-sm text-foreground mt-1">
+                                          {activity.materials.map((mat: string, i: number) => (
+                                            <li key={i}>{mat}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    )}
+                                  </Card>
+                                ))}
+                              </div>
                             </div>
-                            <div className="mb-2 text-gray-700">{activity.description}</div>
-                            <div className="flex flex-wrap gap-2 mb-2">
-                              {activity.intelligence_types && activity.intelligence_types.map((type: string, i: number) => (
-                                <Badge key={i} className="bg-green-100 text-green-800">{type}</Badge>
-                              ))}
-                            </div>
-                            {activity.elos && (
-                              <div className="mb-2">
-                                <span className="font-medium text-sm text-gray-600">ELOs:</span>
-                                <ul className="list-disc ml-6 text-sm text-gray-800">
-                                  {activity.elos.map((elo: string, i: number) => (
-                                    <li key={i}>{elo}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {activity.course_outcomes && (
-                              <div className="mb-2">
-                                <span className="font-medium text-sm text-gray-600">Course Outcomes:</span>
-                                <ul className="list-disc ml-6 text-sm text-gray-800">
-                                  {activity.course_outcomes.map((co: string, i: number) => (
-                                    <li key={i}>{co}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {activity.materials && (
-                              <div className="mb-2">
-                                <span className="font-medium text-sm text-gray-600">Materials:</span>
-                                <ul className="list-disc ml-6 text-sm text-gray-800">
-                                  {activity.materials.map((mat: string, i: number) => (
-                                    <li key={i}>{mat}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </Card>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
-                  ));
+                  )).filter(Boolean);
                 }
                 // Fallback: show raw string
                 return (
-                  <pre className="bg-gray-100 rounded-lg p-4 text-xs overflow-x-auto max-h-[500px] text-red-700">
+                  <pre className="bg-muted rounded-lg p-4 text-xs overflow-x-auto max-h-[500px] text-destructive">
                     {typeof learningExperience === "string"
                       ? learningExperience
                       : JSON.stringify(learningExperience, null, 2)}
