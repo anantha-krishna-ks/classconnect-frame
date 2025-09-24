@@ -450,44 +450,17 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                         <div className="h-px bg-muted-foreground/30 flex-1"></div>
                       </div>
                       
-                      <div className="space-y-4">
+                      <div className="space-y-3 ml-6">
                         {Object.entries(eloActivities).map(([elo, activities]) => (
-                          <div key={elo} className="ml-4">
-                            <h5 className="text-lg font-semibold text-foreground mb-3 flex items-center">
-                              <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
-                              {elo}
-                            </h5>
-                            <div className="ml-5 space-y-3">
-                              {activities.map((activity: any, idx: number) => (
-                                <div key={idx} className="p-4 bg-muted/30 rounded-lg border-l-4 border-primary/40">
-                                  <div className="mb-2">
-                                    <span className="font-semibold text-foreground">{activity.title}</span>
-                                    {activity.pedagogical_approach && (
-                                      <Badge variant="secondary" className="ml-2 text-xs">
-                                        {activity.pedagogical_approach}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                  <p className="text-muted-foreground text-sm mb-2">{activity.description}</p>
-                                  
-                                  {activity.intelligence_types && activity.intelligence_types.length > 0 && (
-                                    <div className="flex flex-wrap gap-1 mb-2">
-                                      {activity.intelligence_types.map((type: string, i: number) => (
-                                        <Badge key={i} variant="outline" className="text-xs">
-                                          {type}
-                                        </Badge>
-                                      ))}
-                                    </div>
-                                  )}
-                                  
-                                  {activity.materials && activity.materials.length > 0 && (
-                                    <div className="mt-2">
-                                      <span className="text-xs font-medium text-muted-foreground">Materials: </span>
-                                      <span className="text-xs text-foreground">{activity.materials.join(', ')}</span>
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
+                          <div key={elo} className="flex items-start">
+                            <span className="text-foreground mr-2">•</span>
+                            <div>
+                              <span className="font-semibold text-foreground">{elo}: </span>
+                              <span className="text-muted-foreground">
+                                {activities.map((activity: any, idx: number) => 
+                                  activity.description || activity.title || "Generated Content"
+                                ).join(", ")}
+                              </span>
                             </div>
                           </div>
                         ))}
