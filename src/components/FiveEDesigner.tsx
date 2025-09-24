@@ -52,6 +52,8 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [contentGenerated, setContentGenerated] = useState<{[key: string]: boolean}>({});
   const [generatedContentData, setGeneratedContentData] = useState<{[key: string]: {[resourceName: string]: string}}>({});
+  // Drag state for reordering resources within a step
+  const [draggingResource, setDraggingResource] = useState<{eloKey: string; stepId: string; index: number} | null>(null);
   
   // Merge tracking state
   const [mergedELOs, setMergedELOs] = useState<{[mergedKey: string]: string[]}>({});
@@ -409,6 +411,65 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
       }
     }));
   };
+
+  // Drag-and-drop handlers for resources within a step
+  const handleResourceDragStart = (
+    e: React.DragEvent,
+    eloKey: string,
+    stepId: string,
+    index: number
+  ) => {
+    setDraggingResource({ eloKey, stepId, index });
+    e.dataTransfer.effectAllowed = 'move';
+    // Fallback for some browsers to transfer data
+    e.dataTransfer.setData(
+      'text/plain',
+      JSON.stringify({ eloKey, stepId, index })
+    );
+  };
+
+  const handleResourceDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleResourceDrop = (
+    e: React.DragEvent,
+    eloKey: string,
+    stepId: string,
+    dropIndex: number
+  ) => {
+    e.preventDefault();
+
+    let source = draggingResource;
+    try {
+      const data = e.dataTransfer.getData('text/plain');
+      if (!source && data) source = JSON.parse(data);
+    } catch {}
+
+    if (!source) return;
+
+    // Only allow reordering within the same step
+    if (source.eloKey === eloKey && source.stepId === stepId) {
+      setSelectedResources(prev => {
+        const current = [...(prev[eloKey]?.[stepId] || [])];
+        const [moved] = current.splice(source!.index, 1);
+        const insertIndex = dropIndex > source!.index ? dropIndex - 1 : dropIndex;
+        current.splice(insertIndex, 0, moved);
+        return {
+          ...prev,
+          [eloKey]: {
+            ...prev[eloKey],
+            [stepId]: current,
+          },
+        };
+      });
+    }
+
+    setDraggingResource(null);
+  };
+
+  const handleResourceDragEnd = () => setDraggingResource(null);
 
   const removeStep = (eloIndex: string, stepId: string) => {
     setDroppedSteps(prev => ({
@@ -1863,10 +1924,19 @@ Students use the story framework to reflect on:
                                       const isGenerating = generatingContent[stepKey];
                                       
                                       return (
-                                        <div key={index} className="space-y-2">
+                                        <div key={index} className="space-y-2" onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}>
                                           {/* Resource Header */}
                                            <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
                                               <div className="flex items-center gap-2">
+                                                <span
+                                                  draggable
+                                                  onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)}
+                                                  onDragEnd={handleResourceDragEnd}
+                                                  title="Drag to reorder"
+                                                  className="cursor-grab"
+                                                >
+                                                  <GripVertical className="w-4 h-4 text-gray-500" />
+                                                </span>
                                                 <span className="text-sm text-gray-800 font-medium">• {resource}</span>
                                               </div>
                                               <div className="flex items-center gap-2">
