@@ -254,52 +254,82 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     let mergedGeneratedContent: {[resourceName: string]: string} = {};
     const mergedContentGenerated: {[key: string]: boolean} = {};
     
+    // First pass: collect all unique steps across all selected ELOs
+    const stepsByName: {[stepName: string]: {
+      steps: Array<{step: FiveEStep, elo: string}>,
+      resources: Array<{resource: string, elo: string}>,
+      descriptions: Array<{description: string, elo: string}>,
+      content: Array<{resourceName: string, content: string, elo: string}>
+    }} = {};
+
     selectedELOsToMerge.forEach(elo => {
       const eloSteps = droppedSteps[elo] || [];
       eloSteps.forEach(step => {
-        const existingStep = mergedSteps.find(s => s.name === step.name);
-        if (existingStep) {
-          // Merge descriptions
-          const existingDesc = mergedDescriptions[existingStep.id] || '';
-          const newDesc = stepDescriptions[elo]?.[step.id] || '';
-          if (newDesc) {
-            mergedDescriptions[existingStep.id] = existingDesc ? `${existingDesc}\n\n--- Merged from ${elo} ---\n${newDesc}` : newDesc;
-          }
-          
-          // Merge selected resources
-          const existingResources = mergedSelectedResources[existingStep.id] || [];
-          const newResources = selectedResources[elo]?.[step.id] || [];
-          mergedSelectedResources[existingStep.id] = [...new Set([...existingResources, ...newResources])];
-          
-          // Merge generated content
-          const stepKey = `${elo}_${step.id}`;
-          const mergedStepKey = `${mergedELOText}_${existingStep.id}`;
-          const stepContent = generatedContentData[stepKey] || {};
-          Object.entries(stepContent).forEach(([resourceName, content]) => {
-            const existingContent = mergedGeneratedContent[resourceName] || '';
-            mergedGeneratedContent[resourceName] = existingContent ? 
-              `${existingContent}\n\n--- Merged Content ---\n${content}` : content;
-          });
-          
-          if (contentGenerated[stepKey]) {
-            mergedContentGenerated[mergedStepKey] = true;
-          }
-        } else {
-          const newStep = { ...step, id: `${step.id}_merged_${Date.now()}` };
-          mergedSteps.push(newStep);
-          mergedDescriptions[newStep.id] = stepDescriptions[elo]?.[step.id] || '';
-          mergedSelectedResources[newStep.id] = selectedResources[elo]?.[step.id] || [];
-          
-          // Copy generated content for new steps
-          const stepKey = `${elo}_${step.id}`;
-          const mergedStepKey = `${mergedELOText}_${newStep.id}`;
-          mergedGeneratedContent = { ...mergedGeneratedContent, ...(generatedContentData[stepKey] || {}) };
-          
-          if (contentGenerated[stepKey]) {
-            mergedContentGenerated[mergedStepKey] = true;
-          }
+        if (!stepsByName[step.name]) {
+          stepsByName[step.name] = { steps: [], resources: [], descriptions: [], content: [] };
         }
+        
+        stepsByName[step.name].steps.push({ step, elo });
+        
+        // Collect resources
+        const resources = selectedResources[elo]?.[step.id] || [];
+        resources.forEach(resource => {
+          stepsByName[step.name].resources.push({ resource, elo });
+        });
+        
+        // Collect descriptions
+        const description = stepDescriptions[elo]?.[step.id] || '';
+        if (description) {
+          stepsByName[step.name].descriptions.push({ description, elo });
+        }
+        
+        // Collect generated content
+        const stepKey = `${elo}_${step.id}`;
+        const stepContent = generatedContentData[stepKey] || {};
+        Object.entries(stepContent).forEach(([resourceName, content]) => {
+          stepsByName[step.name].content.push({ resourceName, content, elo });
+        });
       });
+    });
+
+    // Second pass: create merged steps with combined data
+    Object.entries(stepsByName).forEach(([stepName, data]) => {
+      const newStep = { 
+        ...data.steps[0].step, 
+        id: `${stepName.toLowerCase().replace(/[^a-z0-9]/g, '')}_merged_${Date.now()}` 
+      };
+      mergedSteps.push(newStep);
+      
+      // Merge descriptions from all ELOs
+      const combinedDescription = data.descriptions.length > 0 
+        ? data.descriptions.map(d => `--- From ${d.elo} ---\n${d.description}`).join('\n\n')
+        : '';
+      mergedDescriptions[newStep.id] = combinedDescription;
+      
+      // Merge unique resources
+      const uniqueResources = [...new Set(data.resources.map(r => r.resource))];
+      mergedSelectedResources[newStep.id] = uniqueResources;
+      
+      // Merge content by resource name
+      const resourceContentMap: {[resourceName: string]: string[]} = {};
+      data.content.forEach(({ resourceName, content, elo }) => {
+        if (!resourceContentMap[resourceName]) {
+          resourceContentMap[resourceName] = [];
+        }
+        resourceContentMap[resourceName].push(`--- From ${elo} ---\n${content}`);
+      });
+      
+      // Combine content for each resource
+      Object.entries(resourceContentMap).forEach(([resourceName, contents]) => {
+        mergedGeneratedContent[resourceName] = contents.join('\n\n');
+      });
+      
+      // Mark as generated if any source had generated content
+      const mergedStepKey = `${mergedELOText}_${newStep.id}`;
+      const hasGeneratedContent = data.content.length > 0;
+      if (hasGeneratedContent) {
+        mergedContentGenerated[mergedStepKey] = true;
+      }
     });
     
     // Update state with merged data
@@ -332,11 +362,11 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     newStepDescriptions[mergedELOText] = mergedDescriptions;
     newSelectedResources[mergedELOText] = mergedSelectedResources;
     
-    // Add merged generated content
+    // Add merged generated content properly structured by step
     mergedSteps.forEach(step => {
       const mergedStepKey = `${mergedELOText}_${step.id}`;
       if (Object.keys(mergedGeneratedContent).length > 0) {
-        newGeneratedContentData[mergedStepKey] = mergedGeneratedContent;
+        newGeneratedContentData[mergedStepKey] = {...mergedGeneratedContent};
         newContentGenerated[mergedStepKey] = mergedContentGenerated[mergedStepKey] || false;
       }
     });
