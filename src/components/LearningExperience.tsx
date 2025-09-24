@@ -456,7 +456,11 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                             <span className="text-foreground mr-2">•</span>
                             <div>
                               <span className="font-semibold text-foreground">ELO{index + 1}: </span>
-                              <span className="text-muted-foreground">[Generated Content]</span>
+                              <span className="text-muted-foreground">
+                                {activities.map((activity: any, idx: number) => 
+                                  activity.description || activity.title || activity.content || "Generated learning activity"
+                                ).join(", ")}
+                              </span>
                             </div>
                           </div>
                         ))}
