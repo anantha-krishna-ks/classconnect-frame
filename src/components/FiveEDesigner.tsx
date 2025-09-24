@@ -200,7 +200,7 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   
   // State for step times and resource time allocations
   const [stepTimes, setStepTimes] = useState<{[key: string]: {[key: string]: string}}>({});
-  const [resourceTimeAllocations, setResourceTimeAllocations] = useState<{[key: string]: {[key: string]: {[resourceId: string]: number}}>({});
+  const [resourceTimeAllocations, setResourceTimeAllocations] = useState<{[key: string]: {[key: string]: {[resourceId: string]: number}}}>({});
   const [isGeneratingTimeBasedContent, setIsGeneratingTimeBasedContent] = useState<{[key: string]: boolean}>({});
   const [apiKey, setApiKey] = useState<string>('');
   
