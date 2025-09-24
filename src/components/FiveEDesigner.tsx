@@ -1917,14 +1917,14 @@ Students use the story framework to reflect on:
                                  {selectedResources[eloKey]?.[step.id]?.length > 0 && (
                                    <div className="space-y-3">
                                      <label className="text-sm font-medium text-gray-700">Selected Resources:</label>
-                                     <div className="space-y-3">
+                                      <div className="space-y-3" onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, (selectedResources[eloKey]?.[step.id]?.length || 0))}>
                                      {selectedResources[eloKey][step.id].map((resource, index) => {
                                        const stepKey = `${eloKey}_${step.id}`;
                                       const resourceContent = generatedContentData[stepKey]?.[resource];
                                       const isGenerating = generatingContent[stepKey];
                                       
                                       return (
-                                        <div key={index} className="space-y-2" onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}>
+                                        <div key={resource} className="space-y-2" draggable onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)} onDragEnd={handleResourceDragEnd} onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}>
                                           {/* Resource Header */}
                                            <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
                                               <div className="flex items-center gap-2">
