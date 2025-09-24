@@ -322,6 +322,81 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
           </div>
         )}
 
+        {/* Show Merged 5E Content */}
+        {fiveEData && (
+          <div className="mb-8">
+            <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+              <h3 className="text-xl font-bold text-blue-800 mb-4 flex items-center">
+                <Brain className="w-6 h-6 mr-2 text-blue-600" />
+                Merged 5E Content from All ELOs
+              </h3>
+              {(() => {
+                const mergedContent = mergeFiveEContent();
+                if (!mergedContent) return null;
+                
+                return mergedContent.merged_phases.map((phase: any, idx: number) => (
+                  <div key={idx} className="mb-6">
+                    <h4 className="text-lg font-semibold text-blue-700 mb-3 border-b border-blue-200 pb-2">
+                      {phase.phase} ({phase.total_step_time} mins)
+                    </h4>
+                    
+                    <div className="mb-3">
+                      <Badge className="bg-blue-100 text-blue-800 mb-2">
+                        {phase.total_elos.length} ELOs | {phase.resource_count} Resources
+                      </Badge>
+                    </div>
+                    
+                    {phase.combined_descriptions && (
+                      <div className="mb-4 p-3 bg-white rounded-lg border border-blue-100">
+                        <h5 className="font-medium text-blue-700 mb-2">Combined Descriptions:</h5>
+                        <p className="text-sm text-gray-700">{phase.combined_descriptions}</p>
+                      </div>
+                    )}
+                    
+                    {phase.combined_resources.length > 0 && (
+                      <div className="mb-4">
+                        <h5 className="font-medium text-blue-700 mb-2">Resources & Generated Content:</h5>
+                        <div className="space-y-3">
+                          {phase.combined_resources.map((resource: string, resIdx: number) => (
+                            <Card key={resIdx} className="p-4 bg-white border border-blue-100">
+                              <h6 className="font-medium text-blue-600 mb-2">{resource}</h6>
+                              
+                              {/* Show generated content for this resource from all ELOs */}
+                              <div className="space-y-2">
+                                {Object.entries(phase.all_generated_content)
+                                  .filter(([key, _]) => key.includes(resource))
+                                  .map(([key, content], contentIdx) => {
+                                    const eloName = key.split('_')[0]; // Extract ELO name from key
+                                    return (
+                                      <div key={contentIdx} className="bg-gray-50 p-3 rounded border-l-4 border-blue-300">
+                                        <div className="flex items-center mb-1">
+                                          <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                            {eloName}
+                                          </Badge>
+                                        </div>
+                                        <div className="text-sm text-gray-700 whitespace-pre-wrap">
+                                          {content as string}
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                              
+                              {Object.entries(phase.all_generated_content).filter(([key, _]) => key.includes(resource)).length === 0 && (
+                                <p className="text-xs text-gray-500 italic">No generated content available for this resource</p>
+                              )}
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ));
+              })()}
+            </Card>
+          </div>
+        )}
+
         {/* Generate Learning Experience Button */}
         <div className="flex justify-center">
           <Button
