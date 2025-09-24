@@ -327,86 +327,37 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     const resources = selectedResources[eloKey]?.[stepId] || [];
     if (resources.length === 0 || !totalTime.trim()) return;
 
-    const stepKey = `${eloKey}_${stepId}`;
-    setIsGeneratingTimeBasedContent(prev => ({ ...prev, [stepKey]: true }));
+    console.log('Distributing time:', { eloKey, stepId, totalTime, resources });
 
     try {
       // Parse total time (assume format like "30 mins", "1 hour", etc.)
       const timeInMinutes = parseTimeToMinutes(totalTime);
+      console.log('Time in minutes:', timeInMinutes);
       
-      if (!apiKey) {
-        // Simple equal distribution if no AI
-        const timePerResource = Math.floor(timeInMinutes / resources.length);
-        const allocations: {[resource: string]: number} = {};
-        resources.forEach(resource => {
-          allocations[resource] = timePerResource;
-        });
-        
-        setResourceTimeAllocations(prev => ({
+      // Simple equal distribution (always use this for reliability)
+      const timePerResource = Math.floor(timeInMinutes / resources.length);
+      const remainder = timeInMinutes % resources.length;
+      const allocations: {[resource: string]: number} = {};
+      
+      resources.forEach((resource, index) => {
+        // Distribute remainder among first few resources
+        allocations[resource] = timePerResource + (index < remainder ? 1 : 0);
+      });
+      
+      console.log('Allocations:', allocations);
+      
+      setResourceTimeAllocations(prev => {
+        const updated = {
           ...prev,
           [eloKey]: {
             ...prev[eloKey],
             [stepId]: allocations
           }
-        }));
-      } else {
-        // Use AI for smart distribution
-        const response = await fetch('https://api.perplexity.ai/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'llama-3.1-sonar-small-128k-online',
-            messages: [
-              {
-                role: 'system',
-                content: 'You are an educational time management AI. Distribute time among learning resources based on their complexity and learning objectives. Return only a JSON object with resource names as keys and minutes as values.'
-              },
-              {
-                role: 'user',
-                content: `Distribute ${timeInMinutes} minutes among these learning resources: ${resources.join(', ')}. Consider the complexity and time needed for each resource type.`
-              }
-            ],
-            temperature: 0.2,
-            max_tokens: 500,
-          }),
-        });
-
-        const data = await response.json();
-        const aiResponse = data.choices[0].message.content;
+        };
+        console.log('Updated allocations state:', updated);
+        return updated;
+      });
         
-        try {
-          const allocations = JSON.parse(aiResponse);
-          setResourceTimeAllocations(prev => ({
-            ...prev,
-            [eloKey]: {
-              ...prev[eloKey],
-              [stepId]: allocations
-            }
-          }));
-          
-          // Generate time-based content for each resource
-          await generateTimeBasedContent(eloKey, stepId, allocations);
-        } catch (parseError) {
-          console.error('Error parsing AI response:', parseError);
-          // Fallback to equal distribution
-          const timePerResource = Math.floor(timeInMinutes / resources.length);
-          const allocations: {[resource: string]: number} = {};
-          resources.forEach(resource => {
-            allocations[resource] = timePerResource;
-          });
-          
-          setResourceTimeAllocations(prev => ({
-            ...prev,
-            [eloKey]: {
-              ...prev[eloKey],
-              [stepId]: allocations
-            }
-          }));
-        }
-      }
     } catch (error) {
       console.error('Error distributing time:', error);
       toast({
@@ -415,8 +366,6 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
         variant: "destructive"
       });
     }
-
-    setIsGeneratingTimeBasedContent(prev => ({ ...prev, [stepKey]: false }));
   };
 
   // Parse time string to minutes
