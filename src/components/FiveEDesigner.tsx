@@ -492,7 +492,9 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     
     // Only allow reordering within the same step
     if (data.eloKey === eloKey && data.stepId === stepId && data.index !== dropIndex) {
-      reorderResources(eloKey, stepId, data.index, dropIndex);
+      // Adjust drop index if dragging to a position after the original
+      const adjustedDropIndex = data.index < dropIndex ? dropIndex - 1 : dropIndex;
+      reorderResources(eloKey, stepId, data.index, adjustedDropIndex);
     }
   };
 
@@ -2001,27 +2003,34 @@ Students use the story framework to reflect on:
                                  {selectedResources[eloKey]?.[step.id]?.length > 0 && (
                                    <div className="space-y-3">
                                      <label className="text-sm font-medium text-gray-700">Selected Resources:</label>
-                                     <div className="space-y-3">
-                                     {selectedResources[eloKey][step.id].map((resource, index) => {
-                                       const stepKey = `${eloKey}_${step.id}`;
-                                      const resourceContent = generatedContentData[stepKey]?.[resource];
-                                      const isGenerating = generatingContent[stepKey];
-                                      
-                                       return (
-                                         <div 
-                                           key={index} 
-                                           className="space-y-2 cursor-move"
-                                           draggable
-                                           onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)}
-                                           onDragOver={handleResourceDragOver}
-                                           onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}
-                                         >
-                                           {/* Resource Header */}
-                                            <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
-                                               <div className="flex items-center gap-2">
-                                                 <GripVertical className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-                                                 <span className="text-sm text-gray-800 font-medium">• {resource}</span>
-                                               </div>
+                                      <div className="space-y-3">
+                                      {selectedResources[eloKey][step.id].map((resource, index) => {
+                                        const stepKey = `${eloKey}_${step.id}`;
+                                       const resourceContent = generatedContentData[stepKey]?.[resource];
+                                       const isGenerating = generatingContent[stepKey];
+                                       
+                                        return (
+                                          <div key={index}>
+                                            {/* Drop zone at the top of first item */}
+                                            {index === 0 && (
+                                              <div
+                                                className="h-2 border-2 border-dashed border-transparent hover:border-blue-300 transition-colors rounded"
+                                                onDragOver={handleResourceDragOver}
+                                                onDrop={(e) => handleResourceDrop(e, eloKey, step.id, 0)}
+                                              />
+                                            )}
+                                            
+                                            <div 
+                                              className="space-y-2 cursor-move select-none"
+                                              draggable
+                                              onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)}
+                                            >
+                                              {/* Resource Header */}
+                                               <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
+                                                  <div className="flex items-center gap-2">
+                                                    <GripVertical className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                                                    <span className="text-sm text-gray-800 font-medium">• {resource}</span>
+                                                  </div>
                                               <div className="flex items-center gap-2">
                                                 <span className="text-xs text-gray-600">Estimated time:</span>
                                                  <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
@@ -2042,62 +2051,70 @@ Students use the story framework to reflect on:
                                              </Button>
                                            </div>
                                           
-                                          {/* Generated Content for this Resource */}
-                                          {isGenerating ? (
-                                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                                              <div className="flex items-center space-x-2 text-yellow-700">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                <span className="text-sm">Generating content for {resource}...</span>
-                                              </div>
-                                            </div>
-                                          ) : resourceContent ? (
-                                            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 space-y-2">
-                                              <div className="flex items-center justify-between">
-                                                <div className="flex items-center space-x-2">
-                                                  <Brain className="w-4 h-4 text-emerald-600" />
-                                                  <span className="text-sm font-medium text-emerald-700">Generated Content</span>
-                                                </div>
-                                                <div className="flex items-center space-x-2">
-                                                  <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => editGeneratedContent(stepKey, resource)}
-                                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 h-6 text-xs px-2"
-                                                  >
-                                                    <Edit3 className="w-3 h-3 mr-1" />
-                                                    Edit
-                                                  </Button>
-                                                  <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => deleteGeneratedContent(stepKey, resource)}
-                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-6 text-xs px-2"
-                                                  >
-                                                    <Trash2 className="w-3 h-3 mr-1" />
-                                                    Delete
-                                                  </Button>
-                                                </div>
-                                              </div>
-                                              <div className="bg-white rounded border border-emerald-200 p-3 max-h-48 overflow-y-auto">
-                                                <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
-                                                  {resourceContent.length > 300 ? (
-                                                    <div>
-                                                      {resourceContent.substring(0, 300)}...
-                                                      <div className="mt-2 text-xs text-gray-500">
-                                                        Content truncated. Click Edit to see full content.
-                                                      </div>
-                                                    </div>
-                                                  ) : (
-                                                    resourceContent
-                                                  )}
-                                                </pre>
-                                              </div>
-                                            </div>
-                                          ) : null}
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
+                                               {/* Generated Content for this Resource */}
+                                               {isGenerating ? (
+                                                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                                                   <div className="flex items-center space-x-2 text-yellow-700">
+                                                     <Loader2 className="w-4 h-4 animate-spin" />
+                                                     <span className="text-sm">Generating content for {resource}...</span>
+                                                   </div>
+                                                 </div>
+                                               ) : resourceContent ? (
+                                                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 space-y-2">
+                                                   <div className="flex items-center justify-between">
+                                                     <div className="flex items-center space-x-2">
+                                                       <Brain className="w-4 h-4 text-emerald-600" />
+                                                       <span className="text-sm font-medium text-emerald-700">Generated Content</span>
+                                                     </div>
+                                                     <div className="flex items-center space-x-2">
+                                                       <Button
+                                                         variant="outline"
+                                                         size="sm"
+                                                         onClick={() => editGeneratedContent(stepKey, resource)}
+                                                         className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 h-6 text-xs px-2"
+                                                       >
+                                                         <Edit3 className="w-3 h-3 mr-1" />
+                                                         Edit
+                                                       </Button>
+                                                       <Button
+                                                         variant="outline"
+                                                         size="sm"
+                                                         onClick={() => deleteGeneratedContent(stepKey, resource)}
+                                                         className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-6 text-xs px-2"
+                                                       >
+                                                         <Trash2 className="w-3 h-3 mr-1" />
+                                                         Delete
+                                                       </Button>
+                                                     </div>
+                                                   </div>
+                                                   <div className="bg-white rounded border border-emerald-200 p-3 max-h-48 overflow-y-auto">
+                                                     <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
+                                                       {resourceContent.length > 300 ? (
+                                                         <div>
+                                                           {resourceContent.substring(0, 300)}...
+                                                           <div className="mt-2 text-xs text-gray-500">
+                                                             Content truncated. Click Edit to see full content.
+                                                           </div>
+                                                         </div>
+                                                       ) : (
+                                                         resourceContent
+                                                       )}
+                                                     </pre>
+                                                   </div>
+                                                 </div>
+                                               ) : null}
+                                             </div>
+                                             
+                                             {/* Drop zone after each item */}
+                                             <div
+                                               className="h-2 border-2 border-dashed border-transparent hover:border-blue-300 transition-colors rounded"
+                                               onDragOver={handleResourceDragOver}
+                                               onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index + 1)}
+                                             />
+                                           </div>
+                                         );
+                                       })}
+                                     </div>
                                 </div>
                               )}
                               
