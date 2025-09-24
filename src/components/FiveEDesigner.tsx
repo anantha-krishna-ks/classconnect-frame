@@ -1723,7 +1723,6 @@ Students use the story framework to reflect on:
                             <div className="space-y-4">
                               <div className="flex items-center justify-between gap-4">
                                 <div className="flex-1">
-                                  <label className="text-sm font-medium text-gray-700">Activity Description</label>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <div className="flex items-center gap-2">
