@@ -141,6 +141,19 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     return resourceMap[stepKey] || [];
   };
   
+  // Helper function to get display name for ELO
+  const getELODisplayName = (eloKey: string) => {
+    if (mergedELOs[eloKey]) {
+      const originalCount = mergedELOs[eloKey].length;
+      return `Merged: ${originalCount} ELOs`;
+    }
+    const originalIndex = elos.findIndex(elo => elo === eloKey);
+    return originalIndex !== -1 ? `ELO ${originalIndex + 1}` : eloKey.substring(0, 20) + '...';
+  };
+
+  // Get current available ELOs (dynamic based on droppedSteps)
+  const getCurrentELOs = () => Object.keys(droppedSteps);
+
   // Pre-populate all 5E steps for each ELO on mount
   useEffect(() => {
     if (elos.length > 0 && Object.keys(droppedSteps).length === 0) {
@@ -152,8 +165,17 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
         }));
       });
       setDroppedSteps(initialSteps);
+      setActiveELO(elos[0]);
     }
   }, [elos]);
+
+  // Validate activeELO whenever droppedSteps changes
+  useEffect(() => {
+    const currentELOs = getCurrentELOs();
+    if (currentELOs.length > 0 && (!activeELO || !currentELOs.includes(activeELO))) {
+      setActiveELO(currentELOs[0]);
+    }
+  }, [droppedSteps, activeELO]);
 
   const handleDragStart = (e: React.DragEvent, step: FiveEStep) => {
     setDraggedStep(step);
@@ -1526,41 +1548,65 @@ Students use the story framework to reflect on:
           </div>
         )}
         
-        {elos.length > 0 ? (
+        {getCurrentELOs().length > 0 ? (
           <Tabs value={activeELO} onValueChange={setActiveELO}>
             <TabsList className="inline-flex h-12 items-center justify-start rounded-none bg-white border-b border-gray-200 w-full p-0 mb-6">
-              {elos.map((elo, index) => (
+              {getCurrentELOs().map((eloKey) => (
                 <TabsTrigger 
-                  key={index} 
-                  value={elo}
+                  key={eloKey} 
+                  value={eloKey}
                   className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 data-[state=active]:text-blue-600 data-[state=active]:border-blue-600 transition-all duration-200 rounded-none bg-transparent"
                 >
-                  ELO {index + 1}
+                  {getELODisplayName(eloKey)}
+                  {mergedELOs[eloKey] && (
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        demergeELO(eloKey);
+                      }}
+                      variant="ghost"
+                      size="sm"
+                      className="ml-2 h-auto p-1 text-orange-500 hover:text-orange-700 hover:bg-orange-50"
+                    >
+                      <X className="w-3 h-3" />
+                    </Button>
+                  )}
                 </TabsTrigger>
               ))}
             </TabsList>
 
-            {elos.map((elo, index) => (
-              <TabsContent key={index} value={elo} className="space-y-6">
+            {getCurrentELOs().map((eloKey) => (
+              <TabsContent key={eloKey} value={eloKey} className="space-y-6">
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Expected Learning Outcome</h4>
-                  <p className="text-sm text-gray-600">{elo}</p>
+                  {mergedELOs[eloKey] ? (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-blue-600">Merged ELOs ({mergedELOs[eloKey].length})</p>
+                      {mergedELOs[eloKey].map((originalELO, idx) => (
+                        <p key={idx} className="text-sm text-gray-600 pl-4 border-l-2 border-blue-200">
+                          <span className="font-medium">ELO {elos.findIndex(e => e === originalELO) + 1}:</span> {originalELO}
+                        </p>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-600">{eloKey}</p>
+                  )}
                 </div>
 
                 {/* Drop Zone for 5E Steps */}
                 <div 
                   className="min-h-[200px] border-2 border-dashed border-blue-300 rounded-xl p-6 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 hover:border-blue-400 hover:bg-blue-50/70 transition-all duration-200"
                   onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, elo)}
+                  onDrop={(e) => handleDrop(e, eloKey)}
                 >
                   <h4 className="text-sm font-semibold text-blue-700 mb-4 flex items-center">
                     <Plus className="w-4 h-4 mr-2" />
                     5E Learning Sequence
                   </h4>
                   
-                  {droppedSteps[elo] && droppedSteps[elo].length > 0 ? (
+                  {droppedSteps[eloKey] && droppedSteps[eloKey].length > 0 ? (
                     <div className="space-y-4">
-                      {droppedSteps[elo].map((step, stepIndex) => (
+                      {droppedSteps[eloKey].map((step, stepIndex) => (
                         <Card key={step.id} className="p-4 bg-white border border-gray-200">
                           <div className="flex items-center justify-between mb-3">
                             <Badge className={step.color}>
@@ -1599,7 +1645,7 @@ Students use the story framework to reflect on:
                                         {getResourcesForStep(step.name).map((resource, index) => (
                                           <button
                                             key={index}
-                                            onClick={() => addApproachToDescription(elo, step.id, resource)}
+                                            onClick={() => addApproachToDescription(eloKey, step.id, resource)}
                                             className="w-full text-left px-3 py-2 text-sm border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 last:border-b-0"
                                           >
                                             {resource}
@@ -1612,12 +1658,12 @@ Students use the story framework to reflect on:
                               </div>
                               
                               {/* Selected Resources Display */}
-                              {selectedResources[elo]?.[step.id]?.length > 0 && (
+                              {selectedResources[eloKey]?.[step.id]?.length > 0 && (
                                 <div className="space-y-3">
                                   <label className="text-sm font-medium text-gray-700">Selected Resources:</label>
                                   <div className="space-y-3">
-                                    {selectedResources[elo][step.id].map((resource, index) => {
-                                      const stepKey = `${elo}_${step.id}`;
+                                     {selectedResources[eloKey][step.id].map((resource, index) => {
+                                       const stepKey = `${eloKey}_${step.id}`;
                                       const resourceContent = generatedContentData[stepKey]?.[resource];
                                       const isGenerating = generatingContent[stepKey];
                                       
@@ -1629,7 +1675,7 @@ Students use the story framework to reflect on:
                                             <Button
                                               variant="ghost"
                                               size="sm"
-                                              onClick={() => removeResource(elo, step.id, index)}
+                                              onClick={() => removeResource(eloKey, step.id, index)}
                                               className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
                                             >
                                               <X className="w-3 h-3" />
