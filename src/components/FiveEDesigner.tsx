@@ -1924,17 +1924,12 @@ Students use the story framework to reflect on:
                                       const isGenerating = generatingContent[stepKey];
                                       
                                       return (
-                                        <div key={resource} className="space-y-2" draggable onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)} onDragEnd={handleResourceDragEnd} onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}>
+                                        <div key={`${step.id}-${index}`} className="space-y-2" draggable onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)} onDragEnd={handleResourceDragEnd} onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}>
                                           {/* Resource Header */}
-                                           <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+                                           <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200 cursor-move"
+                                             onMouseDown={(e) => e.stopPropagation()}>
                                               <div className="flex items-center gap-2">
-                                                <span
-                                                  draggable
-                                                  onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)}
-                                                  onDragEnd={handleResourceDragEnd}
-                                                  title="Drag to reorder"
-                                                  className="cursor-grab"
-                                                >
+                                                <span title="Drag to reorder" className="cursor-grab">
                                                   <GripVertical className="w-4 h-4 text-gray-500" />
                                                 </span>
                                                 <span className="text-sm text-gray-800 font-medium">• {resource}</span>
