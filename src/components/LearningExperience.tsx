@@ -400,9 +400,9 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
         )}
         {showLearningContent && learningExperience && (
           <div className="mt-8 animate-fade-in">
-            <Card className="p-6 bg-background border-2 border-primary/20">
-              <h3 className="text-xl font-bold text-foreground mb-4 flex items-center">
-                <Brain className="w-6 h-6 mr-2 text-primary" />
+            <Card className="p-8 bg-gradient-to-br from-background via-background to-primary/5 border-2 border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-6 flex items-center">
+                <Brain className="w-7 h-7 mr-3 text-primary animate-pulse" />
                 Learning Experience (5E Model)
               </h3>
               {/* Organized by 5E phases, then by ELOs */}
