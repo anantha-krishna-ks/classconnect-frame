@@ -451,11 +451,11 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                       </div>
                       
                       <div className="space-y-3 ml-6">
-                        {Object.entries(eloActivities).map(([elo, activities]) => (
+                        {Object.entries(eloActivities).map(([elo, activities], index) => (
                           <div key={elo} className="flex items-start">
                             <span className="text-foreground mr-2">•</span>
                             <div>
-                              <span className="font-semibold text-foreground">{elo}: </span>
+                              <span className="font-semibold text-foreground">ELO{index + 1}: </span>
                               <span className="text-muted-foreground">[Generated Content]</span>
                             </div>
                           </div>
