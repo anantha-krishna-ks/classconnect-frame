@@ -50,6 +50,22 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [contentGenerated, setContentGenerated] = useState<{[key: string]: boolean}>({});
   const [generatedContentData, setGeneratedContentData] = useState<{[key: string]: {[resourceName: string]: string}}>({});
   
+  // Merge tracking state
+  const [mergedELOs, setMergedELOs] = useState<{[mergedKey: string]: string[]}>({});
+  const [originalELOData, setOriginalELOData] = useState<{
+    droppedSteps: {[key: string]: FiveEStep[]};
+    stepDescriptions: {[key: string]: {[stepId: string]: string}};
+    selectedResources: {[key: string]: {[stepId: string]: string[]}};
+    generatedContentData: {[key: string]: {[resourceName: string]: string}};
+    contentGenerated: {[key: string]: boolean};
+  }>({
+    droppedSteps: {},
+    stepDescriptions: {},
+    selectedResources: {},
+    generatedContentData: {},
+    contentGenerated: {}
+  });
+  
   // Resources for each 5E step
   const getResourcesForStep = (stepName: string): string[] => {
     const stepKey = stepName.toLowerCase().replace('/', '').replace(' ', '');
@@ -211,24 +227,77 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     
     const mergedELOText = selectedELOsToMerge.join(' + ');
     
+    // Store original data before merging
+    const originalData = {
+      droppedSteps: {...droppedSteps},
+      stepDescriptions: {...stepDescriptions},
+      selectedResources: {...selectedResources},
+      generatedContentData: {...generatedContentData},
+      contentGenerated: {...contentGenerated}
+    };
+    
+    setOriginalELOData(prev => ({
+      ...prev,
+      ...originalData
+    }));
+    
+    // Track this merge
+    setMergedELOs(prev => ({
+      ...prev,
+      [mergedELOText]: [...selectedELOsToMerge]
+    }));
+    
     // Merge the steps and descriptions
     const mergedSteps: FiveEStep[] = [];
     const mergedDescriptions: {[stepId: string]: string} = {};
+    const mergedSelectedResources: {[stepId: string]: string[]} = {};
+    let mergedGeneratedContent: {[resourceName: string]: string} = {};
+    const mergedContentGenerated: {[key: string]: boolean} = {};
     
     selectedELOsToMerge.forEach(elo => {
       const eloSteps = droppedSteps[elo] || [];
       eloSteps.forEach(step => {
         const existingStep = mergedSteps.find(s => s.name === step.name);
         if (existingStep) {
+          // Merge descriptions
           const existingDesc = mergedDescriptions[existingStep.id] || '';
           const newDesc = stepDescriptions[elo]?.[step.id] || '';
           if (newDesc) {
-            mergedDescriptions[existingStep.id] = existingDesc ? `${existingDesc}\n\n${newDesc}` : newDesc;
+            mergedDescriptions[existingStep.id] = existingDesc ? `${existingDesc}\n\n--- Merged from ${elo} ---\n${newDesc}` : newDesc;
+          }
+          
+          // Merge selected resources
+          const existingResources = mergedSelectedResources[existingStep.id] || [];
+          const newResources = selectedResources[elo]?.[step.id] || [];
+          mergedSelectedResources[existingStep.id] = [...new Set([...existingResources, ...newResources])];
+          
+          // Merge generated content
+          const stepKey = `${elo}_${step.id}`;
+          const mergedStepKey = `${mergedELOText}_${existingStep.id}`;
+          const stepContent = generatedContentData[stepKey] || {};
+          Object.entries(stepContent).forEach(([resourceName, content]) => {
+            const existingContent = mergedGeneratedContent[resourceName] || '';
+            mergedGeneratedContent[resourceName] = existingContent ? 
+              `${existingContent}\n\n--- Merged Content ---\n${content}` : content;
+          });
+          
+          if (contentGenerated[stepKey]) {
+            mergedContentGenerated[mergedStepKey] = true;
           }
         } else {
           const newStep = { ...step, id: `${step.id}_merged_${Date.now()}` };
           mergedSteps.push(newStep);
           mergedDescriptions[newStep.id] = stepDescriptions[elo]?.[step.id] || '';
+          mergedSelectedResources[newStep.id] = selectedResources[elo]?.[step.id] || [];
+          
+          // Copy generated content for new steps
+          const stepKey = `${elo}_${step.id}`;
+          const mergedStepKey = `${mergedELOText}_${newStep.id}`;
+          mergedGeneratedContent = { ...mergedGeneratedContent, ...(generatedContentData[stepKey] || {}) };
+          
+          if (contentGenerated[stepKey]) {
+            mergedContentGenerated[mergedStepKey] = true;
+          }
         }
       });
     });
@@ -236,19 +305,124 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     // Update state with merged data
     const newDroppedSteps = { ...droppedSteps };
     const newStepDescriptions = { ...stepDescriptions };
+    const newSelectedResources = { ...selectedResources };
+    const newGeneratedContentData = { ...generatedContentData };
+    const newContentGenerated = { ...contentGenerated };
     
     selectedELOsToMerge.forEach(elo => {
       delete newDroppedSteps[elo];
       delete newStepDescriptions[elo];
+      delete newSelectedResources[elo];
+      
+      // Clean up generated content for removed ELOs
+      Object.keys(newGeneratedContentData).forEach(key => {
+        if (key.startsWith(`${elo}_`)) {
+          delete newGeneratedContentData[key];
+        }
+      });
+      Object.keys(newContentGenerated).forEach(key => {
+        if (key.startsWith(`${elo}_`)) {
+          delete newContentGenerated[key];
+        }
+      });
     });
     
+    // Add merged data
     newDroppedSteps[mergedELOText] = mergedSteps;
     newStepDescriptions[mergedELOText] = mergedDescriptions;
+    newSelectedResources[mergedELOText] = mergedSelectedResources;
+    
+    // Add merged generated content
+    mergedSteps.forEach(step => {
+      const mergedStepKey = `${mergedELOText}_${step.id}`;
+      if (Object.keys(mergedGeneratedContent).length > 0) {
+        newGeneratedContentData[mergedStepKey] = mergedGeneratedContent;
+        newContentGenerated[mergedStepKey] = mergedContentGenerated[mergedStepKey] || false;
+      }
+    });
     
     setDroppedSteps(newDroppedSteps);
     setStepDescriptions(newStepDescriptions);
+    setSelectedResources(newSelectedResources);
+    setGeneratedContentData(newGeneratedContentData);
+    setContentGenerated(newContentGenerated);
     setSelectedELOsToMerge([]);
     setActiveELO(mergedELOText);
+    
+    toast({
+      title: "ELOs Merged Successfully",
+      description: `Merged ${selectedELOsToMerge.length} ELOs with all their content and resources.`,
+    });
+  };
+
+  const demergeELO = (mergedELOText: string) => {
+    const originalELOs = mergedELOs[mergedELOText];
+    if (!originalELOs) return;
+    
+    // Restore original data for the ELOs that were merged
+    const newDroppedSteps = { ...droppedSteps };
+    const newStepDescriptions = { ...stepDescriptions };
+    const newSelectedResources = { ...selectedResources };
+    const newGeneratedContentData = { ...generatedContentData };
+    const newContentGenerated = { ...contentGenerated };
+    
+    // Remove merged ELO
+    delete newDroppedSteps[mergedELOText];
+    delete newStepDescriptions[mergedELOText];
+    delete newSelectedResources[mergedELOText];
+    
+    // Clean up merged generated content
+    Object.keys(newGeneratedContentData).forEach(key => {
+      if (key.startsWith(`${mergedELOText}_`)) {
+        delete newGeneratedContentData[key];
+      }
+    });
+    Object.keys(newContentGenerated).forEach(key => {
+      if (key.startsWith(`${mergedELOText}_`)) {
+        delete newContentGenerated[key];
+      }
+    });
+    
+    // Restore original ELOs
+    originalELOs.forEach(elo => {
+      if (originalELOData.droppedSteps[elo]) {
+        newDroppedSteps[elo] = originalELOData.droppedSteps[elo];
+        newStepDescriptions[elo] = originalELOData.stepDescriptions[elo] || {};
+        newSelectedResources[elo] = originalELOData.selectedResources[elo] || {};
+        
+        // Restore generated content
+        Object.keys(originalELOData.generatedContentData).forEach(key => {
+          if (key.startsWith(`${elo}_`)) {
+            newGeneratedContentData[key] = originalELOData.generatedContentData[key];
+          }
+        });
+        Object.keys(originalELOData.contentGenerated).forEach(key => {
+          if (key.startsWith(`${elo}_`)) {
+            newContentGenerated[key] = originalELOData.contentGenerated[key];
+          }
+        });
+      }
+    });
+    
+    setDroppedSteps(newDroppedSteps);
+    setStepDescriptions(newStepDescriptions);
+    setSelectedResources(newSelectedResources);
+    setGeneratedContentData(newGeneratedContentData);
+    setContentGenerated(newContentGenerated);
+    
+    // Remove from merged tracking
+    setMergedELOs(prev => {
+      const updated = { ...prev };
+      delete updated[mergedELOText];
+      return updated;
+    });
+    
+    setActiveELO(originalELOs[0]);
+    
+    toast({
+      title: "ELOs De-merged Successfully", 
+      description: `Restored ${originalELOs.length} original ELOs with their content.`,
+    });
   };
 
   const saveFiveEData = async () => {
@@ -1283,6 +1457,20 @@ Students use the story framework to reflect on:
                   Merge ({selectedELOsToMerge.length})
                 </Button>
               )}
+              
+              {/* De-merge buttons for existing merged ELOs */}
+              {Object.keys(mergedELOs).map((mergedELO) => (
+                <Button
+                  key={mergedELO}
+                  onClick={() => demergeELO(mergedELO)}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 text-orange-600 border-orange-300 hover:bg-orange-50"
+                >
+                  <X className="w-4 h-4" />
+                  De-merge: {mergedELO.substring(0, 20)}...
+                </Button>
+              ))}
             </div>
           )}
         </div>
