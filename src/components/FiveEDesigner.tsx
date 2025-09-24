@@ -42,6 +42,9 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [draggedStep, setDraggedStep] = useState<FiveEStep | null>(null);
   const [selectedELOsToMerge, setSelectedELOsToMerge] = useState<string[]>([]);
   
+  // State for custom resource entry
+  const [customResourceInput, setCustomResourceInput] = useState<{[key: string]: {[key: string]: string}}>({});
+  
   // New states for content generation
   const [perplexityApiKey, setPerplexityApiKey] = useState<string>('');
   const [generatingContent, setGeneratingContent] = useState<{[key: string]: boolean}>({});
@@ -66,7 +69,83 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     contentGenerated: {}
   });
   
-  // Resources for each 5E step
+  // All available resources across all 5E steps
+  const getAllResources = (): string[] => {
+    const resourceMap: {[key: string]: string[]} = {
+      'engageelicit': [
+        'Paragraph reading',
+        'Driving question with Image(s)',
+        'Scenario based',
+        'Provocative Questions and Discussions (open ended question)',
+        'Debates and polls',
+        'Think, pair, share',
+        'Driving question on Pre-requisite',
+        'Previous class quiz questions',
+        'Discrepant Events and Demonstrations',
+        'Unexpected phenomena or magic tricks',
+        'Simple experiments',
+        'Short videos or video clips',
+        'Intriguing images or photos',
+        'Infographics or data visualizations',
+        'Personal anecdotes and stories',
+        'Problem scenarios or case studies',
+        'Relevant object presentation',
+        'Newspaper articles',
+        'Charts and graphic organizers',
+        'Brainstorming sessions',
+        'Writing prompts'
+      ],
+      'explore': [
+        'Showcase the ELO dealt',
+        'Create word wall',
+        'Grammar aspects',
+        'Real time examples',
+        'Place holders for files from teachers',
+        'Hands-on Experiments',
+        'Investigate scenarios',
+        'Interactive activities'
+      ],
+      'explain': [
+        'Word wall for introduction of new words',
+        'Lecturing',
+        'Story telling',
+        'Flip learning',
+        'Extra information relevant to the topic',
+        'Analogy',
+        'Story board',
+        'Concept explanations'
+      ],
+      'elaborate': [
+        'Experiments',
+        'Suggesting books to read',
+        'Short stories',
+        'Scenario demonstrations',
+        'Visual and Multimedia Resources',
+        'Placeholder for simulations',
+        'Olabs and manim resources',
+        'Phet simulations',
+        'Extended activities'
+      ],
+      'evaluate': [
+        'Quiz',
+        'Exit card',
+        'Questions',
+        'Concept maps',
+        'Puzzles',
+        'Jigsaw activities',
+        'Worksheet',
+        'Provision to upload customized worksheets',
+        'Assessment rubrics',
+        'Peer evaluation'
+      ]
+    };
+    
+    // Combine all resources and remove duplicates
+    const allResources = Object.values(resourceMap).flat();
+    return [...new Set(allResources)].sort();
+  };
+
+  // Resources for each 5E step (kept for backward compatibility)
   const getResourcesForStep = (stepName: string): string[] => {
     const stepKey = stepName.toLowerCase().replace('/', '').replace(' ', '');
     const resourceMap: {[key: string]: string[]} = {
@@ -197,6 +276,33 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
       [eloIndex]: [...(prev[eloIndex] || []), newStep]
     }));
     setDraggedStep(null);
+  };
+
+  // Add custom resource function
+  const addCustomResource = (eloKey: string, stepId: string) => {
+    const customResource = customResourceInput[eloKey]?.[stepId]?.trim();
+    if (customResource) {
+      addApproachToDescription(eloKey, stepId, customResource);
+      // Clear the input after adding
+      setCustomResourceInput(prev => ({
+        ...prev,
+        [eloKey]: {
+          ...prev[eloKey],
+          [stepId]: ''
+        }
+      }));
+    }
+  };
+
+  // Update custom resource input
+  const updateCustomResourceInput = (eloKey: string, stepId: string, value: string) => {
+    setCustomResourceInput(prev => ({
+      ...prev,
+      [eloKey]: {
+        ...prev[eloKey],
+        [stepId]: value
+      }
+    }));
   };
 
   const addApproachToDescription = (eloIndex: string, stepId: string, approach: string) => {
@@ -1638,11 +1744,42 @@ Students use the story framework to reflect on:
                                     </PopoverTrigger>
                                     <PopoverContent className="w-80 p-0" align="end">
                                       <div className="p-3 border-b">
-                                        <h4 className="font-medium text-sm text-gray-900">Select {step.name} Resources</h4>
-                                        <p className="text-xs text-gray-500 mt-1">Click to add as resource</p>
+                                        <h4 className="font-medium text-sm text-gray-900">Add Resources</h4>
+                                        <p className="text-xs text-gray-500 mt-1">Select from available resources or add custom</p>
                                       </div>
+                                      
+                                      {/* Custom Resource Entry */}
+                                      <div className="p-3 border-b bg-gray-50">
+                                        <div className="space-y-2">
+                                          <label className="text-xs font-medium text-gray-700">Custom Resource:</label>
+                                          <div className="flex gap-2">
+                                            <input
+                                              type="text"
+                                              placeholder="Enter custom resource..."
+                                              value={customResourceInput[eloKey]?.[step.id] || ''}
+                                              onChange={(e) => updateCustomResourceInput(eloKey, step.id, e.target.value)}
+                                              className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                              onKeyPress={(e) => {
+                                                if (e.key === 'Enter') {
+                                                  addCustomResource(eloKey, step.id);
+                                                }
+                                              }}
+                                            />
+                                            <Button
+                                              size="sm"
+                                              onClick={() => addCustomResource(eloKey, step.id)}
+                                              className="px-2 py-1 text-xs h-auto"
+                                              disabled={!customResourceInput[eloKey]?.[step.id]?.trim()}
+                                            >
+                                              Add
+                                            </Button>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Predefined Resources */}
                                       <div className="max-h-60 overflow-y-auto">
-                                        {getResourcesForStep(step.name).map((resource, index) => (
+                                        {getAllResources().map((resource, index) => (
                                           <button
                                             key={index}
                                             onClick={() => addApproachToDescription(eloKey, step.id, resource)}
