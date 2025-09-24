@@ -48,13 +48,7 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   // State for step times and resource time allocations
   const [stepTimes, setStepTimes] = useState<{[key: string]: {[key: string]: string}}>({});
   const [resourceTimeAllocations, setResourceTimeAllocations] = useState<{[key: string]: {[key: string]: {[resource: string]: number}}}>({});
-  const [isGeneratingTimeBasedContent, setIsGeneratingTimeBasedContent] = useState<{[key: string]: boolean}>({});
-  const [apiKey, setApiKey] = useState<string>('');
-  
-  // New states for content generation
-  const [perplexityApiKey, setPerplexityApiKey] = useState<string>('');
   const [generatingContent, setGeneratingContent] = useState<{[key: string]: boolean}>({});
-  const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [contentGenerated, setContentGenerated] = useState<{[key: string]: boolean}>({});
   const [generatedContentData, setGeneratedContentData] = useState<{[key: string]: {[resourceName: string]: string}}>({});
@@ -383,51 +377,6 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     }
   };
 
-  // Generate time-based content for resources
-  const generateTimeBasedContent = async (eloKey: string, stepId: string, allocations: {[resource: string]: number}) => {
-    if (!apiKey) return;
-
-    for (const [resource, minutes] of Object.entries(allocations)) {
-      try {
-        const response = await fetch('https://api.perplexity.ai/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'llama-3.1-sonar-small-128k-online',
-            messages: [
-              {
-                role: 'system',
-                content: 'You are an educational content generator. Create detailed learning activities that fit within the specified time constraint.'
-              },
-              {
-                role: 'user',
-                content: `Create a detailed ${minutes}-minute learning activity for "${resource}". Include specific steps, materials needed, and learning objectives that can be completed within this timeframe.`
-              }
-            ],
-            temperature: 0.3,
-            max_tokens: 800,
-          }),
-        });
-
-        const data = await response.json();
-        const content = data.choices[0].message.content;
-        
-        const stepKey = `${eloKey}_${stepId}`;
-        setGeneratedContentData(prev => ({
-          ...prev,
-          [stepKey]: {
-            ...prev[stepKey],
-            [resource]: content
-          }
-        }));
-      } catch (error) {
-        console.error(`Error generating content for ${resource}:`, error);
-      }
-    }
-  };
 
   const addApproachToDescription = (eloIndex: string, stepId: string, approach: string) => {
     setSelectedResources(prev => {
@@ -1685,65 +1634,6 @@ Students use the story framework to reflect on:
 
   return (
     <div className="space-y-8">
-      {/* API Key Input */}
-      {!apiKey && (
-        <Alert>
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            <div className="space-y-3">
-              <p>Enter your Perplexity API key to enable AI-powered time distribution and content generation:</p>
-              <div className="flex gap-2">
-                <input
-                  type="password"
-                  placeholder="Enter Perplexity API key..."
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
-                <Button onClick={() => {
-                  if (apiKey) {
-                    toast({
-                      title: "API Key Saved",
-                      description: "You can now use AI features for time distribution and content generation."
-                    });
-                  }
-                }}>
-                  Save
-                </Button>
-              </div>
-            </div>
-          </AlertDescription>
-        </Alert>
-      )}
-      {/* API Key Input - Show if not connected to Supabase */}
-      {showApiKeyInput && (
-        <Card className="p-4 bg-orange-50 border-orange-200">
-          <div className="space-y-3">
-            <Label className="text-sm font-medium text-orange-800">
-              Perplexity API Key Required
-            </Label>
-            <p className="text-xs text-orange-700">
-              Enter your Perplexity API key to generate contextual content for each 5E phase.
-            </p>
-            <div className="flex gap-2">
-              <Input
-                type="password"
-                placeholder="Enter your Perplexity API key"
-                value={perplexityApiKey}
-                onChange={(e) => setPerplexityApiKey(e.target.value)}
-                className="flex-1"
-              />
-              <Button
-                onClick={() => setShowApiKeyInput(false)}
-                variant="outline"
-                size="sm"
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        </Card>
-      )}
 
       {/* ELO Tabs with Drop Zones */}
       <Card className="p-6 bg-white border border-gray-200">
