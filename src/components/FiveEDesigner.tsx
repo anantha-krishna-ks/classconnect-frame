@@ -45,6 +45,12 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   // State for custom resource entry
   const [customResourceInput, setCustomResourceInput] = useState<{[key: string]: {[key: string]: string}}>({});
   
+  // State for step times and resource time allocations
+  const [stepTimes, setStepTimes] = useState<{[key: string]: {[key: string]: string}}>({});
+  const [resourceTimeAllocations, setResourceTimeAllocations] = useState<{[key: string]: {[key: string]: {[resource: string]: number}}}>({});
+  const [isGeneratingTimeBasedContent, setIsGeneratingTimeBasedContent] = useState<{[key: string]: boolean}>({});
+  const [apiKey, setApiKey] = useState<string>('');
+  
   // New states for content generation
   const [perplexityApiKey, setPerplexityApiKey] = useState<string>('');
   const [generatingContent, setGeneratingContent] = useState<{[key: string]: boolean}>({});
@@ -303,6 +309,175 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
         [stepId]: value
       }
     }));
+  };
+
+  // Update step time
+  const updateStepTime = (eloKey: string, stepId: string, time: string) => {
+    setStepTimes(prev => ({
+      ...prev,
+      [eloKey]: {
+        ...prev[eloKey],
+        [stepId]: time
+      }
+    }));
+  };
+
+  // Distribute time among resources using AI
+  const distributeTimeAmongResources = async (eloKey: string, stepId: string, totalTime: string) => {
+    const resources = selectedResources[eloKey]?.[stepId] || [];
+    if (resources.length === 0 || !totalTime.trim()) return;
+
+    const stepKey = `${eloKey}_${stepId}`;
+    setIsGeneratingTimeBasedContent(prev => ({ ...prev, [stepKey]: true }));
+
+    try {
+      // Parse total time (assume format like "30 mins", "1 hour", etc.)
+      const timeInMinutes = parseTimeToMinutes(totalTime);
+      
+      if (!apiKey) {
+        // Simple equal distribution if no AI
+        const timePerResource = Math.floor(timeInMinutes / resources.length);
+        const allocations: {[resource: string]: number} = {};
+        resources.forEach(resource => {
+          allocations[resource] = timePerResource;
+        });
+        
+        setResourceTimeAllocations(prev => ({
+          ...prev,
+          [eloKey]: {
+            ...prev[eloKey],
+            [stepId]: allocations
+          }
+        }));
+      } else {
+        // Use AI for smart distribution
+        const response = await fetch('https://api.perplexity.ai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'llama-3.1-sonar-small-128k-online',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are an educational time management AI. Distribute time among learning resources based on their complexity and learning objectives. Return only a JSON object with resource names as keys and minutes as values.'
+              },
+              {
+                role: 'user',
+                content: `Distribute ${timeInMinutes} minutes among these learning resources: ${resources.join(', ')}. Consider the complexity and time needed for each resource type.`
+              }
+            ],
+            temperature: 0.2,
+            max_tokens: 500,
+          }),
+        });
+
+        const data = await response.json();
+        const aiResponse = data.choices[0].message.content;
+        
+        try {
+          const allocations = JSON.parse(aiResponse);
+          setResourceTimeAllocations(prev => ({
+            ...prev,
+            [eloKey]: {
+              ...prev[eloKey],
+              [stepId]: allocations
+            }
+          }));
+          
+          // Generate time-based content for each resource
+          await generateTimeBasedContent(eloKey, stepId, allocations);
+        } catch (parseError) {
+          console.error('Error parsing AI response:', parseError);
+          // Fallback to equal distribution
+          const timePerResource = Math.floor(timeInMinutes / resources.length);
+          const allocations: {[resource: string]: number} = {};
+          resources.forEach(resource => {
+            allocations[resource] = timePerResource;
+          });
+          
+          setResourceTimeAllocations(prev => ({
+            ...prev,
+            [eloKey]: {
+              ...prev[eloKey],
+              [stepId]: allocations
+            }
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error distributing time:', error);
+      toast({
+        title: "Error",
+        description: "Failed to distribute time among resources",
+        variant: "destructive"
+      });
+    }
+
+    setIsGeneratingTimeBasedContent(prev => ({ ...prev, [stepKey]: false }));
+  };
+
+  // Parse time string to minutes
+  const parseTimeToMinutes = (timeStr: string): number => {
+    const cleanTime = timeStr.toLowerCase().replace(/\s+/g, '');
+    
+    if (cleanTime.includes('hour')) {
+      const hours = parseInt(cleanTime) || 1;
+      return hours * 60;
+    } else if (cleanTime.includes('min')) {
+      return parseInt(cleanTime) || 30;
+    } else {
+      // Assume minutes if no unit specified
+      return parseInt(cleanTime) || 30;
+    }
+  };
+
+  // Generate time-based content for resources
+  const generateTimeBasedContent = async (eloKey: string, stepId: string, allocations: {[resource: string]: number}) => {
+    if (!apiKey) return;
+
+    for (const [resource, minutes] of Object.entries(allocations)) {
+      try {
+        const response = await fetch('https://api.perplexity.ai/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'llama-3.1-sonar-small-128k-online',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are an educational content generator. Create detailed learning activities that fit within the specified time constraint.'
+              },
+              {
+                role: 'user',
+                content: `Create a detailed ${minutes}-minute learning activity for "${resource}". Include specific steps, materials needed, and learning objectives that can be completed within this timeframe.`
+              }
+            ],
+            temperature: 0.3,
+            max_tokens: 800,
+          }),
+        });
+
+        const data = await response.json();
+        const content = data.choices[0].message.content;
+        
+        const stepKey = `${eloKey}_${stepId}`;
+        setGeneratedContentData(prev => ({
+          ...prev,
+          [stepKey]: {
+            ...prev[stepKey],
+            [resource]: content
+          }
+        }));
+      } catch (error) {
+        console.error(`Error generating content for ${resource}:`, error);
+      }
+    }
   };
 
   const addApproachToDescription = (eloIndex: string, stepId: string, approach: string) => {
@@ -1549,6 +1724,36 @@ Students use the story framework to reflect on:
 
   return (
     <div className="space-y-8">
+      {/* API Key Input */}
+      {!apiKey && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <div className="space-y-3">
+              <p>Enter your Perplexity API key to enable AI-powered time distribution and content generation:</p>
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  placeholder="Enter Perplexity API key..."
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                <Button onClick={() => {
+                  if (apiKey) {
+                    toast({
+                      title: "API Key Saved",
+                      description: "You can now use AI features for time distribution and content generation."
+                    });
+                  }
+                }}>
+                  Save
+                </Button>
+              </div>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
       {/* API Key Input - Show if not connected to Supabase */}
       {showApiKeyInput && (
         <Card className="p-4 bg-orange-50 border-orange-200">
@@ -1721,11 +1926,19 @@ Students use the story framework to reflect on:
                             <div className="flex items-center gap-2">
                               <div className="flex items-center gap-2">
                                 <label className="text-sm font-medium text-gray-700">Time:</label>
-                                <input
-                                  type="text"
-                                  placeholder="30 mins"
-                                  className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                />
+                                 <input
+                                   type="text"
+                                   placeholder="30 mins"
+                                   value={stepTimes[eloKey]?.[step.id] || ''}
+                                   onChange={(e) => updateStepTime(eloKey, step.id, e.target.value)}
+                                   onBlur={() => {
+                                     const time = stepTimes[eloKey]?.[step.id];
+                                     if (time && selectedResources[eloKey]?.[step.id]?.length > 0) {
+                                       distributeTimeAmongResources(eloKey, step.id, time);
+                                     }
+                                   }}
+                                   className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                 />
                               </div>
                               <Popover>
                                     <PopoverTrigger asChild>
@@ -1801,17 +2014,24 @@ Students use the story framework to reflect on:
                                       return (
                                         <div key={index} className="space-y-2">
                                           {/* Resource Header */}
-                                          <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-                                            <span className="text-sm text-gray-800 font-medium">• {resource}</span>
-                                            <Button
-                                              variant="ghost"
-                                              size="sm"
-                                              onClick={() => removeResource(eloKey, step.id, index)}
-                                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
-                                            >
-                                              <X className="w-3 h-3" />
-                                            </Button>
-                                          </div>
+                                           <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+                                             <div className="flex items-center gap-2">
+                                               <span className="text-sm text-gray-800 font-medium">• {resource}</span>
+                                               {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] && (
+                                                 <Badge variant="secondary" className="text-xs">
+                                                   {resourceTimeAllocations[eloKey][step.id][resource]} min
+                                                 </Badge>
+                                               )}
+                                             </div>
+                                             <Button
+                                               variant="ghost"
+                                               size="sm"
+                                               onClick={() => removeResource(eloKey, step.id, index)}
+                                               className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                                             >
+                                               <X className="w-3 h-3" />
+                                             </Button>
+                                           </div>
                                           
                                           {/* Generated Content for this Resource */}
                                           {isGenerating ? (
