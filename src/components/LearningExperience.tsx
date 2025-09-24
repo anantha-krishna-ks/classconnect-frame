@@ -405,12 +405,11 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                 <Brain className="w-6 h-6 mr-2 text-primary" />
                 Learning Experience (5E Model)
               </h3>
-              {/* Robust parsing and fallback */}
+              {/* Organized by 5E phases, then by ELOs */}
               {(() => {
                 let parsed = learningExperience;
                 if (typeof parsed === "string") {
                   try {
-                    // Try to extract JSON substring if possible
                     const jsonStart = parsed.indexOf('{');
                     const jsonEnd = parsed.lastIndexOf('}') + 1;
                     if (jsonStart !== -1 && jsonEnd !== -1) {
@@ -420,62 +419,86 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                     parsed = null;
                   }
                 }
+                
                 if (parsed && parsed["5E_Model"]) {
-                  return parsed["5E_Model"].map((phaseObj: any, phaseIdx: number) => (
-                    <div key={phaseIdx} className="mb-8">
-                      <h4 className="text-lg font-bold text-primary mb-4">{phaseObj.phase}</h4>
-                      <div className="space-y-6">
-                        {phaseObj.activities.map((activity: any, actIdx: number) => (
-                          <Card key={actIdx} className="p-4 bg-white/90 border border-primary/10 shadow-sm">
-                            <div className="mb-2 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                              <span className="text-base font-semibold text-blue-700">{activity.title}</span>
-                              <span className="text-xs bg-blue-100 text-blue-800 rounded px-2 py-1">{activity.pedagogical_approach}</span>
-                            </div>
-                            <div className="mb-2 text-gray-700">{activity.description}</div>
-                            <div className="flex flex-wrap gap-2 mb-2">
-                              {activity.intelligence_types && activity.intelligence_types.map((type: string, i: number) => (
-                                <Badge key={i} className="bg-green-100 text-green-800">{type}</Badge>
+                  // Group activities by phase, then by ELO
+                  const phaseGroups: { [phase: string]: { [elo: string]: any[] } } = {};
+                  
+                  parsed["5E_Model"].forEach((phaseObj: any) => {
+                    const phaseName = phaseObj.phase;
+                    if (!phaseGroups[phaseName]) {
+                      phaseGroups[phaseName] = {};
+                    }
+                    
+                    phaseObj.activities.forEach((activity: any) => {
+                      if (activity.elos && Array.isArray(activity.elos)) {
+                        activity.elos.forEach((elo: string) => {
+                          if (!phaseGroups[phaseName][elo]) {
+                            phaseGroups[phaseName][elo] = [];
+                          }
+                          phaseGroups[phaseName][elo].push(activity);
+                        });
+                      }
+                    });
+                  });
+                  
+                  return Object.entries(phaseGroups).map(([phase, eloActivities]) => (
+                    <div key={phase} className="mb-8">
+                      <div className="flex items-center mb-6">
+                        <div className="h-px bg-muted-foreground/30 flex-1"></div>
+                        <h4 className="text-xl font-bold text-primary mx-4">{phase}</h4>
+                        <div className="h-px bg-muted-foreground/30 flex-1"></div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        {Object.entries(eloActivities).map(([elo, activities]) => (
+                          <div key={elo} className="ml-4">
+                            <h5 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+                              <span className="w-2 h-2 bg-primary rounded-full mr-3"></span>
+                              {elo}
+                            </h5>
+                            <div className="ml-5 space-y-3">
+                              {activities.map((activity: any, idx: number) => (
+                                <div key={idx} className="p-4 bg-muted/30 rounded-lg border-l-4 border-primary/40">
+                                  <div className="mb-2">
+                                    <span className="font-semibold text-foreground">{activity.title}</span>
+                                    {activity.pedagogical_approach && (
+                                      <Badge variant="secondary" className="ml-2 text-xs">
+                                        {activity.pedagogical_approach}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-muted-foreground text-sm mb-2">{activity.description}</p>
+                                  
+                                  {activity.intelligence_types && activity.intelligence_types.length > 0 && (
+                                    <div className="flex flex-wrap gap-1 mb-2">
+                                      {activity.intelligence_types.map((type: string, i: number) => (
+                                        <Badge key={i} variant="outline" className="text-xs">
+                                          {type}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  )}
+                                  
+                                  {activity.materials && activity.materials.length > 0 && (
+                                    <div className="mt-2">
+                                      <span className="text-xs font-medium text-muted-foreground">Materials: </span>
+                                      <span className="text-xs text-foreground">{activity.materials.join(', ')}</span>
+                                    </div>
+                                  )}
+                                </div>
                               ))}
                             </div>
-                            {activity.elos && (
-                              <div className="mb-2">
-                                <span className="font-medium text-sm text-gray-600">ELOs:</span>
-                                <ul className="list-disc ml-6 text-sm text-gray-800">
-                                  {activity.elos.map((elo: string, i: number) => (
-                                    <li key={i}>{elo}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {activity.course_outcomes && (
-                              <div className="mb-2">
-                                <span className="font-medium text-sm text-gray-600">Course Outcomes:</span>
-                                <ul className="list-disc ml-6 text-sm text-gray-800">
-                                  {activity.course_outcomes.map((co: string, i: number) => (
-                                    <li key={i}>{co}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {activity.materials && (
-                              <div className="mb-2">
-                                <span className="font-medium text-sm text-gray-600">Materials:</span>
-                                <ul className="list-disc ml-6 text-sm text-gray-800">
-                                  {activity.materials.map((mat: string, i: number) => (
-                                    <li key={i}>{mat}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                          </Card>
+                          </div>
                         ))}
                       </div>
                     </div>
                   ));
                 }
-                // Fallback: show raw string
+                
+                // Fallback: show raw content
                 return (
-                  <pre className="bg-gray-100 rounded-lg p-4 text-xs overflow-x-auto max-h-[500px] text-red-700">
+                  <pre className="bg-muted/50 rounded-lg p-4 text-xs overflow-x-auto max-h-[500px] text-destructive">
                     {typeof learningExperience === "string"
                       ? learningExperience
                       : JSON.stringify(learningExperience, null, 2)}
