@@ -2015,14 +2015,15 @@ Students use the story framework to reflect on:
                                         <div key={index} className="space-y-2">
                                           {/* Resource Header */}
                                            <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-                                             <div className="flex items-center gap-2">
-                                               <span className="text-sm text-gray-800 font-medium">• {resource}</span>
-                                               {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] && (
-                                                 <Badge variant="secondary" className="text-xs">
-                                                   {resourceTimeAllocations[eloKey][step.id][resource]} min
-                                                 </Badge>
-                                               )}
-                                             </div>
+                                              <div className="flex items-center gap-2">
+                                                <span className="text-sm text-gray-800 font-medium">• {resource}</span>
+                                              </div>
+                                              <div className="flex items-center gap-2">
+                                                <span className="text-xs text-gray-600">Estimated time:</span>
+                                                <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
+                                                  {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] || 'TBD'} min
+                                                </Badge>
+                                              </div>
                                              <Button
                                                variant="ghost"
                                                size="sm"
