@@ -481,13 +481,25 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   };
 
   const addApproachToDescription = (eloIndex: string, stepId: string, approach: string) => {
-    setSelectedResources(prev => ({
-      ...prev,
-      [eloIndex]: {
-        ...prev[eloIndex],
-        [stepId]: [...(prev[eloIndex]?.[stepId] || []), approach]
+    setSelectedResources(prev => {
+      const updatedResources = {
+        ...prev,
+        [eloIndex]: {
+          ...prev[eloIndex],
+          [stepId]: [...(prev[eloIndex]?.[stepId] || []), approach]
+        }
+      };
+      
+      // Auto-redistribute time if time is already set
+      const stepTime = stepTimes[eloIndex]?.[stepId];
+      if (stepTime && stepTime.trim()) {
+        setTimeout(() => {
+          distributeTimeAmongResources(eloIndex, stepId, stepTime);
+        }, 100);
       }
-    }));
+      
+      return updatedResources;
+    });
   };
 
   const removeResource = (eloIndex: string, stepId: string, resourceIndex: number) => {
@@ -2020,9 +2032,13 @@ Students use the story framework to reflect on:
                                               </div>
                                               <div className="flex items-center gap-2">
                                                 <span className="text-xs text-gray-600">Estimated time:</span>
-                                                <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
-                                                  {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] || 'TBD'} min
-                                                </Badge>
+                                                 <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
+                                                   {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] 
+                                                     ? `${resourceTimeAllocations[eloKey][step.id][resource]} min`
+                                                     : stepTimes[eloKey]?.[step.id] 
+                                                       ? 'Calculating...'
+                                                       : 'Enter time above'}
+                                                 </Badge>
                                               </div>
                                              <Button
                                                variant="ghost"
