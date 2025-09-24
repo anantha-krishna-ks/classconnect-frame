@@ -394,94 +394,6 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
           </Button>
         </div>
 
-        {/* Show Generated Content from 5E Designer */}
-        {fiveEData && (
-          <div className="mt-8 animate-fade-in">
-            <Card className="p-6 bg-background border-2 border-primary/20">
-              <h3 className="text-xl font-bold text-foreground mb-4 flex items-center">
-                <Brain className="w-6 h-6 mr-2 text-primary" />
-                Generated Content from 5E Model (Amalgamated from All ELOs)
-              </h3>
-              {(() => {
-                const mergedContent = mergeFiveEContent();
-                if (!mergedContent) return null;
-                
-                return mergedContent.merged_phases.map((phase: any, phaseIdx: number) => (
-                  <div key={phaseIdx} className="mb-8">
-                    <h4 className="text-lg font-bold text-primary mb-4 flex items-center justify-between">
-                      <span>{phase.phase}</span>
-                      <Badge variant="outline" className="text-xs">
-                        {phase.total_step_time} min | {phase.resource_count} resources
-                      </Badge>
-                    </h4>
-                    
-                    {/* Show combined descriptions */}
-                    {phase.combined_descriptions && (
-                      <div className="mb-4 p-4 bg-blue-50 rounded-lg">
-                        <h5 className="font-medium text-blue-900 mb-2">Phase Description:</h5>
-                        <p className="text-blue-800 text-sm">{phase.combined_descriptions}</p>
-                      </div>
-                    )}
-                    
-                    {/* Show all generated content */}
-                    {Object.keys(phase.all_generated_content).length > 0 && (
-                      <div className="mb-6">
-                        <h5 className="font-medium text-gray-900 mb-3">Generated Content:</h5>
-                        <div className="grid gap-4">
-                          {Object.entries(phase.all_generated_content).map(([key, content]) => {
-                            const [elo, resourceName] = key.split('_', 2);
-                            return (
-                              <Card key={key} className="p-4 bg-white/90 border border-primary/10 shadow-sm">
-                                <div className="mb-2 flex items-center justify-between">
-                                  <span className="font-medium text-sm text-gray-600">
-                                    Resource: {resourceName}
-                                  </span>
-                                  <Badge variant="secondary" className="text-xs">
-                                    ELO: {elo}
-                                  </Badge>
-                                </div>
-                                <div className="text-sm text-gray-800 whitespace-pre-wrap">
-                                  {content as string}
-                                </div>
-                              </Card>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Show combined resources */}
-                    {phase.combined_resources.length > 0 && (
-                      <div className="mb-4">
-                        <h5 className="font-medium text-gray-900 mb-2">Resources Used:</h5>
-                        <div className="flex flex-wrap gap-2">
-                          {phase.combined_resources.map((resource: string, i: number) => (
-                            <Badge key={i} variant="outline" className="text-xs">
-                              {resource}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Show ELOs covered */}
-                    <div className="mb-4">
-                      <h5 className="font-medium text-gray-900 mb-2">ELOs Covered:</h5>
-                      <div className="space-y-1">
-                        {phase.total_elos.map((elo: string, i: number) => (
-                          <div key={i} className="text-xs text-gray-700 bg-gray-50 p-2 rounded">
-                            {elo}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ));
-              })()}
-            </Card>
-          </div>
-        )}
-
         {/* Learning Experience Content */}
         {learningExperienceError && (
           <div className="text-red-500 mt-4">{learningExperienceError}</div>
@@ -491,7 +403,7 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
             <Card className="p-6 bg-background border-2 border-primary/20">
               <h3 className="text-xl font-bold text-foreground mb-4 flex items-center">
                 <Brain className="w-6 h-6 mr-2 text-primary" />
-                AI Generated Learning Experience
+                Learning Experience (5E Model)
               </h3>
               {/* Robust parsing and fallback */}
               {(() => {
