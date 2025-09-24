@@ -430,6 +430,7 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
 
   const handleResourceDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     e.dataTransfer.dropEffect = 'move';
   };
 
@@ -440,6 +441,7 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     dropIndex: number
   ) => {
     e.preventDefault();
+    e.stopPropagation();
 
     let source = draggingResource;
     try {
