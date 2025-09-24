@@ -461,6 +461,41 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     }));
   };
 
+  // Function to reorder resources within a step
+  const reorderResources = (eloKey: string, stepId: string, fromIndex: number, toIndex: number) => {
+    setSelectedResources(prev => {
+      const updated = { ...prev };
+      if (updated[eloKey] && updated[eloKey][stepId]) {
+        const resources = [...updated[eloKey][stepId]];
+        const [movedResource] = resources.splice(fromIndex, 1);
+        resources.splice(toIndex, 0, movedResource);
+        updated[eloKey][stepId] = resources;
+      }
+      return updated;
+    });
+  };
+
+  // Drag and drop handlers for resources
+  const handleResourceDragStart = (e: React.DragEvent, eloKey: string, stepId: string, index: number) => {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ eloKey, stepId, index }));
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleResourceDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleResourceDrop = (e: React.DragEvent, eloKey: string, stepId: string, dropIndex: number) => {
+    e.preventDefault();
+    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+    
+    // Only allow reordering within the same step
+    if (data.eloKey === eloKey && data.stepId === stepId && data.index !== dropIndex) {
+      reorderResources(eloKey, stepId, data.index, dropIndex);
+    }
+  };
+
   const removeStep = (eloIndex: string, stepId: string) => {
     setDroppedSteps(prev => ({
       ...prev,
@@ -1972,13 +2007,21 @@ Students use the story framework to reflect on:
                                       const resourceContent = generatedContentData[stepKey]?.[resource];
                                       const isGenerating = generatingContent[stepKey];
                                       
-                                      return (
-                                        <div key={index} className="space-y-2">
-                                          {/* Resource Header */}
-                                           <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-                                              <div className="flex items-center gap-2">
-                                                <span className="text-sm text-gray-800 font-medium">• {resource}</span>
-                                              </div>
+                                       return (
+                                         <div 
+                                           key={index} 
+                                           className="space-y-2 cursor-move"
+                                           draggable
+                                           onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)}
+                                           onDragOver={handleResourceDragOver}
+                                           onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}
+                                         >
+                                           {/* Resource Header */}
+                                            <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
+                                               <div className="flex items-center gap-2">
+                                                 <GripVertical className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                                                 <span className="text-sm text-gray-800 font-medium">• {resource}</span>
+                                               </div>
                                               <div className="flex items-center gap-2">
                                                 <span className="text-xs text-gray-600">Estimated time:</span>
                                                  <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
