@@ -450,43 +450,13 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                         <div className="h-px bg-muted-foreground/30 flex-1"></div>
                       </div>
                       
-                      <div className="space-y-4 ml-6">
+                      <div className="space-y-3 ml-6">
                         {Object.entries(eloActivities).map(([elo, activities]) => (
-                          <div key={elo} className="border-l-4 border-primary/30 pl-4">
-                            <h5 className="font-semibold text-foreground mb-2">{elo}:</h5>
-                            <div className="space-y-3">
-                              {activities.map((activity: any, idx: number) => (
-                                <div key={idx} className="bg-muted/20 rounded-lg p-4">
-                                  {activity.title && (
-                                    <h6 className="font-medium text-foreground mb-2">{activity.title}</h6>
-                                  )}
-                                  <p className="text-muted-foreground mb-3">
-                                    {activity.description || activity.content || "Generated learning activity"}
-                                  </p>
-                                  
-                                  {activity.materials && activity.materials.length > 0 && (
-                                    <div className="mb-2">
-                                      <span className="text-sm font-medium text-foreground">Materials: </span>
-                                      <span className="text-sm text-muted-foreground">
-                                        {activity.materials.join(', ')}
-                                      </span>
-                                    </div>
-                                  )}
-                                  
-                                  {activity.duration && (
-                                    <div className="mb-2">
-                                      <span className="text-sm font-medium text-foreground">Duration: </span>
-                                      <span className="text-sm text-muted-foreground">{activity.duration}</span>
-                                    </div>
-                                  )}
-                                  
-                                  {activity.pedagogical_approach && (
-                                    <Badge variant="secondary" className="text-xs">
-                                      {activity.pedagogical_approach}
-                                    </Badge>
-                                  )}
-                                </div>
-                              ))}
+                          <div key={elo} className="flex items-start">
+                            <span className="text-foreground mr-2">•</span>
+                            <div>
+                              <span className="font-semibold text-foreground">{elo}: </span>
+                              <span className="text-muted-foreground">[Generated Content]</span>
                             </div>
                           </div>
                         ))}
