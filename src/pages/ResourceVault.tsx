@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Search, 
   BookOpen, 
@@ -20,7 +21,9 @@ import {
   MessageSquare,
   ThumbsUp,
   ThumbsDown,
-  Brain
+  Brain,
+  Lightbulb,
+  Target
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -50,7 +53,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { Textarea } from '@/components/ui/textarea';
 
 const ResourceVault = () => {
   const navigate = useNavigate();
@@ -218,13 +220,272 @@ const ResourceVault = () => {
 
   const handleStudyPalMessage = () => {
     if (chatMessage.trim()) {
+      const topic = chatMessage.trim();
       const newMessage = {
         id: Date.now(),
         user: chatMessage,
-        bot: "I understand you're looking for help with this concept. Let me provide a simpler explanation with examples and suggest some additional resources that might help clarify this topic for you."
+        bot: `Great question about "${topic}"! Let me break this down for you with a clear explanation and provide some visual resources to help you understand better.`,
+        topic: topic,
+        hasResources: true
       };
       setChatHistory([...chatHistory, newMessage]);
       setChatMessage('');
+    }
+  };
+
+  const openResourceWindow = (topic: string, resourceType: 'mindmap' | 'diagram' | 'flowchart' | 'concept-map') => {
+    const windowFeatures = 'width=1000,height=700,scrollbars=yes,resizable=yes';
+    const resourceWindow = window.open('', '_blank', windowFeatures);
+    
+    if (resourceWindow) {
+      resourceWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>${resourceType.charAt(0).toUpperCase() + resourceType.slice(1)} - ${topic}</title>
+          <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+          <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+          </style>
+        </head>
+        <body>
+          <div id="root"></div>
+          <script>
+            const { useState, useEffect } = React;
+            
+            const ResourceViewer = () => {
+              const generateContent = () => {
+                const topic = "${topic}";
+                const resourceType = "${resourceType}";
+                
+                switch (resourceType) {
+                  case 'mindmap':
+                    return React.createElement('div', { className: 'relative' },
+                      React.createElement('div', { className: 'text-center mb-8' },
+                        React.createElement('div', { className: 'inline-block bg-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold' }, topic)
+                      ),
+                      React.createElement('div', { className: 'grid grid-cols-2 gap-8' },
+                        React.createElement('div', { className: 'space-y-4' },
+                          React.createElement('div', { className: 'flex items-center' },
+                            React.createElement('div', { className: 'w-3 h-3 bg-green-500 rounded-full mr-3' }),
+                            React.createElement('div', { className: 'bg-green-100 px-4 py-2 rounded-lg' },
+                              React.createElement('span', { className: 'font-medium' }, 'Key Concepts')
+                            )
+                          ),
+                          React.createElement('div', { className: 'ml-6 space-y-2' },
+                            React.createElement('div', { className: 'bg-white p-3 rounded border-l-4 border-green-500 shadow-sm' }, 'Definition & Properties'),
+                            React.createElement('div', { className: 'bg-white p-3 rounded border-l-4 border-green-500 shadow-sm' }, 'Core Principles')
+                          )
+                        ),
+                        React.createElement('div', { className: 'space-y-4' },
+                          React.createElement('div', { className: 'flex items-center' },
+                            React.createElement('div', { className: 'w-3 h-3 bg-purple-500 rounded-full mr-3' }),
+                            React.createElement('div', { className: 'bg-purple-100 px-4 py-2 rounded-lg' },
+                              React.createElement('span', { className: 'font-medium' }, 'Applications')
+                            )
+                          ),
+                          React.createElement('div', { className: 'ml-6 space-y-2' },
+                            React.createElement('div', { className: 'bg-white p-3 rounded border-l-4 border-purple-500 shadow-sm' }, 'Real-world Examples'),
+                            React.createElement('div', { className: 'bg-white p-3 rounded border-l-4 border-purple-500 shadow-sm' }, 'Problem Solving')
+                          )
+                        )
+                      )
+                    );
+                  
+                  case 'diagram':
+                    return React.createElement('div', { className: 'space-y-6' },
+                      React.createElement('div', { className: 'text-center' },
+                        React.createElement('h2', { className: 'text-2xl font-bold text-gray-800 mb-2' }, topic + ' - Process Diagram'),
+                        React.createElement('p', { className: 'text-gray-600' }, 'Visual representation of the concept')
+                      ),
+                      React.createElement('div', { className: 'flex justify-center' },
+                        React.createElement('div', { className: 'space-y-4' },
+                          React.createElement('div', { className: 'flex items-center justify-center' },
+                            React.createElement('div', { className: 'bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md' }, 'Start: Input/Problem')
+                          ),
+                          React.createElement('div', { className: 'flex justify-center' },
+                            React.createElement('div', { className: 'w-px h-8 bg-gray-300' })
+                          ),
+                          React.createElement('div', { className: 'flex items-center justify-center' },
+                            React.createElement('div', { className: 'bg-green-500 text-white px-6 py-3 rounded-lg shadow-md' }, 'Process: Apply Concept')
+                          ),
+                          React.createElement('div', { className: 'flex justify-center' },
+                            React.createElement('div', { className: 'w-px h-8 bg-gray-300' })
+                          ),
+                          React.createElement('div', { className: 'flex items-center justify-center' },
+                            React.createElement('div', { className: 'bg-orange-500 text-white px-6 py-3 rounded-lg shadow-md' }, 'Output: Solution/Answer')
+                          )
+                        )
+                      )
+                    );
+                  
+                  default:
+                    return React.createElement('div', { className: 'text-center p-8' },
+                      React.createElement('h2', { className: 'text-2xl font-bold mb-4' }, 'Visual Resource'),
+                      React.createElement('p', { className: 'text-gray-600' }, 'Interactive visual content for: ' + topic)
+                    );
+                }
+              };
+              
+              return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6' },
+                React.createElement('div', { className: 'max-w-4xl mx-auto' },
+                  React.createElement('div', { className: 'bg-white rounded-lg shadow-lg border-0' },
+                    React.createElement('div', { className: 'border-b p-6' },
+                      React.createElement('div', { className: 'flex items-center justify-between' },
+                        React.createElement('div', { className: 'flex items-center gap-3' },
+                          React.createElement('div', { className: 'w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center' },
+                            React.createElement('span', { className: 'text-white font-bold' }, '🧠')
+                          ),
+                          React.createElement('div', null,
+                            React.createElement('h1', { className: 'text-xl font-bold text-gray-800' }, "${resourceType.charAt(0).toUpperCase() + resourceType.slice(1).replace('-', ' ')}"),
+                            React.createElement('p', { className: 'text-sm text-gray-600' }, 'Visual learning resource')
+                          )
+                        ),
+                        React.createElement('button', { 
+                          className: 'px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600',
+                          onClick: () => window.close()
+                        }, 'Close')
+                      )
+                    ),
+                    React.createElement('div', { className: 'p-8' }, generateContent())
+                  )
+                )
+              );
+            };
+            
+            ReactDOM.render(React.createElement(ResourceViewer), document.getElementById('root'));
+          </script>
+        </body>
+        </html>
+      `);
+      resourceWindow.document.close();
+    }
+  };
+
+  const openTestWindow = (topic: string) => {
+    const windowFeatures = 'width=800,height=600,scrollbars=yes,resizable=yes';
+    const testWindow = window.open('', '_blank', windowFeatures);
+    
+    if (testWindow) {
+      testWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Quick Test - ${topic}</title>
+          <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+          <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+          </style>
+        </head>
+        <body>
+          <div id="root"></div>
+          <script>
+            const { useState } = React;
+            
+            const TestWindow = () => {
+              const [currentQuestion, setCurrentQuestion] = useState(0);
+              const [selectedAnswers, setSelectedAnswers] = useState([]);
+              const [showResults, setShowResults] = useState(false);
+              const [score, setScore] = useState(0);
+              
+              const questions = ${JSON.stringify(mockQuestions)};
+              
+              const handleAnswerSelect = (answerIndex) => {
+                const newAnswers = [...selectedAnswers];
+                newAnswers[currentQuestion] = answerIndex;
+                setSelectedAnswers(newAnswers);
+              };
+              
+              const handleNext = () => {
+                if (currentQuestion < questions.length - 1) {
+                  setCurrentQuestion(currentQuestion + 1);
+                } else {
+                  const finalScore = selectedAnswers.reduce((acc, answer, index) => {
+                    return acc + (answer === questions[index].correct ? 1 : 0);
+                  }, 0);
+                  setScore(finalScore);
+                  setShowResults(true);
+                }
+              };
+              
+              const progress = ((currentQuestion + 1) / questions.length) * 100;
+              
+              if (showResults) {
+                return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6' },
+                  React.createElement('div', { className: 'max-w-2xl mx-auto' },
+                    React.createElement('div', { className: 'bg-white rounded-lg shadow-lg p-8' },
+                      React.createElement('div', { className: 'text-center mb-6' },
+                        React.createElement('h1', { className: 'text-2xl font-bold mb-4' }, 'Test Results'),
+                        React.createElement('div', { className: 'text-6xl font-bold mb-2 text-blue-500' }, Math.round((score / questions.length) * 100) + '%'),
+                        React.createElement('p', { className: 'text-gray-600' }, \`You scored \${score} out of \${questions.length} questions correctly\`)
+                      ),
+                      React.createElement('button', { 
+                        className: 'w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600',
+                        onClick: () => window.close()
+                      }, 'Close')
+                    )
+                  )
+                );
+              }
+              
+              return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6' },
+                React.createElement('div', { className: 'max-w-2xl mx-auto' },
+                  React.createElement('div', { className: 'bg-white rounded-lg shadow-lg' },
+                    React.createElement('div', { className: 'p-6 border-b' },
+                      React.createElement('div', { className: 'flex items-center justify-between mb-4' },
+                        React.createElement('h1', { className: 'text-xl font-bold' }, 'Quick Test: ${topic}'),
+                        React.createElement('div', { className: 'text-sm text-gray-500' }, \`Question \${currentQuestion + 1} of \${questions.length}\`)
+                      ),
+                      React.createElement('div', { className: 'w-full bg-gray-200 rounded-full h-2' },
+                        React.createElement('div', { 
+                          className: 'bg-blue-500 h-2 rounded-full transition-all',
+                          style: { width: progress + '%' }
+                        })
+                      )
+                    ),
+                    React.createElement('div', { className: 'p-6' },
+                      React.createElement('h3', { className: 'text-lg font-medium mb-4' }, questions[currentQuestion].question),
+                      React.createElement('div', { className: 'space-y-3 mb-6' },
+                        ...questions[currentQuestion].options.map((option, index) =>
+                          React.createElement('button', {
+                            key: index,
+                            className: \`w-full text-left p-4 rounded-lg border-2 transition-colors \${
+                              selectedAnswers[currentQuestion] === index 
+                                ? 'bg-blue-500 text-white border-blue-500' 
+                                : 'bg-gray-50 border-gray-200 hover:bg-blue-50 hover:border-blue-300'
+                            }\`,
+                            onClick: () => handleAnswerSelect(index)
+                          },
+                            React.createElement('span', { className: 'font-medium mr-3' }, String.fromCharCode(65 + index) + '.'),
+                            option
+                          )
+                        )
+                      ),
+                      React.createElement('button', {
+                        className: 'w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 disabled:opacity-50',
+                        disabled: selectedAnswers[currentQuestion] === undefined,
+                        onClick: handleNext
+                      }, currentQuestion === questions.length - 1 ? 'Finish Test' : 'Next Question')
+                    )
+                  )
+                )
+              );
+            };
+            
+            ReactDOM.render(React.createElement(TestWindow), document.getElementById('root'));
+          </script>
+        </body>
+        </html>
+      `);
+      testWindow.document.close();
     }
   };
 
@@ -704,6 +965,58 @@ const ResourceVault = () => {
                           </div>
                         </div>
                       </div>
+
+                      {/* Additional Resources Section */}
+                      {chat.hasResources && (
+                        <div className="flex justify-start mt-4">
+                          <div className="flex items-start gap-2 max-w-[85%]">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Lightbulb className="w-4 h-4 text-blue-500" />
+                            </div>
+                            <div className="bg-blue-50 rounded-2xl rounded-bl-md px-4 py-3 border border-blue-200">
+                              <p className="text-sm text-gray-800 mb-3">Here are some visual resources to help you understand better:</p>
+                              <div className="grid grid-cols-2 gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => openResourceWindow(chat.topic, 'mindmap')}
+                                  className="text-xs h-8 border-blue-300 text-blue-700 hover:bg-blue-100"
+                                >
+                                  <Brain className="w-3 h-3 mr-1" />
+                                  Mind Map
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => openResourceWindow(chat.topic, 'diagram')}
+                                  className="text-xs h-8 border-green-300 text-green-700 hover:bg-green-100"
+                                >
+                                  <Target className="w-3 h-3 mr-1" />
+                                  Diagram
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => openResourceWindow(chat.topic, 'flowchart')}
+                                  className="text-xs h-8 border-purple-300 text-purple-700 hover:bg-purple-100"
+                                >
+                                  <BookOpen className="w-3 h-3 mr-1" />
+                                  Flowchart
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => openResourceWindow(chat.topic, 'concept-map')}
+                                  className="text-xs h-8 border-orange-300 text-orange-700 hover:bg-orange-100"
+                                >
+                                  <Lightbulb className="w-3 h-3 mr-1" />
+                                  Concept Map
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                   
@@ -743,7 +1056,7 @@ const ResourceVault = () => {
                   )}
 
                   {/* Quick Test Section - Show after conversation */}
-                  {chatHistory.length > 0 && resources.length > 0 && (
+                  {chatHistory.length > 0 && (
                     <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
                       <div className="flex items-start gap-2 mb-3">
                         <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -752,14 +1065,13 @@ const ResourceVault = () => {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-1">Test Your Knowledge</h4>
                           <p className="text-sm text-gray-600 mb-3">
-                            Ready to test what you've learned? Take a quick 5-question quiz!
+                            Ready to test what you've learned? Take a quick 5-question quiz in a new window!
                           </p>
                         </div>
                       </div>
                       <Button 
-                        onClick={handleQuickTest} 
+                        onClick={() => openTestWindow(chatHistory[chatHistory.length - 1]?.topic || 'General Knowledge')} 
                         className="w-full bg-blue-500 hover:bg-blue-600"
-                        disabled={showQuickTest}
                       >
                         <Brain className="w-4 h-4 mr-2" />
                         Start Quick Test
@@ -769,41 +1081,6 @@ const ResourceVault = () => {
                 </>
               )}
 
-              {/* Quick Test Display */}
-              {showQuickTest && (
-                <div className="mt-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
-                  <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-medium text-gray-900">Question {currentQuestion + 1}</h4>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-1 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-blue-500 transition-all duration-300"
-                          style={{ width: `${((currentQuestion + 1) / mockQuestions.length) * 100}%` }}
-                        />
-                      </div>
-                      <span className="text-xs text-gray-500">{currentQuestion + 1}/{mockQuestions.length}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <p className="font-medium text-gray-900">{mockQuestions[currentQuestion].question}</p>
-                    <div className="space-y-2">
-                      {mockQuestions[currentQuestion].options.map((option, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          className="w-full text-left justify-start hover:bg-indigo-50 hover:border-indigo-200"
-                          onClick={() => handleTestAnswer(index)}
-                        >
-                          <span className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-medium mr-3">
-                            {String.fromCharCode(65 + index)}
-                          </span>
-                          {option}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
             
             {/* Message Input Area */}
