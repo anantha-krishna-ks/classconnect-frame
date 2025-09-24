@@ -2015,14 +2015,17 @@ Students use the story framework to reflect on:
                                         <div key={index} className="space-y-2">
                                           {/* Resource Header */}
                                            <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-                                              <div className="flex items-center gap-2">
-                                                <span className="text-sm text-gray-800 font-medium">• {resource}</span>
-                                              </div>
-                                              <div className="flex items-center gap-2">
-                                                <span className="text-xs text-gray-600">Estimated time:</span>
-                                                <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
-                                                  {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] || 'TBD'} min
-                                                </Badge>
+                                              <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-2">
+                                                  <span className="text-sm text-gray-800 font-medium">• {resource}</span>
+                                                  <div className="h-1 w-1 bg-gray-400 rounded-full"></div>
+                                                  <span className="text-xs text-gray-500 font-medium">
+                                                    {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] ? 
+                                                      `${resourceTimeAllocations[eloKey][step.id][resource]} min` : 
+                                                      'Time pending'
+                                                    }
+                                                  </span>
+                                                </div>
                                               </div>
                                              <Button
                                                variant="ghost"
