@@ -1937,18 +1937,18 @@ Students use the story framework to reflect on:
                                       const isGenerating = generatingContent[stepKey];
                                       
                                       return (
-                                        <div key={`${step.id}-${index}`} className="space-y-2" draggable onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)} onDragEnd={handleResourceDragEnd} onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}>
-                                          {/* Resource Header */}
-                                           <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200 cursor-move"
-                                             onMouseDown={(e) => e.stopPropagation()}>
-                                              <div className="flex items-center gap-2">
-                                                <span title="Drag to reorder" className="cursor-grab">
-                                                  <GripVertical className="w-4 h-4 text-gray-500" />
-                                                </span>
-                                                <span className="text-sm text-gray-800 font-medium">• {resource}</span>
-                                              </div>
-                                              <div className="flex items-center gap-2">
-                                                <span className="text-xs text-gray-600">Estimated time:</span>
+                                         <div key={`${step.id}-${index}`} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm" draggable onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)} onDragEnd={handleResourceDragEnd} onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}>
+                                           {/* Unified Resource Card */}
+                                           <div className="bg-blue-50 px-3 py-2 border-b border-blue-200 cursor-move" onMouseDown={(e) => e.stopPropagation()}>
+                                             <div className="flex items-center justify-between">
+                                               <div className="flex items-center gap-2">
+                                                 <span title="Drag to reorder" className="cursor-grab">
+                                                   <GripVertical className="w-4 h-4 text-gray-500" />
+                                                 </span>
+                                                 <span className="text-sm text-gray-800 font-medium">• {resource}</span>
+                                               </div>
+                                               <div className="flex items-center gap-2">
+                                                 <span className="text-xs text-gray-600">Time:</span>
                                                  <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
                                                    {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] 
                                                      ? `${resourceTimeAllocations[eloKey][step.id][resource]} min`
@@ -1956,70 +1956,75 @@ Students use the story framework to reflect on:
                                                        ? 'Calculating...'
                                                        : 'Enter time above'}
                                                  </Badge>
-                                              </div>
-                                             <Button
-                                               variant="ghost"
-                                               size="sm"
-                                               onClick={() => removeResource(eloKey, step.id, index)}
-                                               className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
-                                             >
-                                               <X className="w-3 h-3" />
-                                             </Button>
+                                                 <Button
+                                                   variant="ghost"
+                                                   size="sm"
+                                                   onClick={() => removeResource(eloKey, step.id, index)}
+                                                   className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                                                 >
+                                                   <X className="w-3 h-3" />
+                                                 </Button>
+                                               </div>
+                                             </div>
                                            </div>
-                                          
-                                          {/* Generated Content for this Resource */}
-                                          {isGenerating ? (
-                                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                                              <div className="flex items-center space-x-2 text-yellow-700">
-                                                <Loader2 className="w-4 h-4 animate-spin" />
-                                                <span className="text-sm">Generating content for {resource}...</span>
-                                              </div>
-                                            </div>
-                                          ) : resourceContent ? (
-                                            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 space-y-2">
-                                              <div className="flex items-center justify-between">
-                                                <div className="flex items-center space-x-2">
-                                                  <Brain className="w-4 h-4 text-emerald-600" />
-                                                  <span className="text-sm font-medium text-emerald-700">Generated Content</span>
-                                                </div>
-                                                <div className="flex items-center space-x-2">
-                                                  <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => editGeneratedContent(stepKey, resource)}
-                                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 h-6 text-xs px-2"
-                                                  >
-                                                    <Edit3 className="w-3 h-3 mr-1" />
-                                                    Edit
-                                                  </Button>
-                                                  <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => deleteGeneratedContent(stepKey, resource)}
-                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-6 text-xs px-2"
-                                                  >
-                                                    <Trash2 className="w-3 h-3 mr-1" />
-                                                    Delete
-                                                  </Button>
-                                                </div>
-                                              </div>
-                                              <div className="bg-white rounded border border-emerald-200 p-3 max-h-48 overflow-y-auto">
-                                                <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
-                                                  {resourceContent.length > 300 ? (
-                                                    <div>
-                                                      {resourceContent.substring(0, 300)}...
-                                                      <div className="mt-2 text-xs text-gray-500">
-                                                        Content truncated. Click Edit to see full content.
-                                                      </div>
-                                                    </div>
-                                                  ) : (
-                                                    resourceContent
-                                                  )}
-                                                </pre>
-                                              </div>
-                                            </div>
-                                          ) : null}
-                                        </div>
+                                           
+                                           {/* Content Section */}
+                                           {isGenerating ? (
+                                             <div className="p-3">
+                                               <div className="flex items-center space-x-2 text-yellow-700">
+                                                 <Loader2 className="w-4 h-4 animate-spin" />
+                                                 <span className="text-sm">Generating content...</span>
+                                               </div>
+                                             </div>
+                                           ) : resourceContent ? (
+                                             <div className="p-3 space-y-3">
+                                               <div className="flex items-center justify-between">
+                                                 <div className="flex items-center space-x-2">
+                                                   <Brain className="w-4 h-4 text-emerald-600" />
+                                                   <span className="text-sm font-medium text-emerald-700">Generated Content</span>
+                                                 </div>
+                                                 <div className="flex items-center space-x-2">
+                                                   <Button
+                                                     variant="outline"
+                                                     size="sm"
+                                                     onClick={() => editGeneratedContent(stepKey, resource)}
+                                                     className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 h-6 text-xs px-2"
+                                                   >
+                                                     <Edit3 className="w-3 h-3 mr-1" />
+                                                     Edit
+                                                   </Button>
+                                                   <Button
+                                                     variant="outline"
+                                                     size="sm"
+                                                     onClick={() => deleteGeneratedContent(stepKey, resource)}
+                                                     className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-6 text-xs px-2"
+                                                   >
+                                                     <Trash2 className="w-3 h-3 mr-1" />
+                                                     Delete
+                                                   </Button>
+                                                 </div>
+                                               </div>
+                                               <div className="bg-gray-50 rounded border p-3 max-h-48 overflow-y-auto">
+                                                 <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
+                                                   {resourceContent.length > 300 ? (
+                                                     <div>
+                                                       {resourceContent.substring(0, 300)}...
+                                                       <div className="mt-2 text-xs text-gray-500">
+                                                         Content truncated. Click Edit to see full content.
+                                                       </div>
+                                                     </div>
+                                                   ) : (
+                                                     resourceContent
+                                                   )}
+                                                 </pre>
+                                               </div>
+                                             </div>
+                                           ) : (
+                                             <div className="p-3 text-sm text-gray-500 italic">
+                                               No content generated yet
+                                             </div>
+                                           )}
+                                         </div>
                                       );
                                     })}
                                   </div>
