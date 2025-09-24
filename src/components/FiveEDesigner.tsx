@@ -1977,7 +1977,7 @@ Students use the story framework to reflect on:
                                                </div>
                                              </div>
                                            ) : resourceContent ? (
-                                             <div className="p-3 space-y-3">
+                                             <div className="p-3 space-y-3 bg-emerald-50/30">
                                                <div className="flex items-center justify-between">
                                                  <div className="flex items-center space-x-2">
                                                    <Brain className="w-4 h-4 text-emerald-600" />
