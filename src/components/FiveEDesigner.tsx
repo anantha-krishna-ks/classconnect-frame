@@ -48,7 +48,7 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [showApiKeyInput, setShowApiKeyInput] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [contentGenerated, setContentGenerated] = useState<{[key: string]: boolean}>({});
-  const [generatedContentData, setGeneratedContentData] = useState<{[key: string]: string}>({});
+  const [generatedContentData, setGeneratedContentData] = useState<{[key: string]: {[resourceName: string]: string}}>({});
   
   // Resources for each 5E step
   const getResourcesForStep = (stepName: string): string[] => {
@@ -1141,35 +1141,27 @@ Students use the story framework to reflect on:
       const selectedResourcesForStep = selectedResources[eloIndex]?.[stepId] || [];
       console.log('Selected resources for step:', selectedResourcesForStep);
       
-      // Map selected resources to content template types
-      let resourceTypes: string[] = [];
-      
-      for (const resource of selectedResourcesForStep) {
-        const mappedType = mapResourceToType(resource);
-        if (mappedType && !resourceTypes.includes(mappedType)) {
-          resourceTypes.push(mappedType);
-        }
-      }
-      
-      console.log('Mapped resource types:', resourceTypes);
-      
-      if (resourceTypes.length === 0) {
-        console.log('No valid resource types found to generate content for');
+      if (selectedResourcesForStep.length === 0) {
+        console.log('No resources found to generate content for');
         return false;
       }
       
-      // Generate content for each resource type found
-      let allGeneratedContent = '';
+      // Generate content for each resource
+      const resourceContent: {[resourceName: string]: string} = {};
       
-      for (const resourceType of resourceTypes) {
-        const content = getPredefinedContent(stepName, resourceType, eloIndex);
-        allGeneratedContent += content + '\n\n' + '—'.repeat(40) + '\n\n';
+      for (const resource of selectedResourcesForStep) {
+        const mappedType = mapResourceToType(resource);
+        if (mappedType) {
+          const content = getPredefinedContent(stepName, mappedType, eloIndex);
+          resourceContent[resource] = content;
+        }
       }
       
-      // Don't update the textarea - keep generated content separate
-      
-      // Store generated content separately for management
-      setGeneratedContentData(prev => ({ ...prev, [stepKey]: allGeneratedContent.trim() }));
+      // Store generated content per resource
+      setGeneratedContentData(prev => ({
+        ...prev,
+        [stepKey]: resourceContent
+      }));
       
       // Mark as generated
       setContentGenerated(prev => ({ ...prev, [stepKey]: true }));
@@ -1179,10 +1171,6 @@ Students use the story framework to reflect on:
 
     } catch (error) {
       console.error('Error generating content:', error);
-      
-      // Don't show error in textarea - keep it separate
-      console.error('Error details:', error);
-      
       return false;
     } finally {
       setGeneratingContent(prev => ({ ...prev, [stepKey]: false }));
@@ -1190,44 +1178,40 @@ Students use the story framework to reflect on:
   };
 
   // Helper functions for generated content management
-  const editGeneratedContent = (stepKey: string) => {
-    const content = generatedContentData[stepKey] || '';
+  const editGeneratedContent = (stepKey: string, resourceName: string) => {
+    const content = generatedContentData[stepKey]?.[resourceName] || '';
     // Set content in textarea for editing - could be enhanced with a modal
     const [eloIndex, stepId] = stepKey.split('_');
     const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
     
-    // Remove the generated content section and replace with editable version
-    const separator = '\n\n' + '='.repeat(50) + '\n🎓 EDUCATIONAL CONTENT GENERATED\n' + '='.repeat(50) + '\n\n';
-    const baseDescription = currentDescription.split(separator)[0];
-    
-    updateStepDescription(eloIndex, stepId, baseDescription + separator + content);
+    updateStepDescription(eloIndex, stepId, currentDescription + '\n\n' + content);
   };
 
-  const deleteGeneratedContent = (stepKey: string) => {
-    const [eloIndex, stepId] = stepKey.split('_');
-    const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
-    
-    // Remove the generated content section
-    const separator = '\n\n' + '='.repeat(50) + '\n🎓 EDUCATIONAL CONTENT GENERATED\n' + '='.repeat(50) + '\n\n';
-    const baseDescription = currentDescription.split(separator)[0];
-    
-    updateStepDescription(eloIndex, stepId, baseDescription);
-    
-    // Remove from generated content tracking
+  const deleteGeneratedContent = (stepKey: string, resourceName: string) => {
     setGeneratedContentData(prev => {
       const updated = { ...prev };
-      delete updated[stepKey];
+      if (updated[stepKey]) {
+        delete updated[stepKey][resourceName];
+        if (Object.keys(updated[stepKey]).length === 0) {
+          delete updated[stepKey];
+        }
+      }
       return updated;
     });
+    
     setContentGenerated(prev => {
       const updated = { ...prev };
-      delete updated[stepKey];
+      const hasAnyContent = generatedContentData[stepKey] && 
+                           Object.keys(generatedContentData[stepKey]).length > 1;
+      if (!hasAnyContent) {
+        delete updated[stepKey];
+      }
       return updated;
     });
 
     toast({
       title: "Content Deleted",
-      description: "Generated content has been removed from this step.",
+      description: `Generated content for ${resourceName} has been removed.`,
     });
   };
 
@@ -1411,22 +1395,84 @@ Students use the story framework to reflect on:
                               
                               {/* Selected Resources Display */}
                               {selectedResources[elo]?.[step.id]?.length > 0 && (
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                   <label className="text-sm font-medium text-gray-700">Selected Resources:</label>
-                                  <div className="space-y-1">
-                                    {selectedResources[elo][step.id].map((resource, index) => (
-                                      <div key={index} className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-                                        <span className="text-sm text-gray-800">• {resource}</span>
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={() => removeResource(elo, step.id, index)}
-                                          className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
-                                        >
-                                          <X className="w-3 h-3" />
-                                        </Button>
-                                      </div>
-                                    ))}
+                                  <div className="space-y-3">
+                                    {selectedResources[elo][step.id].map((resource, index) => {
+                                      const stepKey = `${elo}_${step.id}`;
+                                      const resourceContent = generatedContentData[stepKey]?.[resource];
+                                      const isGenerating = generatingContent[stepKey];
+                                      
+                                      return (
+                                        <div key={index} className="space-y-2">
+                                          {/* Resource Header */}
+                                          <div className="flex items-center justify-between bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
+                                            <span className="text-sm text-gray-800 font-medium">• {resource}</span>
+                                            <Button
+                                              variant="ghost"
+                                              size="sm"
+                                              onClick={() => removeResource(elo, step.id, index)}
+                                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                                            >
+                                              <X className="w-3 h-3" />
+                                            </Button>
+                                          </div>
+                                          
+                                          {/* Generated Content for this Resource */}
+                                          {isGenerating ? (
+                                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                                              <div className="flex items-center space-x-2 text-yellow-700">
+                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                <span className="text-sm">Generating content for {resource}...</span>
+                                              </div>
+                                            </div>
+                                          ) : resourceContent ? (
+                                            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 space-y-2">
+                                              <div className="flex items-center justify-between">
+                                                <div className="flex items-center space-x-2">
+                                                  <Brain className="w-4 h-4 text-emerald-600" />
+                                                  <span className="text-sm font-medium text-emerald-700">Generated Content</span>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                  <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => editGeneratedContent(stepKey, resource)}
+                                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 h-6 text-xs px-2"
+                                                  >
+                                                    <Edit3 className="w-3 h-3 mr-1" />
+                                                    Edit
+                                                  </Button>
+                                                  <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => deleteGeneratedContent(stepKey, resource)}
+                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-6 text-xs px-2"
+                                                  >
+                                                    <Trash2 className="w-3 h-3 mr-1" />
+                                                    Delete
+                                                  </Button>
+                                                </div>
+                                              </div>
+                                              <div className="bg-white rounded border border-emerald-200 p-3 max-h-48 overflow-y-auto">
+                                                <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
+                                                  {resourceContent.length > 300 ? (
+                                                    <div>
+                                                      {resourceContent.substring(0, 300)}...
+                                                      <div className="mt-2 text-xs text-gray-500">
+                                                        Content truncated. Click Edit to see full content.
+                                                      </div>
+                                                    </div>
+                                                  ) : (
+                                                    resourceContent
+                                                  )}
+                                                </pre>
+                                              </div>
+                                            </div>
+                                          ) : null}
+                                        </div>
+                                      );
+                                    })}
                                   </div>
                                 </div>
                               )}
@@ -1474,117 +1520,6 @@ Students use the story framework to reflect on:
           </div>
         )}
       </Card>
-
-      {/* Generated Content Management Section */}
-      {Object.keys(generatedContentData).length > 0 && (
-        <Card className="p-6 bg-gradient-to-br from-emerald-50 to-green-50 border border-emerald-200">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-3">
-              <Brain className="w-6 h-6 text-emerald-600" />
-              <h3 className="text-lg font-semibold text-emerald-800">Generated Educational Content</h3>
-            </div>
-            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 border-emerald-300">
-              {Object.keys(generatedContentData).length} Items Generated
-            </Badge>
-          </div>
-          
-          <div className="space-y-6">
-            {/* Group generated content by ELO */}
-            {Object.entries(
-              Object.entries(generatedContentData).reduce((acc, [stepKey, content]) => {
-                const [eloIndex, stepId] = stepKey.split('_');
-                if (!acc[eloIndex]) acc[eloIndex] = [];
-                acc[eloIndex].push({ stepKey, content, stepId });
-                return acc;
-              }, {} as Record<string, Array<{ stepKey: string; content: string; stepId: string }>>)
-            ).map(([eloIndex, eloContent]) => (
-              <div key={eloIndex} className="space-y-4">
-                {/* ELO Header */}
-                <div className="bg-emerald-100 p-3 rounded-lg border border-emerald-200">
-                  <h4 className="font-medium text-emerald-800">ELO: {eloIndex}</h4>
-                  <p className="text-sm text-emerald-600 mt-1">{eloContent.length} content item(s) generated</p>
-                </div>
-                
-                {/* Content items for this ELO */}
-                <div className="space-y-3 ml-4">
-                  {eloContent.map(({ stepKey, content, stepId }) => {
-                    const step = fiveESteps.find(s => s.id === stepId);
-                    if (!step) return null;
-                    
-                    return (
-                      <Card key={stepKey} className="border border-emerald-200 bg-white/70 backdrop-blur-sm">
-                        <div className="p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center space-x-3">
-                              <Badge className={step.color + " font-medium"}>
-                                {step.name}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => editGeneratedContent(stepKey)}
-                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
-                              >
-                                <Edit3 className="w-4 h-4 mr-1" />
-                                Edit
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => deleteGeneratedContent(stepKey)}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                              >
-                                <Trash2 className="w-4 h-4 mr-1" />
-                                Delete
-                              </Button>
-                            </div>
-                          </div>
-                          
-                          <div className="bg-white rounded-lg border border-gray-200 p-4 max-h-64 overflow-y-auto">
-                            <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
-                              {content.length > 500 ? (
-                                <div>
-                                  {content.substring(0, 500)}...
-                                  <div className="mt-2 text-xs text-gray-500">
-                                    Content truncated. Click Edit to see full content.
-                                  </div>
-                                </div>
-                              ) : (
-                                content
-                              )}
-                            </pre>
-                          </div>
-                          
-                          <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
-                            <span>Generated content for {step.name} phase</span>
-                            <span>{content.length} characters</span>
-                          </div>
-                        </div>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-6 p-4 bg-white/50 rounded-lg border border-emerald-200">
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-emerald-700">
-                <p className="font-medium mb-1">Content Management Tips:</p>
-                <ul className="space-y-1 text-xs">
-                  <li>• <strong>Edit:</strong> Modify generated content to better fit your teaching style</li>
-                  <li>• <strong>Delete:</strong> Remove generated content while keeping your original step description</li>
-                  <li>• Content is automatically saved with your 5E design</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </Card>
-      )}
 
     </div>
   );
