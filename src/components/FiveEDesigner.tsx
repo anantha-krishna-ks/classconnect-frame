@@ -1718,22 +1718,16 @@ Students use the story framework to reflect on:
                             <Badge className={step.color}>
                               {step.name}
                             </Badge>
-                          </div>
-                          
-                            <div className="space-y-4">
-                              <div className="flex items-center justify-between gap-4">
-                                <div className="flex-1">
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <div className="flex items-center gap-2">
-                                    <label className="text-sm font-medium text-gray-700">Time:</label>
-                                    <input
-                                      type="text"
-                                      placeholder="30 mins"
-                                      className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                    />
-                                  </div>
-                                  <Popover>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2">
+                                <label className="text-sm font-medium text-gray-700">Time:</label>
+                                <input
+                                  type="text"
+                                  placeholder="30 mins"
+                                  className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                />
+                              </div>
+                              <Popover>
                                     <PopoverTrigger asChild>
                                       <Button variant="outline" size="sm" className="text-xs">
                                         <Plus className="w-3 h-3 mr-1" />
@@ -1788,16 +1782,17 @@ Students use the story framework to reflect on:
                                           </button>
                                         ))}
                                       </div>
-                                    </PopoverContent>
-                                  </Popover>
-                                </div>
-                              </div>
-                              
-                              {/* Selected Resources Display */}
-                              {selectedResources[eloKey]?.[step.id]?.length > 0 && (
-                                <div className="space-y-3">
-                                  <label className="text-sm font-medium text-gray-700">Selected Resources:</label>
-                                  <div className="space-y-3">
+                                     </PopoverContent>
+                                   </Popover>
+                                 </div>
+                               </div>
+                               
+                               <div className="space-y-3">
+                                 {/* Selected Resources Display */}
+                                 {selectedResources[eloKey]?.[step.id]?.length > 0 && (
+                                   <div className="space-y-3">
+                                     <label className="text-sm font-medium text-gray-700">Selected Resources:</label>
+                                     <div className="space-y-3">
                                      {selectedResources[eloKey][step.id].map((resource, index) => {
                                        const stepKey = `${eloKey}_${step.id}`;
                                       const resourceContent = generatedContentData[stepKey]?.[resource];
