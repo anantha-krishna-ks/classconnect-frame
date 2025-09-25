@@ -18,19 +18,22 @@ const ExamPrepRoom = () => {
       {/* Main Header */}
       <header className="border-b border-gray-100 px-6 py-3" style={{ backgroundColor: '#3B54A5' }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <img 
-            src="/lovable-uploads/c278e3c9-20de-45b8-a466-41c546111a8a.png" 
-            alt="ExcelSchoolAi" 
-            className="h-10 w-auto"
-          />
+          <div className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/c278e3c9-20de-45b8-a466-41c546111a8a.png" 
+              alt="ExcelSchoolAi" 
+              className="h-8 w-auto"
+            />
+            <span className="text-white font-semibold text-lg">ExcelSchoolAi</span>
+          </div>
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate('/student-dashboard')}
+            onClick={() => navigate('/student-login')}
             className="text-white hover:bg-white/20 hover:text-white border border-white/20 hover:border-white/40 transition-all duration-200"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            Logout
           </Button>
         </div>
       </header>
@@ -50,19 +53,30 @@ const ExamPrepRoom = () => {
             <span className="mx-2">/</span>
             <span className="text-blue-600 font-medium">Exam Prep Room</span>
           </nav>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">Exam Prep Room</h1>
-              <p className="text-gray-600 text-sm">Prepare for exams with AI-powered practice tests and mock exams</p>
-            </div>
-          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/student-dashboard')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </Button>
         </div>
       </header>
 
+      {/* Page Header */}
       <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex items-center gap-3 mb-8 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-md">
+          <div className="w-14 h-14 bg-indigo-100 rounded-2xl flex items-center justify-center border-2 border-indigo-200 hover:scale-105 transition-transform duration-200">
+            <BookOpen className="w-7 h-7 text-indigo-600" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-slate-800 mb-1">Exam Prep Room</h1>
+            <p className="text-slate-600">Prepare for exams with AI-powered practice tests and mock exams</p>
+          </div>
+        </div>
+
         <Tabs defaultValue="create-quiz" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 h-14 p-2 bg-card border border-border rounded-lg">
             <TabsTrigger 
