@@ -133,15 +133,15 @@ const CreateQuiz = () => {
         {selectedSubject && (
           <div className="space-y-2">
             <Label>Chapters (Select multiple)</Label>
-            <div className="border rounded-lg p-4 space-y-2 max-h-40 overflow-y-auto">
+            <div className="bg-muted/30 border border-border rounded-lg p-4 space-y-3 max-h-40 overflow-y-auto scrollbar-thin hover:bg-muted/40 transition-colors">
               {chapters.map((chapter) => (
-                <div key={chapter.id} className="flex items-center space-x-2">
+                <div key={chapter.id} className="flex items-center space-x-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
                   <Checkbox
                     id={chapter.id}
                     checked={selectedChapters.includes(chapter.id)}
                     onCheckedChange={() => handleChapterSelect(chapter.id)}
                   />
-                  <Label htmlFor={chapter.id} className="text-sm cursor-pointer">
+                  <Label htmlFor={chapter.id} className="text-sm cursor-pointer flex-1 font-medium">
                     {chapter.name}
                   </Label>
                 </div>
@@ -154,15 +154,15 @@ const CreateQuiz = () => {
         {selectedChapters.length > 0 && (
           <div className="space-y-2">
             <Label>Concepts/Topics (Select multiple)</Label>
-            <div className="border rounded-lg p-4 space-y-2 max-h-40 overflow-y-auto">
+            <div className="bg-muted/30 border border-border rounded-lg p-4 space-y-3 max-h-40 overflow-y-auto scrollbar-thin hover:bg-muted/40 transition-colors">
               {concepts.map((concept) => (
-                <div key={concept.id} className="flex items-center space-x-2">
+                <div key={concept.id} className="flex items-center space-x-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
                   <Checkbox
                     id={concept.id}
                     checked={selectedConcepts.includes(concept.id)}
                     onCheckedChange={() => handleConceptSelect(concept.id)}
                   />
-                  <Label htmlFor={concept.id} className="text-sm cursor-pointer">
+                  <Label htmlFor={concept.id} className="text-sm cursor-pointer flex-1 font-medium">
                     {concept.name}
                   </Label>
                 </div>
