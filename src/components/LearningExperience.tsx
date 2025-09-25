@@ -622,41 +622,6 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                                     </Button>
                                   </div>
                                   
-                                  {/* Action buttons */}
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10"
-                                      onClick={() => {
-                                        const currentContent = activities.map((activity: any) => 
-                                          activity.description || activity.title || activity.content || "Apply the concept of gravitational force to calculate the weight of an object on Earth using the formula W = mg with accurate substitution of values."
-                                        ).join(" ");
-                                        handleEditELO(eloIndex, currentContent);
-                                      }}
-                                    >
-                                      <Edit2 className="h-4 w-4" />
-                                    </Button>
-                                    
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-green-600 hover:bg-green-50"
-                                      onClick={() => handleRegenerateELO(eloIndex)}
-                                      disabled={regeneratingELO === `ELO${eloIndex}`}
-                                    >
-                                      <RotateCcw className={`h-4 w-4 ${regeneratingELO === `ELO${eloIndex}` ? 'animate-spin' : ''}`} />
-                                    </Button>
-                                    
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                      onClick={() => handleDeleteELO(eloIndex)}
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
                                 </div>
 
                                 {/* Skills Section */}
