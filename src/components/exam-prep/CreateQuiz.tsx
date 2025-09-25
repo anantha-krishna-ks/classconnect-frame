@@ -172,14 +172,14 @@ const CreateQuiz = () => {
         )}
 
         {/* Time Selection */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
+        <div className="space-y-4 p-4 bg-muted/30 border border-border rounded-lg">
+          <div className="flex items-center space-x-3">
             <Checkbox
               id="timed-quiz"
               checked={isTimedQuiz}
               onCheckedChange={(checked) => setIsTimedQuiz(checked as boolean)}
             />
-            <Label htmlFor="timed-quiz">Set time limit for quiz</Label>
+            <Label htmlFor="timed-quiz" className="font-medium cursor-pointer">Set time limit for quiz</Label>
           </div>
           
           {isTimedQuiz && (
