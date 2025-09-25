@@ -1978,12 +1978,8 @@ Students use the story framework to reflect on:
                                              </div>
                                            ) : resourceContent ? (
                                              <div className="p-3 space-y-3 bg-emerald-50/30">
-                                               <div className="flex items-center justify-between">
-                                                 <div className="flex items-center space-x-2">
-                                                   <Brain className="w-4 h-4 text-emerald-600" />
-                                                   <span className="text-sm font-medium text-emerald-700">Generated Content</span>
-                                                 </div>
-                                                 <div className="flex items-center space-x-2">
+                                                <div className="flex items-center justify-end">
+                                                  <div className="flex items-center space-x-2">
                                                    <Button
                                                      variant="outline"
                                                      size="sm"
