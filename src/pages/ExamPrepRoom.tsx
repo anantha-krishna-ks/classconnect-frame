@@ -40,29 +40,23 @@ const ExamPrepRoom = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <Tabs defaultValue="evaluate-candidate" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 bg-muted/30 p-1 rounded-lg">
-            <TabsTrigger 
-              value="evaluate-candidate" 
-              className="flex items-center gap-2 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
+        <Tabs defaultValue="create-quiz" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="create-quiz" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
-              Evaluate Candidate
+              Create Quiz
             </TabsTrigger>
-            <TabsTrigger 
-              value="review-evaluation" 
-              className="flex items-center gap-2 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
+            <TabsTrigger value="mock-exam" className="flex items-center gap-2">
               <Clock className="w-4 h-4" />
-              Review Evaluation
+              My Mock Exam
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="evaluate-candidate">
+          <TabsContent value="create-quiz">
             <CreateQuiz />
           </TabsContent>
 
-          <TabsContent value="review-evaluation">
+          <TabsContent value="mock-exam">
             <MyMockExam />
           </TabsContent>
         </Tabs>
