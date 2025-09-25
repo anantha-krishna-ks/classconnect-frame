@@ -3,14 +3,16 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { X, Brain } from 'lucide-react';
+import { X, Brain, Edit2, RotateCcw, Trash2, Check, XIcon } from 'lucide-react';
 import axios from 'axios';
 import config from '@/config';
 import FiveEDesigner from './FiveEDesigner';
+import { useToast } from '@/hooks/use-toast';
 
 interface LearningExperienceProps {
   elos: string[];
@@ -33,6 +35,7 @@ const LearningExperience: React.FC<LearningExperienceProps> = ({
   onLearningExperienceChange,
   onFiveEChange
 }) => {
+  const { toast } = useToast();
   const [selectedApproaches, setSelectedApproaches] = useState<string[]>([]);
   const [customSkills, setCustomSkills] = useState<string>('');
   const [selectedLearningModel, setSelectedLearningModel] = useState<string>('5E');
@@ -56,6 +59,9 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
   const [learningExperienceError, setLearningExperienceError] = useState<string | null>(null);
   const [learningExperience, setLearningExperience] = useState<any>(null);
   const [fiveEData, setFiveEData] = useState<any>(null);
+  const [editingELO, setEditingELO] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState<string>('');
+  const [regeneratingELO, setRegeneratingELO] = useState<string | null>(null);
 
   const pedagogicalApproaches = [
     'Constructivism',
@@ -196,6 +202,145 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
         setCustomSkills('');
       }
     }
+  };
+
+  // Handle ELO editing
+  const handleEditELO = (eloIndex: number, currentContent: string) => {
+    setEditingELO(`ELO${eloIndex}`);
+    setEditContent(currentContent);
+  };
+
+  const handleSaveEdit = (eloIndex: number) => {
+    if (!learningExperience || !editContent.trim()) return;
+    
+    // Update the learning experience content
+    const updatedExperience = { ...learningExperience };
+    if (updatedExperience["5E_Model"]) {
+      updatedExperience["5E_Model"].forEach((phaseObj: any) => {
+        phaseObj.activities.forEach((activity: any) => {
+          if (activity.elos?.includes(`ELO${eloIndex}`)) {
+            activity.description = editContent;
+          }
+        });
+      });
+    }
+    
+    setLearningExperience(updatedExperience);
+    onLearningExperienceChange(updatedExperience);
+    setEditingELO(null);
+    setEditContent('');
+    
+    toast({
+      title: "Success",
+      description: `ELO ${eloIndex} content updated successfully.`,
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingELO(null);
+    setEditContent('');
+  };
+
+  // Handle ELO regeneration
+  const handleRegenerateELO = async (eloIndex: number) => {
+    setRegeneratingELO(`ELO${eloIndex}`);
+    try {
+      // Call API to regenerate specific ELO content
+      const response = await axios.post(
+        config.ENDPOINTS.GENERATE_LEARNING_EXPERIENCE,
+        {
+          elos: [elos[eloIndex - 1]], // Single ELO
+          pedagogical_approaches: selectedApproaches,
+          intelligence_types: selectedIntelligenceTypes,
+          course_outcomes: courseOutcomes,
+          grade,
+          subject,
+          chapter,
+          five_e_content: mergeFiveEContent(),
+          regenerate_elo: eloIndex
+        },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+
+      let newContent = response.data.learning_experience;
+      if (typeof newContent === "string") {
+        try {
+          newContent = JSON.parse(newContent);
+        } catch (e) {
+          console.error("Failed to parse regenerated content");
+          return;
+        }
+      }
+
+      // Update the specific ELO in the current learning experience
+      const updatedExperience = { ...learningExperience };
+      if (updatedExperience["5E_Model"] && newContent["5E_Model"]) {
+        // Replace activities for the regenerated ELO
+        newContent["5E_Model"].forEach((newPhaseObj: any) => {
+          const existingPhase = updatedExperience["5E_Model"].find((p: any) => p.phase === newPhaseObj.phase);
+          if (existingPhase) {
+            // Update activities for this ELO
+            newPhaseObj.activities.forEach((newActivity: any) => {
+              const existingActivityIndex = existingPhase.activities.findIndex((a: any) => 
+                a.elos?.includes(`ELO${eloIndex}`)
+              );
+              if (existingActivityIndex >= 0) {
+                existingPhase.activities[existingActivityIndex] = newActivity;
+              }
+            });
+          }
+        });
+      }
+      
+      setLearningExperience(updatedExperience);
+      onLearningExperienceChange(updatedExperience);
+      
+      toast({
+        title: "Success",
+        description: `ELO ${eloIndex} content regenerated successfully.`,
+      });
+    } catch (error) {
+      console.error('Failed to regenerate ELO content:', error);
+      toast({
+        title: "Error",
+        description: `Failed to regenerate ELO ${eloIndex} content. Please try again.`,
+        variant: "destructive",
+      });
+    } finally {
+      setRegeneratingELO(null);
+    }
+  };
+
+  // Handle ELO deletion
+  const handleDeleteELO = (eloIndex: number) => {
+    if (!learningExperience) return;
+    
+    const updatedExperience = { ...learningExperience };
+    if (updatedExperience["5E_Model"]) {
+      // Remove activities that only belong to this ELO or remove ELO from shared activities
+      updatedExperience["5E_Model"].forEach((phaseObj: any) => {
+        phaseObj.activities = phaseObj.activities.filter((activity: any) => {
+          if (activity.elos?.includes(`ELO${eloIndex}`)) {
+            // If activity has multiple ELOs, just remove this one
+            if (activity.elos.length > 1) {
+              activity.elos = activity.elos.filter((elo: string) => elo !== `ELO${eloIndex}`);
+              return true;
+            }
+            // If activity only belongs to this ELO, remove it completely
+            return false;
+          }
+          return true;
+        });
+      });
+    }
+    
+    setLearningExperience(updatedExperience);
+    onLearningExperienceChange(updatedExperience);
+    
+    toast({
+      title: "Success", 
+      description: `ELO ${eloIndex} deleted successfully.`,
+    });
   };
 
   // --- Pedagogical Approaches API Call ---
@@ -484,41 +629,32 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                                       size="sm"
                                       className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10"
                                       onClick={() => {
-                                        // Edit functionality
-                                        console.log(`Edit ELO ${eloIndex}`);
+                                        const currentContent = activities.map((activity: any) => 
+                                          activity.description || activity.title || activity.content || "Apply the concept of gravitational force to calculate the weight of an object on Earth using the formula W = mg with accurate substitution of values."
+                                        ).join(" ");
+                                        handleEditELO(eloIndex, currentContent);
                                       }}
                                     >
-                                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                      </svg>
+                                      <Edit2 className="h-4 w-4" />
                                     </Button>
                                     
                                     <Button
                                       variant="ghost"
                                       size="sm"
                                       className="h-8 w-8 p-0 text-muted-foreground hover:text-green-600 hover:bg-green-50"
-                                      onClick={() => {
-                                        // Regenerate functionality
-                                        console.log(`Regenerate ELO ${eloIndex}`);
-                                      }}
+                                      onClick={() => handleRegenerateELO(eloIndex)}
+                                      disabled={regeneratingELO === `ELO${eloIndex}`}
                                     >
-                                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                      </svg>
+                                      <RotateCcw className={`h-4 w-4 ${regeneratingELO === `ELO${eloIndex}` ? 'animate-spin' : ''}`} />
                                     </Button>
                                     
                                     <Button
                                       variant="ghost"
                                       size="sm"
                                       className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                      onClick={() => {
-                                        // Delete functionality
-                                        console.log(`Delete ELO ${eloIndex}`);
-                                      }}
+                                      onClick={() => handleDeleteELO(eloIndex)}
                                     >
-                                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                      </svg>
+                                      <Trash2 className="h-4 w-4" />
                                     </Button>
                                   </div>
                                 </div>
@@ -567,11 +703,40 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
 
                                 {/* Description */}
                                 <div className="mt-4 pt-4 border-t border-muted-foreground/10">
-                                  <p className="text-sm text-muted-foreground leading-relaxed">
-                                    {activities.map((activity: any, idx: number) => 
-                                      activity.description || activity.title || activity.content || "Apply the concept of gravitational force to calculate the weight of an object on Earth using the formula W = mg with accurate substitution of values."
-                                    ).join(" ")}
-                                  </p>
+                                  {editingELO === `ELO${eloIndex}` ? (
+                                    <div className="space-y-3">
+                                      <Textarea
+                                        value={editContent}
+                                        onChange={(e) => setEditContent(e.target.value)}
+                                        className="min-h-[100px] text-sm"
+                                        placeholder="Edit the learning experience content..."
+                                      />
+                                      <div className="flex gap-2">
+                                        <Button
+                                          size="sm"
+                                          onClick={() => handleSaveEdit(eloIndex)}
+                                          className="bg-primary hover:bg-primary/90"
+                                        >
+                                          <Check className="h-4 w-4 mr-1" />
+                                          Save
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={handleCancelEdit}
+                                        >
+                                          <XIcon className="h-4 w-4 mr-1" />
+                                          Cancel
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                      {activities.map((activity: any, idx: number) => 
+                                        activity.description || activity.title || activity.content || "Apply the concept of gravitational force to calculate the weight of an object on Earth using the formula W = mg with accurate substitution of values."
+                                      ).join(" ")}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                             </Card>
