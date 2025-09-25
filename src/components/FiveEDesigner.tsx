@@ -1989,36 +1989,36 @@ Students use the story framework to reflect on:
                                                   </span>
                                                   <span className="text-sm text-gray-800 font-medium">• {resource}</span>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                  {resourceContent && (
-                                                    <div className="flex items-center space-x-1">
-                                                      <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => editGeneratedContent(stepKey, resource)}
-                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 h-6 w-6 p-0"
-                                                      >
-                                                        <Edit3 className="w-3 h-3" />
-                                                      </Button>
-                                                      <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() => regenerateContentForResource(stepKey, resource)}
-                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 h-6 w-6 p-0"
-                                                        title="Regenerate content"
-                                                      >
-                                                        <RefreshCw className="w-3 h-3" />
-                                                      </Button>
-                                                    </div>
-                                                  )}
-                                                  <span className="text-xs text-gray-600">Estimated Time:</span>
-                                                  <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
-                                                    {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] 
-                                                      ? `${resourceTimeAllocations[eloKey][step.id][resource]} min`
-                                                      : stepTimes[eloKey]?.[step.id] 
-                                                        ? 'Calculating...'
-                                                        : 'Enter time above'}
-                                                  </Badge>
+                                                 <div className="flex items-center gap-2">
+                                                   <span className="text-xs text-gray-600">Estimated Time:</span>
+                                                   <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
+                                                     {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] 
+                                                       ? `${resourceTimeAllocations[eloKey][step.id][resource]} min`
+                                                       : stepTimes[eloKey]?.[step.id] 
+                                                         ? 'Calculating...'
+                                                         : 'Enter time above'}
+                                                   </Badge>
+                                                   {resourceContent && (
+                                                     <div className="flex items-center space-x-1">
+                                                       <Button
+                                                         variant="outline"
+                                                         size="sm"
+                                                         onClick={() => editGeneratedContent(stepKey, resource)}
+                                                         className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 h-6 w-6 p-0"
+                                                       >
+                                                         <Edit3 className="w-3 h-3" />
+                                                       </Button>
+                                                       <Button
+                                                         variant="outline"
+                                                         size="sm"
+                                                         onClick={() => regenerateContentForResource(stepKey, resource)}
+                                                         className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 h-6 w-6 p-0"
+                                                         title="Regenerate content"
+                                                       >
+                                                         <RefreshCw className="w-3 h-3" />
+                                                       </Button>
+                                                     </div>
+                                                   )}
                                                   <Button
                                                     variant="ghost"
                                                     size="sm"
