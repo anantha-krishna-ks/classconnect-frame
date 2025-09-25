@@ -6,7 +6,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, FileText, CheckCircle } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Upload, FileText, CheckCircle, X, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import QuizDisplay from '@/components/exam-prep/QuizDisplay';
 import { examPrepData } from '@/data/examPrepData';
@@ -16,6 +18,8 @@ const CreateQuiz = () => {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
   const [selectedConcepts, setSelectedConcepts] = useState<string[]>([]);
+  const [chapterSearch, setChapterSearch] = useState('');
+  const [conceptSearch, setConceptSearch] = useState('');
   const [isTimedQuiz, setIsTimedQuiz] = useState(false);
   const [timeLimit, setTimeLimit] = useState('');
   const [generatedQuiz, setGeneratedQuiz] = useState<any>(null);
@@ -27,6 +31,14 @@ const CreateQuiz = () => {
   const concepts = selectedChapters.length > 0 
     ? selectedChapters.flatMap(chapter => examPrepData.concepts[chapter] || [])
     : [];
+  
+  const filteredChapters = chapters.filter(chapter => 
+    chapter.name.toLowerCase().includes(chapterSearch.toLowerCase())
+  );
+  
+  const filteredConcepts = concepts.filter(concept => 
+    concept.name.toLowerCase().includes(conceptSearch.toLowerCase())
+  );
 
   const handleChapterSelect = (chapterId: string) => {
     setSelectedChapters(prev => 
@@ -37,12 +49,21 @@ const CreateQuiz = () => {
     setSelectedConcepts([]); // Reset concepts when chapters change
   };
 
+  const removeChapter = (chapterId: string) => {
+    setSelectedChapters(prev => prev.filter(id => id !== chapterId));
+    setSelectedConcepts([]);
+  };
+
   const handleConceptSelect = (conceptId: string) => {
     setSelectedConcepts(prev => 
       prev.includes(conceptId) 
         ? prev.filter(id => id !== conceptId)
         : [...prev, conceptId]
     );
+  };
+
+  const removeConcept = (conceptId: string) => {
+    setSelectedConcepts(prev => prev.filter(id => id !== conceptId));
   };
 
   const generateQuiz = () => {
@@ -131,42 +152,128 @@ const CreateQuiz = () => {
 
         {/* Chapter Selection */}
         {selectedSubject && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label>Chapters (Select multiple)</Label>
-            <div className="bg-muted/30 border border-border rounded-lg p-4 space-y-3 max-h-40 overflow-y-auto scrollbar-thin hover:bg-muted/40 transition-colors">
-              {chapters.map((chapter) => (
-                <div key={chapter.id} className="flex items-center space-x-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                  <Checkbox
-                    id={chapter.id}
-                    checked={selectedChapters.includes(chapter.id)}
-                    onCheckedChange={() => handleChapterSelect(chapter.id)}
+            
+            {/* Selected Chapters Display */}
+            {selectedChapters.length > 0 && (
+              <div className="flex flex-wrap gap-2 p-3 bg-muted/20 rounded-lg border">
+                {selectedChapters.map(chapterId => {
+                  const chapter = chapters.find(ch => ch.id === chapterId);
+                  return (
+                    <Badge key={chapterId} variant="secondary" className="flex items-center gap-1 px-3 py-1">
+                      {chapter?.name}
+                      <X 
+                        className="w-3 h-3 cursor-pointer hover:text-destructive" 
+                        onClick={() => removeChapter(chapterId)}
+                      />
+                    </Badge>
+                  );
+                })}
+                <Badge variant="outline" className="px-2 py-1">
+                  {selectedChapters.length}
+                </Badge>
+              </div>
+            )}
+
+            {/* Search and Selection */}
+            <div className="border border-border rounded-lg overflow-hidden">
+              <div className="p-3 border-b bg-muted/10">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search chapters..."
+                    value={chapterSearch}
+                    onChange={(e) => setChapterSearch(e.target.value)}
+                    className="pl-10 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
-                  <Label htmlFor={chapter.id} className="text-sm cursor-pointer flex-1 font-medium">
-                    {chapter.name}
-                  </Label>
                 </div>
-              ))}
+              </div>
+              
+              <ScrollArea className="h-40">
+                <div className="p-2">
+                  {filteredChapters.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground">No chapters found</div>
+                  ) : (
+                    filteredChapters.map((chapter) => (
+                      <div key={chapter.id} className="flex items-center space-x-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
+                        <Checkbox
+                          id={chapter.id}
+                          checked={selectedChapters.includes(chapter.id)}
+                          onCheckedChange={() => handleChapterSelect(chapter.id)}
+                        />
+                        <Label htmlFor={chapter.id} className="text-sm cursor-pointer flex-1 font-medium">
+                          {chapter.name}
+                        </Label>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
             </div>
           </div>
         )}
 
         {/* Concept Selection */}
         {selectedChapters.length > 0 && (
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Label>Concepts/Topics (Select multiple)</Label>
-            <div className="bg-muted/30 border border-border rounded-lg p-4 space-y-3 max-h-40 overflow-y-auto scrollbar-thin hover:bg-muted/40 transition-colors">
-              {concepts.map((concept) => (
-                <div key={concept.id} className="flex items-center space-x-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                  <Checkbox
-                    id={concept.id}
-                    checked={selectedConcepts.includes(concept.id)}
-                    onCheckedChange={() => handleConceptSelect(concept.id)}
+            
+            {/* Selected Concepts Display */}
+            {selectedConcepts.length > 0 && (
+              <div className="flex flex-wrap gap-2 p-3 bg-muted/20 rounded-lg border">
+                {selectedConcepts.map(conceptId => {
+                  const concept = concepts.find(c => c.id === conceptId);
+                  return (
+                    <Badge key={conceptId} variant="secondary" className="flex items-center gap-1 px-3 py-1">
+                      {concept?.name}
+                      <X 
+                        className="w-3 h-3 cursor-pointer hover:text-destructive" 
+                        onClick={() => removeConcept(conceptId)}
+                      />
+                    </Badge>
+                  );
+                })}
+                <Badge variant="outline" className="px-2 py-1">
+                  {selectedConcepts.length}
+                </Badge>
+              </div>
+            )}
+
+            {/* Search and Selection */}
+            <div className="border border-border rounded-lg overflow-hidden">
+              <div className="p-3 border-b bg-muted/10">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search concepts..."
+                    value={conceptSearch}
+                    onChange={(e) => setConceptSearch(e.target.value)}
+                    className="pl-10 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
-                  <Label htmlFor={concept.id} className="text-sm cursor-pointer flex-1 font-medium">
-                    {concept.name}
-                  </Label>
                 </div>
-              ))}
+              </div>
+              
+              <ScrollArea className="h-40">
+                <div className="p-2">
+                  {filteredConcepts.length === 0 ? (
+                    <div className="text-center py-6 text-muted-foreground">No concepts found</div>
+                  ) : (
+                    filteredConcepts.map((concept) => (
+                      <div key={concept.id} className="flex items-center space-x-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
+                        <Checkbox
+                          id={concept.id}
+                          checked={selectedConcepts.includes(concept.id)}
+                          onCheckedChange={() => handleConceptSelect(concept.id)}
+                        />
+                        <Label htmlFor={concept.id} className="text-sm cursor-pointer flex-1 font-medium">
+                          {concept.name}
+                        </Label>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
             </div>
           </div>
         )}
