@@ -222,6 +222,12 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
     return generatedItems.filter(item => item.isSelected);
   };
 
+  // Sync selectedItems array with isSelected properties
+  useEffect(() => {
+    const actualSelectedItems = generatedItems.filter(item => item.isSelected).map(item => item.id);
+    setSelectedItems(actualSelectedItems);
+  }, [generatedItems]);
+
   const calculateBloomsTaxonomyDistribution = () => {
     const selectedItems = getSelectedItems();
     const distribution: { [key: string]: number } = {};
@@ -304,7 +310,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="all">All Items ({generatedItems.length})</TabsTrigger>
-          <TabsTrigger value="selected">Selected ({selectedItems.length})</TabsTrigger>
+          <TabsTrigger value="selected">Selected ({getSelectedItems().length})</TabsTrigger>
           <TabsTrigger value="historical">Historical Questions</TabsTrigger>
         </TabsList>
 
