@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { GripVertical, Plus, X, Merge, ChevronDown, Brain, Loader2, AlertCircle, CheckCircle, Edit3, Trash2, Save, Eye } from 'lucide-react';
+import { GripVertical, Plus, X, Merge, ChevronDown, Brain, Loader2, AlertCircle, CheckCircle, Edit3, RefreshCw, Save, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -1699,11 +1699,53 @@ Students use the story framework to reflect on:
       }
       return updated;
     });
+  };
 
-    toast({
-      title: "Content Deleted",
-      description: `Generated content for ${resourceName} has been removed.`,
-    });
+  const regenerateContentForResource = async (stepKey: string, resourceName: string) => {
+    const [eloIndex, stepId] = stepKey.split('_');
+    const stepName = fiveESteps.find(s => s.id === stepId)?.name || stepId;
+    
+    // Set generating state for this specific resource
+    setGeneratingContent(prev => ({ ...prev, [stepKey]: true }));
+    
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Map resource to type and generate content
+      const mappedType = mapResourceToType(resourceName);
+      if (mappedType) {
+        const content = getPredefinedContent(stepName, mappedType, eloIndex);
+        
+        // Update content for this specific resource
+        setGeneratedContentData(prev => ({
+          ...prev,
+          [stepKey]: {
+            ...prev[stepKey],
+            [resourceName]: content
+          }
+        }));
+        
+        // Mark as generated
+        setContentGenerated(prev => ({ ...prev, [stepKey]: true }));
+        
+        toast({
+          title: "Content Regenerated",
+          description: `New content generated for ${resourceName}`,
+        });
+        
+        console.log(`Content regenerated for ${resourceName}`);
+      }
+    } catch (error) {
+      console.error('Error regenerating content:', error);
+      toast({
+        title: "Error",
+        description: "Failed to regenerate content",
+        variant: "destructive"
+      });
+    } finally {
+      setGeneratingContent(prev => ({ ...prev, [stepKey]: false }));
+    }
   };
 
   return (
@@ -1961,10 +2003,11 @@ Students use the story framework to reflect on:
                                                       <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        onClick={() => deleteGeneratedContent(stepKey, resource)}
-                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-6 w-6 p-0"
+                                                        onClick={() => regenerateContentForResource(stepKey, resource)}
+                                                        className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 h-6 w-6 p-0"
+                                                        title="Regenerate content"
                                                       >
-                                                        <Trash2 className="w-3 h-3" />
+                                                        <RefreshCw className="w-3 h-3" />
                                                       </Button>
                                                     </div>
                                                   )}
