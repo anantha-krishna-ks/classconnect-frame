@@ -40,6 +40,7 @@ import AdminComingSoon from "./pages/AdminComingSoon";
 import StudentComingSoon from "./pages/StudentComingSoon";
 import ParentComingSoon from "./pages/ParentComingSoon";
 import ResourceVault from "./pages/ResourceVault";
+import ExamPrepRoom from "./pages/ExamPrepRoom";
 
 
 const queryClient = new QueryClient();
@@ -101,7 +102,7 @@ const App = () => (
           <Route path="/mix-master" element={<StudentComingSoon />} />
           <Route path="/quick-recall" element={<StudentComingSoon />} />
           <Route path="/confidence-tracker" element={<StudentComingSoon />} />
-          <Route path="/exam-prep" element={<StudentComingSoon />} />
+          <Route path="/exam-prep" element={<ExamPrepRoom />} />
           <Route path="/mock-test" element={<StudentComingSoon />} />
           <Route path="/resource-vault" element={<ResourceVault />} />
           <Route path="/announcements" element={<StudentComingSoon />} />
