@@ -308,10 +308,25 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="all">All Items ({generatedItems.length})</TabsTrigger>
-          <TabsTrigger value="selected">Selected ({getSelectedItems().length})</TabsTrigger>
-          <TabsTrigger value="historical">Historical Questions</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-muted/30 p-2 rounded-lg border border-border/40">
+          <TabsTrigger 
+            value="all" 
+            className="data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:border data-[state=active]:border-border data-[state=active]:shadow-sm font-medium"
+          >
+            All Items ({generatedItems.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="selected" 
+            className="data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:border data-[state=active]:border-border data-[state=active]:shadow-sm font-medium"
+          >
+            Selected ({getSelectedItems().length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="historical" 
+            className="data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:border data-[state=active]:border-border data-[state=active]:shadow-sm font-medium"
+          >
+            Historical Questions
+          </TabsTrigger>
         </TabsList>
 
         {/* All Items Tab */}
