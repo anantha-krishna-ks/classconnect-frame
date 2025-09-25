@@ -6,7 +6,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, FileText, CheckCircle } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { Upload, FileText, CheckCircle, ChevronDown, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import QuizDisplay from '@/components/exam-prep/QuizDisplay';
 import { examPrepData } from '@/data/examPrepData';
@@ -21,6 +23,8 @@ const CreateQuiz = () => {
   const [generatedQuiz, setGeneratedQuiz] = useState<any>(null);
   const [uploadedAnswers, setUploadedAnswers] = useState(false);
   const [showEvaluation, setShowEvaluation] = useState(false);
+  const [chapterDropdownOpen, setChapterDropdownOpen] = useState(false);
+  const [conceptDropdownOpen, setConceptDropdownOpen] = useState(false);
 
   const subjects = examPrepData.subjects;
   const chapters = selectedSubject ? examPrepData.chapters[selectedSubject] || [] : [];
@@ -133,20 +137,67 @@ const CreateQuiz = () => {
         {selectedSubject && (
           <div className="space-y-2">
             <Label>Chapters (Select multiple)</Label>
-            <div className="bg-muted/30 border border-border rounded-lg p-4 space-y-3 max-h-40 overflow-y-auto scrollbar-thin hover:bg-muted/40 transition-colors">
-              {chapters.map((chapter) => (
-                <div key={chapter.id} className="flex items-center space-x-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                  <Checkbox
-                    id={chapter.id}
-                    checked={selectedChapters.includes(chapter.id)}
-                    onCheckedChange={() => handleChapterSelect(chapter.id)}
-                  />
-                  <Label htmlFor={chapter.id} className="text-sm cursor-pointer flex-1 font-medium">
-                    {chapter.name}
-                  </Label>
-                </div>
-              ))}
-            </div>
+            <Popover open={chapterDropdownOpen} onOpenChange={setChapterDropdownOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={chapterDropdownOpen}
+                  className="w-full justify-between min-h-12 p-3"
+                >
+                  <div className="flex flex-wrap gap-1 flex-1 items-center">
+                    {selectedChapters.length === 0 ? (
+                      <span className="text-muted-foreground">Select chapters...</span>
+                    ) : (
+                      selectedChapters.map((chapterId) => {
+                        const chapter = chapters.find(ch => ch.id === chapterId);
+                        return (
+                          <Badge
+                            key={chapterId}
+                            variant="secondary"
+                            className="flex items-center gap-1 px-2 py-1"
+                          >
+                            {chapter?.name}
+                            <X
+                              className="h-3 w-3 cursor-pointer hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleChapterSelect(chapterId);
+                              }}
+                            />
+                          </Badge>
+                        );
+                      })
+                    )}
+                  </div>
+                  <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search chapters..." className="h-9" />
+                  <CommandEmpty>No chapters found.</CommandEmpty>
+                  <CommandList>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {chapters.map((chapter) => (
+                        <CommandItem
+                          key={chapter.id}
+                          value={chapter.name}
+                          onSelect={() => handleChapterSelect(chapter.id)}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <Checkbox
+                            checked={selectedChapters.includes(chapter.id)}
+                            className="pointer-events-none"
+                          />
+                          <span className="flex-1">{chapter.name}</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
         )}
 
@@ -154,20 +205,67 @@ const CreateQuiz = () => {
         {selectedChapters.length > 0 && (
           <div className="space-y-2">
             <Label>Concepts/Topics (Select multiple)</Label>
-            <div className="bg-muted/30 border border-border rounded-lg p-4 space-y-3 max-h-40 overflow-y-auto scrollbar-thin hover:bg-muted/40 transition-colors">
-              {concepts.map((concept) => (
-                <div key={concept.id} className="flex items-center space-x-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                  <Checkbox
-                    id={concept.id}
-                    checked={selectedConcepts.includes(concept.id)}
-                    onCheckedChange={() => handleConceptSelect(concept.id)}
-                  />
-                  <Label htmlFor={concept.id} className="text-sm cursor-pointer flex-1 font-medium">
-                    {concept.name}
-                  </Label>
-                </div>
-              ))}
-            </div>
+            <Popover open={conceptDropdownOpen} onOpenChange={setConceptDropdownOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={conceptDropdownOpen}
+                  className="w-full justify-between min-h-12 p-3"
+                >
+                  <div className="flex flex-wrap gap-1 flex-1 items-center">
+                    {selectedConcepts.length === 0 ? (
+                      <span className="text-muted-foreground">Select concepts...</span>
+                    ) : (
+                      selectedConcepts.map((conceptId) => {
+                        const concept = concepts.find(c => c.id === conceptId);
+                        return (
+                          <Badge
+                            key={conceptId}
+                            variant="outline"
+                            className="flex items-center gap-1 px-2 py-1"
+                          >
+                            {concept?.name}
+                            <X
+                              className="h-3 w-3 cursor-pointer hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleConceptSelect(conceptId);
+                              }}
+                            />
+                          </Badge>
+                        );
+                      })
+                    )}
+                  </div>
+                  <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search concepts..." className="h-9" />
+                  <CommandEmpty>No concepts found.</CommandEmpty>
+                  <CommandList>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {concepts.map((concept) => (
+                        <CommandItem
+                          key={concept.id}
+                          value={concept.name}
+                          onSelect={() => handleConceptSelect(concept.id)}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <Checkbox
+                            checked={selectedConcepts.includes(concept.id)}
+                            className="pointer-events-none"
+                          />
+                          <span className="flex-1">{concept.name}</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
         )}
 
