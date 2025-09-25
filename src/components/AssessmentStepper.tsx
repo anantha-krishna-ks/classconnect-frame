@@ -294,7 +294,7 @@ const AssessmentStepper = ({ onComplete }: AssessmentStepperProps) => {
         {/* Step 3: Item Configuration */}
         <section 
           ref={(el) => { if (el) sectionRefs.current[2] = el; }}
-          className="relative bg-gradient-to-br from-green-50/50 to-white py-16"
+          className="relative bg-gradient-to-br from-green-50/50 to-white py-16 hidden"
         >
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-200 to-transparent"></div>
           <div className="max-w-7xl mx-auto px-6">
