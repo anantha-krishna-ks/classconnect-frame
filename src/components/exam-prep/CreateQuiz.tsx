@@ -239,7 +239,7 @@ const CreateQuiz = () => {
         {/* Generate Quiz Button */}
         <Button 
           onClick={generateQuiz}
-          className="w-full"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
           disabled={!selectedSubject || selectedChapters.length === 0 || selectedConcepts.length === 0}
         >
           <FileText className="w-4 h-4 mr-2" />
