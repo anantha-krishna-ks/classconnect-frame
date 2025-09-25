@@ -2009,7 +2009,7 @@ Students use the story framework to reflect on:
                                       const isGenerating = generatingContent[stepKey];
                                       
                                       return (
-                                         <div key={`${step.id}-${index}`} className="bg-white border-2 border-blue-200 hover:border-blue-300 rounded-lg overflow-hidden transition-all duration-200" draggable onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)} onDragEnd={handleResourceDragEnd} onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}>
+                                         <div key={`${step.id}-${index}`} className="bg-white border border-blue-200 hover:border-blue-300 rounded-lg overflow-hidden transition-all duration-200" draggable onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)} onDragEnd={handleResourceDragEnd} onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}>
                                            {/* Unified Resource Card */}
                                            <div className="bg-blue-50 px-3 py-2 border-b border-blue-200 cursor-move" onMouseDown={(e) => e.stopPropagation()}>
                                               <div className="flex items-center justify-between">
