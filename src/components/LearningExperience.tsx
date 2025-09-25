@@ -607,20 +607,9 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                               <div className="p-6 border-l-4 border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
                                 {/* Header */}
                                 <div className="flex items-center justify-between mb-4">
-                                  <div className="flex items-center gap-3">
-                                    <h5 className="text-lg font-bold text-foreground">ELO {eloIndex}</h5>
-                                    <Button 
-                                      variant="outline" 
-                                      size="sm" 
-                                      className="h-7 px-3 text-xs border-primary/50 text-primary hover:bg-primary/10"
-                                      onClick={() => {
-                                        // Apply functionality - could trigger form filling or navigation
-                                        console.log(`Applied ELO ${eloIndex}`);
-                                      }}
-                                    >
-                                      Apply
-                                    </Button>
-                                  </div>
+                                   <div className="flex items-center gap-3">
+                                     <h5 className="text-lg font-bold text-foreground">ELO {eloIndex}</h5>
+                                   </div>
                                   
                                 </div>
 
