@@ -1904,7 +1904,7 @@ Students use the story framework to reflect on:
 
                 {/* Drop Zone for 5E Steps */}
                 <div 
-                  className="min-h-[200px] border-2 border-dashed border-blue-300 rounded-xl p-6 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 hover:border-blue-400 hover:bg-blue-50/70 transition-all duration-200"
+                  className="min-h-[200px] border border-gray-200 rounded-xl p-6 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 hover:border-gray-300 hover:bg-blue-50/70 transition-all duration-200"
                   onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, eloKey)}
                 >
