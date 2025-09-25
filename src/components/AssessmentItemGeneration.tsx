@@ -308,7 +308,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-3 bg-muted/50 p-2 rounded-lg border border-border/50 h-14">
           <TabsTrigger value="all">All Items ({generatedItems.length})</TabsTrigger>
           <TabsTrigger value="selected">Selected ({getSelectedItems().length})</TabsTrigger>
           <TabsTrigger value="historical">Historical Questions</TabsTrigger>
