@@ -5,7 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { Clock, FileText, Upload, CheckCircle } from 'lucide-react';
+import { Clock, FileText, Upload, CheckCircle, ChevronDown, X } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { useToast } from '@/hooks/use-toast';
 import MockExamDisplay from '@/components/exam-prep/MockExamDisplay';
 import { examPrepData } from '@/data/examPrepData';
@@ -18,6 +20,7 @@ const MyMockExam = () => {
   const [generatedExam, setGeneratedExam] = useState<any>(null);
   const [uploadedAnswers, setUploadedAnswers] = useState(false);
   const [showEvaluation, setShowEvaluation] = useState(false);
+  const [chapterDropdownOpen, setChapterDropdownOpen] = useState(false);
 
   const subjects = examPrepData.subjects;
   const chapters = selectedSubject ? examPrepData.chapters[selectedSubject] || [] : [];
@@ -122,20 +125,67 @@ const MyMockExam = () => {
         {selectedSubject && (
           <div className="space-y-2">
             <Label>Chapters (Select multiple)</Label>
-            <div className="border rounded-lg p-4 space-y-2 max-h-40 overflow-y-auto">
-              {chapters.map((chapter) => (
-                <div key={chapter.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={chapter.id}
-                    checked={selectedChapters.includes(chapter.id)}
-                    onCheckedChange={() => handleChapterSelect(chapter.id)}
-                  />
-                  <Label htmlFor={chapter.id} className="text-sm cursor-pointer">
-                    {chapter.name}
-                  </Label>
-                </div>
-              ))}
-            </div>
+            <Popover open={chapterDropdownOpen} onOpenChange={setChapterDropdownOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={chapterDropdownOpen}
+                  className="w-full justify-between min-h-12 p-3"
+                >
+                  <div className="flex flex-wrap gap-1 flex-1 items-center">
+                    {selectedChapters.length === 0 ? (
+                      <span className="text-muted-foreground">Select chapters...</span>
+                    ) : (
+                      selectedChapters.map((chapterId) => {
+                        const chapter = chapters.find(ch => ch.id === chapterId);
+                        return (
+                          <Badge
+                            key={chapterId}
+                            variant="secondary"
+                            className="flex items-center gap-1 px-2 py-1"
+                          >
+                            {chapter?.name}
+                            <X
+                              className="h-3 w-3 cursor-pointer hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleChapterSelect(chapterId);
+                              }}
+                            />
+                          </Badge>
+                        );
+                      })
+                    )}
+                  </div>
+                  <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0 bg-background z-50" align="start">
+                <Command>
+                  <CommandInput placeholder="Search chapters..." className="h-9" />
+                  <CommandEmpty>No chapters found.</CommandEmpty>
+                  <CommandList>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {chapters.map((chapter) => (
+                        <CommandItem
+                          key={chapter.id}
+                          value={chapter.name}
+                          onSelect={() => handleChapterSelect(chapter.id)}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
+                          <Checkbox
+                            checked={selectedChapters.includes(chapter.id)}
+                            className="pointer-events-none"
+                          />
+                          <span className="flex-1">{chapter.name}</span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
         )}
 
