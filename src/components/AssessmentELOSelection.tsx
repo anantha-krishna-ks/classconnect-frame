@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Trash2, Plus } from 'lucide-react';
 import { generateCourseOutcomes } from '../pages/api';
 import { useToast } from '@/hooks/use-toast';
-import AssessmentItemGeneration from './AssessmentItemGeneration';
 
 interface ItemConfigRow {
   id: string;
@@ -42,7 +41,6 @@ interface AssessmentELOSelectionProps {
 const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComplete }: AssessmentELOSelectionProps) => {
   const [chapterELOs, setChapterELOs] = useState<{ [key: string]: ELO[] }>({});
   const [loading, setLoading] = useState(false);
-  const [showItemGeneration, setShowItemGeneration] = useState(false);
   const { toast } = useToast();
 
   // Item configuration options
@@ -303,32 +301,6 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
   const getTotalCount = () => {
     return Object.values(chapterELOs).flat().length;
   };
-
-  const handleGenerateItems = () => {
-    // Update assessment data with selected ELOs and their configurations
-    const allELOs = Object.values(chapterELOs).flat();
-    const selectedELOs = allELOs.filter(elo => elo.selected);
-    
-    // Create item configuration from ELO data
-    const itemConfiguration = selectedELOs.map(elo => ({
-      eloId: elo.id,
-      eloTitle: elo.title,
-      maxItems: elo.maxItems,
-      maxMarks: elo.maxMarks,
-      itemConfigRows: elo.itemConfigRows
-    }));
-
-    updateAssessmentData({ 
-      selectedELOs,
-      itemConfiguration
-    });
-    
-    setShowItemGeneration(true);
-  };
-
-  if (showItemGeneration) {
-    return <AssessmentItemGeneration assessmentData={assessmentData} updateAssessmentData={updateAssessmentData} />;
-  }
 
   return (
     <div className="space-y-8">
@@ -651,7 +623,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
       {getSelectedCount() > 0 && (
         <div className="text-center animate-fade-in">
           <Button
-            onClick={handleGenerateItems}
+            onClick={onComplete}
             className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold px-12 py-4 h-auto text-lg rounded-xl border border-blue-400/20 hover:scale-105 transition-all duration-300 transform"
           >
             Generate Items Now
