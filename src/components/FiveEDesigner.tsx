@@ -11,6 +11,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { GripVertical, Plus, X, Merge, ChevronDown, Brain, Loader2, AlertCircle, CheckCircle, Edit3, RefreshCw, Save, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface FiveEDesignerProps {
   elos: string[];
@@ -54,6 +55,10 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   const [generatedContentData, setGeneratedContentData] = useState<{[key: string]: {[resourceName: string]: string}}>({});
   // Drag state for reordering resources within a step
   const [draggingResource, setDraggingResource] = useState<{eloKey: string; stepId: string; index: number} | null>(null);
+  
+  // Edit content state
+  const [editingContent, setEditingContent] = useState<{stepKey: string; resourceName: string; content: string} | null>(null);
+  const [editedContent, setEditedContent] = useState('');
   
   // Merge tracking state
   const [mergedELOs, setMergedELOs] = useState<{[mergedKey: string]: string[]}>({});
@@ -1671,11 +1676,37 @@ Students use the story framework to reflect on:
   // Helper functions for generated content management
   const editGeneratedContent = (stepKey: string, resourceName: string) => {
     const content = generatedContentData[stepKey]?.[resourceName] || '';
-    // Set content in textarea for editing - could be enhanced with a modal
-    const [eloIndex, stepId] = stepKey.split('_');
-    const currentDescription = stepDescriptions[eloIndex]?.[stepId] || '';
+    setEditingContent({ stepKey, resourceName, content });
+    setEditedContent(content);
+  };
+
+  const saveEditedContent = () => {
+    if (!editingContent) return;
     
-    updateStepDescription(eloIndex, stepId, currentDescription + '\n\n' + content);
+    const { stepKey, resourceName } = editingContent;
+    
+    // Update the generated content data
+    setGeneratedContentData(prev => ({
+      ...prev,
+      [stepKey]: {
+        ...prev[stepKey],
+        [resourceName]: editedContent
+      }
+    }));
+    
+    // Close the edit modal
+    setEditingContent(null);
+    setEditedContent('');
+    
+    toast({
+      title: "Content Updated",
+      description: `Content for ${resourceName} has been updated successfully.`,
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingContent(null);
+    setEditedContent('');
   };
 
   const deleteGeneratedContent = (stepKey: string, resourceName: string) => {
@@ -2111,6 +2142,37 @@ Students use the story framework to reflect on:
           </div>
         )}
       </Card>
+
+      {/* Edit Content Dialog */}
+      <Dialog open={!!editingContent} onOpenChange={() => editingContent && cancelEdit()}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Edit Generated Content</DialogTitle>
+            <DialogDescription>
+              Editing content for: {editingContent?.resourceName}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-hidden">
+            <Textarea
+              value={editedContent}
+              onChange={(e) => setEditedContent(e.target.value)}
+              className="min-h-[400px] resize-none font-mono text-sm"
+              placeholder="Edit your content here..."
+            />
+          </div>
+          
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={cancelEdit}>
+              Cancel
+            </Button>
+            <Button onClick={saveEditedContent}>
+              <Save className="w-4 h-4 mr-2" />
+              Save Changes
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
