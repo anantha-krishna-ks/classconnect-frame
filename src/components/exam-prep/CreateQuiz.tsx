@@ -108,7 +108,7 @@ const CreateQuiz = () => {
   }
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-background/80 to-muted/30 backdrop-blur-sm border-2 shadow-lg">
       <CardHeader>
         <CardTitle>Create Practice Quiz</CardTitle>
         <CardDescription>
