@@ -239,14 +239,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const totalSelectedMarks = selectedItemsData.reduce((sum, item) => sum + item.marks, 0);
   const bloomsDistribution = calculateBloomsTaxonomyDistribution();
 
-  if (showAssessmentBuilder) {
-    return (
-      <AssessmentBuilder
-        selectedItems={selectedItemsData}
-        onBack={() => setShowAssessmentBuilder(false)}
-      />
-    );
-  }
 
   if (isGenerating) {
     return (
@@ -667,6 +659,31 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
           </div>
         </CardContent>
       </Card>
+
+      {/* Assessment Builder - Shows below existing content when activated */}
+      {showAssessmentBuilder && (
+        <Card className="border border-border/50 bg-white mt-8">
+          <CardHeader className="border-b border-border/50 pb-4">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">Assessment Builder</CardTitle>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowAssessmentBuilder(false)}
+              >
+                <X className="h-4 w-4 mr-2" />
+                Close Builder
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <AssessmentBuilder
+              selectedItems={selectedItemsData}
+              onBack={() => setShowAssessmentBuilder(false)}
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
