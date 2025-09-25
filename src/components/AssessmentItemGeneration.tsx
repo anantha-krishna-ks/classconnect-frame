@@ -619,11 +619,12 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
               </div>
             </div>
 
-            {/* Save Assessment Button */}
+            {/* Create Assessment Button */}
             <div className="text-center pt-6">
               <Button 
                 size="lg"
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold px-12 py-4 text-lg rounded-xl hover:scale-105 transition-all duration-300 transform"
+                disabled={selectedItems.length === 0}
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold px-12 py-4 text-lg rounded-xl hover:scale-105 transition-all duration-300 transform disabled:hover:scale-100"
                 onClick={() => {
                   updateAssessmentData({ 
                     finalizedItems: selectedItemsData,
@@ -635,11 +636,11 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       bloomsDistribution
                     }
                   });
-                  toast.success('Assessment saved successfully!');
+                  toast.success('Assessment created successfully!');
                 }}
               >
                 <Save className="h-5 w-5 mr-2" />
-                Save Assessment
+                Create Assessment
               </Button>
             </div>
           </CardContent>
