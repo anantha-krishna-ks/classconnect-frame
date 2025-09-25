@@ -319,7 +319,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
         <CardContent className="p-0">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="p-6 pb-0">
-              <TabsList className="w-full bg-card shadow-sm border border-border/50 p-2 rounded-xl h-14 gap-1">
+              <TabsList className="w-full bg-card shadow-lg border-2 border-primary/20 p-2 rounded-xl h-14 gap-1 ring-1 ring-primary/10">
                 <TabsTrigger 
                   value="all" 
                   className="flex-1 h-10 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground hover:scale-105 transition-all duration-200 rounded-lg"
