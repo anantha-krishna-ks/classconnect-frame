@@ -148,9 +148,9 @@ const AssessmentStepper = ({ onComplete }: AssessmentStepperProps) => {
         ref={stepperRef}
         className={`${
           isSticky 
-            ? `fixed top-[120px] left-0 right-0 z-40 border-b border-gray-200/30 shadow-sm bg-white/95 backdrop-blur-md` 
+            ? `fixed top-0 left-0 right-0 z-50 border-b border-gray-200/30 shadow-sm bg-white/95 backdrop-blur-md` 
             : 'bg-white border-b border-gray-200'
-        } py-4 transition-all duration-300`}
+        } py-2 transition-all duration-300`}
       >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-center">
@@ -223,7 +223,7 @@ const AssessmentStepper = ({ onComplete }: AssessmentStepperProps) => {
       </div>
 
       {/* Dynamic spacer for sticky stepper */}
-      {isSticky && <div className="h-[88px]"></div>}
+      {isSticky && <div className="h-[76px]"></div>}
 
       {/* Sections Container */}
       <div className="relative">
