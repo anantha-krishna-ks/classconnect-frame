@@ -50,7 +50,7 @@ const QuizDisplay: React.FC<QuizDisplayProps> = ({
       </Card>
 
       {/* Quiz Details */}
-      <Card className="bg-card/80 backdrop-blur-sm border-2 border-primary/20 shadow-sm">
+      <Card>
         <CardHeader>
           <CardTitle>Quiz Information</CardTitle>
         </CardHeader>

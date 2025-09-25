@@ -28,8 +28,8 @@ const ExamPrepRoom = () => {
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-primary-foreground" />
+            <div className="w-12 h-12 bg-indigo-500 rounded-xl flex items-center justify-center">
+              <BookOpen className="w-6 h-6 text-white" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Exam Prep Room</h1>
