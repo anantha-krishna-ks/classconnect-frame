@@ -644,11 +644,24 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                                       </div>
                                     </div>
                                   ) : (
-                                    <p className="text-sm text-muted-foreground leading-relaxed">
-                                      {activities.map((activity: any, idx: number) => 
-                                        activity.description || activity.title || activity.content || "Apply the concept of gravitational force to calculate the weight of an object on Earth using the formula W = mg with accurate substitution of values."
-                                      ).join(" ")}
-                                    </p>
+                                     <div className="text-sm text-muted-foreground leading-relaxed space-y-4">
+                                       <div className="font-semibold text-foreground">
+                                         **Engage/Elicit Exploration Worksheet**
+                                       </div>
+                                       
+                                       <div className="font-medium text-foreground">
+                                         **Part 1: What I Think I Know**
+                                       </div>
+                                       
+                                       <p className="pl-4">
+                                         Fill in your initial thoughts about demonstrate respectful communication in a group task scenario to achieve a common goal collaboratively:
+                                       </p>
+                                       
+                                       <div className="pl-4">
+                                         <p>1. I think demonstrate respectful communication in a group task scenario to achieve a...</p>
+                                         <p className="text-xs text-muted-foreground mt-2 italic">Content truncated. Click Edit to see full content.</p>
+                                       </div>
+                                     </div>
                                   )}
                                 </div>
                               </div>
