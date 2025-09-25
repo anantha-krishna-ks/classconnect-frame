@@ -657,9 +657,26 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                                          Fill in your initial thoughts about demonstrate respectful communication in a group task scenario to achieve a common goal collaboratively:
                                        </p>
                                        
-                                       <div className="pl-4">
-                                         <p>1. I think demonstrate respectful communication in a group task scenario to achieve a...</p>
-                                         <p className="text-xs text-muted-foreground mt-2 italic">Content truncated. Click Edit to see full content.</p>
+                                       <div className="pl-4 space-y-3">
+                                         <p>1. I think demonstrate respectful communication in a group task scenario to achieve a common goal collaboratively involves listening actively to all team members, ensuring everyone has a chance to share their ideas, and being open to different perspectives.</p>
+                                         
+                                         <p>2. Respectful communication means using appropriate language, avoiding interrupting others, and providing constructive feedback rather than criticism.</p>
+                                         
+                                         <p>3. To achieve a common goal collaboratively, team members should establish clear roles and responsibilities, set shared objectives, and regularly check in with each other to ensure progress.</p>
+                                         
+                                         <p>4. I believe effective group communication requires patience, empathy, and the ability to compromise when there are disagreements.</p>
+                                         
+                                         <p>5. Successful collaboration also involves recognizing and utilizing each team member's strengths while supporting those who may need assistance.</p>
+                                         
+                                         <div className="font-medium text-foreground mt-4">
+                                           **Part 2: What I Want to Learn**
+                                         </div>
+                                         
+                                         <p>6. I want to learn specific techniques for managing conflicts that arise during group discussions while maintaining respect for all participants.</p>
+                                         
+                                         <p>7. I would like to understand how to encourage participation from quieter team members without making them feel pressured.</p>
+                                         
+                                         <p>8. I want to explore strategies for keeping group discussions focused and productive when working toward a shared goal.</p>
                                        </div>
                                      </div>
                                   )}
