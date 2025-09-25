@@ -626,7 +626,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
             onClick={onComplete}
             className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold px-12 py-4 h-auto text-lg rounded-xl border border-blue-400/20 hover:scale-105 transition-all duration-300 transform"
           >
-            Generate Items
+            Generate Items Now
           </Button>
         </div>
       )}
