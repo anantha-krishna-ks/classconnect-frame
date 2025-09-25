@@ -87,24 +87,23 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
       const mockItems: GeneratedItem[] = [];
       let itemId = 1;
       
-      assessmentData.itemConfiguration?.forEach((config: any) => {
+      // Use the new configuredItems structure from AssessmentELOSelection
+      assessmentData.configuredItems?.forEach((config: any) => {
         for (let i = 0; i < config.noOfItems; i++) {
-          assessmentData.selectedELOs?.forEach((elo: any) => {
-            mockItems.push({
-              id: `item-${itemId++}`,
-              question: generateMockQuestion(config.itemType, config.bloomsLevel, elo.title),
-              itemType: config.itemType,
-              bloomsLevel: config.bloomsLevel,
-              difficulty: config.difficulty,
-              marks: config.marksPerItem,
-              eloId: elo.id,
-              eloTitle: elo.title,
-              isSelected: false,
-              ...(config.itemType === 'Multiple Choice' && {
-                options: generateMockOptions(),
-                correctAnswer: generateMockOptions()[0]
-              })
-            });
+          mockItems.push({
+            id: `item-${itemId++}`,
+            question: generateMockQuestion(config.itemType, config.bloomsLevel, config.eloTitle),
+            itemType: config.itemType,
+            bloomsLevel: config.bloomsLevel,
+            difficulty: config.difficulty,
+            marks: config.marksPerItem,
+            eloId: config.eloId,
+            eloTitle: config.eloTitle,
+            isSelected: false,
+            ...(config.itemType === 'Multiple Choice' && {
+              options: generateMockOptions(),
+              correctAnswer: generateMockOptions()[0]
+            })
           });
         }
       });
