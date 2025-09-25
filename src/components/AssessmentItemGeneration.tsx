@@ -8,9 +8,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Eye, Edit, Trash2, CheckCircle2, Clock, BookOpen, Target, 
-  BarChart3, PieChart, Save, Filter, X, Sparkles, Image, Upload 
+  BarChart3, PieChart, Save, Filter, X, Sparkles, Image, Upload,
+  GripVertical, Plus, FileDown, Settings
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -46,6 +49,14 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('all');
   const [filterType, setFilterType] = useState('all');
+  const [showAssessmentBuilder, setShowAssessmentBuilder] = useState(false);
+  const [builderData, setBuilderData] = useState({
+    totalMarks: '',
+    totalTime: '',
+    numberingStyle: 'continuous',
+    generalInstructions: 'Read all instructions carefully before attempting the questions.',
+    sections: [] as any[]
+  });
   const [historicalQuestions] = useState<GeneratedItem[]>([
     {
       id: 'hist1',
@@ -632,6 +643,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 disabled={selectedItems.length === 0}
                 className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold px-12 py-4 text-lg rounded-xl hover:scale-105 transition-all duration-300 transform disabled:hover:scale-100"
                 onClick={() => {
+                  setShowAssessmentBuilder(true);
                   updateAssessmentData({ 
                     finalizedItems: selectedItemsData,
                     assessmentOverview: {
@@ -642,7 +654,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       bloomsDistribution
                     }
                   });
-                  toast.success('Assessment created successfully!');
+                  toast.success('Assessment builder opened!');
                 }}
               >
                 <Save className="h-5 w-5 mr-2" />
@@ -652,7 +664,383 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
           </CardContent>
         </Card>
       )}
+
+      {/* Assessment Builder */}
+      {showAssessmentBuilder && (
+        <Card className="border border-border/50 bg-white mt-8">
+          <CardHeader className="bg-gradient-to-r from-blue-500/10 to-purple-500/10">
+            <CardTitle className="flex items-center gap-2 text-2xl bg-gradient-to-r from-blue-600 to-purple-800 bg-clip-text text-transparent">
+              <Settings className="h-6 w-6 text-blue-600" />
+              Assessment Builder
+            </CardTitle>
+            <p className="text-muted-foreground">Configure and build your assessment paper</p>
+          </CardHeader>
+          <CardContent className="space-y-8 p-8">
+            
+            {/* Top Controls */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">Total Marks</label>
+                <Input 
+                  type="number"
+                  placeholder="100"
+                  value={builderData.totalMarks}
+                  onChange={(e) => setBuilderData(prev => ({ ...prev, totalMarks: e.target.value }))}
+                  className="h-10"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">Total Time (mins)</label>
+                <Input 
+                  type="number"
+                  placeholder="180"
+                  value={builderData.totalTime}
+                  onChange={(e) => setBuilderData(prev => ({ ...prev, totalTime: e.target.value }))}
+                  className="h-10"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">Question Numbering</label>
+                <Select 
+                  value={builderData.numberingStyle}
+                  onValueChange={(value) => setBuilderData(prev => ({ ...prev, numberingStyle: value }))}
+                >
+                  <SelectTrigger className="h-10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="continuous">Continuous Numbering</SelectItem>
+                    <SelectItem value="reset">Reset per Section</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2">
+                <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white flex-1">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save
+                </Button>
+                <Button variant="outline" className="flex-1">
+                  <FileDown className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              </div>
+            </div>
+
+            {/* General Instructions */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                General Instructions
+              </h3>
+              <Card className="border border-blue-200 bg-blue-50/30">
+                <CardContent className="p-4">
+                  <Textarea
+                    value={builderData.generalInstructions}
+                    onChange={(e) => setBuilderData(prev => ({ ...prev, generalInstructions: e.target.value }))}
+                    className="min-h-[80px] border-0 bg-transparent resize-none focus:ring-0"
+                    placeholder="Enter general instructions for the assessment..."
+                  />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Sections */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Assessment Sections</h3>
+                <Button 
+                  onClick={() => {
+                    const newSection = {
+                      id: Date.now(),
+                      title: `SECTION - ${String.fromCharCode(65 + builderData.sections.length)}`,
+                      questions: selectedItemsData.slice(0, Math.min(3, selectedItemsData.length)).map((item, idx) => ({
+                        id: Date.now() + idx,
+                        text: item.question,
+                        marks: item.marks,
+                        subQuestions: []
+                      }))
+                    };
+                    setBuilderData(prev => ({ 
+                      ...prev, 
+                      sections: [...prev.sections, newSection] 
+                    }));
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Section
+                </Button>
+              </div>
+
+              {builderData.sections.length === 0 ? (
+                <Card className="border-2 border-dashed border-gray-300 bg-gray-50">
+                  <CardContent className="p-12 text-center">
+                    <div className="space-y-4">
+                      <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto">
+                        <Plus className="h-8 w-8 text-gray-400" />
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-medium text-gray-700">No sections created yet</h4>
+                        <p className="text-sm text-gray-500 mt-1">Add your first section to start building the assessment</p>
+                      </div>
+                      <Button 
+                        onClick={() => {
+                          const newSection = {
+                            id: Date.now(),
+                            title: 'SECTION - A',
+                            questions: selectedItemsData.slice(0, Math.min(3, selectedItemsData.length)).map((item, idx) => ({
+                              id: Date.now() + idx,
+                              text: item.question,
+                              marks: item.marks,
+                              subQuestions: []
+                            }))
+                          };
+                          setBuilderData(prev => ({ 
+                            ...prev, 
+                            sections: [newSection] 
+                          }));
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add First Section
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-6">
+                  {builderData.sections.map((section, sectionIdx) => (
+                    <Card key={section.id} className="border border-purple-200 bg-purple-50/30">
+                      <CardHeader className="pb-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <Input
+                              value={section.title}
+                              onChange={(e) => {
+                                const updatedSections = [...builderData.sections];
+                                updatedSections[sectionIdx].title = e.target.value;
+                                setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                              }}
+                              className="text-lg font-semibold border-purple-300 bg-white/70"
+                            />
+                            <Badge className="bg-purple-100 text-purple-700">
+                              {section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0)} marks
+                            </Badge>
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              const updatedSections = builderData.sections.filter((_, idx) => idx !== sectionIdx);
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                            }}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-100"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {section.questions.map((question: any, questionIdx: number) => (
+                           <QuestionCard
+                             key={question.id}
+                             question={question}
+                             questionNumber={builderData.numberingStyle === 'continuous' 
+                               ? builderData.sections.slice(0, sectionIdx).reduce((sum, s) => sum + s.questions.length, 0) + questionIdx + 1
+                               : questionIdx + 1
+                             }
+                             onUpdate={(updatedQuestion) => {
+                               const updatedSections = [...builderData.sections];
+                               updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
+                               setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                             }}
+                             onDelete={() => {
+                               const updatedSections = [...builderData.sections];
+                               updatedSections[sectionIdx].questions = updatedSections[sectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
+                               setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                             }}
+                           />
+                        ))}
+                        <Button 
+                          variant="outline" 
+                          className="w-full border-dashed border-purple-300 text-purple-600 hover:bg-purple-100"
+                          onClick={() => {
+                            const availableItems = selectedItemsData.filter(item => 
+                              !builderData.sections.some(s => 
+                                s.questions.some((q: any) => q.text === item.question)
+                              )
+                            );
+                            if (availableItems.length > 0) {
+                              const newQuestion = {
+                                id: Date.now(),
+                                text: availableItems[0].question,
+                                marks: availableItems[0].marks,
+                                subQuestions: []
+                              };
+                              const updatedSections = [...builderData.sections];
+                              updatedSections[sectionIdx].questions.push(newQuestion);
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                            }
+                          }}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Question
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
+  );
+};
+
+// Question Card Component
+const QuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => {
+  const [subQuestionNumbering, setSubQuestionNumbering] = useState('123');
+
+  const addSubQuestion = () => {
+    const newSubQuestion = {
+      id: Date.now(),
+      text: 'New sub-question',
+      marks: 2
+    };
+    onUpdate({
+      ...question,
+      subQuestions: [...(question.subQuestions || []), newSubQuestion]
+    });
+  };
+
+  const updateSubQuestion = (subIdx: number, updatedSub: any) => {
+    const updatedSubQuestions = [...(question.subQuestions || [])];
+    updatedSubQuestions[subIdx] = updatedSub;
+    onUpdate({
+      ...question,
+      subQuestions: updatedSubQuestions
+    });
+  };
+
+  const deleteSubQuestion = (subIdx: number) => {
+    const updatedSubQuestions = (question.subQuestions || []).filter((_: any, idx: number) => idx !== subIdx);
+    onUpdate({
+      ...question,
+      subQuestions: updatedSubQuestions
+    });
+  };
+
+  const getSubQuestionLabel = (index: number) => {
+    switch (subQuestionNumbering) {
+      case '123': return `${index + 1}.`;
+      case 'abc': return `${String.fromCharCode(97 + index)}.`;
+      case 'roman': return `${['i', 'ii', 'iii', 'iv', 'v', 'vi'][index] || (index + 1)}.`;
+      default: return `${index + 1}.`;
+    }
+  };
+
+  return (
+    <Card className="border border-gray-200 bg-white">
+      <CardContent className="p-4 space-y-4">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center gap-2 mt-1">
+            <GripVertical className="h-4 w-4 text-gray-400 cursor-move" />
+            <span className="text-sm font-semibold text-gray-600 min-w-[24px]">Q{questionNumber}</span>
+          </div>
+          <div className="flex-1 space-y-3">
+            <div className="flex gap-4">
+              <Textarea
+                value={question.text}
+                onChange={(e) => onUpdate({ ...question, text: e.target.value })}
+                className="flex-1 min-h-[60px] resize-none"
+                placeholder="Enter question text..."
+              />
+              <div className="space-y-2">
+                <label className="text-xs text-gray-500">Marks</label>
+                <Input
+                  type="number"
+                  value={question.marks}
+                  onChange={(e) => onUpdate({ ...question, marks: parseInt(e.target.value) || 0 })}
+                  className="w-20 h-8 text-center"
+                  min="1"
+                />
+              </div>
+            </div>
+            
+            {/* Sub-questions */}
+            {question.subQuestions && question.subQuestions.length > 0 && (
+              <div className="ml-6 space-y-3 border-l-2 border-gray-200 pl-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-gray-600">Sub-questions:</span>
+                  <Select value={subQuestionNumbering} onValueChange={setSubQuestionNumbering}>
+                    <SelectTrigger className="w-24 h-6 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="123">1, 2, 3...</SelectItem>
+                      <SelectItem value="abc">a, b, c...</SelectItem>
+                      <SelectItem value="roman">i, ii, iii...</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {question.subQuestions.map((subQ: any, subIdx: number) => (
+                  <div key={subQ.id} className="flex items-start gap-2">
+                    <span className="text-sm font-medium text-gray-500 mt-2 min-w-[20px]">
+                      {getSubQuestionLabel(subIdx)}
+                    </span>
+                    <Textarea
+                      value={subQ.text}
+                      onChange={(e) => updateSubQuestion(subIdx, { ...subQ, text: e.target.value })}
+                      className="flex-1 min-h-[40px] text-sm resize-none"
+                      placeholder="Enter sub-question..."
+                    />
+                    <Input
+                      type="number"
+                      value={subQ.marks}
+                      onChange={(e) => updateSubQuestion(subIdx, { ...subQ, marks: parseInt(e.target.value) || 0 })}
+                      className="w-16 h-8 text-xs text-center"
+                      min="1"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteSubQuestion(subIdx)}
+                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={addSubQuestion}
+                className="text-blue-600 border-blue-300 hover:bg-blue-50"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Add Sub-question
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onDelete}
+                className="text-red-500 hover:text-red-700 hover:bg-red-100"
+              >
+                <Trash2 className="h-3 w-3 mr-1" />
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
