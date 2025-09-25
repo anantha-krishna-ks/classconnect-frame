@@ -8,15 +8,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Eye, Edit, Trash2, CheckCircle2, Clock, BookOpen, Target, 
-  BarChart3, PieChart, Save, Filter, X, Sparkles, Image, Upload,
-  GripVertical, Plus, Download, FileText, ArrowLeft, Minus
+  BarChart3, PieChart, Save, Filter, X, Sparkles, Image, Upload 
 } from 'lucide-react';
 import { toast } from 'sonner';
-import AssessmentBuilder from './AssessmentBuilder';
 
 interface GeneratedItem {
   id: string;
@@ -35,36 +31,6 @@ interface GeneratedItem {
   imageUrl?: string;
 }
 
-interface SubQuestion {
-  id: string;
-  text: string;
-  marks: number;
-  numberingStyle: 'numeric' | 'alpha' | 'roman' | 'custom';
-  customLabel?: string;
-}
-
-interface QuestionCard {
-  id: string;
-  questionText: string;
-  marks: number;
-  subQuestions: SubQuestion[];
-  originalItem?: GeneratedItem;
-}
-
-interface AssessmentSection {
-  id: string;
-  title: string;
-  questions: QuestionCard[];
-}
-
-interface AssessmentBuilder {
-  generalInstructions: string;
-  totalMarks: number;
-  totalTime: number;
-  mainNumbering: 'continuous' | 'reset-per-section';
-  sections: AssessmentSection[];
-}
-
 interface AssessmentItemGenerationProps {
   assessmentData: any;
   updateAssessmentData: (data: any) => void;
@@ -80,14 +46,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('all');
   const [filterType, setFilterType] = useState('all');
-  const [showAssessmentBuilder, setShowAssessmentBuilder] = useState(false);
-  const [assessmentBuilder, setAssessmentBuilder] = useState<AssessmentBuilder>({
-    generalInstructions: 'Read all questions carefully before attempting. Write your answers clearly and legibly.',
-    totalMarks: 0,
-    totalTime: 120,
-    mainNumbering: 'continuous',
-    sections: []
-  });
   const [historicalQuestions] = useState<GeneratedItem[]>([
     {
       id: 'hist1',
@@ -114,356 +72,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
       correctAnswer: 'Photosynthesis'
     }
   ]);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-  // Helper functions for assessment builder
-  const addSection = () => {
-    const newSection: AssessmentSection = {
-      id: `section-${Date.now()}`,
-      title: `SECTION - ${String.fromCharCode(65 + assessmentBuilder.sections.length)}`,
-      questions: []
-    };
-    setAssessmentBuilder(prev => ({
-      ...prev,
-      sections: [...prev.sections, newSection]
-    }));
-  };
-
-  const updateSectionTitle = (sectionId: string, title: string) => {
-    setAssessmentBuilder(prev => ({
-      ...prev,
-      sections: prev.sections.map(section => 
-        section.id === sectionId ? { ...section, title } : section
-      )
-    }));
-  };
-
-  const addQuestionToSection = (sectionId: string, item?: GeneratedItem) => {
-    const newQuestion: QuestionCard = {
-      id: `question-${Date.now()}`,
-      questionText: item?.question || 'Enter your question here...',
-      marks: item?.marks || 1,
-      subQuestions: [],
-      originalItem: item
-    };
-    
-    setAssessmentBuilder(prev => ({
-      ...prev,
-      sections: prev.sections.map(section => 
-        section.id === sectionId 
-          ? { ...section, questions: [...section.questions, newQuestion] }
-          : section
-      )
-    }));
-  };
-
-  const updateQuestion = (sectionId: string, questionId: string, updates: Partial<QuestionCard>) => {
-    setAssessmentBuilder(prev => ({
-      ...prev,
-      sections: prev.sections.map(section => 
-        section.id === sectionId 
-          ? {
-              ...section,
-              questions: section.questions.map(q => 
-                q.id === questionId ? { ...q, ...updates } : q
-              )
-            }
-          : section
-      )
-    }));
-  };
-
-  const addSubQuestion = (sectionId: string, questionId: string) => {
-    const newSubQuestion: SubQuestion = {
-      id: `sub-${Date.now()}`,
-      text: 'Enter sub-question...',
-      marks: 1,
-      numberingStyle: 'alpha'
-    };
-
-    setAssessmentBuilder(prev => ({
-      ...prev,
-      sections: prev.sections.map(section => 
-        section.id === sectionId 
-          ? {
-              ...section,
-              questions: section.questions.map(q => 
-                q.id === questionId 
-                  ? { ...q, subQuestions: [...q.subQuestions, newSubQuestion] }
-                  : q
-              )
-            }
-          : section
-      )
-    }));
-  };
-
-  const updateSubQuestion = (sectionId: string, questionId: string, subQuestionId: string, updates: Partial<SubQuestion>) => {
-    setAssessmentBuilder(prev => ({
-      ...prev,
-      sections: prev.sections.map(section => 
-        section.id === sectionId 
-          ? {
-              ...section,
-              questions: section.questions.map(q => 
-                q.id === questionId 
-                  ? {
-                      ...q,
-                      subQuestions: q.subQuestions.map(sub => 
-                        sub.id === subQuestionId ? { ...sub, ...updates } : sub
-                      )
-                    }
-                  : q
-              )
-            }
-          : section
-      )
-    }));
-  };
-
-  const calculateTotalMarks = () => {
-    return assessmentBuilder.sections.reduce((total, section) => {
-      return total + section.questions.reduce((sectionTotal, question) => {
-        const subTotal = question.subQuestions.reduce((subSum, sub) => subSum + sub.marks, 0);
-        return sectionTotal + question.marks + subTotal;
-      }, 0);
-    }, 0);
-  };
-
-  const getSectionTotal = (section: AssessmentSection) => {
-    return section.questions.reduce((total, question) => {
-      const subTotal = question.subQuestions.reduce((subSum, sub) => subSum + sub.marks, 0);
-      return total + question.marks + subTotal;
-    }, 0);
-  };
-
-  const getSubQuestionNumber = (subQuestion: SubQuestion, index: number) => {
-    switch (subQuestion.numberingStyle) {
-      case 'numeric':
-        return `${index + 1}.`;
-      case 'alpha':
-        return `${String.fromCharCode(97 + index)}.`;
-      case 'roman':
-        const romanNumerals = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x'];
-        return `${romanNumerals[index] || index + 1}.`;
-      case 'custom':
-        return subQuestion.customLabel || `${index + 1}.`;
-      default:
-        return `${index + 1}.`;
-    }
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    
-    if (!over) return;
-    
-    const activeSectionId = active.data.current?.sectionId;
-    const overSectionId = over.data.current?.sectionId;
-    
-    if (activeSectionId && overSectionId && activeSectionId === overSectionId) {
-      setAssessmentBuilder(prev => ({
-        ...prev,
-        sections: prev.sections.map(section => {
-          if (section.id === activeSectionId) {
-            const oldIndex = section.questions.findIndex(q => q.id === active.id);
-            const newIndex = section.questions.findIndex(q => q.id === over.id);
-            
-            return {
-              ...section,
-              questions: arrayMove(section.questions, oldIndex, newIndex)
-            };
-          }
-          return section;
-        })
-      }));
-    }
-  };
-
-  const initializeAssessmentBuilder = () => {
-    const selectedItemsData = generatedItems.filter(item => selectedItems.includes(item.id));
-    
-    // Create initial section with selected questions
-    const initialSection: AssessmentSection = {
-      id: 'section-1',
-      title: 'SECTION - A',
-      questions: selectedItemsData.map(item => ({
-        id: `question-${item.id}`,
-        questionText: item.question,
-        marks: item.marks,
-        subQuestions: [],
-        originalItem: item
-      }))
-    };
-
-    setAssessmentBuilder(prev => ({
-      ...prev,
-      sections: [initialSection],
-      totalMarks: selectedItemsData.reduce((total, item) => total + item.marks, 0)
-    }));
-    
-    setShowAssessmentBuilder(true);
-  };
-
-  // Sortable Question Card Component
-  const SortableQuestionCard = ({ question, sectionId, index }: { question: QuestionCard, sectionId: string, index: number }) => {
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-    } = useSortable({ 
-      id: question.id,
-      data: { sectionId }
-    });
-
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
-
-    return (
-      <Card ref={setNodeRef} style={style} className="mb-4 border-l-4 border-l-primary">
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            {/* Drag Handle */}
-            <button
-              {...attributes}
-              {...listeners}
-              className="mt-1 p-1 hover:bg-muted rounded cursor-grab active:cursor-grabbing"
-            >
-              <GripVertical className="h-4 w-4 text-muted-foreground" />
-            </button>
-
-            <div className="flex-1 space-y-3">
-              {/* Question Number and Text */}
-              <div className="flex items-start gap-3">
-                <span className="font-semibold text-primary min-w-8">
-                  {assessmentBuilder.mainNumbering === 'continuous' 
-                    ? `${assessmentBuilder.sections.reduce((total, section, sIndex) => 
-                        sIndex < assessmentBuilder.sections.findIndex(s => s.id === sectionId) 
-                          ? total + section.questions.length 
-                          : total, 0) + index + 1}.`
-                    : `${index + 1}.`
-                  }
-                </span>
-                <div className="flex-1">
-                  <Textarea
-                    value={question.questionText}
-                    onChange={(e) => updateQuestion(sectionId, question.id, { questionText: e.target.value })}
-                    className="min-h-16 border-none p-0 resize-none focus:ring-0"
-                    placeholder="Enter your question here..."
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    value={question.marks}
-                    onChange={(e) => updateQuestion(sectionId, question.id, { marks: parseInt(e.target.value) || 0 })}
-                    className="w-16 text-center"
-                    min="0"
-                  />
-                  <span className="text-sm text-muted-foreground">marks</span>
-                </div>
-              </div>
-
-              {/* Sub-questions */}
-              {question.subQuestions.length > 0 && (
-                <div className="ml-8 space-y-2 border-l-2 border-muted pl-4">
-                  {question.subQuestions.map((subQ, subIndex) => (
-                    <div key={subQ.id} className="flex items-start gap-3">
-                      <span className="font-medium text-sm min-w-8">
-                        {getSubQuestionNumber(subQ, subIndex)}
-                      </span>
-                      <div className="flex-1">
-                        <Textarea
-                          value={subQ.text}
-                          onChange={(e) => updateSubQuestion(sectionId, question.id, subQ.id, { text: e.target.value })}
-                          className="min-h-12 border-none p-0 resize-none text-sm focus:ring-0"
-                          placeholder="Enter sub-question..."
-                        />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Select
-                          value={subQ.numberingStyle}
-                          onValueChange={(value) => updateSubQuestion(sectionId, question.id, subQ.id, { numberingStyle: value as SubQuestion['numberingStyle'] })}
-                        >
-                          <SelectTrigger className="w-24 h-8 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="numeric">1, 2, 3</SelectItem>
-                            <SelectItem value="alpha">a, b, c</SelectItem>
-                            <SelectItem value="roman">i, ii, iii</SelectItem>
-                            <SelectItem value="custom">Custom</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        {subQ.numberingStyle === 'custom' && (
-                          <Input
-                            value={subQ.customLabel || ''}
-                            onChange={(e) => updateSubQuestion(sectionId, question.id, subQ.id, { customLabel: e.target.value })}
-                            className="w-16 h-8 text-xs"
-                            placeholder="Label"
-                          />
-                        )}
-                        <Input
-                          type="number"
-                          value={subQ.marks}
-                          onChange={(e) => updateSubQuestion(sectionId, question.id, subQ.id, { marks: parseInt(e.target.value) || 0 })}
-                          className="w-12 h-8 text-center text-xs"
-                          min="0"
-                        />
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            setAssessmentBuilder(prev => ({
-                              ...prev,
-                              sections: prev.sections.map(section => 
-                                section.id === sectionId 
-                                  ? {
-                                      ...section,
-                                      questions: section.questions.map(q => 
-                                        q.id === question.id 
-                                          ? { ...q, subQuestions: q.subQuestions.filter(sub => sub.id !== subQ.id) }
-                                          : q
-                                      )
-                                    }
-                                  : section
-                              )
-                            }));
-                          }}
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Add Sub-question Button */}
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => addSubQuestion(sectionId, question.id)}
-                className="ml-8 h-8 text-xs"
-              >
-                <Plus className="h-3 w-3 mr-1" />
-                Add Sub-question
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
 
   useEffect(() => {
     generateItems();
@@ -1024,8 +632,17 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 disabled={selectedItems.length === 0}
                 className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold px-12 py-4 text-lg rounded-xl hover:scale-105 transition-all duration-300 transform disabled:hover:scale-100"
                 onClick={() => {
-                  setShowAssessmentBuilder(true);
-                  toast.success('Opening Assessment Builder...');
+                  updateAssessmentData({ 
+                    finalizedItems: selectedItemsData,
+                    assessmentOverview: {
+                      totalChapters: assessmentData.selectedChapters?.length || 0,
+                      totalELOs: assessmentData.selectedELOs?.length || 0,
+                      totalItems: selectedItems.length,
+                      totalMarks: totalSelectedMarks,
+                      bloomsDistribution
+                    }
+                  });
+                  toast.success('Assessment created successfully!');
                 }}
               >
                 <Save className="h-5 w-5 mr-2" />
@@ -1034,14 +651,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             </div>
           </CardContent>
         </Card>
-      )}
-
-      {/* Assessment Builder */}
-      {showAssessmentBuilder && (
-        <AssessmentBuilder
-          selectedItems={selectedItemsData}
-          onBack={() => setShowAssessmentBuilder(false)}
-        />
       )}
     </div>
   );
