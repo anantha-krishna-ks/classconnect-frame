@@ -11,7 +11,10 @@ const ExamPrepRoom = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background exam-prep-room" style={{
+      '--primary': '238 84% 67%',
+      '--primary-foreground': '210 40% 98%'
+    } as React.CSSProperties}>
       {/* Header */}
       <header className="border-b border-border px-6 py-4 bg-card">
         <div className="max-w-7xl mx-auto">
