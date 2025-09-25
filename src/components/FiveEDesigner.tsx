@@ -1940,32 +1940,52 @@ Students use the story framework to reflect on:
                                          <div key={`${step.id}-${index}`} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm" draggable onDragStart={(e) => handleResourceDragStart(e, eloKey, step.id, index)} onDragEnd={handleResourceDragEnd} onDragOver={(e) => handleResourceDragOver(e)} onDrop={(e) => handleResourceDrop(e, eloKey, step.id, index)}>
                                            {/* Unified Resource Card */}
                                            <div className="bg-blue-50 px-3 py-2 border-b border-blue-200 cursor-move" onMouseDown={(e) => e.stopPropagation()}>
-                                             <div className="flex items-center justify-between">
-                                               <div className="flex items-center gap-2">
-                                                 <span title="Drag to reorder" className="cursor-grab">
-                                                   <GripVertical className="w-4 h-4 text-gray-500" />
-                                                 </span>
-                                                 <span className="text-sm text-gray-800 font-medium">• {resource}</span>
-                                               </div>
-                                               <div className="flex items-center gap-2">
-                                                 <span className="text-xs text-gray-600">Estimated Time:</span>
-                                                 <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
-                                                   {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] 
-                                                     ? `${resourceTimeAllocations[eloKey][step.id][resource]} min`
-                                                     : stepTimes[eloKey]?.[step.id] 
-                                                       ? 'Calculating...'
-                                                       : 'Enter time above'}
-                                                 </Badge>
-                                                 <Button
-                                                   variant="ghost"
-                                                   size="sm"
-                                                   onClick={() => removeResource(eloKey, step.id, index)}
-                                                   className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
-                                                 >
-                                                   <X className="w-3 h-3" />
-                                                 </Button>
-                                               </div>
-                                             </div>
+                                              <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                  <span title="Drag to reorder" className="cursor-grab">
+                                                    <GripVertical className="w-4 h-4 text-gray-500" />
+                                                  </span>
+                                                  <span className="text-sm text-gray-800 font-medium">• {resource}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                  {resourceContent && (
+                                                    <div className="flex items-center space-x-1">
+                                                      <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => editGeneratedContent(stepKey, resource)}
+                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 h-6 w-6 p-0"
+                                                      >
+                                                        <Edit3 className="w-3 h-3" />
+                                                      </Button>
+                                                      <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => deleteGeneratedContent(stepKey, resource)}
+                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-6 w-6 p-0"
+                                                      >
+                                                        <Trash2 className="w-3 h-3" />
+                                                      </Button>
+                                                    </div>
+                                                  )}
+                                                  <span className="text-xs text-gray-600">Estimated Time:</span>
+                                                  <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
+                                                    {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] 
+                                                      ? `${resourceTimeAllocations[eloKey][step.id][resource]} min`
+                                                      : stepTimes[eloKey]?.[step.id] 
+                                                        ? 'Calculating...'
+                                                        : 'Enter time above'}
+                                                  </Badge>
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => removeResource(eloKey, step.id, index)}
+                                                    className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                                                  >
+                                                    <X className="w-3 h-3" />
+                                                  </Button>
+                                                </div>
+                                              </div>
                                            </div>
                                            
                                            {/* Content Section */}
@@ -1977,30 +1997,8 @@ Students use the story framework to reflect on:
                                                </div>
                                              </div>
                                            ) : resourceContent ? (
-                                             <div className="p-3 space-y-3 bg-emerald-50/30">
-                                                <div className="flex items-center justify-end">
-                                                  <div className="flex items-center space-x-2">
-                                                   <Button
-                                                     variant="outline"
-                                                     size="sm"
-                                                     onClick={() => editGeneratedContent(stepKey, resource)}
-                                                     className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200 h-6 text-xs px-2"
-                                                   >
-                                                     <Edit3 className="w-3 h-3 mr-1" />
-                                                     Edit
-                                                   </Button>
-                                                   <Button
-                                                     variant="outline"
-                                                     size="sm"
-                                                     onClick={() => deleteGeneratedContent(stepKey, resource)}
-                                                     className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-6 text-xs px-2"
-                                                   >
-                                                     <Trash2 className="w-3 h-3 mr-1" />
-                                                     Delete
-                                                   </Button>
-                                                 </div>
-                                               </div>
-                                               <div className="bg-gray-50 rounded border p-3 max-h-48 overflow-y-auto">
+                                              <div className="p-3 space-y-3 bg-emerald-50/30">
+                                                <div className="bg-gray-50 rounded border p-3 max-h-48 overflow-y-auto">
                                                  <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
                                                    {resourceContent.length > 300 ? (
                                                      <div>
