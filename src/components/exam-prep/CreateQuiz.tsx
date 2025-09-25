@@ -111,7 +111,7 @@ const CreateQuiz = () => {
           Generate customized quizzes based on specific concepts and chapters
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 bg-muted/20 rounded-lg p-6">
         {/* Subject Selection */}
         <div className="space-y-2">
           <Label htmlFor="subject">Subject</Label>
