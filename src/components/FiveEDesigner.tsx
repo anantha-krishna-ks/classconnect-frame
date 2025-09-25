@@ -1948,7 +1948,7 @@ Students use the story framework to reflect on:
                                                  <span className="text-sm text-gray-800 font-medium">• {resource}</span>
                                                </div>
                                                <div className="flex items-center gap-2">
-                                                 <span className="text-xs text-gray-600">Time:</span>
+                                                 <span className="text-xs text-gray-600">Estimated Time:</span>
                                                  <Badge variant="outline" className="text-xs font-semibold text-blue-700 border-blue-300">
                                                    {resourceTimeAllocations[eloKey]?.[step.id]?.[resource] 
                                                      ? `${resourceTimeAllocations[eloKey][step.id][resource]} min`
