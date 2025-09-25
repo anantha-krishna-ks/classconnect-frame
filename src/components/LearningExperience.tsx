@@ -624,47 +624,6 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                                   
                                 </div>
 
-                                {/* Skills Section */}
-                                <div className="mb-4">
-                                  <span className="text-sm font-medium text-muted-foreground mr-3">Skills:</span>
-                                  <div className="inline-flex flex-wrap gap-2">
-                                    {activity?.skills?.map((skill: string, idx: number) => (
-                                      <Badge key={idx} className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200">
-                                        {skill}
-                                      </Badge>
-                                    )) || (
-                                      <>
-                                        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200">
-                                          Explaining gravitational effects on motion
-                                        </Badge>
-                                        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200">
-                                          Observing interconnected natural phenomena
-                                        </Badge>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-
-                                {/* Competencies Section */}
-                                <div className="mb-4">
-                                  <span className="text-sm font-medium text-muted-foreground mr-3">Competencies:</span>
-                                  <div className="inline-flex flex-wrap gap-2">
-                                    {activity?.competencies?.map((comp: string, idx: number) => (
-                                      <Badge key={idx} className="bg-green-100 text-green-800 hover:bg-green-200 border-green-200">
-                                        {comp}
-                                      </Badge>
-                                    )) || (
-                                      <>
-                                        <Badge className="bg-green-100 text-green-800 hover:bg-green-200 border-green-200">
-                                          Explaining the role of gravity in motion
-                                        </Badge>
-                                        <Badge className="bg-green-100 text-green-800 hover:bg-green-200 border-green-200">
-                                          Observing interconnected natural phenomena
-                                        </Badge>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
 
                                 {/* Description */}
                                 <div className="mt-4 pt-4 border-t border-muted-foreground/10">
