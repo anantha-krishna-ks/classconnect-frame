@@ -445,25 +445,138 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                   return Object.entries(phaseGroups).map(([phase, eloActivities]) => (
                     <div key={phase} className="mb-8">
                       <div className="flex items-center mb-6">
-                        <div className="h-px bg-muted-foreground/30 flex-1"></div>
-                        <h4 className="text-xl font-bold text-primary mx-4">{phase}</h4>
-                        <div className="h-px bg-muted-foreground/30 flex-1"></div>
+                        <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent flex-1"></div>
+                        <h4 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mx-4 px-4 py-2 rounded-full border border-primary/20 bg-background/50">
+                          {phase}
+                        </h4>
+                        <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent flex-1"></div>
                       </div>
                       
-                      <div className="space-y-3 ml-6">
-                        {Object.entries(eloActivities).map(([elo, activities], index) => (
-                          <div key={elo} className="flex items-start">
-                            <span className="text-foreground mr-2">•</span>
-                            <div>
-                              <span className="font-semibold text-foreground">ELO{index + 1}: </span>
-                              <span className="text-muted-foreground">
-                                {activities.map((activity: any, idx: number) => 
-                                  activity.description || activity.title || activity.content || "Generated learning activity"
-                                ).join(", ")}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
+                      <div className="space-y-4">
+                        {Object.entries(eloActivities).map(([elo, activities], index) => {
+                          const eloIndex = index + 1;
+                          const activity = activities[0]; // Get first activity for display
+                          
+                          return (
+                            <Card key={elo} className="border border-muted-foreground/20 bg-background/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:border-primary/30">
+                              <div className="p-6">
+                                {/* Header */}
+                                <div className="flex items-center justify-between mb-4">
+                                  <div className="flex items-center gap-3">
+                                    <h5 className="text-lg font-bold text-foreground">ELO {eloIndex}</h5>
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm" 
+                                      className="h-7 px-3 text-xs border-primary/50 text-primary hover:bg-primary/10"
+                                      onClick={() => {
+                                        // Apply functionality - could trigger form filling or navigation
+                                        console.log(`Applied ELO ${eloIndex}`);
+                                      }}
+                                    >
+                                      Apply
+                                    </Button>
+                                  </div>
+                                  
+                                  {/* Action buttons */}
+                                  <div className="flex items-center gap-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                                      onClick={() => {
+                                        // Edit functionality
+                                        console.log(`Edit ELO ${eloIndex}`);
+                                      }}
+                                    >
+                                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                      </svg>
+                                    </Button>
+                                    
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-green-600 hover:bg-green-50"
+                                      onClick={() => {
+                                        // Regenerate functionality
+                                        console.log(`Regenerate ELO ${eloIndex}`);
+                                      }}
+                                    >
+                                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                      </svg>
+                                    </Button>
+                                    
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                      onClick={() => {
+                                        // Delete functionality
+                                        console.log(`Delete ELO ${eloIndex}`);
+                                      }}
+                                    >
+                                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
+                                    </Button>
+                                  </div>
+                                </div>
+
+                                {/* Skills Section */}
+                                <div className="mb-4">
+                                  <span className="text-sm font-medium text-muted-foreground mr-3">Skills:</span>
+                                  <div className="inline-flex flex-wrap gap-2">
+                                    {activity?.skills?.map((skill: string, idx: number) => (
+                                      <Badge key={idx} className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200">
+                                        {skill}
+                                      </Badge>
+                                    )) || (
+                                      <>
+                                        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200">
+                                          Explaining gravitational effects on motion
+                                        </Badge>
+                                        <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200">
+                                          Observing interconnected natural phenomena
+                                        </Badge>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Competencies Section */}
+                                <div className="mb-4">
+                                  <span className="text-sm font-medium text-muted-foreground mr-3">Competencies:</span>
+                                  <div className="inline-flex flex-wrap gap-2">
+                                    {activity?.competencies?.map((comp: string, idx: number) => (
+                                      <Badge key={idx} className="bg-green-100 text-green-800 hover:bg-green-200 border-green-200">
+                                        {comp}
+                                      </Badge>
+                                    )) || (
+                                      <>
+                                        <Badge className="bg-green-100 text-green-800 hover:bg-green-200 border-green-200">
+                                          Explaining the role of gravity in motion
+                                        </Badge>
+                                        <Badge className="bg-green-100 text-green-800 hover:bg-green-200 border-green-200">
+                                          Observing interconnected natural phenomena
+                                        </Badge>
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Description */}
+                                <div className="mt-4 pt-4 border-t border-muted-foreground/10">
+                                  <p className="text-sm text-muted-foreground leading-relaxed">
+                                    {activities.map((activity: any, idx: number) => 
+                                      activity.description || activity.title || activity.content || "Apply the concept of gravitational force to calculate the weight of an object on Earth using the formula W = mg with accurate substitution of values."
+                                    ).join(" ")}
+                                  </p>
+                                </div>
+                              </div>
+                            </Card>
+                          );
+                        })}
                       </div>
                     </div>
                   ));
