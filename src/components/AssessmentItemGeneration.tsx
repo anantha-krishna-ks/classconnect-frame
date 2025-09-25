@@ -363,8 +363,8 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                             <div className="flex items-start justify-between">
                               <p className="font-medium leading-6">{item.question}</p>
                               <div className="flex items-center gap-2 ml-4">
-                                <div className="bg-primary/10 border border-primary/20 px-3 py-1 rounded-full">
-                                  <span className="text-sm font-semibold text-primary">{item.marks} marks</span>
+                                <div className="bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+                                  <span className="text-sm font-semibold text-emerald-700">{item.marks} marks</span>
                                 </div>
                               </div>
                             </div>
