@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Trash2, Plus } from 'lucide-react';
 import { generateCourseOutcomes } from '../pages/api';
 import { useToast } from '@/hooks/use-toast';
+import AssessmentItemGeneration from './AssessmentItemGeneration';
 
 interface ItemConfigRow {
   id: string;
@@ -41,6 +42,7 @@ interface AssessmentELOSelectionProps {
 const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComplete }: AssessmentELOSelectionProps) => {
   const [chapterELOs, setChapterELOs] = useState<{ [key: string]: ELO[] }>({});
   const [loading, setLoading] = useState(false);
+  const [showItemGeneration, setShowItemGeneration] = useState(false);
   const { toast } = useToast();
 
   // Item configuration options
@@ -300,6 +302,37 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
 
   const getTotalCount = () => {
     return Object.values(chapterELOs).flat().length;
+  };
+
+  const handleGenerateItems = () => {
+    // Get all selected ELOs with their configurations
+    const allELOs = Object.values(chapterELOs).flat();
+    const selectedELOs = allELOs.filter(elo => elo.selected && elo.itemConfigRows.length > 0);
+    
+    if (selectedELOs.length === 0) {
+      toast({
+        title: "No configured ELOs",
+        description: "Please select and configure at least one ELO with item details",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Update assessment data with selected ELOs and their configurations
+    updateAssessmentData({
+      ...assessmentData,
+      selectedELOs,
+      configuredItems: selectedELOs.flatMap(elo => 
+        elo.itemConfigRows.map(row => ({
+          eloId: elo.id,
+          eloTitle: elo.title,
+          ...row
+        }))
+      )
+    });
+
+    // Show the item generation component
+    setShowItemGeneration(true);
   };
 
   return (
@@ -620,15 +653,23 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
       </Card>
 
       {/* Continue Button */}
-      {getSelectedCount() > 0 && (
+      {getSelectedCount() > 0 && !showItemGeneration && (
         <div className="text-center animate-fade-in">
           <Button
-            onClick={onComplete}
+            onClick={handleGenerateItems}
             className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold px-12 py-4 h-auto text-lg rounded-xl border border-blue-400/20 hover:scale-105 transition-all duration-300 transform"
           >
             Generate Items Now
           </Button>
         </div>
+      )}
+
+      {/* Assessment Item Generation */}
+      {showItemGeneration && (
+        <AssessmentItemGeneration
+          assessmentData={assessmentData}
+          updateAssessmentData={updateAssessmentData}
+        />
       )}
     </div>
   );
