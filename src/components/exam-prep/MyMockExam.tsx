@@ -96,7 +96,7 @@ const MyMockExam = () => {
   }
 
   return (
-    <Card>
+    <Card className="relative overflow-hidden bg-gradient-to-br from-background via-background/95 to-primary/5 backdrop-blur-sm border-2 border-primary/10 shadow-lg">
       <CardHeader>
         <CardTitle>Create Mock Exam</CardTitle>
         <CardDescription>
