@@ -604,7 +604,7 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                           
                           return (
                             <Card key={elo} className="border border-muted-foreground/20 bg-background/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:border-primary/30">
-                              <div className="p-6">
+                              <div className="p-6 border-l-4 border-primary/30 bg-gradient-to-r from-primary/5 to-transparent">
                                 {/* Header */}
                                 <div className="flex items-center justify-between mb-4">
                                   <div className="flex items-center gap-3">
