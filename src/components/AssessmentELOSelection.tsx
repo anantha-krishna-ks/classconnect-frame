@@ -435,7 +435,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                 <AccordionContent className="px-4 pb-4">
                                   <div className="space-y-4">
                                     {/* ELO Item Configuration Table */}
-                                    <div className="border rounded-lg overflow-hidden">
+                                    <div className="border-2 border-slate-200 rounded-xl overflow-hidden shadow-sm">
                                       <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 grid grid-cols-7 gap-4 font-medium text-sm text-slate-600">
                                         <div>Bloom's Level</div>
                                         <div>Item Type</div>
