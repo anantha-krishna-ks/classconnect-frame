@@ -328,18 +328,56 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
         {/* All Items Tab */}
         <TabsContent value="all" className="space-y-6">
           {/* Filters */}
-          <div className="flex items-center gap-4">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <select 
-              value={filterType} 
-              onChange={(e) => setFilterType(e.target.value)}
-              className="border border-border rounded-md px-3 py-2 text-sm"
-            >
-              <option value="all">All Types</option>
-              {itemTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
-              ))}
-            </select>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <select 
+                value={filterType} 
+                onChange={(e) => setFilterType(e.target.value)}
+                className="border border-border rounded-md px-3 py-2 text-sm"
+              >
+                <option value="all">All Types</option>
+                {itemTypes.map(type => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const filteredItems = getItemsByType(filterType);
+                  setGeneratedItems(prev => 
+                    prev.map(item => 
+                      filteredItems.find(filtered => filtered.id === item.id) 
+                        ? { ...item, isSelected: true }
+                        : item
+                    )
+                  );
+                }}
+                className="text-xs"
+              >
+                Select All
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const filteredItems = getItemsByType(filterType);
+                  setGeneratedItems(prev => 
+                    prev.map(item => 
+                      filteredItems.find(filtered => filtered.id === item.id) 
+                        ? { ...item, isSelected: false }
+                        : item
+                    )
+                  );
+                }}
+                className="text-xs"
+              >
+                Clear
+              </Button>
+            </div>
           </div>
 
           {/* Items Grid */}
