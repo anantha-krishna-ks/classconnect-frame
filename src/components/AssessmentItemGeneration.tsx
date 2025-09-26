@@ -1036,23 +1036,23 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                  </div>
                  
                  {/* Time & Marks */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-white rounded-lg border">
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-blue-700">Total Marks</label>
-                    <Input 
-                      type="number"
-                      placeholder="100"
-                      value={builderData.totalMarks}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        setBuilderData(prev => ({ ...prev, totalMarks: value }));
-                        updateAssessmentData({ marks: value });
-                      }}
-                      className="h-12 text-lg font-bold text-center text-blue-700"
-                    />
-                  </div>
+                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white rounded-lg border">
                    <div className="space-y-2">
-                     <label className="text-sm font-semibold text-green-700">Time</label>
+                     <label className="text-sm font-semibold text-blue-700">Total Marks</label>
+                     <Input 
+                       type="number"
+                       placeholder="100"
+                       value={builderData.totalMarks}
+                       onChange={(e) => {
+                         const value = e.target.value;
+                         setBuilderData(prev => ({ ...prev, totalMarks: value }));
+                         updateAssessmentData({ marks: value });
+                       }}
+                       className="h-12 text-lg font-bold text-center text-blue-700"
+                     />
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-sm font-semibold text-green-700">Time Duration</label>
                      <div className="grid grid-cols-2 gap-2">
                        <div>
                          <Input 
@@ -1077,16 +1077,16 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                        </div>
                      </div>
                    </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-purple-700">Date</label>
-                    <Input 
-                      type="date"
-                      value={builderData.examDate || ''}
-                      onChange={(e) => setBuilderData(prev => ({ ...prev, examDate: e.target.value }))}
-                      className="h-12"
-                    />
-                  </div>
-                </div>
+                   <div className="space-y-2">
+                     <label className="text-sm font-semibold text-purple-700">Exam Date</label>
+                     <Input 
+                       type="date"
+                       value={builderData.examDate || ''}
+                       onChange={(e) => setBuilderData(prev => ({ ...prev, examDate: e.target.value }))}
+                       className="h-12"
+                     />
+                   </div>
+                 </div>
               </CardContent>
             </Card>
 
