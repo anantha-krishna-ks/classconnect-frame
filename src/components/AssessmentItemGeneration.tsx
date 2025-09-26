@@ -17,6 +17,26 @@ import {
   GripVertical, Plus, FileDown, Settings, ChevronDown
 } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverEvent,
+  DragOverlay,
+  DragStartEvent,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+  PointerSensor,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 interface GeneratedItem {
   id: string;
@@ -51,6 +71,30 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const [activeTab, setActiveTab] = useState('all');
   const [filterType, setFilterType] = useState('all');
   const [showAssessmentBuilder, setShowAssessmentBuilder] = useState(false);
+  
+  // Drag and drop state
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [isDragOverlay, setIsDragOverlay] = useState(false);
+  
+  // Configure sensors for smooth drag experience
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 200,
+      tolerance: 5,
+    },
+  });
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
+  });
+  
+  const sensors = useSensors(mouseSensor, touchSensor, pointerSensor);
   const [builderData, setBuilderData] = useState({
     totalMarks: assessmentData.marks || '',
     totalTime: assessmentData.duration ? 
@@ -337,6 +381,95 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
     console.log('PDF export would be implemented here');
   };
 
+  // Drag and drop handlers
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+    setIsDragOverlay(true);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    if (activeId === overId) return;
+
+    // Handle drag over for sections in assessment builder
+    if (showAssessmentBuilder) {
+      const activeQuestion = generatedItems.find(item => item.id === activeId);
+      const overSection = builderData.sections.find(section => section.id === overId);
+      
+      if (activeQuestion && overSection) {
+        // Move question to different section
+        const updatedSections = builderData.sections.map(section => {
+          if (section.id === overId) {
+            return {
+              ...section,
+              questions: [...section.questions, activeQuestion]
+            };
+          }
+          return {
+            ...section,
+            questions: section.questions.filter((q: any) => q.id !== activeId)
+          };
+        });
+
+        setBuilderData(prev => ({
+          ...prev,
+          sections: updatedSections
+        }));
+      }
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    setActiveId(null);
+    setIsDragOverlay(false);
+
+    if (!over) return;
+
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
+    if (activeId === overId) return;
+
+    if (showAssessmentBuilder) {
+      // Handle reordering within sections
+      builderData.sections.forEach((section, sectionIndex) => {
+        const activeIndex = section.questions.findIndex((q: any) => q.id === activeId);
+        const overIndex = section.questions.findIndex((q: any) => q.id === overId);
+        
+        if (activeIndex !== -1 && overIndex !== -1) {
+          const reorderedQuestions = arrayMove(section.questions, activeIndex, overIndex);
+          
+          const updatedSections = [...builderData.sections];
+          updatedSections[sectionIndex] = {
+            ...section,
+            questions: reorderedQuestions
+          };
+
+          setBuilderData(prev => ({
+            ...prev,
+            sections: updatedSections
+          }));
+        }
+      });
+    } else {
+      // Handle reordering in the main items list
+      const activeIndex = generatedItems.findIndex(item => item.id === activeId);
+      const overIndex = generatedItems.findIndex(item => item.id === overId);
+
+      if (activeIndex !== -1 && overIndex !== -1) {
+        setGeneratedItems(items => arrayMove(items, activeIndex, overIndex));
+        toast.success('Question reordered successfully');
+      }
+    }
+  };
+
   if (isGenerating) {
     return (
       <div className="space-y-8">
@@ -437,156 +570,149 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             </div>
           </div>
 
-          {/* Items Grid */}
-          <div className="grid gap-4">
-            {getItemsByType(filterType).map((item, index) => (
-              <Card key={item.id} className={`border border-border/50 ${item.isSelected ? 'ring-2 ring-green-500 bg-green-50/50' : 'bg-white'}`}>
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <Checkbox 
-                      checked={item.isSelected}
-                      onCheckedChange={() => toggleItemSelection(item.id)}
-                      className="mt-1"
+          {/* Items Grid with Drag and Drop */}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext items={getItemsByType(filterType).map(item => item.id)} strategy={verticalListSortingStrategy}>
+              <div className="grid gap-4">
+                {getItemsByType(filterType).map((item, index) => (
+                  <DraggableQuestionCard
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    onSelect={() => toggleItemSelection(item.id)}
+                    onPreview={() => setPreviewItem(item)}
+                    onEdit={() => setEditingItem(item)}
+                    onDelete={() => deleteItem(item.id)}
+                    getTypeColor={getTypeColor}
+                    getBadgeColor={getBadgeColor}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+            
+            <DragOverlay>
+              {activeId ? (
+                <DragOverlayContent 
+                  item={generatedItems.find(item => item.id === activeId)}
+                  getTypeColor={getTypeColor}
+                  getBadgeColor={getBadgeColor}
+                />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+          
+          {/* Edit Dialog */}
+          {editingItem && (
+            <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
+              <DialogContent className="max-w-3xl">
+                <DialogHeader>
+                  <DialogTitle>Edit Question</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Question Text</label>
+                    <Textarea 
+                      value={editingItem?.question || ''} 
+                      onChange={(e) => setEditingItem(prev => prev ? {...prev, question: e.target.value} : null)}
+                      className="min-h-[100px]"
                     />
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
-                            <Badge className={getTypeColor(item.itemType)}>{item.itemType}</Badge>
-                            <Badge className={getBadgeColor(item.bloomsLevel)}>{item.bloomsLevel}</Badge>
-                            <Badge variant="outline">{item.marks} marks</Badge>
-                            {item.hasImage && (
-                              <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                                <Image className="h-3 w-3 mr-1" />
-                                Image
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-foreground font-medium">{item.question}</p>
-                          <p className="text-sm text-muted-foreground">ELO: {item.eloTitle}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm" onClick={() => setPreviewItem(item)}>
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
-                              <DialogHeader>
-                                <DialogTitle>Preview Question</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <div className="flex gap-2">
-                                  <Badge className={getTypeColor(item.itemType)}>{item.itemType}</Badge>
-                                  <Badge className={getBadgeColor(item.bloomsLevel)}>{item.bloomsLevel}</Badge>
-                                  <Badge variant="outline">{item.marks} marks</Badge>
-                                </div>
-                                <p className="text-lg font-medium">{item.question}</p>
-                                {item.options && (
-                                  <div className="space-y-2">
-                                    <p className="font-medium">Options:</p>
-                                    {item.options.map((option, idx) => (
-                                      <div key={idx} className="flex items-center gap-2">
-                                        <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-sm">
-                                          {String.fromCharCode(65 + idx)}
-                                        </span>
-                                        <span>{option}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm" onClick={() => setEditingItem(item)}>
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-3xl">
-                              <DialogHeader>
-                                <DialogTitle>Edit Question</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-6">
-                                <div className="space-y-2">
-                                  <label className="text-sm font-medium">Question Text</label>
-                                  <Textarea 
-                                    value={editingItem?.question || ''} 
-                                    onChange={(e) => setEditingItem(prev => prev ? {...prev, question: e.target.value} : null)}
-                                    className="min-h-[100px]"
-                                  />
-                                </div>
-                                
-                                <div className="space-y-4">
-                                  <label className="text-sm font-medium">Image (Optional)</label>
-                                  {(imagePreview || editingItem?.imageUrl) ? (
-                                    <div className="space-y-3">
-                                      <div className="relative border border-border rounded-lg p-4">
-                                        <img 
-                                          src={imagePreview || editingItem?.imageUrl} 
-                                          alt="Question image" 
-                                          className="max-w-full h-auto max-h-64 rounded-md"
-                                        />
-                                        <Button 
-                                          variant="ghost" 
-                                          size="sm" 
-                                          onClick={removeImage}
-                                          className="absolute top-2 right-2 bg-red-100 hover:bg-red-200"
-                                        >
-                                          <X className="h-4 w-4" />
-                                        </Button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
-                                      <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                                      <p className="text-sm text-muted-foreground mb-2">Upload an image for this question</p>
-                                      <input
-                                        type="file"
-                                        accept="image/*"
-                                        onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
-                                        className="hidden"
-                                        id="image-upload"
-                                      />
-                                      <label 
-                                        htmlFor="image-upload"
-                                        className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 cursor-pointer"
-                                      >
-                                        Choose File
-                                      </label>
-                                    </div>
-                                  )}
-                                </div>
-                                
-                                <div className="flex gap-2">
-                                  <Button onClick={saveItemWithImage}>
-                                    Save Changes
-                                  </Button>
-                                  <Button variant="outline" onClick={() => {
-                                    setEditingItem(null);
-                                    setImageFile(null);
-                                    setImagePreview(null);
-                                  }}>
-                                    Cancel
-                                  </Button>
-                                </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          <Button variant="ghost" size="sm" onClick={() => deleteItem(item.id)}>
-                            <Trash2 className="h-4 w-4 text-red-500" />
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <label className="text-sm font-medium">Image (Optional)</label>
+                    {(imagePreview || editingItem?.imageUrl) ? (
+                      <div className="space-y-3">
+                        <div className="relative border border-border rounded-lg p-4">
+                          <img 
+                            src={imagePreview || editingItem?.imageUrl} 
+                            alt="Question image" 
+                            className="max-w-full h-auto max-h-64 rounded-md"
+                          />
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={removeImage}
+                            className="absolute top-2 right-2 bg-red-100 hover:bg-red-200"
+                          >
+                            <X className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+                        <Upload className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                        <p className="text-sm text-muted-foreground mb-2">Upload an image for this question</p>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
+                          className="hidden"
+                          id="image-upload"
+                        />
+                        <label 
+                          htmlFor="image-upload"
+                          className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 cursor-pointer"
+                        >
+                          Choose File
+                        </label>
+                      </div>
+                    )}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  
+                  <div className="flex gap-2">
+                    <Button onClick={saveItemWithImage}>
+                      Save Changes
+                    </Button>
+                    <Button variant="outline" onClick={() => {
+                      setEditingItem(null);
+                      setImageFile(null);
+                      setImagePreview(null);
+                    }}>
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
+          
+          {/* Preview Dialog */}
+          {previewItem && (
+            <Dialog open={!!previewItem} onOpenChange={() => setPreviewItem(null)}>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Preview Question</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="flex gap-2">
+                    <Badge className={getTypeColor(previewItem.itemType)}>{previewItem.itemType}</Badge>
+                    <Badge className={getBadgeColor(previewItem.bloomsLevel)}>{previewItem.bloomsLevel}</Badge>
+                    <Badge variant="outline">{previewItem.marks} marks</Badge>
+                  </div>
+                  <p className="text-lg font-medium">{previewItem.question}</p>
+                  {previewItem.options && (
+                    <div className="space-y-2">
+                      <p className="font-medium">Options:</p>
+                      {previewItem.options.map((option, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <span className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-sm">
+                            {String.fromCharCode(65 + idx)}
+                          </span>
+                          <span>{option}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </TabsContent>
 
         {/* Selected Items Tab */}
@@ -1933,6 +2059,118 @@ const QuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => 
                 <Trash2 className="h-3 w-3 mr-1" />
                 Delete
               </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Draggable Question Card Component
+const DraggableQuestionCard = ({ 
+  item, 
+  index, 
+  onSelect, 
+  onPreview, 
+  onEdit, 
+  onDelete, 
+  getTypeColor, 
+  getBadgeColor 
+}: any) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <Card 
+      ref={setNodeRef} 
+      style={style}
+      className={`border border-border/50 ${item.isSelected ? 'ring-2 ring-green-500 bg-green-50/50' : 'bg-white'} ${isDragging ? 'shadow-lg scale-105' : ''} transition-all duration-200`}
+    >
+      <CardContent className="p-6">
+        <div className="flex items-start gap-4">
+          <div className="flex items-center gap-2">
+            <Checkbox 
+              checked={item.isSelected}
+              onCheckedChange={onSelect}
+              className="mt-1"
+            />
+            <button
+              {...attributes}
+              {...listeners}
+              className="p-1 hover:bg-gray-100 rounded cursor-grab active:cursor-grabbing"
+              aria-label="Drag to reorder"
+            >
+              <GripVertical className="h-4 w-4 text-gray-400" />
+            </button>
+          </div>
+          <div className="flex-1 space-y-3">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-muted-foreground">#{index + 1}</span>
+                  <Badge className={getTypeColor(item.itemType)}>{item.itemType}</Badge>
+                  <Badge className={getBadgeColor(item.bloomsLevel)}>{item.bloomsLevel}</Badge>
+                  <Badge variant="outline">{item.marks} marks</Badge>
+                  {item.hasImage && (
+                    <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                      <Image className="h-3 w-3 mr-1" />
+                      Image
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-foreground font-medium">{item.question}</p>
+                <p className="text-sm text-muted-foreground">ELO: {item.eloTitle}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={onPreview}>
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={onEdit}>
+                  <Edit className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={onDelete}>
+                  <Trash2 className="h-4 w-4 text-red-500" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Drag Overlay Content Component
+const DragOverlayContent = ({ item, getTypeColor, getBadgeColor }: any) => {
+  if (!item) return null;
+
+  return (
+    <Card className="border border-border/50 bg-white shadow-xl rotate-3 scale-105">
+      <CardContent className="p-6">
+        <div className="flex items-start gap-4">
+          <GripVertical className="h-4 w-4 text-gray-400 mt-1" />
+          <div className="flex-1 space-y-3">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Badge className={getTypeColor(item.itemType)}>{item.itemType}</Badge>
+                <Badge className={getBadgeColor(item.bloomsLevel)}>{item.bloomsLevel}</Badge>
+                <Badge variant="outline">{item.marks} marks</Badge>
+              </div>
+              <p className="text-foreground font-medium">{item.question}</p>
+              <p className="text-sm text-muted-foreground">ELO: {item.eloTitle}</p>
             </div>
           </div>
         </div>
