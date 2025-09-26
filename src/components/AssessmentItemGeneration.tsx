@@ -51,8 +51,10 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const [filterType, setFilterType] = useState('all');
   const [showAssessmentBuilder, setShowAssessmentBuilder] = useState(false);
   const [builderData, setBuilderData] = useState({
-    totalMarks: '',
-    totalTime: '',
+    totalMarks: assessmentData.marks || '',
+    totalTime: assessmentData.duration ? 
+      (parseInt(assessmentData.duration.split(':')[0]) * 60 + parseInt(assessmentData.duration.split(':')[1] || '0')).toString() 
+      : '',
     numberingStyle: 'continuous',
     generalInstructions: 'Read all instructions carefully before attempting the questions.',
     sections: [] as any[]
@@ -87,6 +89,17 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   useEffect(() => {
     generateItems();
   }, []);
+
+  // Sync builder data when assessment data changes
+  useEffect(() => {
+    setBuilderData(prev => ({
+      ...prev,
+      totalMarks: assessmentData.marks || '',
+      totalTime: assessmentData.duration ? 
+        (parseInt(assessmentData.duration.split(':')[0]) * 60 + parseInt(assessmentData.duration.split(':')[1] || '0')).toString() 
+        : ''
+    }));
+  }, [assessmentData.marks, assessmentData.duration]);
 
   const generateItems = async () => {
     setIsGenerating(true);
@@ -723,7 +736,11 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   type="number"
                   placeholder="100"
                   value={builderData.totalMarks}
-                  onChange={(e) => setBuilderData(prev => ({ ...prev, totalMarks: e.target.value }))}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setBuilderData(prev => ({ ...prev, totalMarks: value }));
+                    updateAssessmentData({ marks: value });
+                  }}
                   className="h-10"
                 />
               </div>
@@ -733,7 +750,15 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   type="number"
                   placeholder="180"
                   value={builderData.totalTime}
-                  onChange={(e) => setBuilderData(prev => ({ ...prev, totalTime: e.target.value }))}
+                  onChange={(e) => {
+                    const totalMinutes = parseInt(e.target.value) || 0;
+                    const hours = Math.floor(totalMinutes / 60);
+                    const minutes = totalMinutes % 60;
+                    const durationFormat = `${hours}:${minutes.toString().padStart(2, '0')}`;
+                    
+                    setBuilderData(prev => ({ ...prev, totalTime: e.target.value }));
+                    updateAssessmentData({ duration: durationFormat });
+                  }}
                   className="h-10"
                 />
               </div>
