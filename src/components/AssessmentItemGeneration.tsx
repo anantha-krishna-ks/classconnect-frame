@@ -996,49 +996,50 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 <Card className="border-2 border-gray-800">
                    <CardHeader className="bg-gray-50 border-b-2 border-gray-800 p-4">
                      {/* Header Layout */}
-                     <div className="flex justify-between items-start">
-                      {/* Left Side - Class and Subject */}
-                      <div className="text-left space-y-1">
-                        <div className="text-sm font-medium">
-                          <span className="italic">Class:</span> {builderData.classGrade || '____'}
-                        </div>
-                        <div className="text-sm font-medium">
-                          <span className="italic">Subject:</span> {builderData.subject || '____'}
-                        </div>
-                      </div>
-                      
-                      {/* Center - Title */}
-                      <div className="text-center flex-1 mx-4">
-                        <h2 className="text-lg font-bold uppercase leading-tight">
-                          {builderData.schoolName || 'SCHOOL NAME'}
-                        </h2>
-                        <h3 className="text-base font-semibold uppercase mt-1">
-                          {builderData.assessmentTitle || 'ASSESSMENT PAPER'}
-                        </h3>
-                      </div>
-                      
-                       {/* Right Side - Logo and Marks/Time */}
-                       <div className="text-right space-y-1">
-                         {/* Logo area with consistent height */}
-                         <div className="flex justify-end mb-2 h-12">
-                           {builderData.schoolLogo ? (
-                             <img 
-                               src={builderData.schoolLogo} 
-                               alt="School Logo" 
-                               className="w-12 h-12 object-contain"
-                             />
-                           ) : (
-                             <div className="w-12 h-12"></div>
-                           )}
+                     <div className="space-y-2">
+                       {/* Logo area with consistent height */}
+                       <div className="flex justify-center mb-2 h-12">
+                         {builderData.schoolLogo ? (
+                           <img 
+                             src={builderData.schoolLogo} 
+                             alt="School Logo" 
+                             className="w-12 h-12 object-contain"
+                           />
+                         ) : (
+                           <div className="w-12 h-12"></div>
+                         )}
+                       </div>
+                       
+                       {/* Center - Title */}
+                       <div className="text-center mb-4">
+                         <h2 className="text-lg font-bold uppercase leading-tight">
+                           {builderData.schoolName || 'SCHOOL NAME'}
+                         </h2>
+                         <h3 className="text-base font-semibold uppercase mt-1">
+                           {builderData.assessmentTitle || 'ASSESSMENT PAPER'}
+                         </h3>
+                       </div>
+                       
+                       {/* Row 1: Class and Marks */}
+                       <div className="flex justify-between items-center">
+                         <div className="text-sm font-medium">
+                           <span className="italic">Class:</span> {builderData.classGrade || '____'}
                          </div>
                          <div className="text-sm font-medium">
                            <span className="font-bold">Marks:</span> {builderData.totalMarks || '__'}
+                         </div>
+                       </div>
+                       
+                       {/* Row 2: Subject and Time */}
+                       <div className="flex justify-between items-center">
+                         <div className="text-sm font-medium">
+                           <span className="italic">Subject:</span> {builderData.subject || '____'}
                          </div>
                          <div className="text-sm font-medium">
                            <span className="font-bold">Time:</span> {builderData.timeHours || '__'} hours {builderData.timeMinutes ? `${builderData.timeMinutes} mins` : ''}
                          </div>
                        </div>
-                    </div>
+                     </div>
                   </CardHeader>
                   <CardContent className="p-3">
                     <div className="text-xs">
