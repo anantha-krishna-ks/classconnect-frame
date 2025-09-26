@@ -1369,6 +1369,15 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-center text-xl font-bold">Assessment Paper Preview</DialogTitle>
+            {builderData.schoolLogo && (
+              <div className="flex justify-center mt-2">
+                <img 
+                  src={builderData.schoolLogo} 
+                  alt="School Logo" 
+                  className="w-16 h-16"
+                />
+              </div>
+            )}
           </DialogHeader>
           <div className="space-y-6 p-4">
             {/* Paper Header */}
@@ -1391,15 +1400,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     <span className="font-semibold">Class:</span> {builderData.classGrade || "VII"}
                   </p>
                   <div className="text-right">
-                    {builderData.schoolLogo && (
-                      <div className="flex justify-end mb-2">
-                        <img 
-                          src={builderData.schoolLogo} 
-                          alt="School Logo" 
-                          className="w-12 h-12"
-                        />
-                      </div>
-                    )}
                     <div className="text-sm font-medium mb-1">
                     </div>
                     <p className="text-lg font-bold">
