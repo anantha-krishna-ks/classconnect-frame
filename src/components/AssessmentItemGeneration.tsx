@@ -368,10 +368,10 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 bg-card p-1.5 rounded-xl border border-border shadow-sm h-16 gap-1">
-          <TabsTrigger value="all" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg font-medium transition-all duration-200 hover:scale-105 hover:bg-blue-50 hover:text-blue-700 py-3 px-4 text-blue-600 border border-transparent data-[state=active]:border-blue-600">All Items ({generatedItems.length})</TabsTrigger>
-          <TabsTrigger value="selected" className="data-[state=active]:bg-green-600 data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg font-medium transition-all duration-200 hover:scale-105 hover:bg-green-50 hover:text-green-700 py-3 px-4 text-green-600 border border-transparent data-[state=active]:border-green-600">Selected ({getSelectedItems().length})</TabsTrigger>
-          <TabsTrigger value="historical" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white data-[state=active]:shadow-sm rounded-lg font-medium transition-all duration-200 hover:scale-105 hover:bg-orange-50 hover:text-orange-700 py-3 px-4 text-orange-600 border border-transparent data-[state=active]:border-orange-600">Historical Questions</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm h-16 gap-1">
+          <TabsTrigger value="all" className="!bg-blue-600 !text-white data-[state=active]:!bg-blue-700 data-[state=active]:!text-white !shadow-md rounded-lg font-medium transition-all duration-200 hover:scale-105 hover:!bg-blue-500 py-3 px-4 !border-blue-600">All Items ({generatedItems.length})</TabsTrigger>
+          <TabsTrigger value="selected" className="!bg-green-600 !text-white data-[state=active]:!bg-green-700 data-[state=active]:!text-white !shadow-md rounded-lg font-medium transition-all duration-200 hover:scale-105 hover:!bg-green-500 py-3 px-4 !border-green-600">Selected ({getSelectedItems().length})</TabsTrigger>
+          <TabsTrigger value="historical" className="!bg-orange-600 !text-white data-[state=active]:!bg-orange-700 data-[state=active]:!text-white !shadow-md rounded-lg font-medium transition-all duration-200 hover:scale-105 hover:!bg-orange-500 py-3 px-4 !border-orange-600">Historical Questions</TabsTrigger>
         </TabsList>
 
         {/* All Items Tab */}
