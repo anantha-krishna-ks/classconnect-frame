@@ -1368,7 +1368,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-center text-xl font-bold">Assessment Paper Preview</DialogTitle>
             {builderData.schoolLogo && (
               <div className="flex justify-center mt-2">
                 <img 
