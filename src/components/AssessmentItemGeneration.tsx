@@ -1383,37 +1383,39 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 </h2>
               </div>
               
-              {/* Middle Section - Class, Subject, Logo, Marks, Time */}
-              <div className="flex justify-between items-start mb-4">
-                {/* Left Side - Class and Subject */}
-                <div className="space-y-2">
+              {/* Middle Section - Class/Marks and Subject/Time */}
+              <div className="space-y-3 mb-4">
+                {/* First Row - Class and Marks */}
+                <div className="flex justify-between items-center">
                   <p className="text-lg font-medium italic">
                     <span className="font-semibold">Class:</span> {builderData.classGrade || "VII"}
                   </p>
-                  <p className="text-lg font-medium italic">
-                    <span className="font-semibold">Subject:</span> {builderData.subject?.toUpperCase() || "SCIENCE"}
-                  </p>
-                </div>
-                
-                {/* Right Side - Logo, School Name, Marks, Time */}
-                <div className="text-right space-y-1">
-                  {builderData.schoolLogo && (
-                    <div className="mb-2">
+                  <div className="flex items-center gap-8">
+                    {builderData.schoolLogo && (
                       <img 
                         src={builderData.schoolLogo} 
                         alt="School Logo" 
-                        className="w-12 h-12 mx-auto"
+                        className="w-12 h-12"
                       />
+                    )}
+                    <div className="text-right">
+                      <div className="text-sm font-medium mb-1">
+                        <p className="uppercase font-bold">
+                          {builderData.schoolName?.split(',')[0] || "EXCEL"}
+                        </p>
+                        <p className="text-xs lowercase">public school</p>
+                      </div>
+                      <p className="text-lg font-bold">
+                        <span className="font-semibold">Marks:</span> {builderData.totalMarks || "80"}
+                      </p>
                     </div>
-                  )}
-                  <div className="text-sm font-medium">
-                    <p className="uppercase font-bold">
-                      {builderData.schoolName?.split(',')[0] || "EXCEL"}
-                    </p>
-                    <p className="text-xs lowercase">public school</p>
                   </div>
-                  <p className="text-lg font-bold">
-                    <span className="font-semibold">Marks:</span> {builderData.totalMarks || "80"}
+                </div>
+                
+                {/* Second Row - Subject and Time */}
+                <div className="flex justify-between items-center">
+                  <p className="text-lg font-medium italic">
+                    <span className="font-semibold">Subject:</span> {builderData.subject?.toUpperCase() || "SCIENCE"}
                   </p>
                   <p className="text-lg font-bold">
                     <span className="font-semibold">Time:</span> {builderData.timeHours || "3"} hours {builderData.timeMinutes ? `${builderData.timeMinutes} minutes` : ''}
