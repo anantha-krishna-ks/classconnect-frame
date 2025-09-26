@@ -66,6 +66,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [editingItem, setEditingItem] = useState<GeneratedItem | null>(null);
   const [previewItem, setPreviewItem] = useState<GeneratedItem | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('all');
@@ -1332,6 +1333,13 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
               <CardContent>
                 <div className="flex gap-4">
                   <Button 
+                    onClick={() => setIsPreviewOpen(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    Preview Assessment
+                  </Button>
+                  <Button 
                     onClick={exportAsPDF}
                     className="bg-red-600 hover:bg-red-700 text-white"
                   >
@@ -1355,6 +1363,133 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
           </CardContent>
         </Card>
       )}
+      
+      {/* Assessment Preview Dialog */}
+      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl font-bold">Assessment Paper Preview</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 p-4">
+            {/* Paper Header */}
+            <div className="text-center space-y-2 border-b pb-4">
+              <h1 className="text-2xl font-bold">{builderData.schoolName || "INSTITUTION NAME"}</h1>
+              <h2 className="text-xl font-semibold">{builderData.assessmentTitle || "ASSESSMENT TITLE"}</h2>
+              <div className="flex justify-between items-center mt-4">
+                <div>
+                  <p><strong>Subject:</strong> {builderData.subject || "N/A"}</p>
+                  <p><strong>Grade:</strong> {builderData.classGrade || "N/A"}</p>
+                </div>
+                <div>
+                  <p><strong>Time:</strong> {builderData.timeHours || 0}h {builderData.timeMinutes || 0}m</p>
+                  <p><strong>Total Marks:</strong> {builderData.totalMarks || 0}</p>
+                </div>
+                <div>
+                  <p><strong>Date:</strong> {builderData.examDate || "N/A"}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* General Instructions */}
+            {builderData.generalInstructions && (
+              <div className="border rounded-lg p-4 bg-blue-50">
+                <h3 className="font-semibold mb-2">General Instructions:</h3>
+                <p className="whitespace-pre-line">{builderData.generalInstructions}</p>
+              </div>
+            )}
+
+            {/* Sections */}
+            {builderData.sections?.map((section: any, sectionIdx: number) => (
+              <div key={sectionIdx} className="border rounded-lg p-4">
+                <div className="mb-4">
+                  <h3 className="text-lg font-bold">Section {String.fromCharCode(65 + sectionIdx)}: {section.title}</h3>
+                  {section.instruction && (
+                    <p className="text-sm text-gray-600 mt-1">{section.instruction}</p>
+                  )}
+                </div>
+                
+                {section.questions?.map((question: any, qIdx: number) => (
+                  <div key={question.id} className="mb-6 p-4 border-l-4 border-blue-500 bg-gray-50">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-semibold">Question {qIdx + 1}:</h4>
+                      <span className="text-sm font-medium bg-blue-100 px-2 py-1 rounded">
+                        [{question.marks} marks]
+                      </span>
+                    </div>
+                    <p className="mb-3">{question.question}</p>
+                    
+                    {question.imageUrl && (
+                      <div className="mb-3">
+                        <img 
+                          src={question.imageUrl} 
+                          alt="Question" 
+                          className="max-w-md rounded border"
+                        />
+                      </div>
+                    )}
+                    
+                    {question.options && question.options.length > 0 && (
+                      <div className="ml-4 space-y-2">
+                        {question.options.map((option: string, optIdx: number) => (
+                          <div key={optIdx} className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
+                              {String.fromCharCode(97 + optIdx)}
+                            </span>
+                            <span>{option}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {question.subQuestions && question.subQuestions.length > 0 && (
+                      <div className="ml-4 mt-3 space-y-3">
+                        {question.subQuestions.map((subQ: any, subIdx: number) => (
+                          <div key={subQ.id} className="border-l-2 border-gray-300 pl-3">
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="font-medium">({String.fromCharCode(97 + subIdx)})</span>
+                              <span className="text-xs bg-gray-200 px-2 py-1 rounded">
+                                [{subQ.marks} marks]
+                              </span>
+                            </div>
+                            <p>{subQ.question}</p>
+                            {subQ.imageUrl && (
+                              <div className="mt-2">
+                                <img 
+                                  src={subQ.imageUrl} 
+                                  alt="Sub-question" 
+                                  className="max-w-sm rounded border"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {question.orQuestion && (
+                      <div className="mt-4 pt-4 border-t border-dashed border-gray-400">
+                        <div className="flex justify-between items-start mb-2">
+                          <h5 className="font-semibold text-center w-full">OR</h5>
+                        </div>
+                        <p className="mb-2">{question.orQuestion}</p>
+                        {question.orQuestionImage && (
+                          <div className="mb-2">
+                            <img 
+                              src={question.orQuestionImage} 
+                              alt="OR Question" 
+                              className="max-w-md rounded border"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
