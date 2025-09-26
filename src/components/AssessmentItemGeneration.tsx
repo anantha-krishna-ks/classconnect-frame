@@ -393,6 +393,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             </div>
             <div className="flex items-center gap-2">
               <Button
+                variant="outline"
                 size="sm"
                 onClick={() => {
                   const filteredItems = getItemsByType(filterType);
@@ -404,11 +405,12 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     )
                   );
                 }}
-                className="text-xs bg-green-600 hover:bg-green-700 text-white font-medium px-4 py-2"
+                className="text-xs"
               >
                 Select All
               </Button>
               <Button
+                variant="outline"
                 size="sm"
                 onClick={() => {
                   const filteredItems = getItemsByType(filterType);
@@ -420,7 +422,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     )
                   );
                 }}
-                className="text-xs bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2"
+                className="text-xs"
               >
                 Clear
               </Button>
