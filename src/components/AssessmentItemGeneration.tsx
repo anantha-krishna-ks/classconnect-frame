@@ -874,9 +874,42 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       onChange={(e) => setBuilderData(prev => ({ ...prev, classGrade: e.target.value }))}
                     />
                   </div>
-                </div>
-                
-                {/* Time & Marks */}
+                 </div>
+                 
+                 {/* School Name & Logo */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                   <div className="space-y-2">
+                     <label className="text-sm font-semibold">School Name</label>
+                     <Input 
+                       placeholder="e.g., ABC High School"
+                       value={builderData.schoolName || ''}
+                       onChange={(e) => setBuilderData(prev => ({ ...prev, schoolName: e.target.value }))}
+                     />
+                   </div>
+                   <div className="space-y-2">
+                     <label className="text-sm font-semibold">School Logo</label>
+                     <input
+                       type="file"
+                       accept="image/*"
+                       onChange={(e) => {
+                         const file = e.target.files?.[0];
+                         if (file) {
+                           const reader = new FileReader();
+                           reader.onload = (event) => {
+                             setBuilderData(prev => ({
+                               ...prev,
+                               schoolLogo: event.target?.result as string
+                             }));
+                           };
+                           reader.readAsDataURL(file);
+                         }
+                       }}
+                       className="w-full file:mr-2 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border rounded-md h-10"
+                     />
+                   </div>
+                 </div>
+                 
+                 {/* Time & Marks */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-white rounded-lg border">
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-blue-700">Total Marks</label>
@@ -961,34 +994,9 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
               <CardContent className="p-4 space-y-6">
                 {/* Paper Header Preview */}
                 <Card className="border-2 border-gray-800">
-                  <CardHeader className="bg-gray-50 border-b-2 border-gray-800 p-4">
-                    {/* Logo Upload Section */}
-                    <div className="flex justify-end mb-2">
-                      <div className="flex items-center gap-2">
-                        <label className="text-xs text-gray-600">Logo:</label>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) {
-                              const reader = new FileReader();
-                              reader.onload = (event) => {
-                                setBuilderData(prev => ({
-                                  ...prev,
-                                  schoolLogo: event.target?.result as string
-                                }));
-                              };
-                              reader.readAsDataURL(file);
-                            }
-                          }}
-                          className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                        />
-                      </div>
-                    </div>
-                    
-                    {/* Header Layout */}
-                    <div className="flex justify-between items-start">
+                   <CardHeader className="bg-gray-50 border-b-2 border-gray-800 p-4">
+                     {/* Header Layout */}
+                     <div className="flex justify-between items-start">
                       {/* Left Side - Class and Subject */}
                       <div className="text-left space-y-1">
                         <div className="text-sm font-medium">
