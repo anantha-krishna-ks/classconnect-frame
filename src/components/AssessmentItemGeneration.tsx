@@ -1087,10 +1087,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     />
                   </div>
                   <div className="flex flex-col justify-end gap-2">
-                    <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white h-12">
-                      <Save className="h-4 w-4 mr-2" />
-                      Save Paper
-                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -1350,6 +1346,10 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   >
                     <FileDown className="h-4 w-4 mr-2" />
                     Export as QTI
+                  </Button>
+                  <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white">
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Paper
                   </Button>
                 </div>
               </CardContent>
