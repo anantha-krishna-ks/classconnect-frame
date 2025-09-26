@@ -1017,24 +1017,27 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                         </h3>
                       </div>
                       
-                      {/* Right Side - Logo and Marks/Time */}
-                      <div className="text-right space-y-1">
-                        {builderData.schoolLogo && (
-                          <div className="flex justify-end mb-2">
-                            <img 
-                              src={builderData.schoolLogo} 
-                              alt="School Logo" 
-                              className="w-12 h-12 object-contain"
-                            />
-                          </div>
-                        )}
-                        <div className="text-sm font-medium">
-                          <span className="font-bold">Marks:</span> {builderData.totalMarks || '__'}
-                        </div>
-                        <div className="text-sm font-medium">
-                          <span className="font-bold">Time:</span> {builderData.timeHours || '__'} hours {builderData.timeMinutes ? `${builderData.timeMinutes} mins` : ''}
-                        </div>
-                      </div>
+                       {/* Right Side - Logo and Marks/Time */}
+                       <div className="text-right space-y-1">
+                         {/* Logo area with consistent height */}
+                         <div className="flex justify-end mb-2 h-12">
+                           {builderData.schoolLogo ? (
+                             <img 
+                               src={builderData.schoolLogo} 
+                               alt="School Logo" 
+                               className="w-12 h-12 object-contain"
+                             />
+                           ) : (
+                             <div className="w-12 h-12"></div>
+                           )}
+                         </div>
+                         <div className="text-sm font-medium">
+                           <span className="font-bold">Marks:</span> {builderData.totalMarks || '__'}
+                         </div>
+                         <div className="text-sm font-medium">
+                           <span className="font-bold">Time:</span> {builderData.timeHours || '__'} hours {builderData.timeMinutes ? `${builderData.timeMinutes} mins` : ''}
+                         </div>
+                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="p-3">
