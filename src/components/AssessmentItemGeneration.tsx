@@ -63,6 +63,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
     subject: '',
     classGrade: '',
     timeHours: '',
+    timeMinutes: '',
     examDate: '',
     schoolName: '',
     schoolLogo: ''
@@ -891,17 +892,32 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       className="h-12 text-lg font-bold text-center text-blue-700"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-semibold text-green-700">Time (Hours)</label>
-                    <Input 
-                      type="number"
-                      step="0.5"
-                      placeholder="3"
-                      value={builderData.timeHours || ''}
-                      onChange={(e) => setBuilderData(prev => ({ ...prev, timeHours: e.target.value }))}
-                      className="h-12 text-lg font-bold text-center text-green-700"
-                    />
-                  </div>
+                   <div className="space-y-2">
+                     <label className="text-sm font-semibold text-green-700">Time</label>
+                     <div className="grid grid-cols-2 gap-2">
+                       <div>
+                         <Input 
+                           type="number"
+                           placeholder="3"
+                           value={builderData.timeHours || ''}
+                           onChange={(e) => setBuilderData(prev => ({ ...prev, timeHours: e.target.value }))}
+                           className="h-12 text-lg font-bold text-center text-green-700"
+                         />
+                         <label className="text-xs text-green-600 block text-center mt-1">Hours</label>
+                       </div>
+                       <div>
+                         <Input 
+                           type="number"
+                           max="59"
+                           placeholder="30"
+                           value={builderData.timeMinutes || ''}
+                           onChange={(e) => setBuilderData(prev => ({ ...prev, timeMinutes: e.target.value }))}
+                           className="h-12 text-lg font-bold text-center text-green-700"
+                         />
+                         <label className="text-xs text-green-600 block text-center mt-1">Minutes</label>
+                       </div>
+                     </div>
+                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-purple-700">Date</label>
                     <Input 
@@ -1008,7 +1024,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                           <span className="font-bold">Marks:</span> {builderData.totalMarks || '__'}
                         </div>
                         <div className="text-sm font-medium">
-                          <span className="font-bold">Time:</span> {builderData.timeHours || '__'} hours
+                          <span className="font-bold">Time:</span> {builderData.timeHours || '__'} hours {builderData.timeMinutes ? `${builderData.timeMinutes} mins` : ''}
                         </div>
                       </div>
                     </div>
