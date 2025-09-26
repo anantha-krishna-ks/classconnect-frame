@@ -1017,16 +1017,59 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 // Question Card Component
 const QuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => {
   const [subQuestionNumbering, setSubQuestionNumbering] = useState('123');
+  const [imageFiles, setImageFiles] = useState<{[key: string]: File}>({});
+  const [imagePreviews, setImagePreviews] = useState<{[key: string]: string}>({});
 
   const addSubQuestion = () => {
     const newSubQuestion = {
       id: Date.now(),
       text: 'New sub-question',
-      marks: 2
+      marks: 2,
+      hasImage: false,
+      imageUrl: null
     };
     onUpdate({
       ...question,
       subQuestions: [...(question.subQuestions || []), newSubQuestion]
+    });
+  };
+
+  const handleImageUpload = (subIdx: number, file: File) => {
+    const subQuestionId = question.subQuestions[subIdx].id;
+    setImageFiles(prev => ({ ...prev, [subQuestionId]: file }));
+    
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageUrl = reader.result as string;
+      setImagePreviews(prev => ({ ...prev, [subQuestionId]: imageUrl }));
+      
+      // Update sub-question with image data
+      updateSubQuestion(subIdx, {
+        ...question.subQuestions[subIdx],
+        hasImage: true,
+        imageUrl: imageUrl
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = (subIdx: number) => {
+    const subQuestionId = question.subQuestions[subIdx].id;
+    setImageFiles(prev => {
+      const newFiles = { ...prev };
+      delete newFiles[subQuestionId];
+      return newFiles;
+    });
+    setImagePreviews(prev => {
+      const newPreviews = { ...prev };
+      delete newPreviews[subQuestionId];
+      return newPreviews;
+    });
+    
+    updateSubQuestion(subIdx, {
+      ...question.subQuestions[subIdx],
+      hasImage: false,
+      imageUrl: null
     });
   };
 
@@ -1101,31 +1144,84 @@ const QuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => 
                   </Select>
                 </div>
                 {question.subQuestions.map((subQ: any, subIdx: number) => (
-                  <div key={subQ.id} className="flex items-start gap-2">
-                    <span className="text-sm font-medium text-gray-500 mt-2 min-w-[20px]">
-                      {getSubQuestionLabel(subIdx)}
-                    </span>
-                    <Textarea
-                      value={subQ.text}
-                      onChange={(e) => updateSubQuestion(subIdx, { ...subQ, text: e.target.value })}
-                      className="flex-1 min-h-[40px] text-sm resize-none"
-                      placeholder="Enter sub-question..."
-                    />
-                    <Input
-                      type="number"
-                      value={subQ.marks}
-                      onChange={(e) => updateSubQuestion(subIdx, { ...subQ, marks: parseInt(e.target.value) || 0 })}
-                      className="w-16 h-8 text-xs text-center"
-                      min="1"
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteSubQuestion(subIdx)}
-                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+                  <div key={subQ.id} className="space-y-3 p-4 bg-gradient-to-r from-blue-50/30 to-purple-50/30 rounded-lg border border-blue-100">
+                    <div className="flex items-start gap-2">
+                      <span className="text-sm font-medium text-gray-500 mt-2 min-w-[20px]">
+                        {getSubQuestionLabel(subIdx)}
+                      </span>
+                      <Textarea
+                        value={subQ.text}
+                        onChange={(e) => updateSubQuestion(subIdx, { ...subQ, text: e.target.value })}
+                        className="flex-1 min-h-[40px] text-sm resize-none"
+                        placeholder="Enter sub-question..."
+                      />
+                      <Input
+                        type="number"
+                        value={subQ.marks}
+                        onChange={(e) => updateSubQuestion(subIdx, { ...subQ, marks: parseInt(e.target.value) || 0 })}
+                        className="w-16 h-8 text-xs text-center"
+                        min="1"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteSubQuestion(subIdx)}
+                        className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    
+                    {/* Image Upload Section */}
+                    <div className="ml-6 space-y-3">
+                      {(imagePreviews[subQ.id] || subQ.imageUrl) ? (
+                        <div className="relative bg-white p-3 rounded-lg border border-purple-200 shadow-sm">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs font-medium text-purple-700 flex items-center gap-1">
+                              <Image className="h-3 w-3" />
+                              Question Image
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeImage(subIdx)}
+                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full"
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                          <img 
+                            src={imagePreviews[subQ.id] || subQ.imageUrl} 
+                            alt="Sub-question image" 
+                            className="max-w-full h-auto max-h-48 rounded-md border border-gray-200 shadow-sm object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-dashed border-purple-300 rounded-lg p-4">
+                          <div className="text-center">
+                            <Upload className="h-6 w-6 text-purple-500 mx-auto mb-2" />
+                            <p className="text-xs text-purple-600 mb-2 font-medium">Add image to this sub-question</p>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleImageUpload(subIdx, file);
+                              }}
+                              className="hidden"
+                              id={`image-upload-${subQ.id}`}
+                            />
+                            <label 
+                              htmlFor={`image-upload-${subQ.id}`}
+                              className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-500 to-blue-500 text-white text-xs rounded-md hover:from-purple-600 hover:to-blue-600 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md"
+                            >
+                              <Image className="h-3 w-3 mr-1" />
+                              Choose Image
+                            </label>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
