@@ -1019,6 +1019,7 @@ const QuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => 
   const [subQuestionNumbering, setSubQuestionNumbering] = useState('123');
   const [imageFiles, setImageFiles] = useState<{[key: string]: File}>({});
   const [imagePreviews, setImagePreviews] = useState<{[key: string]: string}>({});
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const addSubQuestion = () => {
     const newSubQuestion = {
@@ -1032,6 +1033,51 @@ const QuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => 
       ...question,
       subQuestions: [...(question.subQuestions || []), newSubQuestion]
     });
+  };
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', index.toString());
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
+
+    const updatedSubQuestions = [...(question.subQuestions || [])];
+    const draggedItem = updatedSubQuestions[draggedIndex];
+    
+    // Remove dragged item
+    updatedSubQuestions.splice(draggedIndex, 1);
+    
+    // Insert at new position
+    const insertIndex = draggedIndex < dropIndex ? dropIndex - 1 : dropIndex;
+    updatedSubQuestions.splice(insertIndex, 0, draggedItem);
+    
+    onUpdate({
+      ...question,
+      subQuestions: updatedSubQuestions
+    });
+    
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
   };
 
   const handleImageUpload = (subIdx: number, file: File) => {
@@ -1144,11 +1190,25 @@ const QuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => 
                   </Select>
                 </div>
                 {question.subQuestions.map((subQ: any, subIdx: number) => (
-                  <div key={subQ.id} className="space-y-3 p-4 bg-gradient-to-r from-blue-50/30 to-purple-50/30 rounded-lg border border-blue-100">
+                  <div 
+                    key={subQ.id} 
+                    className={`space-y-3 p-4 bg-gradient-to-r from-blue-50/30 to-purple-50/30 rounded-lg border border-blue-100 transition-all duration-200 ${
+                      draggedIndex === subIdx ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
+                    } hover:shadow-sm cursor-move`}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, subIdx)}
+                    onDragOver={handleDragOver}
+                    onDragEnter={handleDragEnter}
+                    onDrop={(e) => handleDrop(e, subIdx)}
+                    onDragEnd={handleDragEnd}
+                  >
                     <div className="flex items-start gap-2">
-                      <span className="text-sm font-medium text-gray-500 mt-2 min-w-[20px]">
-                        {getSubQuestionLabel(subIdx)}
-                      </span>
+                      <div className="flex items-center gap-2 mt-2">
+                        <GripVertical className="h-4 w-4 text-gray-400 cursor-grab active:cursor-grabbing" />
+                        <span className="text-sm font-medium text-gray-500 min-w-[20px]">
+                          {getSubQuestionLabel(subIdx)}
+                        </span>
+                      </div>
                       <Textarea
                         value={subQ.text}
                         onChange={(e) => updateSubQuestion(subIdx, { ...subQ, text: e.target.value })}
