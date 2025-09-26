@@ -1111,6 +1111,9 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => {
   const [imageFiles, setImageFiles] = useState<{[key: string]: File}>({});
   const [imagePreviews, setImagePreviews] = useState<{[key: string]: string}>({});
+  const [subQuestionNumbering, setSubQuestionNumbering] = useState('123');
+  const [isCustomNumbering, setIsCustomNumbering] = useState(false);
+  const [customLabels, setCustomLabels] = useState<{[key: number]: string}>({});
 
   const handleImageUpload = (id: string, file: File, type: 'main' | 'subQuestion' | 'orQuestion') => {
     setImageFiles(prev => ({ ...prev, [id]: file }));
@@ -1188,7 +1191,42 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
 
   const deleteSubQuestion = (subIdx: number) => {
     const updatedSubQuestions = question.subQuestions.filter((_: any, idx: number) => idx !== subIdx);
+    // Clean up custom labels
+    const newCustomLabels = { ...customLabels };
+    delete newCustomLabels[subIdx];
+    setCustomLabels(newCustomLabels);
     onUpdate({ ...question, subQuestions: updatedSubQuestions });
+  };
+
+  const getSubQuestionLabel = (index: number) => {
+    if (isCustomNumbering) {
+      return customLabels[index] || `${index + 1}.`;
+    }
+    
+    switch (subQuestionNumbering) {
+      case '123': return `${index + 1}.`;
+      case 'abc': return `${String.fromCharCode(97 + index)}.`;
+      case 'roman': return `${['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x'][index] || (index + 1)}.`;
+      default: return `${index + 1}.`;
+    }
+  };
+
+  const handleNumberingChange = (value: string) => {
+    if (value === 'custom') {
+      setIsCustomNumbering(true);
+      setSubQuestionNumbering('custom');
+    } else {
+      setIsCustomNumbering(false);
+      setSubQuestionNumbering(value);
+      setCustomLabels({}); // Clear custom labels when switching away from custom
+    }
+  };
+
+  const updateCustomLabel = (index: number, label: string) => {
+    setCustomLabels(prev => ({
+      ...prev,
+      [index]: label
+    }));
   };
   
   return (
@@ -1276,11 +1314,36 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
           
         {/* Sub-questions */}
         {question.subQuestions && question.subQuestions.length > 0 && (
-          <div className="ml-8 mt-4 space-y-2 border-l-2 border-gray-300 pl-4">
+          <div className="ml-8 mt-4 space-y-3 border-l-2 border-gray-300 pl-4">
+            {/* Sub-question Numbering Control */}
+            <div className="flex items-center gap-3 p-2 bg-blue-50 rounded border border-blue-200">
+              <span className="text-sm font-medium text-blue-700">Sub-question style:</span>
+              <Select value={subQuestionNumbering} onValueChange={handleNumberingChange}>
+                <SelectTrigger className="w-32 h-7 text-xs bg-white border-blue-300">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-300 shadow-lg z-50">
+                  <SelectItem value="123" className="hover:bg-blue-50 cursor-pointer">1, 2, 3...</SelectItem>
+                  <SelectItem value="abc" className="hover:bg-blue-50 cursor-pointer">a, b, c...</SelectItem>
+                  <SelectItem value="roman" className="hover:bg-blue-50 cursor-pointer">i, ii, iii...</SelectItem>
+                  <SelectItem value="custom" className="hover:bg-blue-50 cursor-pointer">Custom...</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
             {question.subQuestions.map((subQ: any, subIdx: number) => (
               <div key={subQ.id} className="p-2 bg-gray-50 rounded border">
                 <div className="flex items-start gap-2">
-                  <span className="font-medium min-w-[20px] mt-1">{['i)', 'ii)', 'iii)', 'iv)', 'v)'][subIdx] || `${subIdx + 1})`}</span>
+                  {isCustomNumbering ? (
+                    <Input
+                      value={customLabels[subIdx] || `${subIdx + 1}.`}
+                      onChange={(e) => updateCustomLabel(subIdx, e.target.value)}
+                      className="min-w-[50px] max-w-[80px] h-6 text-xs font-medium text-center"
+                      placeholder="Label"
+                    />
+                  ) : (
+                    <span className="font-medium min-w-[20px] mt-1">{getSubQuestionLabel(subIdx)}</span>
+                  )}
                   <Textarea
                     value={subQ.text}
                     onChange={(e) => {
