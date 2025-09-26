@@ -683,29 +683,8 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             </CardTitle>
             <p className="text-muted-foreground">Review your assessment overview and finalize the creation</p>
           </CardHeader>
-              <CardContent className="space-y-6 p-8">
-                
-                {/* Question Numbering Control */}
-                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <label className="text-sm font-semibold text-blue-800">Question Numbering Style:</label>
-                  <Select 
-                    value={builderData.numberingStyle} 
-                    onValueChange={(value) => setBuilderData(prev => ({ ...prev, numberingStyle: value }))}
-                  >
-                    <SelectTrigger className="w-48 bg-white border-blue-300 z-50">
-                      <SelectValue placeholder="Select numbering style" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
-                      <SelectItem value="continuous" className="hover:bg-blue-50">
-                        Continuous Numbering (1, 2, 3...)
-                      </SelectItem>
-                      <SelectItem value="reset" className="hover:bg-blue-50">
-                        Reset per Section (1, 2... then 1, 2...)
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-            {/* Summary Statistics */}
+            <CardContent className="space-y-6 p-8">
+              {/* Summary Statistics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
                 <div className="text-sm text-muted-foreground">Total Chapters</div>
@@ -833,7 +812,33 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
           </CardHeader>
           <CardContent className="space-y-8 p-8">
             
-            {/* Assessment Header Configuration */}
+            {/* Question Numbering Control */}
+            <Card className="border border-blue-200 bg-blue-50">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-semibold text-blue-800">Question Numbering Settings</CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-blue-700">Numbering Style:</label>
+                  <Select 
+                    value={builderData.numberingStyle || 'continuous'} 
+                    onValueChange={(value) => setBuilderData(prev => ({ ...prev, numberingStyle: value }))}
+                  >
+                    <SelectTrigger className="w-64 bg-white border-blue-300 shadow-sm">
+                      <SelectValue placeholder="Select numbering style" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                      <SelectItem value="continuous" className="hover:bg-blue-50 cursor-pointer">
+                        Continuous Numbering (1, 2, 3, 4...)
+                      </SelectItem>
+                      <SelectItem value="reset" className="hover:bg-blue-50 cursor-pointer">
+                        Reset per Section (1, 2... then 1, 2...)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
             <Card className="border border-slate-300 bg-gradient-to-r from-slate-50 to-gray-50">
               <CardHeader>
                 <CardTitle className="text-xl font-bold text-center">Assessment Paper Configuration</CardTitle>
