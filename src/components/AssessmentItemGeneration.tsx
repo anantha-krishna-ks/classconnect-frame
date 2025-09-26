@@ -1404,7 +1404,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       <p className="uppercase font-bold">
                         {builderData.schoolName?.split(',')[0] || "EXCEL"}
                       </p>
-                      <p className="text-xs lowercase">public school</p>
                     </div>
                     <p className="text-lg font-bold">
                       <span className="font-semibold">Marks:</span> {builderData.totalMarks || "80"}
