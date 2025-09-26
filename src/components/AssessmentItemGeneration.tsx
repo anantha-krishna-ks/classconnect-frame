@@ -17,25 +17,6 @@ import {
   GripVertical, Plus, FileDown, Settings, ChevronDown
 } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  DndContext,
-  DragEndEvent,
-  DragOverEvent,
-  DragOverlay,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  closestCorners,
-  UniqueIdentifier
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable,
-  arrayMove
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 
 interface GeneratedItem {
   id: string;
@@ -87,17 +68,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
     schoolName: '',
     schoolLogo: ''
   });
-  // Rest of the historical questions data...
-  
-  const [draggedQuestion, setDraggedQuestion] = useState<any>(null);
-  
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
   const [historicalQuestions] = useState<GeneratedItem[]>([
     {
       id: 'hist1',
@@ -178,98 +148,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  // Drag and Drop handlers
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    const questionId = active.id as string;
-    
-    // Find the question being dragged
-    let draggedQuestionData = null;
-    for (const section of builderData.sections) {
-      const question = section.questions.find((q: any) => q.id.toString() === questionId);
-      if (question) {
-        draggedQuestionData = question;
-        break;
-      }
-    }
-    setDraggedQuestion(draggedQuestionData);
-  };
-
-  const handleDragOver = (event: DragOverEvent) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeId = active.id as string;
-    const overId = over.id as string;
-    
-    // Don't do anything if dropping on itself
-    if (activeId === overId) return;
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setDraggedQuestion(null);
-    
-    if (!over) return;
-
-    const activeId = active.id as string;
-    const overId = over.id as string;
-
-    if (activeId === overId) return;
-
-    // Find source and destination
-    let sourceSection = -1;
-    let sourceIndex = -1;
-    let destSection = -1;
-    let destIndex = -1;
-    let draggedQuestionData = null;
-
-    // Find source question
-    builderData.sections.forEach((section, sIdx) => {
-      const qIdx = section.questions.findIndex((q: any) => q.id.toString() === activeId);
-      if (qIdx !== -1) {
-        sourceSection = sIdx;
-        sourceIndex = qIdx;
-        draggedQuestionData = section.questions[qIdx];
-      }
-    });
-
-    // Find destination - could be a question or a section
-    builderData.sections.forEach((section, sIdx) => {
-      // Check if dropping on a section
-      if (`section-${sIdx}` === overId) {
-        destSection = sIdx;
-        destIndex = section.questions.length; // Add to end of section
-        return;
-      }
-      
-      // Check if dropping on a question
-      const qIdx = section.questions.findIndex((q: any) => q.id.toString() === overId);
-      if (qIdx !== -1) {
-        destSection = sIdx;
-        destIndex = qIdx;
-      }
-    });
-
-    if (sourceSection === -1 || destSection === -1 || !draggedQuestionData) return;
-
-    // Update the sections
-    const newSections = [...builderData.sections];
-    
-    // Remove from source
-    newSections[sourceSection].questions.splice(sourceIndex, 1);
-    
-    // Add to destination
-    if (sourceSection === destSection && sourceIndex < destIndex) {
-      // Adjust index if moving within same section
-      destIndex--;
-    }
-    newSections[destSection].questions.splice(destIndex, 0, draggedQuestionData);
-    
-    setBuilderData(prev => ({ ...prev, sections: newSections }));
-    toast.success('Question moved successfully');
   };
 
   const generateMockQuestion = (type: string, bloomsLevel: string, eloTitle: string) => {
@@ -1195,76 +1073,94 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     </Button>
                   </div>
 
-                   {/* Assessment Sections with Drag and Drop */}
-                   <DndContext
-                     sensors={sensors}
-                     collisionDetection={closestCorners}
-                     onDragStart={handleDragStart}
-                     onDragOver={handleDragOver}
-                     onDragEnd={handleDragEnd}
-                   >
-                     {builderData.sections.map((section: any, sectionIdx: number) => {
-                       const questionIds = section.questions.map((q: any) => q.id.toString());
-                       
-                       return (
-                         <SortableContext
-                           key={section.id}
-                           items={questionIds}
-                           strategy={verticalListSortingStrategy}
-                         >
-                           <DroppableSection
-                             section={section}
-                             sectionIdx={sectionIdx}
-                             builderData={builderData}
-                             setBuilderData={setBuilderData}
-                           >
-                             {section.questions.map((question: any, questionIdx: number) => (
-                               <DraggableQuestionCard
-                                 key={question.id}
-                                 question={question}
-                                 sectionIdx={sectionIdx}
-                                 questionNumber={
-                                   builderData.numberingStyle === 'continuous' 
-                                     ? builderData.sections.slice(0, sectionIdx).reduce((sum, s) => sum + s.questions.length, 0) + questionIdx + 1
-                                     : questionIdx + 1
-                                 }
-                                 onUpdate={(updatedQuestion) => {
-                                   const updatedSections = [...builderData.sections];
-                                   updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
-                                   setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                                 }}
-                                 onDelete={() => {
-                                   const updatedSections = [...builderData.sections];
-                                   updatedSections[sectionIdx].questions = updatedSections[sectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
-                                   setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                                 }}
-                               />
-                             ))}
-                           </DroppableSection>
-                         </SortableContext>
-                       );
-                     })}
-                     
-                     <DragOverlay>
-                       {draggedQuestion ? (
-                         <Card className="border border-gray-200 bg-white shadow-lg rotate-3 scale-105">
-                           <CardContent className="p-4">
-                             <div className="flex items-start gap-4">
-                               <GripVertical className="h-4 w-4 text-gray-400 mt-1" />
-                               <div className="flex-1">
-                                 <div className="text-sm text-gray-700 line-clamp-2">
-                                   {draggedQuestion.text || 'Question text...'}
-                                 </div>
-                               </div>
-                               <div className="text-sm font-bold border px-2 py-1 rounded">
-                                 [{draggedQuestion.marks}]
-                               </div>
-                             </div>
-                           </CardContent>
-                         </Card>
-                       ) : null}
-                     </DragOverlay>
-                   </DndContext>
+                  {builderData.sections.map((section: any, sectionIdx: number) => (
+                    <Card key={section.id} className="border border-blue-200">
+                      <CardHeader className="bg-blue-50 py-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Input 
+                              value={section.title}
+                              onChange={(e) => {
+                                const updatedSections = [...builderData.sections];
+                                updatedSections[sectionIdx].title = e.target.value;
+                                setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                              }}
+                              className="font-bold text-sm w-32"
+                            />
+                            <Input 
+                              placeholder="Instructions"
+                              value={section.instruction || ''}
+                              onChange={(e) => {
+                                const updatedSections = [...builderData.sections];
+                                updatedSections[sectionIdx].instruction = e.target.value;
+                                setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                              }}
+                              className="text-sm flex-1"
+                            />
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              const updatedSections = builderData.sections.filter((_, idx) => idx !== sectionIdx);
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                            }}
+                            className="text-red-500"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      
+                      <CardContent className="p-3 space-y-3">
+                        {section.questions.map((question: any, questionIdx: number) => (
+                          <ExamQuestionCard
+                            key={question.id}
+                            question={question}
+                            questionNumber={
+                              builderData.numberingStyle === 'continuous' 
+                                ? builderData.sections.slice(0, sectionIdx).reduce((sum, s) => sum + s.questions.length, 0) + questionIdx + 1
+                                : questionIdx + 1
+                            }
+                            onUpdate={(updatedQuestion) => {
+                              const updatedSections = [...builderData.sections];
+                              updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                            }}
+                            onDelete={() => {
+                              const updatedSections = [...builderData.sections];
+                              updatedSections[sectionIdx].questions = updatedSections[sectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                            }}
+                          />
+                        ))}
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="w-full border-dashed text-blue-600"
+                          onClick={() => {
+                            const newQuestion = {
+                              id: Date.now(),
+                              text: 'Enter your question here...',
+                              marks: 5,
+                              subQuestions: [],
+                              hasOROption: false,
+                              orQuestion: '',
+                              hasImage: false,
+                              imageUrl: null
+                            };
+                            const updatedSections = [...builderData.sections];
+                            updatedSections[sectionIdx].questions.push(newQuestion);
+                            setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                          }}
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Add Question
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -1296,147 +1192,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
           </CardContent>
         </Card>
       )}
-    </div>
-  );
-};
-
-// Draggable Question Component
-const DraggableQuestionCard = ({ question, questionNumber, onUpdate, onDelete, sectionIdx }: any) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: question.id.toString(),
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  return (
-    <div ref={setNodeRef} style={style} className={isDragging ? 'z-50' : ''}>
-      <Card className="border border-gray-200 bg-white hover:shadow-md transition-shadow">
-        <CardContent className="p-4 space-y-4">
-          <div className="flex items-start gap-4">
-            <div className="flex items-center gap-2 mt-1">
-              <div 
-                {...attributes} 
-                {...listeners}
-                className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
-              >
-                <GripVertical className="h-4 w-4 text-gray-400" />
-              </div>
-              <span className="text-sm font-semibold text-gray-600 min-w-[24px]">Q{questionNumber}</span>
-            </div>
-            <div className="flex-1 space-y-3">
-              <div className="flex gap-4">
-                <Textarea
-                  value={question.text}
-                  onChange={(e) => onUpdate({ ...question, text: e.target.value })}
-                  className="flex-1 min-h-[60px] resize-none"
-                  placeholder="Enter question text..."
-                />
-                <div className="space-y-2">
-                  <label className="text-xs text-gray-500">Marks</label>
-                  <Input
-                    type="number"
-                    value={question.marks}
-                    onChange={(e) => onUpdate({ ...question, marks: parseInt(e.target.value) || 0 })}
-                    className="w-20 h-8 text-center"
-                    min="1"
-                  />
-                </div>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onDelete}
-              className="text-red-500 hover:text-red-700"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-// Droppable Section Component  
-const DroppableSection = ({ section, sectionIdx, children, builderData, setBuilderData }: any) => {
-  const {
-    setNodeRef,
-    isOver,
-  } = useSortable({
-    id: `section-${sectionIdx}`,
-  });
-
-  return (
-    <div ref={setNodeRef} className={`${isOver ? 'bg-blue-50 border-blue-300' : ''} transition-colors`}>
-      <Card className="border border-blue-200">
-        <CardHeader className="bg-blue-50 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Input 
-                value={section.title}
-                onChange={(e) => {
-                  const updatedSections = [...builderData.sections];
-                  updatedSections[sectionIdx].title = e.target.value;
-                  setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                }}
-                className="text-sm font-medium bg-white border-blue-300"
-                placeholder="Section Title"
-              />
-            </div>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => {
-                const updatedSections = builderData.sections.filter((_: any, idx: number) => idx !== sectionIdx);
-                setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-              }}
-              className="text-red-500"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        </CardHeader>
-        
-        <CardContent className="p-3 space-y-3">
-          {children}
-          
-          <Button 
-            variant="outline" 
-            size="sm"
-            className="w-full border-dashed text-blue-600"
-            onClick={() => {
-              const newQuestion = {
-                id: Date.now(),
-                text: 'Enter your question here...',
-                marks: 5,
-                subQuestions: [],
-                hasOROption: false,
-                orQuestion: '',
-                hasImage: false,
-                imageUrl: null
-              };
-              const updatedSections = [...builderData.sections];
-              updatedSections[sectionIdx].questions.push(newQuestion);
-              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-            }}
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            Add Question
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   );
 };
