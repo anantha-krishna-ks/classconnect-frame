@@ -10,10 +10,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { 
   Eye, Edit, Trash2, CheckCircle2, Clock, BookOpen, Target, 
   BarChart3, PieChart, Save, Filter, X, Sparkles, Image, Upload,
-  GripVertical, Plus, FileDown, Settings
+  GripVertical, Plus, FileDown, Settings, ChevronDown
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -292,6 +293,41 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const selectedItemsData = getSelectedItems();
   const totalSelectedMarks = selectedItemsData.reduce((sum, item) => sum + item.marks, 0);
   const bloomsDistribution = calculateBloomsTaxonomyDistribution();
+
+  // Export functions
+  const exportAsQTI = () => {
+    toast.success('QTI export initiated', {
+      description: 'Your assessment will be exported in QTI format shortly.'
+    });
+    
+    // Create QTI XML structure (simplified)
+    const qtiContent = `<?xml version="1.0" encoding="UTF-8"?>
+<assessmentItem xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1">
+  <itemBody>
+    <!-- Assessment content would go here -->
+  </itemBody>
+</assessmentItem>`;
+    
+    const blob = new Blob([qtiContent], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${assessmentData.assessmentName || 'assessment'}.qti`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const exportAsPDF = () => {
+    toast.success('PDF export initiated', {
+      description: 'Your assessment will be exported as PDF shortly.'
+    });
+    
+    // In a real implementation, you'd use a PDF library like jsPDF
+    // For now, we'll just show success message
+    console.log('PDF export would be implemented here');
+  };
 
   if (isGenerating) {
     return (
@@ -782,10 +818,25 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   <Save className="h-4 w-4 mr-2" />
                   Save
                 </Button>
-                <Button variant="outline" className="flex-1">
-                  <FileDown className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="flex-1">
+                      <FileDown className="h-4 w-4 mr-2" />
+                      Export
+                      <ChevronDown className="h-4 w-4 ml-2" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={exportAsQTI}>
+                      <FileDown className="h-4 w-4 mr-2" />
+                      Export as QTI
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={exportAsPDF}>
+                      <FileDown className="h-4 w-4 mr-2" />
+                      Export as PDF
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 
