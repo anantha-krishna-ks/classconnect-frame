@@ -886,13 +886,17 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       instruction: `Answer all questions`,
                       questions: items.map((item: any, qIndex: number) => ({
                         id: Date.now() + index * 1000 + qIndex,
+                        question: item.question,
                         text: item.question,
                         marks: item.marks,
+                        options: item.options || [],
+                        correctAnswer: item.correctAnswer,
+                        itemType: item.itemType,
                         subQuestions: [],
                         hasOROption: false,
                         orQuestion: '',
-                        hasImage: false,
-                        imageUrl: null
+                        hasImage: item.hasImage || false,
+                        imageUrl: item.imageUrl || null
                       }))
                     };
                   });
