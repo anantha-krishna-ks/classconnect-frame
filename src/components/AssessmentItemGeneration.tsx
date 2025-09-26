@@ -1155,13 +1155,16 @@ const QuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => 
                         className="flex-1 min-h-[40px] text-sm resize-none"
                         placeholder="Enter sub-question..."
                       />
-                      <Input
-                        type="number"
-                        value={subQ.marks}
-                        onChange={(e) => updateSubQuestion(subIdx, { ...subQ, marks: parseInt(e.target.value) || 0 })}
-                        className="w-16 h-8 text-xs text-center"
-                        min="1"
-                      />
+                      <div className="flex flex-col items-center">
+                        <label className="text-xs text-muted-foreground mb-1">Marks</label>
+                        <Input
+                          type="number"
+                          value={subQ.marks}
+                          onChange={(e) => updateSubQuestion(subIdx, { ...subQ, marks: parseInt(e.target.value) || 0 })}
+                          className="w-16 h-8 text-xs text-center"
+                          min="1"
+                        />
+                      </div>
                       <Button
                         variant="ghost"
                         size="sm"
