@@ -1372,22 +1372,57 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
           </DialogHeader>
           <div className="space-y-6 p-4">
             {/* Paper Header */}
-            <div className="text-center space-y-2 border-b pb-4">
-              <h1 className="text-2xl font-bold">{builderData.schoolName || "INSTITUTION NAME"}</h1>
-              <h2 className="text-xl font-semibold">{builderData.assessmentTitle || "ASSESSMENT TITLE"}</h2>
-              <div className="flex justify-between items-center mt-4">
-                <div>
-                  <p><strong>Subject:</strong> {builderData.subject || "N/A"}</p>
-                  <p><strong>Grade:</strong> {builderData.classGrade || "N/A"}</p>
+            <div className="border-b-2 border-black pb-6 mb-6">
+              {/* Top Section - School Name and Assessment Title */}
+              <div className="text-center space-y-1 mb-4">
+                <h1 className="text-xl font-bold uppercase tracking-wide">
+                  {builderData.schoolName || "EXCEL PUBLIC SCHOOL, MYSURU"}
+                </h1>
+                <h2 className="text-lg font-semibold uppercase">
+                  {builderData.assessmentTitle || "TERM 1 ASSESSMENT"} - {builderData.examDate ? new Date(builderData.examDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase() : "SEPTEMBER 2025"}
+                </h2>
+              </div>
+              
+              {/* Middle Section - Class, Subject, Logo, Marks, Time */}
+              <div className="flex justify-between items-start mb-4">
+                {/* Left Side - Class and Subject */}
+                <div className="space-y-2">
+                  <p className="text-lg font-medium italic">
+                    <span className="font-semibold">Class:</span> {builderData.classGrade || "VII"}
+                  </p>
+                  <p className="text-lg font-medium italic">
+                    <span className="font-semibold">Subject:</span> {builderData.subject?.toUpperCase() || "SCIENCE"}
+                  </p>
                 </div>
-                <div>
-                  <p><strong>Time:</strong> {builderData.timeHours || 0}h {builderData.timeMinutes || 0}m</p>
-                  <p><strong>Total Marks:</strong> {builderData.totalMarks || 0}</p>
-                </div>
-                <div>
-                  <p><strong>Date:</strong> {builderData.examDate || "N/A"}</p>
+                
+                {/* Right Side - Logo, School Name, Marks, Time */}
+                <div className="text-right space-y-1">
+                  {builderData.schoolLogo && (
+                    <div className="mb-2">
+                      <img 
+                        src={builderData.schoolLogo} 
+                        alt="School Logo" 
+                        className="w-12 h-12 mx-auto"
+                      />
+                    </div>
+                  )}
+                  <div className="text-sm font-medium">
+                    <p className="uppercase font-bold">
+                      {builderData.schoolName?.split(',')[0] || "EXCEL"}
+                    </p>
+                    <p className="text-xs lowercase">public school</p>
+                  </div>
+                  <p className="text-lg font-bold">
+                    <span className="font-semibold">Marks:</span> {builderData.totalMarks || "80"}
+                  </p>
+                  <p className="text-lg font-bold">
+                    <span className="font-semibold">Time:</span> {builderData.timeHours || "3"} hours {builderData.timeMinutes ? `${builderData.timeMinutes} minutes` : ''}
+                  </p>
                 </div>
               </div>
+              
+              {/* Bottom border line */}
+              <div className="border-t border-gray-400 pt-2"></div>
             </div>
 
             {/* General Instructions */}
