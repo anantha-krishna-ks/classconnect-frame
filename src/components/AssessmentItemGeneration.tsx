@@ -781,7 +781,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     <label className="text-sm font-semibold">Assessment Title</label>
                     <Input 
                       placeholder="e.g., Annual Examination 2024"
-                      value={builderData.assessmentTitle || ''}
+                      value={builderData.assessmentTitle || assessmentData.assessmentName || ''}
                       onChange={(e) => setBuilderData(prev => ({ ...prev, assessmentTitle: e.target.value }))}
                       className="font-medium"
                     />
@@ -790,7 +790,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     <label className="text-sm font-semibold">Subject</label>
                     <Input 
                       placeholder="e.g., Mathematics / Science"
-                      value={builderData.subject || ''}
+                      value={builderData.subject || assessmentData.subject || ''}
                       onChange={(e) => setBuilderData(prev => ({ ...prev, subject: e.target.value }))}
                     />
                   </div>
@@ -798,7 +798,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     <label className="text-sm font-semibold">Class/Grade</label>
                     <Input 
                       placeholder="e.g., Class X / Grade 10"
-                      value={builderData.classGrade || ''}
+                      value={builderData.classGrade || assessmentData.grade || ''}
                       onChange={(e) => setBuilderData(prev => ({ ...prev, classGrade: e.target.value }))}
                     />
                   </div>
