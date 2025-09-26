@@ -1086,8 +1086,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       className="h-12"
                     />
                   </div>
-                  <div className="flex flex-col justify-end gap-2">
-                  </div>
                 </div>
               </CardContent>
             </Card>
