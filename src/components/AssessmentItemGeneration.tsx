@@ -1390,25 +1390,25 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   <p className="text-lg font-medium italic">
                     <span className="font-semibold">Class:</span> {builderData.classGrade || "VII"}
                   </p>
-                  <div className="flex items-center gap-8">
+                  <div className="text-right">
                     {builderData.schoolLogo && (
-                      <img 
-                        src={builderData.schoolLogo} 
-                        alt="School Logo" 
-                        className="w-12 h-12"
-                      />
-                    )}
-                    <div className="text-right">
-                      <div className="text-sm font-medium mb-1">
-                        <p className="uppercase font-bold">
-                          {builderData.schoolName?.split(',')[0] || "EXCEL"}
-                        </p>
-                        <p className="text-xs lowercase">public school</p>
+                      <div className="flex justify-end mb-2">
+                        <img 
+                          src={builderData.schoolLogo} 
+                          alt="School Logo" 
+                          className="w-12 h-12"
+                        />
                       </div>
-                      <p className="text-lg font-bold">
-                        <span className="font-semibold">Marks:</span> {builderData.totalMarks || "80"}
+                    )}
+                    <div className="text-sm font-medium mb-1">
+                      <p className="uppercase font-bold">
+                        {builderData.schoolName?.split(',')[0] || "EXCEL"}
                       </p>
+                      <p className="text-xs lowercase">public school</p>
                     </div>
+                    <p className="text-lg font-bold">
+                      <span className="font-semibold">Marks:</span> {builderData.totalMarks || "80"}
+                    </p>
                   </div>
                 </div>
                 
