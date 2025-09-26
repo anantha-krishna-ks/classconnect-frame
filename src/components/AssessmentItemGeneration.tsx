@@ -1260,10 +1260,10 @@ const QuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => 
                           />
                         </div>
                       ) : (
-                        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-dashed border-purple-300 rounded-lg p-4">
+                        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-dashed border-purple-300 rounded-lg p-2">
                           <div className="text-center">
-                            <Upload className="h-6 w-6 text-purple-500 mx-auto mb-2" />
-                            <p className="text-xs text-purple-600 mb-2 font-medium">Add image to this sub-question</p>
+                            <Upload className="h-4 w-4 text-purple-500 mx-auto mb-1" />
+                            <p className="text-xs text-purple-600 mb-1 font-medium">Add image</p>
                             <input
                               type="file"
                               accept="image/*"
