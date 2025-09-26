@@ -58,7 +58,12 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
       : '',
     numberingStyle: 'continuous',
     generalInstructions: 'Read all instructions carefully before attempting the questions.',
-    sections: [] as any[]
+    sections: [] as any[],
+    assessmentTitle: '',
+    subject: '',
+    classGrade: '',
+    timeHours: '',
+    examDate: ''
   });
   const [historicalQuestions] = useState<GeneratedItem[]>([
     {
@@ -764,221 +769,230 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
           </CardHeader>
           <CardContent className="space-y-8 p-8">
             
-            {/* Top Controls */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-lg border">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Total Marks</label>
-                <Input 
-                  type="number"
-                  placeholder="100"
-                  value={builderData.totalMarks}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setBuilderData(prev => ({ ...prev, totalMarks: value }));
-                    updateAssessmentData({ marks: value });
-                  }}
-                  className="h-10"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Total Time (mins)</label>
-                <Input 
-                  type="number"
-                  placeholder="180"
-                  value={builderData.totalTime}
-                  onChange={(e) => {
-                    const totalMinutes = parseInt(e.target.value) || 0;
-                    const hours = Math.floor(totalMinutes / 60);
-                    const minutes = totalMinutes % 60;
-                    const durationFormat = `${hours}:${minutes.toString().padStart(2, '0')}`;
-                    
-                    setBuilderData(prev => ({ ...prev, totalTime: e.target.value }));
-                    updateAssessmentData({ duration: durationFormat });
-                  }}
-                  className="h-10"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-muted-foreground">Question Numbering</label>
-                <Select 
-                  value={builderData.numberingStyle}
-                  onValueChange={(value) => setBuilderData(prev => ({ ...prev, numberingStyle: value }))}
-                >
-                  <SelectTrigger className="h-10">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="continuous">Continuous Numbering</SelectItem>
-                    <SelectItem value="reset">Reset per Section</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex gap-2">
-                <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white flex-1">
-                  <Save className="h-4 w-4 mr-2" />
-                  Save
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="flex-1">
-                      <FileDown className="h-4 w-4 mr-2" />
-                      Export
-                      <ChevronDown className="h-4 w-4 ml-2" />
+            {/* Assessment Header Configuration */}
+            <Card className="border border-slate-300 bg-gradient-to-r from-slate-50 to-gray-50">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-center">Assessment Paper Configuration</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Basic Details */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">Assessment Title</label>
+                    <Input 
+                      placeholder="e.g., Annual Examination 2024"
+                      value={builderData.assessmentTitle || ''}
+                      onChange={(e) => setBuilderData(prev => ({ ...prev, assessmentTitle: e.target.value }))}
+                      className="font-medium"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">Subject</label>
+                    <Input 
+                      placeholder="e.g., Mathematics / Science"
+                      value={builderData.subject || ''}
+                      onChange={(e) => setBuilderData(prev => ({ ...prev, subject: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold">Class/Grade</label>
+                    <Input 
+                      placeholder="e.g., Class X / Grade 10"
+                      value={builderData.classGrade || ''}
+                      onChange={(e) => setBuilderData(prev => ({ ...prev, classGrade: e.target.value }))}
+                    />
+                  </div>
+                </div>
+                
+                {/* Time & Marks */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-white rounded-lg border">
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-blue-700">Total Marks</label>
+                    <Input 
+                      type="number"
+                      placeholder="100"
+                      value={builderData.totalMarks}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setBuilderData(prev => ({ ...prev, totalMarks: value }));
+                        updateAssessmentData({ marks: value });
+                      }}
+                      className="h-12 text-lg font-bold text-center text-blue-700"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-green-700">Time (Hours)</label>
+                    <Input 
+                      type="number"
+                      step="0.5"
+                      placeholder="3"
+                      value={builderData.timeHours || ''}
+                      onChange={(e) => setBuilderData(prev => ({ ...prev, timeHours: e.target.value }))}
+                      className="h-12 text-lg font-bold text-center text-green-700"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-purple-700">Date</label>
+                    <Input 
+                      type="date"
+                      value={builderData.examDate || ''}
+                      onChange={(e) => setBuilderData(prev => ({ ...prev, examDate: e.target.value }))}
+                      className="h-12"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-end gap-2">
+                    <Button className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white h-12">
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Paper
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem onClick={exportAsQTI}>
-                      <FileDown className="h-4 w-4 mr-2" />
-                      Export as QTI
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={exportAsPDF}>
-                      <FileDown className="h-4 w-4 mr-2" />
-                      Export as PDF
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* General Instructions */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                General Instructions
-              </h3>
-              <Card className="border border-blue-200 bg-blue-50/30">
-                <CardContent className="p-4">
-                  <Textarea
-                    value={builderData.generalInstructions}
-                    onChange={(e) => setBuilderData(prev => ({ ...prev, generalInstructions: e.target.value }))}
-                    className="min-h-[80px] border-0 bg-transparent resize-none focus:ring-0"
-                    placeholder="Enter general instructions for the assessment..."
-                  />
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="border border-blue-200 bg-blue-50/50">
+              <CardHeader>
+                <CardTitle className="text-lg font-semibold text-blue-800">General Instructions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={builderData.generalInstructions}
+                  onChange={(e) => setBuilderData(prev => ({ ...prev, generalInstructions: e.target.value }))}
+                  className="min-h-[120px] border-blue-200 bg-white font-medium"
+                  placeholder="1. Read all instructions carefully before attempting the questions.&#10;2. Answer all questions.&#10;3. All questions are compulsory.&#10;4. Use blue or black pen only."
+                />
+              </CardContent>
+            </Card>
 
-            {/* Sections */}
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Assessment Sections</h3>
-                <Button 
-                  onClick={() => {
-                    const newSection = {
-                      id: Date.now(),
-                      title: `SECTION - ${String.fromCharCode(65 + builderData.sections.length)}`,
-                      questions: selectedItemsData.slice(0, Math.min(3, selectedItemsData.length)).map((item, idx) => ({
-                        id: Date.now() + idx,
-                        text: item.question,
-                        marks: item.marks,
-                        subQuestions: []
-                      }))
-                    };
-                    setBuilderData(prev => ({ 
-                      ...prev, 
-                      sections: [...prev.sections, newSection] 
-                    }));
-                  }}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Section
-                </Button>
-              </div>
+            {/* Assessment Preview */}
+            <Card className="border-2 border-gray-400 bg-white">
+              <CardHeader className="text-center border-b border-gray-300 bg-gray-50">
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-bold uppercase tracking-wide">{builderData.assessmentTitle || 'ASSESSMENT PAPER'}</h2>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="font-semibold">Subject: {builderData.subject || '________'}</span>
+                    <span className="font-semibold">Class: {builderData.classGrade || '________'}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span>Time: {builderData.timeHours || '__'} Hours</span>
+                    <span>Maximum Marks: {builderData.totalMarks || '__'}</span>
+                    <span>Date: {builderData.examDate || '__________'}</span>
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent className="p-6 space-y-6">
+                {/* Instructions Box */}
+                <div className="border border-gray-300 p-4 bg-gray-50/50">
+                  <h4 className="font-bold mb-2">GENERAL INSTRUCTIONS:</h4>
+                  <div className="text-sm whitespace-pre-line">
+                    {builderData.generalInstructions || 'No instructions added yet.'}
+                  </div>
+                </div>
 
-              {builderData.sections.length === 0 ? (
-                <Card className="border-2 border-dashed border-gray-300 bg-gray-50">
-                  <CardContent className="p-12 text-center">
-                    <div className="space-y-4">
-                      <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto">
-                        <Plus className="h-8 w-8 text-gray-400" />
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-medium text-gray-700">No sections created yet</h4>
-                        <p className="text-sm text-gray-500 mt-1">Add your first section to start building the assessment</p>
-                      </div>
-                      <Button 
-                        onClick={() => {
-                          const newSection = {
-                            id: Date.now(),
-                            title: 'SECTION - A',
-                            questions: selectedItemsData.slice(0, Math.min(3, selectedItemsData.length)).map((item, idx) => ({
-                              id: Date.now() + idx,
-                              text: item.question,
-                              marks: item.marks,
-                              subQuestions: []
-                            }))
-                          };
-                          setBuilderData(prev => ({ 
-                            ...prev, 
-                            sections: [newSection] 
-                          }));
-                        }}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add First Section
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="space-y-6">
-                  {builderData.sections.map((section, sectionIdx) => (
-                    <Card key={section.id} className="border border-purple-200 bg-purple-50/30">
-                      <CardHeader className="pb-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <Input
-                              value={section.title}
-                              onChange={(e) => {
-                                const updatedSections = [...builderData.sections];
-                                updatedSections[sectionIdx].title = e.target.value;
-                                setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                              }}
-                              className="text-lg font-semibold border-purple-300 bg-white/70"
-                            />
-                            <Badge className="bg-purple-100 text-purple-700">
-                              {section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0)} marks
-                            </Badge>
+                {/* Sections */}
+                <div className="space-y-8">
+                  {builderData.sections.map((section: any, sectionIdx: number) => (
+                    <div key={section.id} className="space-y-4">
+                      {/* Section Header */}
+                      <div className="flex items-center justify-between border-b-2 border-gray-400 pb-2">
+                        <div className="space-y-1">
+                          <h3 className="text-xl font-bold uppercase tracking-wider">
+                            {section.title}
+                          </h3>
+                          <p className="text-sm font-medium">
+                            ({section.instruction || 'Answer all questions'})
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium">
+                            [{section.questionsCount || section.questions.length} × {section.marksPerQuestion || 'varies'} = {section.totalMarks || section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0)}]
                           </div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => {
-                              const updatedSections = builderData.sections.filter((_, idx) => idx !== sectionIdx);
+                        </div>
+                      </div>
+
+                      {/* Section Controls */}
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium">Section Instruction</label>
+                          <Input 
+                            placeholder="Answer all questions"
+                            value={section.instruction || ''}
+                            onChange={(e) => {
+                              const updatedSections = [...builderData.sections];
+                              updatedSections[sectionIdx].instruction = e.target.value;
                               setBuilderData(prev => ({ ...prev, sections: updatedSections }));
                             }}
-                            className="text-red-500 hover:text-red-700 hover:bg-red-100"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                            className="h-8 text-sm"
+                          />
                         </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium">Questions Count</label>
+                          <Input 
+                            type="number"
+                            placeholder="Auto"
+                            value={section.questionsCount || ''}
+                            onChange={(e) => {
+                              const updatedSections = [...builderData.sections];
+                              updatedSections[sectionIdx].questionsCount = e.target.value;
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                            }}
+                            className="h-8 text-sm text-center"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium">Marks/Question</label>
+                          <Input 
+                            placeholder="varies"
+                            value={section.marksPerQuestion || ''}
+                            onChange={(e) => {
+                              const updatedSections = [...builderData.sections];
+                              updatedSections[sectionIdx].marksPerQuestion = e.target.value;
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                            }}
+                            className="h-8 text-sm text-center"
+                          />
+                        </div>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            const updatedSections = builderData.sections.filter((_, idx) => idx !== sectionIdx);
+                            setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                          }}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-100 h-8"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+
+                      {/* Questions */}
+                      <div className="space-y-4 pl-4">
                         {section.questions.map((question: any, questionIdx: number) => (
-                           <QuestionCard
-                             key={question.id}
-                             question={question}
-                             questionNumber={builderData.numberingStyle === 'continuous' 
-                               ? builderData.sections.slice(0, sectionIdx).reduce((sum, s) => sum + s.questions.length, 0) + questionIdx + 1
-                               : questionIdx + 1
-                             }
-                             onUpdate={(updatedQuestion) => {
-                               const updatedSections = [...builderData.sections];
-                               updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
-                               setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                             }}
-                             onDelete={() => {
-                               const updatedSections = [...builderData.sections];
-                               updatedSections[sectionIdx].questions = updatedSections[sectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
-                               setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                             }}
-                           />
+                          <ExamQuestionCard
+                            key={question.id}
+                            question={question}
+                            questionNumber={builderData.numberingStyle === 'continuous' 
+                              ? builderData.sections.slice(0, sectionIdx).reduce((sum, s) => sum + s.questions.length, 0) + questionIdx + 1
+                              : questionIdx + 1
+                            }
+                            onUpdate={(updatedQuestion) => {
+                              const updatedSections = [...builderData.sections];
+                              updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                            }}
+                            onDelete={() => {
+                              const updatedSections = [...builderData.sections];
+                              updatedSections[sectionIdx].questions = updatedSections[sectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                            }}
+                          />
                         ))}
+                        
                         <Button 
                           variant="outline" 
-                          className="w-full border-dashed border-purple-300 text-purple-600 hover:bg-purple-100"
+                          className="w-full border-dashed border-blue-300 text-blue-600 hover:bg-blue-50"
                           onClick={() => {
                             const availableItems = selectedItemsData.filter(item => 
                               !builderData.sections.some(s => 
@@ -990,7 +1004,9 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                                 id: Date.now(),
                                 text: availableItems[0].question,
                                 marks: availableItems[0].marks,
-                                subQuestions: []
+                                subQuestions: [],
+                                hasOROption: false,
+                                orQuestion: ''
                               };
                               const updatedSections = [...builderData.sections];
                               updatedSections[sectionIdx].questions.push(newQuestion);
@@ -1001,15 +1017,197 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                           <Plus className="h-4 w-4 mr-2" />
                           Add Question
                         </Button>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
                   ))}
+                  
+                  {/* Add Section Button */}
+                  <div className="text-center pt-4 border-t border-gray-300">
+                    <Button 
+                      onClick={() => {
+                        const newSection = {
+                          id: Date.now(),
+                          title: `SECTION - ${String.fromCharCode(65 + builderData.sections.length)}`,
+                          instruction: 'Answer all questions',
+                          questions: [],
+                          questionsCount: '',
+                          marksPerQuestion: '',
+                          totalMarks: ''
+                        };
+                        setBuilderData(prev => ({ 
+                          ...prev, 
+                          sections: [...prev.sections, newSection] 
+                        }));
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add New Section
+                    </Button>
+                  </div>
                 </div>
-              )}
-            </div>
+              </CardContent>
+            </Card>
+
+            {/* Export Options */}
+            <Card className="border border-green-200 bg-green-50/30">
+              <CardHeader>
+                <CardTitle className="text-green-800">Export Assessment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-4">
+                  <Button 
+                    onClick={exportAsPDF}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    <FileDown className="h-4 w-4 mr-2" />
+                    Export as PDF
+                  </Button>
+                  <Button 
+                    onClick={exportAsQTI}
+                    variant="outline"
+                  >
+                    <FileDown className="h-4 w-4 mr-2" />
+                    Export as QTI
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </CardContent>
         </Card>
       )}
+    </div>
+  );
+};
+
+// Exam Question Card Component for Assessment Preview
+const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => {
+  const [showOROption, setShowOROption] = useState(false);
+  
+  return (
+    <div className="space-y-3 border-l-4 border-gray-400 pl-4">
+      <div className="flex items-start gap-4">
+        <span className="font-bold text-lg min-w-[40px] mt-1">{questionNumber})</span>
+        <div className="flex-1 space-y-2">
+          <div className="flex gap-4">
+            <Textarea
+              value={question.text}
+              onChange={(e) => onUpdate({ ...question, text: e.target.value })}
+              className="flex-1 min-h-[60px] resize-none font-medium border-gray-300"
+              placeholder="Enter question text..."
+            />
+            <div className="flex flex-col gap-2">
+              <div className="text-center">
+                <label className="text-xs text-gray-600">Marks</label>
+                <Input
+                  type="number"
+                  value={question.marks}
+                  onChange={(e) => onUpdate({ ...question, marks: parseInt(e.target.value) || 0 })}
+                  className="w-16 h-8 text-center font-bold"
+                  min="1"
+                />
+              </div>
+              <div className="text-right">
+                <div className="text-sm font-bold border border-gray-400 px-2 py-1 rounded">
+                  [{question.marks}]
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Sub-questions */}
+          {question.subQuestions && question.subQuestions.length > 0 && (
+            <div className="ml-4 space-y-2 border-l-2 border-gray-300 pl-4">
+              {question.subQuestions.map((subQ: any, subIdx: number) => (
+                <div key={subQ.id} className="flex items-start gap-2">
+                  <span className="font-medium min-w-[20px] mt-2">{['i)', 'ii)', 'iii)', 'iv)', 'v)'][subIdx] || `${subIdx + 1})`}</span>
+                  <Textarea
+                    value={subQ.text}
+                    onChange={(e) => {
+                      const updatedSubQuestions = [...(question.subQuestions || [])];
+                      updatedSubQuestions[subIdx] = { ...subQ, text: e.target.value };
+                      onUpdate({ ...question, subQuestions: updatedSubQuestions });
+                    }}
+                    className="flex-1 min-h-[40px] text-sm resize-none"
+                    placeholder="Enter sub-question..."
+                  />
+                  <div className="text-right mt-1">
+                    <Input
+                      type="number"
+                      value={subQ.marks}
+                      onChange={(e) => {
+                        const updatedSubQuestions = [...(question.subQuestions || [])];
+                        updatedSubQuestions[subIdx] = { ...subQ, marks: parseInt(e.target.value) || 0 };
+                        onUpdate({ ...question, subQuestions: updatedSubQuestions });
+                      }}
+                      className="w-12 h-6 text-xs text-center"
+                      min="1"
+                    />
+                    <div className="text-xs font-medium mt-1">
+                      [{subQ.marks}]
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {/* OR Option */}
+          {question.hasOROption && (
+            <div className="ml-4 space-y-2 border-l-2 border-orange-300 pl-4 bg-orange-50/50 p-2 rounded">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-center bg-orange-200 px-2 py-1 rounded text-sm">OR</span>
+              </div>
+              <Textarea
+                value={question.orQuestion || ''}
+                onChange={(e) => onUpdate({ ...question, orQuestion: e.target.value })}
+                className="w-full min-h-[60px] resize-none bg-white"
+                placeholder="Enter alternative question..."
+              />
+            </div>
+          )}
+          
+          {/* Controls */}
+          <div className="flex gap-2 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const newSubQuestion = {
+                  id: Date.now(),
+                  text: 'New sub-question',
+                  marks: 1
+                };
+                onUpdate({
+                  ...question,
+                  subQuestions: [...(question.subQuestions || []), newSubQuestion]
+                });
+              }}
+              className="text-blue-600 border-blue-300 hover:bg-blue-50"
+            >
+              <Plus className="h-3 w-3 mr-1" />
+              Add Sub-question
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onUpdate({ ...question, hasOROption: !question.hasOROption })}
+              className="text-orange-600 border-orange-300 hover:bg-orange-50"
+            >
+              {question.hasOROption ? 'Remove OR' : 'Add OR'}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onDelete}
+              className="text-red-500 hover:text-red-700 hover:bg-red-100"
+            >
+              <Trash2 className="h-3 w-3 mr-1" />
+              Delete
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
