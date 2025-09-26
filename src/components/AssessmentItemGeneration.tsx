@@ -1199,137 +1199,133 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     </Button>
                   </div>
 
-                  {builderData.sections.map((section: any, sectionIdx: number) => (
-                    <Card key={section.id} className="border border-blue-200">
-                      <CardHeader className="bg-blue-50 py-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <Input 
-                              value={section.title}
-                              onChange={(e) => {
-                                const updatedSections = [...builderData.sections];
-                                updatedSections[sectionIdx].title = e.target.value;
-                                setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                              }}
-                              className="font-bold text-sm w-32"
-                            />
-                            <Input 
-                              placeholder="Instructions"
-                              value={section.instruction || ''}
-                              onChange={(e) => {
-                                const updatedSections = [...builderData.sections];
-                                updatedSections[sectionIdx].instruction = e.target.value;
-                                setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                              }}
-                              className="text-sm flex-1"
-                            />
-                          </div>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => {
-                              const updatedSections = builderData.sections.filter((_, idx) => idx !== sectionIdx);
-                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                            }}
-                            className="text-red-500"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardHeader>
-                      
-                      <CardContent className="p-3">
-                        <DndContext
-                          sensors={sensors}
-                          collisionDetection={closestCenter}
-                          onDragStart={handleDragStart}
-                          onDragOver={handleDragOver}
-                          onDragEnd={(event) => {
-                            const { active, over } = event;
-                            setActiveId(null);
-                            setIsDragOverlay(false);
+                  {/* Global DndContext for cross-section drag and drop */}
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragStart={handleDragStart}
+                    onDragOver={(event) => {
+                      const { active, over } = event;
+                      if (!over) return;
 
-                            if (!over || active.id === over.id) return;
+                      const activeId = active.id as string;
+                      const overId = over.id as string;
 
-                            const activeIndex = section.questions.findIndex((q: any) => q.id === active.id);
-                            const overIndex = section.questions.findIndex((q: any) => q.id === over.id);
+                      if (activeId === overId) return;
 
-                            if (activeIndex !== -1 && overIndex !== -1) {
-                              const reorderedQuestions = arrayMove(section.questions, activeIndex, overIndex);
-                              
-                              const updatedSections = [...builderData.sections];
-                              updatedSections[sectionIdx].questions = reorderedQuestions;
-                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                              
-                              toast.success('Question reordered successfully');
-                            }
-                          }}
-                        >
-                          <SortableContext items={section.questions.map((q: any) => q.id)} strategy={verticalListSortingStrategy}>
-                            <div className="space-y-3">
-                              {section.questions.map((question: any, questionIdx: number) => (
-                                <DraggableExamQuestionCard
-                                  key={question.id}
-                                  question={question}
-                                  questionNumber={
-                                    builderData.numberingStyle === 'continuous' 
-                                      ? builderData.sections.slice(0, sectionIdx).reduce((sum, s) => sum + s.questions.length, 0) + questionIdx + 1
-                                      : questionIdx + 1
-                                  }
-                                  onUpdate={(updatedQuestion) => {
-                                    const updatedSections = [...builderData.sections];
-                                    updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
-                                    setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                                  }}
-                                  onDelete={() => {
-                                    const updatedSections = [...builderData.sections];
-                                    updatedSections[sectionIdx].questions = updatedSections[sectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
-                                    setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                                  }}
-                                />
-                              ))}
-                            </div>
-                          </SortableContext>
-                          
-                          <DragOverlay>
-                            {activeId ? (
-                              <ExamQuestionCard
-                                question={section.questions.find((q: any) => q.id === activeId) || {}}
-                                questionNumber="•"
-                                onUpdate={() => {}}
-                                onDelete={() => {}}
-                                isDragOverlay={true}
-                              />
-                            ) : null}
-                          </DragOverlay>
-                        </DndContext>
+                      // Find which sections contain the active and over items
+                      let activeSection = null;
+                      let overSection = null;
+                      let activeIndex = -1;
+                      let overIndex = -1;
+
+                      builderData.sections.forEach((section, sectionIdx) => {
+                        const activeIdx = section.questions.findIndex((q: any) => q.id === activeId);
+                        const overIdx = section.questions.findIndex((q: any) => q.id === overId);
                         
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="w-full border-dashed text-blue-600 mt-4"
-                          onClick={() => {
-                            const newQuestion = {
-                              id: Date.now(),
-                              text: 'Enter your question here...',
-                              marks: 5,
-                              subQuestions: [],
-                              hasOROption: false,
-                              orQuestion: '',
-                              hasImage: false,
-                              imageUrl: null
-                            };
-                            const updatedSections = [...builderData.sections];
-                            updatedSections[sectionIdx].questions.push(newQuestion);
-                            setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                          }}
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add Question
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        if (activeIdx !== -1) {
+                          activeSection = sectionIdx;
+                          activeIndex = activeIdx;
+                        }
+                        if (overIdx !== -1) {
+                          overSection = sectionIdx;
+                          overIndex = overIdx;
+                        }
+                      });
+
+                      // If dragging to a different section, move the question
+                      if (activeSection !== null && overSection !== null && activeSection !== overSection) {
+                        const updatedSections = [...builderData.sections];
+                        const activeQuestion = updatedSections[activeSection].questions[activeIndex];
+                        
+                        // Remove from active section
+                        updatedSections[activeSection].questions.splice(activeIndex, 1);
+                        
+                        // Add to over section at the right position
+                        updatedSections[overSection].questions.splice(overIndex, 0, activeQuestion);
+                        
+                        setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                      }
+                    }}
+                    onDragEnd={(event) => {
+                      const { active, over } = event;
+                      setActiveId(null);
+                      setIsDragOverlay(false);
+
+                      if (!over || active.id === over.id) return;
+
+                      const activeId = active.id as string;
+                      const overId = over.id as string;
+
+                      // Find sections and indices
+                      let activeSection = null;
+                      let overSection = null;
+                      let activeIndex = -1;
+                      let overIndex = -1;
+
+                      builderData.sections.forEach((section, sectionIdx) => {
+                        const activeIdx = section.questions.findIndex((q: any) => q.id === activeId);
+                        const overIdx = section.questions.findIndex((q: any) => q.id === overId);
+                        
+                        if (activeIdx !== -1) {
+                          activeSection = sectionIdx;
+                          activeIndex = activeIdx;
+                        }
+                        if (overIdx !== -1) {
+                          overSection = sectionIdx;
+                          overIndex = overIdx;
+                        }
+                      });
+
+                      if (activeSection !== null && overSection !== null) {
+                        const updatedSections = [...builderData.sections];
+                        
+                        if (activeSection === overSection) {
+                          // Reorder within same section
+                          const reorderedQuestions = arrayMove(updatedSections[activeSection].questions, activeIndex, overIndex);
+                          updatedSections[activeSection].questions = reorderedQuestions;
+                        } else {
+                          // Move between sections (already handled in onDragOver, but ensure final position)
+                          const activeQuestion = updatedSections[activeSection].questions[activeIndex];
+                          updatedSections[activeSection].questions.splice(activeIndex, 1);
+                          updatedSections[overSection].questions.splice(overIndex, 0, activeQuestion);
+                        }
+                        
+                        setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                        toast.success(activeSection === overSection ? 'Question reordered successfully' : 'Question moved to different section');
+                      }
+                    }}
+                  >
+                    {/* Create sortable context with all questions across all sections */}
+                    <SortableContext 
+                      items={builderData.sections.flatMap(section => section.questions.map((q: any) => q.id))} 
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {builderData.sections.map((section: any, sectionIdx: number) => (
+                        <DroppableSectionCard
+                          key={section.id}
+                          section={section}
+                          sectionIdx={sectionIdx}
+                          builderData={builderData}
+                          setBuilderData={setBuilderData}
+                        />
+                      ))}
+                    </SortableContext>
+                    
+                    <DragOverlay>
+                      {activeId ? (
+                        <div className="rotate-3 scale-105">
+                          <ExamQuestionCard
+                            question={builderData.sections.flatMap(s => s.questions).find((q: any) => q.id === activeId) || {}}
+                            questionNumber="•"
+                            onUpdate={() => {}}
+                            onDelete={() => {}}
+                            isDragOverlay={true}
+                          />
+                        </div>
+                      ) : null}
+                    </DragOverlay>
+                  </DndContext>
                 </div>
               </CardContent>
             </Card>
@@ -1365,7 +1361,107 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   );
 };
 
-// Draggable Exam Question Card Component for Assessment Builder
+// Droppable Section Card Component
+const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData }: any) => {
+  return (
+    <Card className="border border-blue-200 transition-all duration-200 hover:border-blue-300">
+      <CardHeader className="bg-blue-50 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Input 
+              value={section.title}
+              onChange={(e) => {
+                const updatedSections = [...builderData.sections];
+                updatedSections[sectionIdx].title = e.target.value;
+                setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+              }}
+              className="font-bold text-sm w-32"
+            />
+            <Input 
+              placeholder="Instructions"
+              value={section.instruction || ''}
+              onChange={(e) => {
+                const updatedSections = [...builderData.sections];
+                updatedSections[sectionIdx].instruction = e.target.value;
+                setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+              }}
+              className="text-sm flex-1"
+            />
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => {
+              const updatedSections = builderData.sections.filter((_: any, idx: number) => idx !== sectionIdx);
+              setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+            }}
+            className="text-red-500"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="p-3 min-h-[100px] border-2 border-dashed border-transparent hover:border-blue-200 transition-all duration-200">
+        <div className="space-y-3">
+          {section.questions.map((question: any, questionIdx: number) => (
+            <DraggableExamQuestionCard
+              key={question.id}
+              question={question}
+              questionNumber={
+                builderData.numberingStyle === 'continuous' 
+                  ? builderData.sections.slice(0, sectionIdx).reduce((sum: number, s: any) => sum + s.questions.length, 0) + questionIdx + 1
+                  : questionIdx + 1
+              }
+              onUpdate={(updatedQuestion: any) => {
+                const updatedSections = [...builderData.sections];
+                updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
+                setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+              }}
+              onDelete={() => {
+                const updatedSections = [...builderData.sections];
+                updatedSections[sectionIdx].questions = updatedSections[sectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
+                setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+              }}
+            />
+          ))}
+          
+          {section.questions.length === 0 && (
+            <div className="text-center py-8 text-gray-400 text-sm">
+              Drop questions here or click "Add Question" to create new ones
+            </div>
+          )}
+        </div>
+        
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="w-full border-dashed text-blue-600 mt-4"
+          onClick={() => {
+            const newQuestion = {
+              id: Date.now(),
+              text: 'Enter your question here...',
+              marks: 5,
+              subQuestions: [],
+              hasOROption: false,
+              orQuestion: '',
+              hasImage: false,
+              imageUrl: null
+            };
+            const updatedSections = [...builderData.sections];
+            updatedSections[sectionIdx].questions.push(newQuestion);
+            setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+          }}
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          Add Question
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+// Draggable Exam Question Card Component for Assessment Builder  
 const DraggableExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => {
   const {
     attributes,
@@ -1395,6 +1491,7 @@ const DraggableExamQuestionCard = ({ question, questionNumber, onUpdate, onDelet
     </div>
   );
 };
+
 
 // Exam Question Card Component for Assessment Preview
 const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHandleProps, isDragging, isDragOverlay }: any) => {
