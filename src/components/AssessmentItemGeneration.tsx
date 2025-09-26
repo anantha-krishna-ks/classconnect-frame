@@ -866,117 +866,100 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             </Card>
 
             {/* Assessment Preview */}
-            <Card className="border-2 border-gray-400 bg-white">
-              <CardHeader className="text-center border-b border-gray-300 bg-gray-50">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-bold uppercase tracking-wide">{builderData.assessmentTitle || 'ASSESSMENT PAPER'}</h2>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="font-semibold">Subject: {builderData.subject || '________'}</span>
-                    <span className="font-semibold">Class: {builderData.classGrade || '________'}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span>Time: {builderData.timeHours || '__'} Hours</span>
-                    <span>Maximum Marks: {builderData.totalMarks || '__'}</span>
-                    <span>Date: {builderData.examDate || '__________'}</span>
-                  </div>
-                </div>
+            <Card className="border border-border bg-card">
+              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b">
+                <CardTitle className="text-center">Assessment Paper Preview</CardTitle>
               </CardHeader>
               
-              <CardContent className="p-6 space-y-6">
-                {/* Instructions Box */}
-                <div className="border border-gray-300 p-4 bg-gray-50/50">
-                  <h4 className="font-bold mb-2">GENERAL INSTRUCTIONS:</h4>
-                  <div className="text-sm whitespace-pre-line">
-                    {builderData.generalInstructions || 'No instructions added yet.'}
+              <CardContent className="p-4 space-y-6">
+                {/* Paper Header Preview */}
+                <Card className="border-2 border-gray-800">
+                  <CardHeader className="text-center bg-gray-50 border-b-2 border-gray-800">
+                    <h2 className="text-xl font-bold uppercase">{builderData.assessmentTitle || 'ASSESSMENT PAPER'}</h2>
+                    <div className="grid grid-cols-2 gap-4 text-sm mt-2">
+                      <div>Subject: {builderData.subject || '____'}</div>
+                      <div>Class: {builderData.classGrade || '____'}</div>
+                      <div>Time: {builderData.timeHours || '__'} Hours</div>
+                      <div>Max Marks: {builderData.totalMarks || '__'}</div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-3">
+                    <div className="text-xs">
+                      <strong>Instructions:</strong> {builderData.generalInstructions || 'Read all questions carefully.'}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Sections Management */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Question Sections</h3>
+                    <Button 
+                      onClick={() => {
+                        const newSection = {
+                          id: Date.now(),
+                          title: `SECTION ${String.fromCharCode(65 + builderData.sections.length)}`,
+                          instruction: 'Answer all questions',
+                          questions: []
+                        };
+                        setBuilderData(prev => ({ 
+                          ...prev, 
+                          sections: [...prev.sections, newSection] 
+                        }));
+                      }}
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Section
+                    </Button>
                   </div>
-                </div>
 
-                {/* Sections */}
-                <div className="space-y-8">
                   {builderData.sections.map((section: any, sectionIdx: number) => (
-                    <div key={section.id} className="space-y-4">
-                      {/* Section Header */}
-                      <div className="flex items-center justify-between border-b-2 border-gray-400 pb-2">
-                        <div className="space-y-1">
-                          <h3 className="text-xl font-bold uppercase tracking-wider">
-                            {section.title}
-                          </h3>
-                          <p className="text-sm font-medium">
-                            ({section.instruction || 'Answer all questions'})
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium">
-                            [{section.questionsCount || section.questions.length} × {section.marksPerQuestion || 'varies'} = {section.totalMarks || section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0)}]
+                    <Card key={section.id} className="border border-blue-200">
+                      <CardHeader className="bg-blue-50 py-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Input 
+                              value={section.title}
+                              onChange={(e) => {
+                                const updatedSections = [...builderData.sections];
+                                updatedSections[sectionIdx].title = e.target.value;
+                                setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                              }}
+                              className="font-bold text-sm w-32"
+                            />
+                            <Input 
+                              placeholder="Instructions"
+                              value={section.instruction || ''}
+                              onChange={(e) => {
+                                const updatedSections = [...builderData.sections];
+                                updatedSections[sectionIdx].instruction = e.target.value;
+                                setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                              }}
+                              className="text-sm flex-1"
+                            />
                           </div>
-                        </div>
-                      </div>
-
-                      {/* Section Controls */}
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                        <div className="space-y-1">
-                          <label className="text-xs font-medium">Section Instruction</label>
-                          <Input 
-                            placeholder="Answer all questions"
-                            value={section.instruction || ''}
-                            onChange={(e) => {
-                              const updatedSections = [...builderData.sections];
-                              updatedSections[sectionIdx].instruction = e.target.value;
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              const updatedSections = builderData.sections.filter((_, idx) => idx !== sectionIdx);
                               setBuilderData(prev => ({ ...prev, sections: updatedSections }));
                             }}
-                            className="h-8 text-sm"
-                          />
+                            className="text-red-500"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
-                        <div className="space-y-1">
-                          <label className="text-xs font-medium">Questions Count</label>
-                          <Input 
-                            type="number"
-                            placeholder="Auto"
-                            value={section.questionsCount || ''}
-                            onChange={(e) => {
-                              const updatedSections = [...builderData.sections];
-                              updatedSections[sectionIdx].questionsCount = e.target.value;
-                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                            }}
-                            className="h-8 text-sm text-center"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <label className="text-xs font-medium">Marks/Question</label>
-                          <Input 
-                            placeholder="varies"
-                            value={section.marksPerQuestion || ''}
-                            onChange={(e) => {
-                              const updatedSections = [...builderData.sections];
-                              updatedSections[sectionIdx].marksPerQuestion = e.target.value;
-                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                            }}
-                            className="h-8 text-sm text-center"
-                          />
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => {
-                            const updatedSections = builderData.sections.filter((_, idx) => idx !== sectionIdx);
-                            setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                          }}
-                          className="text-red-500 hover:text-red-700 hover:bg-red-100 h-8"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-
-                      {/* Questions */}
-                      <div className="space-y-4 pl-4">
+                      </CardHeader>
+                      
+                      <CardContent className="p-3 space-y-3">
                         {section.questions.map((question: any, questionIdx: number) => (
                           <ExamQuestionCard
                             key={question.id}
                             question={question}
-                            questionNumber={builderData.numberingStyle === 'continuous' 
-                              ? builderData.sections.slice(0, sectionIdx).reduce((sum, s) => sum + s.questions.length, 0) + questionIdx + 1
-                              : questionIdx + 1
-                            }
+                            questionNumber={questionIdx + 1}
                             onUpdate={(updatedQuestion) => {
                               const updatedSections = [...builderData.sections];
                               updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
@@ -992,59 +975,30 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                         
                         <Button 
                           variant="outline" 
-                          className="w-full border-dashed border-blue-300 text-blue-600 hover:bg-blue-50"
+                          size="sm"
+                          className="w-full border-dashed text-blue-600"
                           onClick={() => {
-                            const availableItems = selectedItemsData.filter(item => 
-                              !builderData.sections.some(s => 
-                                s.questions.some((q: any) => q.text === item.question)
-                              )
-                            );
-                            if (availableItems.length > 0) {
-                              const newQuestion = {
-                                id: Date.now(),
-                                text: availableItems[0].question,
-                                marks: availableItems[0].marks,
-                                subQuestions: [],
-                                hasOROption: false,
-                                orQuestion: ''
-                              };
-                              const updatedSections = [...builderData.sections];
-                              updatedSections[sectionIdx].questions.push(newQuestion);
-                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                            }
+                            const newQuestion = {
+                              id: Date.now(),
+                              text: 'Enter your question here...',
+                              marks: 5,
+                              subQuestions: [],
+                              hasOROption: false,
+                              orQuestion: '',
+                              hasImage: false,
+                              imageUrl: null
+                            };
+                            const updatedSections = [...builderData.sections];
+                            updatedSections[sectionIdx].questions.push(newQuestion);
+                            setBuilderData(prev => ({ ...prev, sections: updatedSections }));
                           }}
                         >
-                          <Plus className="h-4 w-4 mr-2" />
+                          <Plus className="h-4 w-4 mr-1" />
                           Add Question
                         </Button>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   ))}
-                  
-                  {/* Add Section Button */}
-                  <div className="text-center pt-4 border-t border-gray-300">
-                    <Button 
-                      onClick={() => {
-                        const newSection = {
-                          id: Date.now(),
-                          title: `SECTION - ${String.fromCharCode(65 + builderData.sections.length)}`,
-                          instruction: 'Answer all questions',
-                          questions: [],
-                          questionsCount: '',
-                          marksPerQuestion: '',
-                          totalMarks: ''
-                        };
-                        setBuilderData(prev => ({ 
-                          ...prev, 
-                          sections: [...prev.sections, newSection] 
-                        }));
-                      }}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add New Section
-                    </Button>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -1085,7 +1039,7 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
   const [imageFiles, setImageFiles] = useState<{[key: string]: File}>({});
   const [imagePreviews, setImagePreviews] = useState<{[key: string]: string}>({});
 
-  const handleImageUpload = (id: string, file: File, type: 'subQuestion' | 'orQuestion') => {
+  const handleImageUpload = (id: string, file: File, type: 'main' | 'subQuestion' | 'orQuestion') => {
     setImageFiles(prev => ({ ...prev, [id]: file }));
     
     const reader = new FileReader();
@@ -1093,7 +1047,13 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
       const imageUrl = reader.result as string;
       setImagePreviews(prev => ({ ...prev, [id]: imageUrl }));
       
-      if (type === 'subQuestion') {
+      if (type === 'main') {
+        onUpdate({ 
+          ...question, 
+          hasImage: true,
+          imageUrl: imageUrl 
+        });
+      } else if (type === 'subQuestion') {
         const subIdx = question.subQuestions.findIndex((sq: any) => sq.id === id);
         if (subIdx !== -1) {
           const updatedSubQuestions = [...question.subQuestions];
@@ -1115,7 +1075,7 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
     reader.readAsDataURL(file);
   };
 
-  const removeImage = (id: string, type: 'subQuestion' | 'orQuestion') => {
+  const removeImage = (id: string, type: 'main' | 'subQuestion' | 'orQuestion') => {
     setImageFiles(prev => {
       const newFiles = { ...prev };
       delete newFiles[id];
@@ -1127,7 +1087,13 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
       return newPreviews;
     });
     
-    if (type === 'subQuestion') {
+    if (type === 'main') {
+      onUpdate({ 
+        ...question, 
+        hasImage: false,
+        imageUrl: null 
+      });
+    } else if (type === 'subQuestion') {
       const subIdx = question.subQuestions.findIndex((sq: any) => sq.id === id);
       if (subIdx !== -1) {
         const updatedSubQuestions = [...question.subQuestions];
@@ -1153,250 +1119,297 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
   };
   
   return (
-    <div className="space-y-3 border-l-4 border-gray-400 pl-4">
-      <div className="flex items-start gap-4">
-        <span className="font-bold text-lg min-w-[40px] mt-1">{questionNumber})</span>
-        <div className="flex-1 space-y-2">
-          <div className="flex gap-4">
-            <Textarea
-              value={question.text}
-              onChange={(e) => onUpdate({ ...question, text: e.target.value })}
-              className="flex-1 min-h-[60px] resize-none font-medium border-gray-300"
-              placeholder="Enter question text..."
-            />
-            <div className="flex flex-col gap-2">
+    <Card className="border border-gray-300 bg-white">
+      <CardContent className="p-4">
+        {/* Main Question */}
+        <div className="space-y-3">
+          <div className="flex items-start gap-3">
+            <span className="font-bold text-lg min-w-[30px] mt-1">{questionNumber})</span>
+            <div className="flex-1">
+              <Textarea
+                value={question.text}
+                onChange={(e) => onUpdate({ ...question, text: e.target.value })}
+                className="min-h-[60px] resize-none font-medium"
+                placeholder="Enter question text..."
+              />
+            </div>
+            <div className="flex items-center gap-2">
               <div className="text-center">
-                <label className="text-xs text-gray-600">Marks</label>
+                <label className="text-xs text-muted-foreground">Marks</label>
                 <Input
                   type="number"
                   value={question.marks}
                   onChange={(e) => onUpdate({ ...question, marks: parseInt(e.target.value) || 0 })}
-                  className="w-16 h-8 text-center font-bold"
+                  className="w-14 h-8 text-center font-bold"
                   min="1"
                 />
               </div>
-              <div className="text-right">
-                <div className="text-sm font-bold border border-gray-400 px-2 py-1 rounded">
-                  [{question.marks}]
-                </div>
+              <div className="text-sm font-bold border px-2 py-1 rounded">
+                [{question.marks}]
               </div>
             </div>
           </div>
           
-          {/* Sub-questions */}
-          {question.subQuestions && question.subQuestions.length > 0 && (
-            <div className="ml-4 space-y-3 border-l-2 border-gray-300 pl-4">
-              {question.subQuestions.map((subQ: any, subIdx: number) => (
-                <div key={subQ.id} className="space-y-2 p-3 bg-gray-50 rounded border">
-                  <div className="flex items-start gap-2">
-                    <span className="font-medium min-w-[20px] mt-2">{['i)', 'ii)', 'iii)', 'iv)', 'v)'][subIdx] || `${subIdx + 1})`}</span>
-                    <Textarea
-                      value={subQ.text}
-                      onChange={(e) => {
-                        const updatedSubQuestions = [...(question.subQuestions || [])];
-                        updatedSubQuestions[subIdx] = { ...subQ, text: e.target.value };
-                        onUpdate({ ...question, subQuestions: updatedSubQuestions });
-                      }}
-                      className="flex-1 min-h-[40px] text-sm resize-none"
-                      placeholder="Enter sub-question..."
-                    />
-                    <div className="flex flex-col gap-2">
-                      <Input
-                        type="number"
-                        value={subQ.marks}
-                        onChange={(e) => {
-                          const updatedSubQuestions = [...(question.subQuestions || [])];
-                          updatedSubQuestions[subIdx] = { ...subQ, marks: parseInt(e.target.value) || 0 };
-                          onUpdate({ ...question, subQuestions: updatedSubQuestions });
-                        }}
-                        className="w-12 h-6 text-xs text-center"
-                        min="1"
-                      />
-                      <div className="text-xs font-medium text-center">
-                        [{subQ.marks}]
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => deleteSubQuestion(subIdx)}
-                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  {/* Sub-question Image Upload */}
-                  <div className="ml-6">
-                    {(imagePreviews[subQ.id] || subQ.imageUrl) ? (
-                      <div className="relative bg-white p-2 rounded border border-purple-200">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-medium text-purple-700 flex items-center gap-1">
-                            <Image className="h-3 w-3" />
-                            Image
-                          </span>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeImage(subQ.id, 'subQuestion')}
-                            className="h-5 w-5 p-0 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full"
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                        <img 
-                          src={imagePreviews[subQ.id] || subQ.imageUrl} 
-                          alt="Sub-question image" 
-                          className="max-w-full h-auto max-h-32 rounded border shadow-sm object-contain"
-                        />
-                      </div>
-                    ) : (
-                      <div className="bg-gray-50 border border-dashed border-gray-300 rounded p-2">
-                        <div className="text-center">
-                          <Upload className="h-3 w-3 text-gray-400 mx-auto mb-1" />
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) handleImageUpload(subQ.id, file, 'subQuestion');
-                            }}
-                            className="hidden"
-                            id={`sub-image-upload-${subQ.id}`}
-                          />
-                          <label 
-                            htmlFor={`sub-image-upload-${subQ.id}`}
-                            className="inline-flex items-center px-2 py-1 bg-gray-600 text-white text-xs rounded cursor-pointer hover:bg-gray-700"
-                          >
-                            <Image className="h-3 w-3 mr-1" />
-                            Add Image
-                          </label>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+          {/* Main Question Image Upload */}
+          <div className="ml-8">
+            {(imagePreviews[`main-${question.id}`] || question.imageUrl) ? (
+              <div className="relative bg-gray-50 p-2 rounded border">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-medium text-blue-700 flex items-center gap-1">
+                    <Image className="h-3 w-3" />
+                    Question Image
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeImage(`main-${question.id}`, 'main')}
+                    className="h-5 w-5 p-0 text-red-500 hover:bg-red-100 rounded-full"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
                 </div>
-              ))}
-            </div>
-          )}
-          
-          {/* OR Option */}
-          {question.hasOROption && (
-            <div className="ml-4 space-y-3 border-l-2 border-orange-300 pl-4 bg-orange-50/50 p-3 rounded">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-center bg-orange-200 px-2 py-1 rounded text-sm">OR</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onUpdate({ ...question, hasOROption: false, orQuestion: '', orQuestionImage: null, hasOrQuestionImage: false })}
-                  className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
+                <img 
+                  src={imagePreviews[`main-${question.id}`] || question.imageUrl} 
+                  alt="Question image" 
+                  className="max-w-full h-auto max-h-32 rounded border object-contain"
+                />
               </div>
-              <Textarea
-                value={question.orQuestion || ''}
-                onChange={(e) => onUpdate({ ...question, orQuestion: e.target.value })}
-                className="w-full min-h-[60px] resize-none bg-white"
-                placeholder="Enter alternative question..."
-              />
-              
-              {/* OR Question Image Upload */}
-              <div>
-                {(imagePreviews[`or-${question.id}`] || question.orQuestionImage) ? (
-                  <div className="relative bg-white p-2 rounded border border-purple-200">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-medium text-purple-700 flex items-center gap-1">
-                        <Image className="h-3 w-3" />
-                        OR Question Image
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeImage(`or-${question.id}`, 'orQuestion')}
-                        className="h-5 w-5 p-0 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full"
-                      >
-                        <X className="h-3 w-3" />
-                      </Button>
-                    </div>
-                    <img 
-                      src={imagePreviews[`or-${question.id}`] || question.orQuestionImage} 
-                      alt="OR question image" 
-                      className="max-w-full h-auto max-h-32 rounded border shadow-sm object-contain"
-                    />
-                  </div>
-                ) : (
-                  <div className="bg-orange-50 border border-dashed border-orange-300 rounded p-2">
-                    <div className="text-center">
-                      <Upload className="h-3 w-3 text-orange-400 mx-auto mb-1" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) handleImageUpload(`or-${question.id}`, file, 'orQuestion');
-                        }}
-                        className="hidden"
-                        id={`or-image-upload-${question.id}`}
-                      />
-                      <label 
-                        htmlFor={`or-image-upload-${question.id}`}
-                        className="inline-flex items-center px-2 py-1 bg-orange-600 text-white text-xs rounded cursor-pointer hover:bg-orange-700"
-                      >
-                        <Image className="h-3 w-3 mr-1" />
-                        Add Image
-                      </label>
-                    </div>
-                  </div>
-                )}
+            ) : (
+              <div className="bg-blue-50 border border-dashed border-blue-300 rounded p-2">
+                <div className="text-center">
+                  <Upload className="h-3 w-3 text-blue-500 mx-auto mb-1" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageUpload(`main-${question.id}`, file, 'main');
+                    }}
+                    className="hidden"
+                    id={`main-image-upload-${question.id}`}
+                  />
+                  <label 
+                    htmlFor={`main-image-upload-${question.id}`}
+                    className="inline-flex items-center px-2 py-1 bg-blue-600 text-white text-xs rounded cursor-pointer hover:bg-blue-700"
+                  >
+                    <Image className="h-3 w-3 mr-1" />
+                    Add Image
+                  </label>
+                </div>
               </div>
-            </div>
-          )}
-          
-          {/* Controls */}
-          <div className="flex gap-2 pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const newSubQuestion = {
-                  id: Date.now(),
-                  text: 'New sub-question',
-                  marks: 1,
-                  hasImage: false,
-                  imageUrl: null
-                };
-                onUpdate({
-                  ...question,
-                  subQuestions: [...(question.subQuestions || []), newSubQuestion]
-                });
-              }}
-              className="text-blue-600 border-blue-300 hover:bg-blue-50"
-            >
-              <Plus className="h-3 w-3 mr-1" />
-              Add Sub-question
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onUpdate({ ...question, hasOROption: !question.hasOROption })}
-              className="text-orange-600 border-orange-300 hover:bg-orange-50"
-            >
-              {question.hasOROption ? 'Remove OR' : 'Add OR'}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onDelete}
-              className="text-red-500 hover:text-red-700 hover:bg-red-100"
-            >
-              <Trash2 className="h-3 w-3 mr-1" />
-              Delete
-            </Button>
+            )}
           </div>
         </div>
-      </div>
-    </div>
+          
+        {/* Sub-questions */}
+        {question.subQuestions && question.subQuestions.length > 0 && (
+          <div className="ml-8 mt-4 space-y-2 border-l-2 border-gray-300 pl-4">
+            {question.subQuestions.map((subQ: any, subIdx: number) => (
+              <div key={subQ.id} className="p-2 bg-gray-50 rounded border">
+                <div className="flex items-start gap-2">
+                  <span className="font-medium min-w-[20px] mt-1">{['i)', 'ii)', 'iii)', 'iv)', 'v)'][subIdx] || `${subIdx + 1})`}</span>
+                  <Textarea
+                    value={subQ.text}
+                    onChange={(e) => {
+                      const updatedSubQuestions = [...(question.subQuestions || [])];
+                      updatedSubQuestions[subIdx] = { ...subQ, text: e.target.value };
+                      onUpdate({ ...question, subQuestions: updatedSubQuestions });
+                    }}
+                    className="flex-1 min-h-[30px] text-sm resize-none"
+                    placeholder="Enter sub-question..."
+                  />
+                  <Input
+                    type="number"
+                    value={subQ.marks}
+                    onChange={(e) => {
+                      const updatedSubQuestions = [...(question.subQuestions || [])];
+                      updatedSubQuestions[subIdx] = { ...subQ, marks: parseInt(e.target.value) || 0 };
+                      onUpdate({ ...question, subQuestions: updatedSubQuestions });
+                    }}
+                    className="w-12 h-6 text-xs text-center"
+                    min="1"
+                  />
+                  <div className="text-xs font-medium">
+                    [{subQ.marks}]
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteSubQuestion(subIdx)}
+                    className="h-6 w-6 p-0 text-red-500 hover:bg-red-100"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+                
+                {/* Sub-question Image */}
+                <div className="ml-6 mt-2">
+                  {(imagePreviews[subQ.id] || subQ.imageUrl) ? (
+                    <div className="relative bg-white p-1 rounded border">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-purple-700 flex items-center gap-1">
+                          <Image className="h-2 w-2" />
+                          Image
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeImage(subQ.id, 'subQuestion')}
+                          className="h-4 w-4 p-0 text-red-500 hover:bg-red-100 rounded-full"
+                        >
+                          <X className="h-2 w-2" />
+                        </Button>
+                      </div>
+                      <img 
+                        src={imagePreviews[subQ.id] || subQ.imageUrl} 
+                        alt="Sub-question image" 
+                        className="max-w-full h-auto max-h-20 rounded border object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="bg-purple-50 border border-dashed border-purple-300 rounded p-1">
+                      <div className="text-center">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleImageUpload(subQ.id, file, 'subQuestion');
+                          }}
+                          className="hidden"
+                          id={`sub-image-upload-${subQ.id}`}
+                        />
+                        <label 
+                          htmlFor={`sub-image-upload-${subQ.id}`}
+                          className="inline-flex items-center px-1 py-0.5 bg-purple-600 text-white text-xs rounded cursor-pointer hover:bg-purple-700"
+                        >
+                          <Image className="h-2 w-2 mr-1" />
+                          +Image
+                        </label>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {/* OR Option */}
+        {question.hasOROption && (
+          <div className="ml-8 mt-4 p-3 bg-orange-50 rounded border border-orange-300">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-bold text-center bg-orange-200 px-2 py-1 rounded text-sm">OR</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onUpdate({ ...question, hasOROption: false, orQuestion: '', orQuestionImage: null, hasOrQuestionImage: false })}
+                className="h-6 w-6 p-0 text-red-500 hover:bg-red-100"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
+            <Textarea
+              value={question.orQuestion || ''}
+              onChange={(e) => onUpdate({ ...question, orQuestion: e.target.value })}
+              className="w-full min-h-[40px] resize-none bg-white"
+              placeholder="Enter alternative question..."
+            />
+            
+            {/* OR Question Image */}
+            <div className="mt-2">
+              {(imagePreviews[`or-${question.id}`] || question.orQuestionImage) ? (
+                <div className="relative bg-white p-2 rounded border">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-orange-700 flex items-center gap-1">
+                      <Image className="h-3 w-3" />
+                      OR Image
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeImage(`or-${question.id}`, 'orQuestion')}
+                      className="h-5 w-5 p-0 text-red-500 hover:bg-red-100 rounded-full"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <img 
+                    src={imagePreviews[`or-${question.id}`] || question.orQuestionImage} 
+                    alt="OR question image" 
+                    className="max-w-full h-auto max-h-24 rounded border object-contain"
+                  />
+                </div>
+              ) : (
+                <div className="bg-orange-50 border border-dashed border-orange-300 rounded p-2">
+                  <div className="text-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageUpload(`or-${question.id}`, file, 'orQuestion');
+                      }}
+                      className="hidden"
+                      id={`or-image-upload-${question.id}`}
+                    />
+                    <label 
+                      htmlFor={`or-image-upload-${question.id}`}
+                      className="inline-flex items-center px-2 py-1 bg-orange-600 text-white text-xs rounded cursor-pointer hover:bg-orange-700"
+                    >
+                      <Image className="h-3 w-3 mr-1" />
+                      Add Image
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {/* Controls */}
+        <div className="flex gap-2 mt-3 pt-2 border-t">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const newSubQuestion = {
+                id: Date.now(),
+                text: 'New sub-question',
+                marks: 1,
+                hasImage: false,
+                imageUrl: null
+              };
+              onUpdate({
+                ...question,
+                subQuestions: [...(question.subQuestions || []), newSubQuestion]
+              });
+            }}
+            className="text-blue-600 border-blue-300 hover:bg-blue-50"
+          >
+            <Plus className="h-3 w-3 mr-1" />
+            Sub-Q
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onUpdate({ ...question, hasOROption: !question.hasOROption })}
+            className="text-orange-600 border-orange-300 hover:bg-orange-50"
+          >
+            {question.hasOROption ? 'Remove OR' : 'Add OR'}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onDelete}
+            className="text-red-500 hover:bg-red-100"
+          >
+            <Trash2 className="h-3 w-3 mr-1" />
+            Delete
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
