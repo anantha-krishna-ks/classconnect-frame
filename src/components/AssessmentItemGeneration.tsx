@@ -1082,7 +1082,75 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 
 // Exam Question Card Component for Assessment Preview
 const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => {
-  const [showOROption, setShowOROption] = useState(false);
+  const [imageFiles, setImageFiles] = useState<{[key: string]: File}>({});
+  const [imagePreviews, setImagePreviews] = useState<{[key: string]: string}>({});
+
+  const handleImageUpload = (id: string, file: File, type: 'subQuestion' | 'orQuestion') => {
+    setImageFiles(prev => ({ ...prev, [id]: file }));
+    
+    const reader = new FileReader();
+    reader.onload = () => {
+      const imageUrl = reader.result as string;
+      setImagePreviews(prev => ({ ...prev, [id]: imageUrl }));
+      
+      if (type === 'subQuestion') {
+        const subIdx = question.subQuestions.findIndex((sq: any) => sq.id === id);
+        if (subIdx !== -1) {
+          const updatedSubQuestions = [...question.subQuestions];
+          updatedSubQuestions[subIdx] = {
+            ...updatedSubQuestions[subIdx],
+            hasImage: true,
+            imageUrl: imageUrl
+          };
+          onUpdate({ ...question, subQuestions: updatedSubQuestions });
+        }
+      } else if (type === 'orQuestion') {
+        onUpdate({ 
+          ...question, 
+          orQuestionImage: imageUrl,
+          hasOrQuestionImage: true 
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeImage = (id: string, type: 'subQuestion' | 'orQuestion') => {
+    setImageFiles(prev => {
+      const newFiles = { ...prev };
+      delete newFiles[id];
+      return newFiles;
+    });
+    setImagePreviews(prev => {
+      const newPreviews = { ...prev };
+      delete newPreviews[id];
+      return newPreviews;
+    });
+    
+    if (type === 'subQuestion') {
+      const subIdx = question.subQuestions.findIndex((sq: any) => sq.id === id);
+      if (subIdx !== -1) {
+        const updatedSubQuestions = [...question.subQuestions];
+        updatedSubQuestions[subIdx] = {
+          ...updatedSubQuestions[subIdx],
+          hasImage: false,
+          imageUrl: null
+        };
+        onUpdate({ ...question, subQuestions: updatedSubQuestions });
+      }
+    } else if (type === 'orQuestion') {
+      onUpdate({ 
+        ...question, 
+        orQuestionImage: null,
+        hasOrQuestionImage: false 
+      });
+    }
+  };
+
+  const deleteSubQuestion = (subIdx: number) => {
+    const updatedSubQuestions = question.subQuestions.filter((_: any, idx: number) => idx !== subIdx);
+    onUpdate({ ...question, subQuestions: updatedSubQuestions });
+  };
   
   return (
     <div className="space-y-3 border-l-4 border-gray-400 pl-4">
@@ -1117,35 +1185,95 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
           
           {/* Sub-questions */}
           {question.subQuestions && question.subQuestions.length > 0 && (
-            <div className="ml-4 space-y-2 border-l-2 border-gray-300 pl-4">
+            <div className="ml-4 space-y-3 border-l-2 border-gray-300 pl-4">
               {question.subQuestions.map((subQ: any, subIdx: number) => (
-                <div key={subQ.id} className="flex items-start gap-2">
-                  <span className="font-medium min-w-[20px] mt-2">{['i)', 'ii)', 'iii)', 'iv)', 'v)'][subIdx] || `${subIdx + 1})`}</span>
-                  <Textarea
-                    value={subQ.text}
-                    onChange={(e) => {
-                      const updatedSubQuestions = [...(question.subQuestions || [])];
-                      updatedSubQuestions[subIdx] = { ...subQ, text: e.target.value };
-                      onUpdate({ ...question, subQuestions: updatedSubQuestions });
-                    }}
-                    className="flex-1 min-h-[40px] text-sm resize-none"
-                    placeholder="Enter sub-question..."
-                  />
-                  <div className="text-right mt-1">
-                    <Input
-                      type="number"
-                      value={subQ.marks}
+                <div key={subQ.id} className="space-y-2 p-3 bg-gray-50 rounded border">
+                  <div className="flex items-start gap-2">
+                    <span className="font-medium min-w-[20px] mt-2">{['i)', 'ii)', 'iii)', 'iv)', 'v)'][subIdx] || `${subIdx + 1})`}</span>
+                    <Textarea
+                      value={subQ.text}
                       onChange={(e) => {
                         const updatedSubQuestions = [...(question.subQuestions || [])];
-                        updatedSubQuestions[subIdx] = { ...subQ, marks: parseInt(e.target.value) || 0 };
+                        updatedSubQuestions[subIdx] = { ...subQ, text: e.target.value };
                         onUpdate({ ...question, subQuestions: updatedSubQuestions });
                       }}
-                      className="w-12 h-6 text-xs text-center"
-                      min="1"
+                      className="flex-1 min-h-[40px] text-sm resize-none"
+                      placeholder="Enter sub-question..."
                     />
-                    <div className="text-xs font-medium mt-1">
-                      [{subQ.marks}]
+                    <div className="flex flex-col gap-2">
+                      <Input
+                        type="number"
+                        value={subQ.marks}
+                        onChange={(e) => {
+                          const updatedSubQuestions = [...(question.subQuestions || [])];
+                          updatedSubQuestions[subIdx] = { ...subQ, marks: parseInt(e.target.value) || 0 };
+                          onUpdate({ ...question, subQuestions: updatedSubQuestions });
+                        }}
+                        className="w-12 h-6 text-xs text-center"
+                        min="1"
+                      />
+                      <div className="text-xs font-medium text-center">
+                        [{subQ.marks}]
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteSubQuestion(subIdx)}
+                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     </div>
+                  </div>
+                  
+                  {/* Sub-question Image Upload */}
+                  <div className="ml-6">
+                    {(imagePreviews[subQ.id] || subQ.imageUrl) ? (
+                      <div className="relative bg-white p-2 rounded border border-purple-200">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium text-purple-700 flex items-center gap-1">
+                            <Image className="h-3 w-3" />
+                            Image
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeImage(subQ.id, 'subQuestion')}
+                            className="h-5 w-5 p-0 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full"
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <img 
+                          src={imagePreviews[subQ.id] || subQ.imageUrl} 
+                          alt="Sub-question image" 
+                          className="max-w-full h-auto max-h-32 rounded border shadow-sm object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="bg-gray-50 border border-dashed border-gray-300 rounded p-2">
+                        <div className="text-center">
+                          <Upload className="h-3 w-3 text-gray-400 mx-auto mb-1" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleImageUpload(subQ.id, file, 'subQuestion');
+                            }}
+                            className="hidden"
+                            id={`sub-image-upload-${subQ.id}`}
+                          />
+                          <label 
+                            htmlFor={`sub-image-upload-${subQ.id}`}
+                            className="inline-flex items-center px-2 py-1 bg-gray-600 text-white text-xs rounded cursor-pointer hover:bg-gray-700"
+                          >
+                            <Image className="h-3 w-3 mr-1" />
+                            Add Image
+                          </label>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -1154,9 +1282,17 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
           
           {/* OR Option */}
           {question.hasOROption && (
-            <div className="ml-4 space-y-2 border-l-2 border-orange-300 pl-4 bg-orange-50/50 p-2 rounded">
-              <div className="flex items-center gap-2">
+            <div className="ml-4 space-y-3 border-l-2 border-orange-300 pl-4 bg-orange-50/50 p-3 rounded">
+              <div className="flex items-center justify-between">
                 <span className="font-bold text-center bg-orange-200 px-2 py-1 rounded text-sm">OR</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onUpdate({ ...question, hasOROption: false, orQuestion: '', orQuestionImage: null, hasOrQuestionImage: false })}
+                  className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-100"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
               </div>
               <Textarea
                 value={question.orQuestion || ''}
@@ -1164,6 +1300,56 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
                 className="w-full min-h-[60px] resize-none bg-white"
                 placeholder="Enter alternative question..."
               />
+              
+              {/* OR Question Image Upload */}
+              <div>
+                {(imagePreviews[`or-${question.id}`] || question.orQuestionImage) ? (
+                  <div className="relative bg-white p-2 rounded border border-purple-200">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-medium text-purple-700 flex items-center gap-1">
+                        <Image className="h-3 w-3" />
+                        OR Question Image
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeImage(`or-${question.id}`, 'orQuestion')}
+                        className="h-5 w-5 p-0 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full"
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <img 
+                      src={imagePreviews[`or-${question.id}`] || question.orQuestionImage} 
+                      alt="OR question image" 
+                      className="max-w-full h-auto max-h-32 rounded border shadow-sm object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-orange-50 border border-dashed border-orange-300 rounded p-2">
+                    <div className="text-center">
+                      <Upload className="h-3 w-3 text-orange-400 mx-auto mb-1" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageUpload(`or-${question.id}`, file, 'orQuestion');
+                        }}
+                        className="hidden"
+                        id={`or-image-upload-${question.id}`}
+                      />
+                      <label 
+                        htmlFor={`or-image-upload-${question.id}`}
+                        className="inline-flex items-center px-2 py-1 bg-orange-600 text-white text-xs rounded cursor-pointer hover:bg-orange-700"
+                      >
+                        <Image className="h-3 w-3 mr-1" />
+                        Add Image
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
           
@@ -1176,7 +1362,9 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any)
                 const newSubQuestion = {
                   id: Date.now(),
                   text: 'New sub-question',
-                  marks: 1
+                  marks: 1,
+                  hasImage: false,
+                  imageUrl: null
                 };
                 onUpdate({
                   ...question,
