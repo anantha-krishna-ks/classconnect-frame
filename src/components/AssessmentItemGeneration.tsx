@@ -683,7 +683,28 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             </CardTitle>
             <p className="text-muted-foreground">Review your assessment overview and finalize the creation</p>
           </CardHeader>
-          <CardContent className="space-y-6 p-8">
+              <CardContent className="space-y-6 p-8">
+                
+                {/* Question Numbering Control */}
+                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <label className="text-sm font-semibold text-blue-800">Question Numbering Style:</label>
+                  <Select 
+                    value={builderData.numberingStyle} 
+                    onValueChange={(value) => setBuilderData(prev => ({ ...prev, numberingStyle: value }))}
+                  >
+                    <SelectTrigger className="w-48 bg-white border-blue-300 z-50">
+                      <SelectValue placeholder="Select numbering style" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
+                      <SelectItem value="continuous" className="hover:bg-blue-50">
+                        Continuous Numbering (1, 2, 3...)
+                      </SelectItem>
+                      <SelectItem value="reset" className="hover:bg-blue-50">
+                        Reset per Section (1, 2... then 1, 2...)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
             {/* Summary Statistics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
@@ -1002,7 +1023,11 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                           <ExamQuestionCard
                             key={question.id}
                             question={question}
-                            questionNumber={questionIdx + 1}
+                            questionNumber={
+                              builderData.numberingStyle === 'continuous' 
+                                ? builderData.sections.slice(0, sectionIdx).reduce((sum, s) => sum + s.questions.length, 0) + questionIdx + 1
+                                : questionIdx + 1
+                            }
                             onUpdate={(updatedQuestion) => {
                               const updatedSections = [...builderData.sections];
                               updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
