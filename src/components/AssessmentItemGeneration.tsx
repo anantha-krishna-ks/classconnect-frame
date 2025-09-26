@@ -1443,55 +1443,83 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 
                 {section.questions?.map((question: any, qIdx: number) => (
                   <div key={question.id} className="mb-6 p-4 border-l-4 border-blue-500 bg-gray-50">
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-semibold">Question {qIdx + 1}:</h4>
-                      <span className="text-sm font-medium bg-blue-100 px-2 py-1 rounded">
-                        [{question.marks} marks]
-                      </span>
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-semibold text-lg">Question {qIdx + 1}:</h4>
+                      <div className="flex gap-2">
+                        <span className="text-sm font-medium bg-blue-100 px-2 py-1 rounded">
+                          [{question.marks} marks]
+                        </span>
+                        {question.itemType && (
+                          <span className="text-xs bg-gray-200 px-2 py-1 rounded">
+                            {question.itemType}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <p className="mb-3">{question.question}</p>
                     
+                    <div className="mb-3">
+                      <p className="text-base leading-relaxed">{question.question}</p>
+                    </div>
+                    
+                    {/* Main Question Image */}
                     {question.imageUrl && (
-                      <div className="mb-3">
+                      <div className="mb-4 flex justify-center">
                         <img 
                           src={question.imageUrl} 
-                          alt="Question" 
-                          className="max-w-md rounded border"
+                          alt="Question Image" 
+                          className="max-w-full max-h-64 rounded border shadow-sm"
                         />
                       </div>
                     )}
                     
+                    {/* Question Options */}
                     {question.options && question.options.length > 0 && (
-                      <div className="ml-4 space-y-2">
+                      <div className="ml-6 mb-4 space-y-2">
+                        <p className="font-medium text-gray-700 mb-2">Options:</p>
                         {question.options.map((option: string, optIdx: number) => (
-                          <div key={optIdx} className="flex items-center gap-2">
-                            <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
-                              {String.fromCharCode(97 + optIdx)}
+                          <div key={optIdx} className="flex items-start gap-3">
+                            <span className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
+                              {String.fromCharCode(97 + optIdx)})
                             </span>
-                            <span>{option}</span>
+                            <span className="text-base">{option}</span>
                           </div>
                         ))}
                       </div>
                     )}
                     
+                    {/* Sub-Questions */}
                     {question.subQuestions && question.subQuestions.length > 0 && (
-                      <div className="ml-4 mt-3 space-y-3">
+                      <div className="ml-6 mt-4 space-y-4">
+                        <p className="font-medium text-gray-700">Sub-questions:</p>
                         {question.subQuestions.map((subQ: any, subIdx: number) => (
-                          <div key={subQ.id} className="border-l-2 border-gray-300 pl-3">
-                            <div className="flex justify-between items-start mb-1">
-                              <span className="font-medium">({String.fromCharCode(97 + subIdx)})</span>
+                          <div key={subQ.id} className="border-l-3 border-gray-300 pl-4 bg-white p-3 rounded">
+                            <div className="flex justify-between items-start mb-2">
+                              <span className="font-medium text-base">({String.fromCharCode(97 + subIdx)})</span>
                               <span className="text-xs bg-gray-200 px-2 py-1 rounded">
                                 [{subQ.marks} marks]
                               </span>
                             </div>
-                            <p>{subQ.question}</p>
+                            <p className="mb-2">{subQ.question}</p>
                             {subQ.imageUrl && (
-                              <div className="mt-2">
+                              <div className="mt-3 flex justify-center">
                                 <img 
                                   src={subQ.imageUrl} 
-                                  alt="Sub-question" 
-                                  className="max-w-sm rounded border"
+                                  alt="Sub-question Image" 
+                                  className="max-w-full max-h-48 rounded border shadow-sm"
                                 />
+                              </div>
+                            )}
+                            {/* Sub-question options if any */}
+                            {subQ.options && subQ.options.length > 0 && (
+                              <div className="ml-4 mt-3 space-y-1">
+                                {subQ.options.map((option: string, optIdx: number) => (
+                                  <div key={optIdx} className="flex items-start gap-2">
+                                    <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium">
+                                      {String.fromCharCode(105 + optIdx)})
+                                    </span>
+                                    <span className="text-sm">{option}</span>
+                                  </div>
+                                ))}
                               </div>
                             )}
                           </div>
@@ -1499,19 +1527,34 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       </div>
                     )}
                     
+                    {/* OR Question */}
                     {question.orQuestion && (
-                      <div className="mt-4 pt-4 border-t border-dashed border-gray-400">
-                        <div className="flex justify-between items-start mb-2">
-                          <h5 className="font-semibold text-center w-full">OR</h5>
+                      <div className="mt-6 pt-4 border-t-2 border-dashed border-gray-400">
+                        <div className="text-center mb-3">
+                          <h5 className="font-bold text-lg bg-gray-200 inline-block px-4 py-1 rounded">OR</h5>
                         </div>
-                        <p className="mb-2">{question.orQuestion}</p>
+                        <p className="mb-3 text-base">{question.orQuestion}</p>
                         {question.orQuestionImage && (
-                          <div className="mb-2">
+                          <div className="mb-3 flex justify-center">
                             <img 
                               src={question.orQuestionImage} 
-                              alt="OR Question" 
-                              className="max-w-md rounded border"
+                              alt="OR Question Image" 
+                              className="max-w-full max-h-64 rounded border shadow-sm"
                             />
+                          </div>
+                        )}
+                        {/* OR Question options if any */}
+                        {question.orOptions && question.orOptions.length > 0 && (
+                          <div className="ml-6 space-y-2">
+                            <p className="font-medium text-gray-700">Options:</p>
+                            {question.orOptions.map((option: string, optIdx: number) => (
+                              <div key={optIdx} className="flex items-start gap-3">
+                                <span className="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
+                                  {String.fromCharCode(97 + optIdx)})
+                                </span>
+                                <span className="text-base">{option}</span>
+                              </div>
+                            ))}
                           </div>
                         )}
                       </div>
