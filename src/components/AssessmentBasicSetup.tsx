@@ -49,6 +49,8 @@ const AssessmentBasicSetup = ({ assessmentData, updateAssessmentData, onComplete
     { value: 'PA2', label: 'PA2' },
     { value: 'Mid-term', label: 'Mid-term' },
     { value: 'Preparatory', label: 'Preparatory' },
+    { value: 'Pre-Preparatory', label: 'Pre-Preparatory' },
+    { value: 'Unit', label: 'Unit' },
     { value: 'Final', label: 'Final' }
   ];
 
