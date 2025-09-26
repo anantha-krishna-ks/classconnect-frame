@@ -735,7 +735,49 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 disabled={selectedItems.length === 0}
                 className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed text-white font-semibold px-12 py-4 text-lg rounded-xl hover:scale-105 transition-all duration-300 transform disabled:hover:scale-100"
                 onClick={() => {
+                  // Auto-fetch selected items and organize them into sections
+                  const selectedItemsData = getSelectedItems();
+                  
+                  // Group items by type for better organization
+                  const itemsByType = selectedItemsData.reduce((acc: any, item) => {
+                    if (!acc[item.itemType]) {
+                      acc[item.itemType] = [];
+                    }
+                    acc[item.itemType].push(item);
+                    return acc;
+                  }, {});
+
+                  // Create sections based on item types
+                  const autoSections = Object.keys(itemsByType).map((itemType, index) => {
+                    const items = itemsByType[itemType];
+                    return {
+                      id: Date.now() + index,
+                      title: `SECTION ${String.fromCharCode(65 + index)} - ${itemType.toUpperCase()}`,
+                      instruction: `Answer all questions`,
+                      questions: items.map((item: any, qIndex: number) => ({
+                        id: Date.now() + index * 1000 + qIndex,
+                        text: item.question,
+                        marks: item.marks,
+                        subQuestions: [],
+                        hasOROption: false,
+                        orQuestion: '',
+                        hasImage: false,
+                        imageUrl: null
+                      }))
+                    };
+                  });
+
+                  // Update builder data with auto-populated sections
+                  setBuilderData(prev => ({
+                    ...prev,
+                    sections: autoSections,
+                    assessmentTitle: assessmentData.assessmentName || prev.assessmentTitle,
+                    subject: assessmentData.subject || prev.subject,
+                    classGrade: assessmentData.grade || prev.classGrade
+                  }));
+
                   setShowAssessmentBuilder(true);
+                  
                   updateAssessmentData({ 
                     finalizedItems: selectedItemsData,
                     assessmentOverview: {
@@ -746,7 +788,8 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       bloomsDistribution
                     }
                   });
-                  toast.success('Assessment builder opened!');
+                  
+                  toast.success(`Assessment created with ${selectedItemsData.length} items organized into ${autoSections.length} sections!`);
                 }}
               >
                 <Save className="h-5 w-5 mr-2" />
