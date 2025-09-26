@@ -63,7 +63,9 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
     subject: '',
     classGrade: '',
     timeHours: '',
-    examDate: ''
+    examDate: '',
+    schoolName: '',
+    schoolLogo: ''
   });
   const [historicalQuestions] = useState<GeneratedItem[]>([
     {
@@ -943,13 +945,72 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
               <CardContent className="p-4 space-y-6">
                 {/* Paper Header Preview */}
                 <Card className="border-2 border-gray-800">
-                  <CardHeader className="text-center bg-gray-50 border-b-2 border-gray-800">
-                    <h2 className="text-xl font-bold uppercase">{builderData.assessmentTitle || 'ASSESSMENT PAPER'}</h2>
-                    <div className="grid grid-cols-2 gap-4 text-sm mt-2">
-                      <div>Subject: {builderData.subject || '____'}</div>
-                      <div>Class: {builderData.classGrade || '____'}</div>
-                      <div>Time: {builderData.timeHours || '__'} Hours</div>
-                      <div>Max Marks: {builderData.totalMarks || '__'}</div>
+                  <CardHeader className="bg-gray-50 border-b-2 border-gray-800 p-4">
+                    {/* Logo Upload Section */}
+                    <div className="flex justify-end mb-2">
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-gray-600">Logo:</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                setBuilderData(prev => ({
+                                  ...prev,
+                                  schoolLogo: event.target?.result as string
+                                }));
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                          className="text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Header Layout */}
+                    <div className="flex justify-between items-start">
+                      {/* Left Side - Class and Subject */}
+                      <div className="text-left space-y-1">
+                        <div className="text-sm font-medium">
+                          <span className="italic">Class:</span> {builderData.classGrade || '____'}
+                        </div>
+                        <div className="text-sm font-medium">
+                          <span className="italic">Subject:</span> {builderData.subject || '____'}
+                        </div>
+                      </div>
+                      
+                      {/* Center - Title */}
+                      <div className="text-center flex-1 mx-4">
+                        <h2 className="text-lg font-bold uppercase leading-tight">
+                          {builderData.schoolName || 'SCHOOL NAME'}
+                        </h2>
+                        <h3 className="text-base font-semibold uppercase mt-1">
+                          {builderData.assessmentTitle || 'ASSESSMENT PAPER'}
+                        </h3>
+                      </div>
+                      
+                      {/* Right Side - Logo and Marks/Time */}
+                      <div className="text-right space-y-1">
+                        {builderData.schoolLogo && (
+                          <div className="flex justify-end mb-2">
+                            <img 
+                              src={builderData.schoolLogo} 
+                              alt="School Logo" 
+                              className="w-12 h-12 object-contain"
+                            />
+                          </div>
+                        )}
+                        <div className="text-sm font-medium">
+                          <span className="font-bold">Marks:</span> {builderData.totalMarks || '__'}
+                        </div>
+                        <div className="text-sm font-medium">
+                          <span className="font-bold">Time:</span> {builderData.timeHours || '__'} hours
+                        </div>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="p-3">
