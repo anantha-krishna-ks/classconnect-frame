@@ -862,14 +862,36 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">Assessment Sections</h3>
+                <Button 
+                  onClick={() => {
+                    const newSection = {
+                      id: Date.now(),
+                      title: `SECTION - ${String.fromCharCode(65 + builderData.sections.length)}`,
+                      questions: selectedItemsData.slice(0, Math.min(3, selectedItemsData.length)).map((item, idx) => ({
+                        id: Date.now() + idx,
+                        text: item.question,
+                        marks: item.marks,
+                        subQuestions: []
+                      }))
+                    };
+                    setBuilderData(prev => ({ 
+                      ...prev, 
+                      sections: [...prev.sections, newSection] 
+                    }));
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Section
+                </Button>
               </div>
 
               {builderData.sections.length === 0 ? (
-                <Card className="border-2 border-dashed border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50/30 transition-all duration-200">
+                <Card className="border-2 border-dashed border-gray-300 bg-gray-50">
                   <CardContent className="p-12 text-center">
                     <div className="space-y-4">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center mx-auto">
-                        <Plus className="h-8 w-8 text-blue-600" />
+                      <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto">
+                        <Plus className="h-8 w-8 text-gray-400" />
                       </div>
                       <div>
                         <h4 className="text-lg font-medium text-gray-700">No sections created yet</h4>
@@ -892,134 +914,96 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                             sections: [newSection] 
                           }));
                         }}
-                        className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                        size="lg"
+                        className="bg-blue-600 hover:bg-blue-700"
                       >
-                        <Plus className="h-5 w-5 mr-2" />
-                        Create First Section
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add First Section
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
               ) : (
-                <div className="space-y-8">
+                <div className="space-y-6">
                   {builderData.sections.map((section, sectionIdx) => (
-                    <div key={section.id} className="relative">
-                      {/* Section Number Badge */}
-                      <div className="absolute -left-4 -top-2 z-10">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-purple-700 text-white flex items-center justify-center text-sm font-bold shadow-lg">
-                          {sectionIdx + 1}
-                        </div>
-                      </div>
-                      
-                      <Card className="border-2 border-purple-300 bg-gradient-to-br from-purple-50 to-purple-100/50 shadow-lg hover:shadow-xl transition-all duration-200 ml-4">
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-purple-600/5 rounded-lg"></div>
-                        <CardHeader className="pb-4 relative z-10">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <Input
-                                value={section.title}
-                                onChange={(e) => {
-                                  const updatedSections = [...builderData.sections];
-                                  updatedSections[sectionIdx].title = e.target.value;
-                                  setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                                }}
-                                className="text-lg font-semibold border-purple-300 bg-white/70 shadow-sm"
-                              />
-                              <Badge className="bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-sm">
-                                {section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0)} marks
-                              </Badge>
-                            </div>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => {
-                                const updatedSections = builderData.sections.filter((_, idx) => idx !== sectionIdx);
+                    <Card key={section.id} className="border border-purple-200 bg-purple-50/30">
+                      <CardHeader className="pb-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <Input
+                              value={section.title}
+                              onChange={(e) => {
+                                const updatedSections = [...builderData.sections];
+                                updatedSections[sectionIdx].title = e.target.value;
                                 setBuilderData(prev => ({ ...prev, sections: updatedSections }));
                               }}
-                              className="text-red-500 hover:text-red-700 hover:bg-red-100 rounded-full w-8 h-8 p-0"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                              className="text-lg font-semibold border-purple-300 bg-white/70"
+                            />
+                            <Badge className="bg-purple-100 text-purple-700">
+                              {section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0)} marks
+                            </Badge>
                           </div>
-                        </CardHeader>
-                        <CardContent className="space-y-4 relative z-10">
-                          {section.questions.map((question: any, questionIdx: number) => (
-                             <QuestionCard
-                               key={question.id}
-                               question={question}
-                               questionNumber={builderData.numberingStyle === 'continuous' 
-                                 ? builderData.sections.slice(0, sectionIdx).reduce((sum, s) => sum + s.questions.length, 0) + questionIdx + 1
-                                 : questionIdx + 1
-                               }
-                               onUpdate={(updatedQuestion) => {
-                                 const updatedSections = [...builderData.sections];
-                                 updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
-                                 setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                               }}
-                               onDelete={() => {
-                                 const updatedSections = [...builderData.sections];
-                                 updatedSections[sectionIdx].questions = updatedSections[sectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
-                                 setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                               }}
-                             />
-                          ))}
                           <Button 
-                            variant="outline" 
-                            className="w-full border-dashed border-purple-300 text-purple-600 hover:bg-purple-100 bg-white/50"
+                            variant="ghost" 
+                            size="sm"
                             onClick={() => {
-                              const availableItems = selectedItemsData.filter(item => 
-                                !builderData.sections.some(s => 
-                                  s.questions.some((q: any) => q.text === item.question)
-                                )
-                              );
-                              if (availableItems.length > 0) {
-                                const newQuestion = {
-                                  id: Date.now(),
-                                  text: availableItems[0].question,
-                                  marks: availableItems[0].marks,
-                                  subQuestions: []
-                                };
-                                const updatedSections = [...builderData.sections];
-                                updatedSections[sectionIdx].questions.push(newQuestion);
-                                setBuilderData(prev => ({ ...prev, sections: updatedSections }));
-                              }
+                              const updatedSections = builderData.sections.filter((_, idx) => idx !== sectionIdx);
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
                             }}
+                            className="text-red-500 hover:text-red-700 hover:bg-red-100"
                           >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Add Question to This Section
+                            <Trash2 className="h-4 w-4" />
                           </Button>
-                        </CardContent>
-                      </Card>
-                    </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {section.questions.map((question: any, questionIdx: number) => (
+                           <QuestionCard
+                             key={question.id}
+                             question={question}
+                             questionNumber={builderData.numberingStyle === 'continuous' 
+                               ? builderData.sections.slice(0, sectionIdx).reduce((sum, s) => sum + s.questions.length, 0) + questionIdx + 1
+                               : questionIdx + 1
+                             }
+                             onUpdate={(updatedQuestion) => {
+                               const updatedSections = [...builderData.sections];
+                               updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
+                               setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                             }}
+                             onDelete={() => {
+                               const updatedSections = [...builderData.sections];
+                               updatedSections[sectionIdx].questions = updatedSections[sectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
+                               setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                             }}
+                           />
+                        ))}
+                        <Button 
+                          variant="outline" 
+                          className="w-full border-dashed border-purple-300 text-purple-600 hover:bg-purple-100"
+                          onClick={() => {
+                            const availableItems = selectedItemsData.filter(item => 
+                              !builderData.sections.some(s => 
+                                s.questions.some((q: any) => q.text === item.question)
+                              )
+                            );
+                            if (availableItems.length > 0) {
+                              const newQuestion = {
+                                id: Date.now(),
+                                text: availableItems[0].question,
+                                marks: availableItems[0].marks,
+                                subQuestions: []
+                              };
+                              const updatedSections = [...builderData.sections];
+                              updatedSections[sectionIdx].questions.push(newQuestion);
+                              setBuilderData(prev => ({ ...prev, sections: updatedSections }));
+                            }
+                          }}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Question
+                        </Button>
+                      </CardContent>
+                    </Card>
                   ))}
-                  
-                  {/* Add New Section Button at Bottom */}
-                  <div className="flex justify-center pt-6">
-                    <Button 
-                      onClick={() => {
-                        const newSection = {
-                          id: Date.now(),
-                          title: `SECTION - ${String.fromCharCode(65 + builderData.sections.length)}`,
-                          questions: selectedItemsData.slice(0, Math.min(3, selectedItemsData.length)).map((item, idx) => ({
-                            id: Date.now() + idx,
-                            text: item.question,
-                            marks: item.marks,
-                            subQuestions: []
-                          }))
-                        };
-                        setBuilderData(prev => ({ 
-                          ...prev, 
-                          sections: [...prev.sections, newSection] 
-                        }));
-                      }}
-                      className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold px-8 py-4 rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
-                      size="lg"
-                    >
-                      <Plus className="h-5 w-5 mr-2" />
-                      Add New Section
-                    </Button>
-                  </div>
                 </div>
               )}
             </div>
