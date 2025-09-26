@@ -884,16 +884,20 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       id: Date.now() + index,
                       title: `SECTION ${String.fromCharCode(65 + index)} - ${itemType.toUpperCase()}`,
                       instruction: `Answer all questions`,
-                      questions: items.map((item: any, qIndex: number) => ({
-                        id: Date.now() + index * 1000 + qIndex,
-                        text: item.question,
-                        marks: item.marks,
-                        subQuestions: [],
-                        hasOROption: false,
-                        orQuestion: '',
-                        hasImage: false,
-                        imageUrl: null
-                      }))
+                        questions: items.map((item: any, qIndex: number) => ({
+                          id: Date.now() + index * 1000 + qIndex,
+                          question: item.question, // Fix: use 'question' instead of 'text'
+                          marks: item.marks,
+                          itemType: item.itemType,
+                          bloomsLevel: item.bloomsLevel,
+                          difficulty: item.difficulty,
+                          options: item.options || [],
+                          subQuestions: [],
+                          hasOROption: false,
+                          orQuestion: '',
+                          hasImage: !!item.imageUrl,
+                          imageUrl: item.imageUrl || null
+                        }))
                     };
                   });
 
