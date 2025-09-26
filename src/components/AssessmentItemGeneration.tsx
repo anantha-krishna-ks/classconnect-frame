@@ -1332,7 +1332,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             {/* Export Options */}
             <Card className="border border-green-200 bg-green-50/30">
               <CardHeader>
-                <CardTitle className="text-green-800">Export Assessment</CardTitle>
+                <CardTitle className="text-green-800">Finalize & Export</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex gap-4">
