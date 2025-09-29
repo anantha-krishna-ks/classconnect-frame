@@ -23,8 +23,7 @@ import {
   ThumbsDown,
   Brain,
   Lightbulb,
-  Target,
-  Trash2
+  Target
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -999,132 +998,7 @@ const ResourceVault = () => {
 
       {/* Notes Modal Dialog */}
       <Dialog open={showNotes} onOpenChange={setShowNotes}>
-        <DialogContent className="w-[95vw] max-w-[95vw] sm:w-[90vw] sm:max-w-3xl lg:max-w-4xl xl:max-w-5xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="sticky top-0 bg-white z-10 pb-4 border-b">
-            <DialogTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-emerald-500" />
-              My Notes
-            </DialogTitle>
-            <DialogDescription>
-              Save and organize your study notes while browsing resources
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-4 pb-4">
-            {/* Note Editor Column */}
-            <div className="space-y-4">
-              <div className="p-3 sm:p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                <h3 className="font-semibold text-emerald-800 mb-3 flex items-center gap-2 text-sm sm:text-base">
-                  <FileText className="w-4 h-4" />
-                  {editingNoteId !== null ? 'Edit Note' : 'Create New Note'}
-                </h3>
-                <div className="space-y-3">
-                  <Input
-                    placeholder="Note title..."
-                    value={currentNote.title}
-                    onChange={(e) => setCurrentNote({...currentNote, title: e.target.value})}
-                    className="font-medium bg-white text-sm sm:text-base"
-                  />
-                  <Textarea
-                    placeholder="Write your note here..."
-                    value={currentNote.content}
-                    onChange={(e) => setCurrentNote({...currentNote, content: e.target.value})}
-                    rows={4}
-                    className="resize-none bg-white text-sm sm:text-base"
-                  />
-                  <Input
-                    placeholder="Tags (comma separated)..."
-                    value={currentNote.tags}
-                    onChange={(e) => setCurrentNote({...currentNote, tags: e.target.value})}
-                    className="text-xs sm:text-sm bg-white"
-                  />
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Button 
-                      onClick={handleSaveNote}
-                      disabled={!currentNote.title.trim() || !currentNote.content.trim()}
-                      className="bg-emerald-500 hover:bg-emerald-600 flex-1 text-sm"
-                    >
-                      {editingNoteId !== null ? 'Update Note' : 'Save Note'}
-                    </Button>
-                    {editingNoteId !== null && (
-                      <Button 
-                        onClick={handleCancelEdit}
-                        variant="outline"
-                        className="text-sm"
-                      >
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Notes List Column */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-sm sm:text-base sticky top-20 bg-white py-2 z-10">
-                <BookOpen className="w-4 h-4" />
-                Saved Notes ({notes.length})
-              </h3>
-              
-              <div className="space-y-2 sm:space-y-3">
-                {notes.length === 0 ? (
-                  <div className="text-center py-6 sm:py-8">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500" />
-                    </div>
-                    <p className="text-xs sm:text-sm text-gray-500 px-4">
-                      No notes yet. Create your first note to get started!
-                    </p>
-                  </div>
-                ) : (
-                  notes.map((note) => (
-                    <div key={note.id} className="border border-gray-200 rounded-lg p-2 sm:p-3 bg-white hover:shadow-sm transition-shadow">
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-medium text-gray-900 text-xs sm:text-sm flex-1 line-clamp-1 pr-2">{note.title}</h4>
-                        <div className="flex gap-1 flex-shrink-0">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditNote(note)}
-                            className="h-6 w-6 sm:h-7 sm:w-7 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                          >
-                            <FileText className="w-3 h-3" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteNote(note.id)}
-                            className="h-6 w-6 sm:h-7 sm:w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </Button>
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-600 mb-2 line-clamp-2">{note.content}</p>
-                      {note.tags && (
-                        <div className="flex flex-wrap gap-1 mb-2">
-                          {note.tags.split(',').slice(0, 3).map((tag: string, index: number) => (
-                            <Badge key={index} variant="secondary" className="text-xs px-1 py-0">
-                              {tag.trim()}
-                            </Badge>
-                          ))}
-                          {note.tags.split(',').length > 3 && (
-                            <Badge variant="outline" className="text-xs px-1 py-0">
-                              +{note.tags.split(',').length - 3}
-                            </Badge>
-                          )}
-                        </div>
-                      )}
-                      <p className="text-xs text-gray-400">
-                        {note.updatedAt.toLocaleDateString()}
-                      </p>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-emerald-500" />
