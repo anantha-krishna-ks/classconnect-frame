@@ -23,7 +23,8 @@ import {
   ThumbsDown,
   Brain,
   Lightbulb,
-  Target
+  Target,
+  Trash2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -1096,7 +1097,7 @@ const ResourceVault = () => {
                             onClick={() => handleDeleteNote(note.id)}
                             className="h-6 w-6 sm:h-7 sm:w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                           >
-                            <ExternalLink className="w-3 h-3" />
+                            <Trash2 className="w-3 h-3" />
                           </Button>
                         </div>
                       </div>
