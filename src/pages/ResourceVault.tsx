@@ -799,7 +799,7 @@ const ResourceVault = () => {
                           setSelectedResource(resource);
                         }}
                       >
-                        <Download className="w-4 h-4 mr-2" />
+                        <ExternalLink className="w-4 h-4 mr-2" />
                         View Details
                       </Button>
                     </div>
