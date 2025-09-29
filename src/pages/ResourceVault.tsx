@@ -999,8 +999,8 @@ const ResourceVault = () => {
 
       {/* Notes Modal Dialog */}
       <Dialog open={showNotes} onOpenChange={setShowNotes}>
-        <DialogContent className="w-[95vw] max-w-[95vw] sm:w-[90vw] sm:max-w-3xl lg:max-w-4xl xl:max-w-5xl max-h-[90vh] overflow-hidden">
-          <DialogHeader>
+        <DialogContent className="w-[95vw] max-w-[95vw] sm:w-[90vw] sm:max-w-3xl lg:max-w-4xl xl:max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="sticky top-0 bg-white z-10 pb-4 border-b">
             <DialogTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-emerald-500" />
               My Notes
@@ -1010,7 +1010,7 @@ const ResourceVault = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mt-4 pb-4">
             {/* Note Editor Column */}
             <div className="space-y-4">
               <div className="p-3 sm:p-4 bg-emerald-50 rounded-lg border border-emerald-200">
@@ -1062,12 +1062,12 @@ const ResourceVault = () => {
 
             {/* Notes List Column */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-sm sm:text-base">
+              <h3 className="font-semibold text-gray-800 flex items-center gap-2 text-sm sm:text-base sticky top-20 bg-white py-2 z-10">
                 <BookOpen className="w-4 h-4" />
                 Saved Notes ({notes.length})
               </h3>
               
-              <div className="max-h-64 sm:max-h-80 lg:max-h-96 overflow-y-auto pr-2 space-y-2 sm:space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {notes.length === 0 ? (
                   <div className="text-center py-6 sm:py-8">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
