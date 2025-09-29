@@ -59,6 +59,7 @@ const ResourceVault = () => {
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedChapter, setSelectedChapter] = useState('');
   const [searchTopic, setSearchTopic] = useState('');
+  const [searchHighlight, setSearchHighlight] = useState('');
   const [chatMessage, setChatMessage] = useState('');
   const [showStudyPal, setShowStudyPal] = useState(false);
   const [selectedResource, setSelectedResource] = useState<any>(null);
@@ -228,9 +229,26 @@ const ResourceVault = () => {
         )
       );
       setResources(filtered);
+      setSearchHighlight(searchQuery.toLowerCase());
       // Close the modal to show the filtered results
       setSelectedResource(null);
     }
+  };
+
+  // Helper function to highlight matching text
+  const highlightText = (text: string, highlight: string) => {
+    if (!highlight) return text;
+    
+    const regex = new RegExp(`(${highlight})`, 'gi');
+    const parts = text.split(regex);
+    
+    return parts.map((part, index) => 
+      regex.test(part) ? 
+        React.createElement('mark', { 
+          key: index, 
+          className: 'bg-yellow-200 text-yellow-900 px-1 rounded' 
+        }, part) : part
+    );
   };
 
   const handleStudyPalMessage = () => {
@@ -761,8 +779,12 @@ const ResourceVault = () => {
                           <IconComponent className="w-5 h-5 text-purple-600 group-hover:text-purple-700 transition-colors duration-200" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-slate-800 mb-1 group-hover:text-purple-700 transition-colors duration-200 line-clamp-2">{resource.title}</h4>
-                          <p className="text-sm text-slate-600 group-hover:text-slate-700 transition-colors duration-200 line-clamp-2">{resource.description}</p>
+                          <h4 className="font-medium text-slate-800 mb-1 group-hover:text-purple-700 transition-colors duration-200 line-clamp-2">
+                            {highlightText(resource.title, searchHighlight)}
+                          </h4>
+                          <p className="text-sm text-slate-600 group-hover:text-slate-700 transition-colors duration-200 line-clamp-2">
+                            {highlightText(resource.description, searchHighlight)}
+                          </p>
                         </div>
                         <Badge variant="secondary" className="bg-slate-100 text-slate-700 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors duration-200 shrink-0">
                           {resource.type}
