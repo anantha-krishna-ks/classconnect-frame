@@ -811,7 +811,7 @@ const ResourceVault = () => {
               <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
                 <h3 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-2">
                   <Search className="w-4 h-4 text-blue-500" />
-                  Find Related Resources
+                  Search
                 </h3>
                 <p className="text-xs text-gray-600 mb-3">
                   Search for more resources related to any concept or topic
