@@ -1785,7 +1785,7 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
   
   return (
     <Card className={`border border-gray-300 bg-white transition-all duration-200 ${isDragging ? 'shadow-xl scale-105 rotate-2' : 'shadow-sm hover:shadow-md'} ${isDragOverlay ? 'shadow-2xl' : ''}`}>
-      <CardContent className="p-4">
+      <CardContent className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
         {/* Main Question */}
         <div className="space-y-3">
           <div className="flex items-start gap-3">
