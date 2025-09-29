@@ -218,6 +218,21 @@ const ResourceVault = () => {
     }
   };
 
+  const handleInModalSearch = (searchQuery: string) => {
+    if (searchQuery.trim()) {
+      const filtered = mockResources.filter(r => 
+        r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.content.keyTopics.some((topic: string) => 
+          topic.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+      setResources(filtered);
+      // Close the modal to show the filtered results
+      setSelectedResource(null);
+    }
+  };
+
   const handleStudyPalMessage = () => {
     if (chatMessage.trim()) {
       const topic = chatMessage.trim();
@@ -716,35 +731,6 @@ const ResourceVault = () => {
             </CardContent>
           </Card>
 
-          {/* Search by Topic */}
-          <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-slate-800 flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                Search by Concept or Topic
-              </CardTitle>
-              <CardDescription className="text-slate-600">
-                Type any specific concept or phrase to find related resources
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-3">
-                <Input
-                  placeholder="Enter a concept, topic, or phrase..."
-                  value={searchTopic}
-                  onChange={(e) => setSearchTopic(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleTopicSearch()}
-                  className="hover:border-blue-300 focus:border-blue-400 transition-colors duration-200 bg-slate-50/50 hover:bg-white"
-                />
-                <Button 
-                  onClick={handleTopicSearch} 
-                  className="bg-blue-500 hover:bg-blue-600 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105"
-                >
-                  <Search className="w-4 h-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Resources Display */}
@@ -820,6 +806,33 @@ const ResourceVault = () => {
                   )}
                 </div>
               </DialogHeader>
+
+              {/* Search Functionality inside Modal */}
+              <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
+                <h3 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                  <Search className="w-4 h-4 text-blue-500" />
+                  Find Related Resources
+                </h3>
+                <p className="text-xs text-gray-600 mb-3">
+                  Search for more resources related to any concept or topic
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter a concept, topic, or phrase..."
+                    value={searchTopic}
+                    onChange={(e) => setSearchTopic(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleInModalSearch(searchTopic)}
+                    className="flex-1 h-9 text-sm hover:border-blue-300 focus:border-blue-400 transition-colors duration-200"
+                  />
+                  <Button 
+                    onClick={() => handleInModalSearch(searchTopic)} 
+                    size="sm"
+                    className="bg-blue-500 hover:bg-blue-600 px-3"
+                  >
+                    <Search className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
               
               <div className="space-y-6 mt-6">
                 {/* Summary */}
