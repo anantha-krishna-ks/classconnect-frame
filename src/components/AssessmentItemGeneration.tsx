@@ -1902,9 +1902,6 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
                     className="w-12 h-6 text-xs text-center"
                     min="1"
                   />
-                  <div className="text-xs font-medium">
-                    [{subQ.marks}]
-                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
