@@ -2075,7 +2075,7 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
             variant="outline"
             size="sm"
             onClick={() => document.getElementById(`main-image-upload-${question.id}`)?.click()}
-            className="text-blue-600 border-blue-300 hover:bg-blue-50"
+            className="text-green-600 border-green-300 hover:bg-green-50"
           >
             <Image className="h-3 w-3 mr-1" />
             Add Image
