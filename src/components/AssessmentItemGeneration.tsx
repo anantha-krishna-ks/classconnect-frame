@@ -1858,30 +1858,7 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
                   className="max-w-full h-auto max-h-32 rounded border object-contain"
                 />
               </div>
-            ) : (
-              <div className="bg-blue-50 border border-dashed border-blue-300 rounded p-2">
-                <div className="text-center">
-                  <Upload className="h-3 w-3 text-blue-500 mx-auto mb-1" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleImageUpload(`main-${question.id}`, file, 'main');
-                    }}
-                    className="hidden"
-                    id={`main-image-upload-${question.id}`}
-                  />
-                  <label 
-                    htmlFor={`main-image-upload-${question.id}`}
-                    className="inline-flex items-center px-2 py-1 bg-blue-600 text-white text-xs rounded cursor-pointer hover:bg-blue-700"
-                  >
-                    <Image className="h-3 w-3 mr-1" />
-                    Add Image
-                  </label>
-                </div>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
           
@@ -2107,6 +2084,25 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
           >
             {question.hasOROption ? 'Remove OR' : 'Add OR'}
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => document.getElementById(`main-image-upload-${question.id}`)?.click()}
+            className="text-blue-600 border-blue-300 hover:bg-blue-50"
+          >
+            <Image className="h-3 w-3 mr-1" />
+            Add Image
+          </Button>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleImageUpload(`main-${question.id}`, file, 'main');
+            }}
+            className="hidden"
+            id={`main-image-upload-${question.id}`}
+          />
           <Button
             variant="ghost"
             size="sm"
