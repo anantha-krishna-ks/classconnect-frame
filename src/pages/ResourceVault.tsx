@@ -997,6 +997,123 @@ const ResourceVault = () => {
             <FileText className="w-7 h-7 text-white" />
           </Button>
         </SheetTrigger>
+        <SheetContent className="w-full sm:max-w-lg flex flex-col h-screen">
+          <SheetHeader className="pb-4 border-b flex-shrink-0">
+            <SheetTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
+                <FileText className="w-4 h-4 text-white" />
+              </div>
+              My Notes
+            </SheetTitle>
+            <SheetDescription>
+              Save and organize your study notes
+            </SheetDescription>
+          </SheetHeader>
+          
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Note Editor Section */}
+            <div className="border-b p-4 bg-emerald-50/50 flex-shrink-0">
+              <div className="space-y-3">
+                <Input
+                  placeholder="Note title..."
+                  value={currentNote.title}
+                  onChange={(e) => setCurrentNote({...currentNote, title: e.target.value})}
+                  className="font-medium"
+                />
+                <Textarea
+                  placeholder="Write your note here..."
+                  value={currentNote.content}
+                  onChange={(e) => setCurrentNote({...currentNote, content: e.target.value})}
+                  rows={4}
+                  className="resize-none"
+                />
+                <Input
+                  placeholder="Tags (comma separated)..."
+                  value={currentNote.tags}
+                  onChange={(e) => setCurrentNote({...currentNote, tags: e.target.value})}
+                  className="text-sm"
+                />
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleSaveNote}
+                    disabled={!currentNote.title.trim() || !currentNote.content.trim()}
+                    className="bg-emerald-500 hover:bg-emerald-600 flex-1"
+                    size="sm"
+                  >
+                    {editingNoteId !== null ? 'Update Note' : 'Save Note'}
+                  </Button>
+                  {editingNoteId !== null && (
+                    <Button 
+                      onClick={handleCancelEdit}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Notes List */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {notes.length === 0 ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FileText className="w-8 h-8 text-emerald-500" />
+                    </div>
+                    <h3 className="font-medium text-gray-900 mb-2">No notes yet</h3>
+                    <p className="text-sm text-gray-500 max-w-xs">
+                      Start taking notes to organize your learning and keep track of important concepts.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {notes.map((note) => (
+                    <div key={note.id} className="border border-emerald-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <h4 className="font-medium text-gray-900 flex-1">{note.title}</h4>
+                        <div className="flex gap-1 ml-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditNote(note)}
+                            className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                          >
+                            <FileText className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteNote(note.id)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-3">{note.content}</p>
+                      {note.tags && (
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {note.tags.split(',').map((tag: string, index: number) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {tag.trim()}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-400">
+                        {note.updatedAt.toLocaleDateString()} at {note.updatedAt.toLocaleTimeString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </SheetContent>
       </Sheet>
 
       {/* StudyPal Floating Button */}
