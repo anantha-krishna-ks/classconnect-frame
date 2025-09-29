@@ -2094,7 +2094,7 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
             variant="ghost"
             size="sm"
             onClick={onDelete}
-            className="text-red-500 hover:bg-red-100"
+            className="text-red-500 hover:bg-red-100 ml-auto"
           >
             <Trash2 className="h-3 w-3 mr-1" />
             Delete
