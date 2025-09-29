@@ -991,7 +991,7 @@ const ResourceVault = () => {
       {/* Notes Floating Button */}
       <Button
         onClick={() => setShowNotes(true)}
-        className="fixed bottom-8 right-28 rounded-full w-16 h-16 bg-emerald-500 hover:bg-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm animate-fade-in"
+        className="fixed bottom-28 right-8 rounded-full w-16 h-16 bg-emerald-500 hover:bg-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm animate-fade-in"
         size="icon"
       >
         <FileText className="w-7 h-7 text-white" />
