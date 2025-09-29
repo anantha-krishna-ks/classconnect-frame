@@ -1784,106 +1784,91 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
   };
   
   return (
-    <Card className={`border border-gray-300 bg-white transition-all duration-200 ${isDragging ? 'shadow-xl scale-105 rotate-2' : 'shadow-sm hover:shadow-md'} ${isDragOverlay ? 'shadow-2xl' : ''}`}>
+    <Card className={`border-l-4 border-l-blue-500 border border-gray-200 bg-white rounded-lg transition-all duration-200 ${isDragging ? 'shadow-xl scale-105 rotate-2' : 'shadow-sm hover:shadow-md'} ${isDragOverlay ? 'shadow-2xl' : ''}`}>
       <CardContent className="p-4">
-        {/* Main Question */}
-        <div className="space-y-3">
-          <div className="flex items-start gap-3">
+        {/* Header Row */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
             {dragHandleProps && (
               <button
                 {...dragHandleProps}
-                className="p-1 hover:bg-gray-100 rounded cursor-grab active:cursor-grabbing mt-1"
+                className="p-1 hover:bg-gray-100 rounded cursor-grab active:cursor-grabbing"
                 aria-label="Drag to reorder question"
               >
-                <GripVertical className="h-4 w-4 text-gray-400" />
+                <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M3 3h2v2H3V3zm4 0h2v2H7V3zm4 0h2v2h-2V3zm4 0h2v2h-2V3zm4 0h2v2h-2V3zM3 7h2v2H3V7zm4 0h2v2H7V7zm4 0h2v2h-2V7zm4 0h2v2h-2V7zm4 0h2v2h-2V7zM3 11h2v2H3v-2zm4 0h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM3 15h2v2H3v-2zm4 0h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM3 19h2v2H3v-2zm4 0h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2z"/>
+                </svg>
               </button>
             )}
-            <span className="font-bold text-lg min-w-[30px] mt-1">{questionNumber})</span>
-            <div className="flex-1">
-              <Textarea
-                value={question.text}
-                onChange={(e) => onUpdate({ ...question, text: e.target.value })}
-                className="min-h-[60px] resize-none font-medium"
-                placeholder="Enter question text..."
-              />
+            <div className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded-full font-bold text-sm">
+              {questionNumber}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="text-center">
-                <label className="text-xs text-muted-foreground">Marks</label>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <span className="text-sm text-gray-500">Marks:</span>
+              <div className="flex items-center gap-2 mt-1">
                 <Input
                   type="number"
                   value={question.marks}
                   onChange={(e) => onUpdate({ ...question, marks: parseInt(e.target.value) || 0 })}
-                  className="w-14 h-8 text-center font-bold"
+                  className="w-16 h-8 text-center font-bold"
                   min="1"
                 />
+                <div className="text-sm font-bold text-gray-600 border px-2 py-1 rounded bg-gray-50">
+                  [{question.marks}]
+                </div>
               </div>
-              <div className="text-sm font-bold border px-2 py-1 rounded">
-                [{question.marks}]
-              </div>
-              {onDelete && (
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {}}
+              className="text-gray-400 hover:text-gray-600 p-1"
+            >
+              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+              </svg>
+            </Button>
+            <span className="text-sm text-gray-500">Question {questionNumber}</span>
+          </div>
+        </div>
+
+        {/* Question Text */}
+        <div className="mb-4">
+          <Textarea
+            value={question.text}
+            onChange={(e) => onUpdate({ ...question, text: e.target.value })}
+            className="min-h-[80px] resize-none bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 placeholder-gray-500 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="In the context of building understanding through careful reading, what is the most accurate statement?"
+          />
+        </div>
+        {/* Main Question Image Upload */}
+        {(imagePreviews[`main-${question.id}`] || question.imageUrl) ? (
+          <div className="mb-4">
+            <div className="relative bg-gray-50 p-3 rounded-lg border">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-blue-700 flex items-center gap-1">
+                  <Image className="h-4 w-4" />
+                  Question Image
+                </span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={onDelete}
-                  className="text-red-500 hover:text-red-700 hover:bg-red-100"
+                  onClick={() => removeImage(`main-${question.id}`, 'main')}
+                  className="h-6 w-6 p-0 text-red-500 hover:bg-red-100 rounded-full"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <X className="h-3 w-3" />
                 </Button>
-              )}
+              </div>
+              <img 
+                src={imagePreviews[`main-${question.id}`] || question.imageUrl} 
+                alt="Question image" 
+                className="max-w-full h-auto max-h-40 rounded border object-contain"
+              />
             </div>
           </div>
-          
-          {/* Main Question Image Upload */}
-          <div className="ml-8">
-            {(imagePreviews[`main-${question.id}`] || question.imageUrl) ? (
-              <div className="relative bg-gray-50 p-2 rounded border">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-medium text-blue-700 flex items-center gap-1">
-                    <Image className="h-3 w-3" />
-                    Question Image
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeImage(`main-${question.id}`, 'main')}
-                    className="h-5 w-5 p-0 text-red-500 hover:bg-red-100 rounded-full"
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                </div>
-                <img 
-                  src={imagePreviews[`main-${question.id}`] || question.imageUrl} 
-                  alt="Question image" 
-                  className="max-w-full h-auto max-h-32 rounded border object-contain"
-                />
-              </div>
-            ) : (
-              <div className="bg-blue-50 border border-dashed border-blue-300 rounded p-2">
-                <div className="text-center">
-                  <Upload className="h-3 w-3 text-blue-500 mx-auto mb-1" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleImageUpload(`main-${question.id}`, file, 'main');
-                    }}
-                    className="hidden"
-                    id={`main-image-upload-${question.id}`}
-                  />
-                  <label 
-                    htmlFor={`main-image-upload-${question.id}`}
-                    className="inline-flex items-center px-2 py-1 bg-blue-600 text-white text-xs rounded cursor-pointer hover:bg-blue-700"
-                  >
-                    <Image className="h-3 w-3 mr-1" />
-                    Add Image
-                  </label>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        ) : null}
           
         {/* Sub-questions */}
         {question.subQuestions && question.subQuestions.length > 0 && (
@@ -2076,46 +2061,63 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
           </div>
         )}
         
-        {/* Controls */}
-        <div className="flex gap-2 mt-3 pt-2 border-t">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              const newSubQuestion = {
-                id: Date.now(),
-                text: 'New sub-question',
-                marks: 1,
-                hasImage: false,
-                imageUrl: null
-              };
-              onUpdate({
-                ...question,
-                subQuestions: [...(question.subQuestions || []), newSubQuestion]
-              });
-            }}
-            className="text-blue-600 border-blue-300 hover:bg-blue-50"
-          >
-            <Plus className="h-3 w-3 mr-1" />
-            Sub-Q
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onUpdate({ ...question, hasOROption: !question.hasOROption })}
-            className="text-orange-600 border-orange-300 hover:bg-orange-50"
-          >
-            {question.hasOROption ? 'Remove OR' : 'Add OR'}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onDelete}
-            className="text-red-500 hover:bg-red-100"
-          >
-            <Trash2 className="h-3 w-3 mr-1" />
-            Delete
-          </Button>
+        {/* Action Bar */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const newSubQuestion = {
+                  id: Date.now(),
+                  text: 'New sub-question',
+                  marks: 1,
+                  hasImage: false,
+                  imageUrl: null
+                };
+                onUpdate({
+                  ...question,
+                  subQuestions: [...(question.subQuestions || []), newSubQuestion]
+                });
+              }}
+              className="text-gray-700 hover:bg-gray-50 font-medium"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Sub-Question
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onUpdate({ ...question, hasOROption: !question.hasOROption })}
+              className="text-gray-700 hover:bg-gray-50 font-medium"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add OR
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {}}
+              className="text-gray-700 hover:bg-gray-50 font-medium"
+            >
+              <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Add Image
+            </Button>
+          </div>
+          <div className="flex items-center gap-2">
+            {onDelete && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onDelete}
+                className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
