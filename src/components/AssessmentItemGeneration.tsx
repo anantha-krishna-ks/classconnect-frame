@@ -1818,9 +1818,6 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
                   min="1"
                 />
               </div>
-              <div className="text-sm font-bold border px-2 py-1 rounded">
-                [{question.marks}]
-              </div>
               {onDelete && (
                 <Button
                   variant="ghost"
