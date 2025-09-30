@@ -1434,19 +1434,30 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             )}
 
             {/* Sections */}
-            {builderData.sections?.map((section: any, sectionIdx: number) => (
-              <div key={sectionIdx} className="border rounded-lg p-4">
-                <div className="mb-4">
-                  <h3 className="text-lg font-bold">Section {String.fromCharCode(65 + sectionIdx)}: {section.title}</h3>
-                  {section.instruction && (
-                    <p className="text-sm text-gray-600 mt-1">{section.instruction}</p>
-                  )}
-                </div>
-                
-                {section.questions?.map((question: any, qIdx: number) => (
-                  <div key={question.id} className="mb-6 p-4 border-l-4 border-blue-500 bg-gray-50">
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-semibold">{qIdx + 1}:</h4>
+            {builderData.sections?.map((section: any, sectionIdx: number) => {
+              // Calculate starting question number for continuous numbering
+              const startingQuestionNumber = builderData.sections
+                .slice(0, sectionIdx)
+                .reduce((acc: number, s: any) => acc + (s.questions?.length || 0), 0) + 1;
+              
+              return (
+                <div key={sectionIdx} className="border rounded-lg p-4">
+                  <div className="mb-4">
+                    <h3 className="text-lg font-bold">Section {String.fromCharCode(65 + sectionIdx)}: {section.title}</h3>
+                    {section.instruction && (
+                      <p className="text-sm text-gray-600 mt-1">{section.instruction}</p>
+                    )}
+                  </div>
+                  
+                  {section.questions?.map((question: any, qIdx: number) => {
+                    const questionNumber = builderData.numberingStyle === 'continuous' 
+                      ? startingQuestionNumber + qIdx 
+                      : qIdx + 1;
+                    
+                    return (
+                      <div key={question.id} className="mb-6 p-4 border-l-4 border-blue-500 bg-gray-50">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold">{questionNumber}:</h4>
                       <span className="text-sm font-medium bg-blue-100 px-2 py-1 rounded">
                         [{question.marks} marks]
                       </span>
@@ -1519,9 +1530,11 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            ))}
+                    );
+                  })}
+                </div>
+              );
+            })}
           </div>
         </DialogContent>
       </Dialog>
