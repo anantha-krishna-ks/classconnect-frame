@@ -1446,7 +1446,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 {section.questions?.map((question: any, qIdx: number) => (
                   <div key={question.id} className="mb-6 p-4 border-l-4 border-blue-500 bg-gray-50">
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-semibold">Question {qIdx + 1}:</h4>
+                      <h4 className="font-semibold">{qIdx + 1}:</h4>
                       <span className="text-sm font-medium bg-blue-100 px-2 py-1 rounded">
                         [{question.marks} marks]
                       </span>
