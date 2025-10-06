@@ -1823,10 +1823,11 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
             <div className="flex items-center gap-2">
               <div className="text-center">
                 <label className="text-xs text-muted-foreground">Marks</label>
-                <Input
+              <Input
                   type="number"
+                  step="0.01"
                   value={question.marks}
-                  onChange={(e) => onUpdate({ ...question, marks: parseInt(e.target.value) || 0 })}
+                  onChange={(e) => onUpdate({ ...question, marks: parseFloat(e.target.value) || 0 })}
                   className="w-14 h-8 text-center font-bold"
                   min="1"
                 />
