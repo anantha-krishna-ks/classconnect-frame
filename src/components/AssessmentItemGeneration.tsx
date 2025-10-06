@@ -1564,89 +1564,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   );
 };
 
-// Subsection Component
-const SubsectionCard = ({ subsection, sectionIdx, subsectionIdx, builderData, setBuilderData }: any) => {
-  return (
-    <div className="ml-6 mt-3 border-l-2 border-indigo-300 pl-4">
-      <div className="flex items-center justify-between mb-2 bg-indigo-50 rounded-lg p-2">
-        <div className="flex items-center gap-2 flex-1">
-          <span className="text-xs font-semibold text-indigo-600">Subsection:</span>
-          <Input 
-            value={subsection.title}
-            onChange={(e) => {
-              const updatedSections = [...builderData.sections];
-              updatedSections[sectionIdx].subsections[subsectionIdx].title = e.target.value;
-              setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-            }}
-            className="font-semibold text-xs h-8 flex-1"
-            placeholder="Subsection title"
-          />
-        </div>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={() => {
-            const updatedSections = [...builderData.sections];
-            updatedSections[sectionIdx].subsections = updatedSections[sectionIdx].subsections.filter((_: any, idx: number) => idx !== subsectionIdx);
-            setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-          }}
-          className="text-red-500 h-7 w-7 p-0"
-        >
-          <X className="h-3 w-3" />
-        </Button>
-      </div>
-      
-      <div className="space-y-2">
-        {subsection.questions?.map((question: any, questionIdx: number) => (
-          <DraggableExamQuestionCard
-            key={question.id}
-            question={question}
-            questionNumber={questionIdx + 1}
-            onUpdate={(updatedQuestion: any) => {
-              const updatedSections = [...builderData.sections];
-              updatedSections[sectionIdx].subsections[subsectionIdx].questions[questionIdx] = updatedQuestion;
-              setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-            }}
-            onDelete={() => {
-              const updatedSections = [...builderData.sections];
-              updatedSections[sectionIdx].subsections[subsectionIdx].questions = 
-                updatedSections[sectionIdx].subsections[subsectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
-              setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-            }}
-          />
-        ))}
-        
-        <Button 
-          variant="outline" 
-          size="sm"
-          className="w-full border-dashed text-indigo-600 h-8 text-xs"
-          onClick={() => {
-            const newQuestion = {
-              id: Date.now(),
-              text: 'Enter your question here...',
-              marks: 5,
-              subQuestions: [],
-              hasOROption: false,
-              orQuestion: '',
-              hasImage: false,
-              imageUrl: null
-            };
-            const updatedSections = [...builderData.sections];
-            if (!updatedSections[sectionIdx].subsections[subsectionIdx].questions) {
-              updatedSections[sectionIdx].subsections[subsectionIdx].questions = [];
-            }
-            updatedSections[sectionIdx].subsections[subsectionIdx].questions.push(newQuestion);
-            setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-          }}
-        >
-          <Plus className="h-3 w-3 mr-1" />
-          Add Question
-        </Button>
-      </div>
-    </div>
-  );
-};
-
 // Droppable Section Card Component
 const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData }: any) => {
   return (
@@ -1742,40 +1659,6 @@ const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData
           <Plus className="h-4 w-4 mr-1" />
           Add Question
         </Button>
-        
-        <Button 
-          variant="outline" 
-          size="sm"
-          className="w-full border-dashed text-indigo-600 mt-2"
-          onClick={() => {
-            const newSubsection = {
-              id: Date.now(),
-              title: 'New Subsection',
-              questions: []
-            };
-            const updatedSections = [...builderData.sections];
-            if (!updatedSections[sectionIdx].subsections) {
-              updatedSections[sectionIdx].subsections = [];
-            }
-            updatedSections[sectionIdx].subsections.push(newSubsection);
-            setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-          }}
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          Add Subsection
-        </Button>
-        
-        {/* Render Subsections */}
-        {section.subsections?.map((subsection: any, subsectionIdx: number) => (
-          <SubsectionCard
-            key={subsection.id}
-            subsection={subsection}
-            sectionIdx={sectionIdx}
-            subsectionIdx={subsectionIdx}
-            builderData={builderData}
-            setBuilderData={setBuilderData}
-          />
-        ))}
       </CardContent>
     </Card>
   );
