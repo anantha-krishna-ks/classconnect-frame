@@ -847,24 +847,38 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             {/* Bloom's Taxonomy Distribution */}
             <div className="space-y-4">
               <h4 className="text-lg font-semibold flex items-center gap-2">
-                <PieChart className="h-5 w-5" />
+                <PieChart className="h-5 w-5 text-primary" />
                 Bloom's Taxonomy Distribution
               </h4>
-              <div className="space-y-2">
-                {Object.entries(bloomsDistribution).map(([level, count]) => (
-                  <div key={level} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <span className="font-medium">{level}</span>
-                    <div className="flex items-center gap-2">
-                      <div className="w-32 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full ${getBadgeColor(level).split(' ')[0]}`}
-                          style={{ width: `${selectedItems.length > 0 ? (count / selectedItems.length) * 100 : 0}%` }}
-                        />
+              <div className="space-y-3">
+                {Object.entries(bloomsDistribution).map(([level, count]) => {
+                  const getBarColor = (level: string) => {
+                    const colors = {
+                      'Remember': 'bg-red-500',
+                      'Understand': 'bg-orange-500',
+                      'Apply': 'bg-yellow-500',
+                      'Analyze': 'bg-green-500',
+                      'Evaluate': 'bg-blue-500',
+                      'Create': 'bg-purple-500'
+                    };
+                    return colors[level as keyof typeof colors] || 'bg-primary';
+                  };
+                  
+                  return (
+                    <div key={level} className="flex items-center justify-between p-4 bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow">
+                      <span className="font-medium text-foreground min-w-[100px]">{level}</span>
+                      <div className="flex items-center gap-3 flex-1 max-w-md">
+                        <div className="flex-1 bg-muted/50 rounded-full h-3 overflow-hidden shadow-inner">
+                          <div 
+                            className={`h-full rounded-full ${getBarColor(level)} transition-all duration-500 ease-out shadow-sm`}
+                            style={{ width: `${selectedItems.length > 0 ? (count / selectedItems.length) * 100 : 0}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-semibold text-foreground w-12 text-right">{count} ({selectedItems.length > 0 ? Math.round((count / selectedItems.length) * 100) : 0}%)</span>
                       </div>
-                      <span className="text-sm font-medium w-8 text-right">{count}</span>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
