@@ -14,7 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { 
   Eye, Edit, Trash2, CheckCircle2, Clock, BookOpen, Target, 
   BarChart3, PieChart, Save, Filter, X, Sparkles, Image, Upload,
-  GripVertical, Plus, FileDown, Settings, ChevronDown
+  GripVertical, Plus, FileDown, Settings, ChevronDown, FileCheck
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -950,7 +950,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   toast.success(`Assessment created with ${selectedItemsData.length} items organized into ${autoSections.length} sections!`);
                 }}
               >
-                <Save className="h-5 w-5 mr-2" />
+                <FileCheck className="h-5 w-5 mr-2" />
                 Create Assessment
               </Button>
             </div>
