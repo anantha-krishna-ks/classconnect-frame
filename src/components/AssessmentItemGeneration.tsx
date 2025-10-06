@@ -865,6 +865,18 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     return colors[level as keyof typeof colors] || 'bg-primary';
                   };
 
+                  const getSubtleBarBg = (level: string) => {
+                    const colors = {
+                      'Remember': 'bg-red-100/50',
+                      'Understand': 'bg-orange-100/50',
+                      'Apply': 'bg-yellow-100/50',
+                      'Analyze': 'bg-green-100/50',
+                      'Evaluate': 'bg-blue-100/50',
+                      'Create': 'bg-purple-100/50'
+                    };
+                    return colors[level as keyof typeof colors] || 'bg-muted/50';
+                  };
+
                   const getTaxonomyIcon = (level: string) => {
                     const icons = {
                       'Remember': Brain,
@@ -886,7 +898,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                         <span className="font-medium text-foreground">{level}</span>
                       </div>
                       <div className="flex items-center gap-3 flex-1 max-w-md bg-muted/30 p-2 rounded-lg">
-                        <div className="flex-1 bg-muted/50 rounded-full h-3 overflow-hidden shadow-inner">
+                        <div className={`flex-1 ${getSubtleBarBg(level)} rounded-full h-3 overflow-hidden shadow-inner`}>
                           <div 
                             className={`h-full rounded-full ${getBarColor(level)} transition-all duration-500 ease-out shadow-sm`}
                             style={{ width: `${selectedItems.length > 0 ? (count / selectedItems.length) * 100 : 0}%` }}
