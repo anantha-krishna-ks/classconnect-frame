@@ -382,6 +382,16 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
     console.log('PDF export would be implemented here');
   };
 
+  const exportAsWord = () => {
+    toast.success('Word export initiated', {
+      description: 'Your assessment will be exported as Word document shortly.'
+    });
+    
+    // In a real implementation, you'd use a library like docx
+    // For now, we'll just show success message
+    console.log('Word export would be implemented here');
+  };
+
   // Drag and drop handlers
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
@@ -1343,13 +1353,25 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     <Eye className="h-4 w-4 mr-2" />
                     Preview Assessment
                   </Button>
-                  <Button 
-                    onClick={exportAsPDF}
-                    className="bg-red-600 hover:bg-red-700 text-white"
-                  >
-                    <FileDown className="h-4 w-4 mr-2" />
-                    Export as PDF
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="bg-red-600 hover:bg-red-700 text-white">
+                        <FileDown className="h-4 w-4 mr-2" />
+                        Export
+                        <ChevronDown className="h-4 w-4 ml-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={exportAsPDF}>
+                        <FileDown className="h-4 w-4 mr-2" />
+                        Export as PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={exportAsWord}>
+                        <FileDown className="h-4 w-4 mr-2" />
+                        Export as Word
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <Button 
                     onClick={exportAsQTI}
                     variant="outline"
