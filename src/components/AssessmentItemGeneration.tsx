@@ -880,7 +880,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   const Icon = getTaxonomyIcon(level);
                   
                   return (
-                    <div key={level} className="flex items-center justify-between p-4 bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow">
+                    <div key={level} className="flex items-center justify-between p-2.5 bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex items-center gap-2 min-w-[140px]">
                         <Icon className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium text-foreground">{level}</span>
