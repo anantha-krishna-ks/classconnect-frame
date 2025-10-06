@@ -14,7 +14,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { 
   Eye, Edit, Trash2, CheckCircle2, Clock, BookOpen, Target, 
   BarChart3, PieChart, Save, Filter, X, Sparkles, Image, Upload,
-  GripVertical, Plus, FileDown, Settings, ChevronDown, FileCheck
+  GripVertical, Plus, FileDown, Settings, ChevronDown, FileCheck,
+  Brain, Lightbulb, Wrench, Search, Scale, Palette
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -863,10 +864,27 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     };
                     return colors[level as keyof typeof colors] || 'bg-primary';
                   };
+
+                  const getTaxonomyIcon = (level: string) => {
+                    const icons = {
+                      'Remember': Brain,
+                      'Understand': Lightbulb,
+                      'Apply': Wrench,
+                      'Analyze': Search,
+                      'Evaluate': Scale,
+                      'Create': Palette
+                    };
+                    return icons[level as keyof typeof icons] || Brain;
+                  };
+
+                  const Icon = getTaxonomyIcon(level);
                   
                   return (
                     <div key={level} className="flex items-center justify-between p-4 bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow">
-                      <span className="font-medium text-foreground min-w-[100px]">{level}</span>
+                      <div className="flex items-center gap-2 min-w-[140px]">
+                        <Icon className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium text-foreground">{level}</span>
+                      </div>
                       <div className="flex items-center gap-3 flex-1 max-w-md bg-muted/30 p-2 rounded-lg">
                         <div className="flex-1 bg-muted/50 rounded-full h-3 overflow-hidden shadow-inner">
                           <div 
