@@ -1826,10 +1826,10 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
               <Input
                   type="number"
                   step="0.01"
+                  min="0"
                   value={question.marks}
                   onChange={(e) => onUpdate({ ...question, marks: parseFloat(e.target.value) || 0 })}
-                  className="w-14 h-8 text-center font-bold"
-                  min="1"
+                  className="w-20 h-8 text-center font-bold"
                 />
               </div>
             </div>
