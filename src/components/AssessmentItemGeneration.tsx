@@ -867,7 +867,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   return (
                     <div key={level} className="flex items-center justify-between p-4 bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow">
                       <span className="font-medium text-foreground min-w-[100px]">{level}</span>
-                      <div className="flex items-center gap-3 flex-1 max-w-md">
+                      <div className="flex items-center gap-3 flex-1 max-w-md bg-muted/30 p-2 rounded-lg">
                         <div className="flex-1 bg-muted/50 rounded-full h-3 overflow-hidden shadow-inner">
                           <div 
                             className={`h-full rounded-full ${getBarColor(level)} transition-all duration-500 ease-out shadow-sm`}
