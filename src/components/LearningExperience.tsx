@@ -471,8 +471,8 @@ const [selectedIntelligenceTypes, setSelectedIntelligenceTypes] = useState<strin
                         }
                       }}
                     >
+                      {isSelected && <Check className="h-4 w-4 mr-1" />}
                       {type}
-                      {isSelected && <X className="h-4 w-4" />}
                     </button>
                   );
                 })}
