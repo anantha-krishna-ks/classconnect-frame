@@ -49,7 +49,7 @@ const allIntelligenceTypes = [
   'Interpersonal',
   'Naturalistic'
 ];
-const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); // always all selected
+const [selectedIntelligenceTypes, setSelectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes);
   const [showLearningContent, setShowLearningContent] = useState<boolean>(false);
 
   // New state for pedagogical approaches (flat list)
@@ -445,6 +445,36 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
                 placeholder="Type custom pedagogical approaches and press Enter, comma, or space to add..."
                 className="w-full"
               />
+            </div>
+
+            {/* Intelligence Types Multi-Select */}
+            <div className="mb-6">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">
+                Select Intelligence Types
+              </h4>
+              <div className="grid grid-cols-2 gap-3 p-4 bg-white rounded-lg border border-gray-200">
+                {allIntelligenceTypes.map((type) => (
+                  <div key={type} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={type}
+                      checked={selectedIntelligenceTypes.includes(type)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setSelectedIntelligenceTypes([...selectedIntelligenceTypes, type]);
+                        } else {
+                          setSelectedIntelligenceTypes(selectedIntelligenceTypes.filter(t => t !== type));
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor={type}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      {type}
+                    </label>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="mb-6">
