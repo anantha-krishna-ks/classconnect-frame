@@ -1924,10 +1924,19 @@ Students use the story framework to reflect on:
                               <div className="flex items-center gap-2">
                                 <label className="text-sm font-medium text-gray-700">Time:</label>
                                  <input
-                                   type="text"
-                                   placeholder="30 mins"
+                                   type="number"
+                                   min="0"
+                                   placeholder="30"
                                    value={stepTimes[eloKey]?.[step.id] || ''}
-                                   onChange={(e) => updateStepTime(eloKey, step.id, e.target.value)}
+                                   onChange={(e) => {
+                                     const value = e.target.value.replace(/\D/g, '');
+                                     updateStepTime(eloKey, step.id, value);
+                                   }}
+                                   onKeyDown={(e) => {
+                                     if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E' || e.key === '.') {
+                                       e.preventDefault();
+                                     }
+                                   }}
                                    onBlur={() => {
                                      const time = stepTimes[eloKey]?.[step.id];
                                      if (time && selectedResources[eloKey]?.[step.id]?.length > 0) {
