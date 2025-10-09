@@ -1923,28 +1923,33 @@ Students use the story framework to reflect on:
                             <div className="flex items-center gap-2">
                               <div className="flex items-center gap-2">
                                 <label className="text-sm font-medium text-gray-700">Time:</label>
-                                 <input
-                                   type="number"
-                                   min="0"
-                                   placeholder="30"
-                                   value={stepTimes[eloKey]?.[step.id] || ''}
-                                   onChange={(e) => {
-                                     const value = e.target.value.replace(/\D/g, '');
-                                     updateStepTime(eloKey, step.id, value);
-                                   }}
-                                   onKeyDown={(e) => {
-                                     if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E' || e.key === '.') {
-                                       e.preventDefault();
-                                     }
-                                   }}
-                                   onBlur={() => {
-                                     const time = stepTimes[eloKey]?.[step.id];
-                                     if (time && selectedResources[eloKey]?.[step.id]?.length > 0) {
-                                       distributeTimeAmongResources(eloKey, step.id, time);
-                                     }
-                                   }}
-                                   className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                 />
+                                <div className="relative inline-flex items-center">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    placeholder="30"
+                                    value={stepTimes[eloKey]?.[step.id] || ''}
+                                    onChange={(e) => {
+                                      const value = e.target.value.replace(/\D/g, '');
+                                      updateStepTime(eloKey, step.id, value);
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E' || e.key === '.') {
+                                        e.preventDefault();
+                                      }
+                                    }}
+                                    onBlur={() => {
+                                      const time = stepTimes[eloKey]?.[step.id];
+                                      if (time && selectedResources[eloKey]?.[step.id]?.length > 0) {
+                                        distributeTimeAmongResources(eloKey, step.id, time);
+                                      }
+                                    }}
+                                    className="w-20 px-2 py-1 text-sm border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-blue-500 border-r-0"
+                                  />
+                                  <span className="px-2 py-1 text-sm bg-muted text-muted-foreground border border-gray-300 border-l-0 rounded-r">
+                                    mins
+                                  </span>
+                                </div>
                               </div>
                               <Popover>
                                     <PopoverTrigger asChild>
