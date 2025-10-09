@@ -449,36 +449,31 @@ const [selectedIntelligenceTypes, setSelectedIntelligenceTypes] = useState<strin
 
             {/* Intelligence Types Multi-Select */}
             <div className="mb-6">
-              <h4 className="text-sm font-medium text-foreground mb-3">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">
                 Select Intelligence Types
               </h4>
-              <div className="flex flex-wrap gap-2.5 p-4 bg-gradient-to-br from-card via-card to-primary/5 rounded-xl border border-border/50 shadow-sm">
-                {allIntelligenceTypes.map((type) => {
-                  const isSelected = selectedIntelligenceTypes.includes(type);
-                  return (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => {
-                        if (isSelected) {
-                          setSelectedIntelligenceTypes(selectedIntelligenceTypes.filter(t => t !== type));
-                        } else {
+              <div className="grid grid-cols-2 gap-3 p-4 bg-white rounded-lg border border-gray-200">
+                {allIntelligenceTypes.map((type) => (
+                  <div key={type} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={type}
+                      checked={selectedIntelligenceTypes.includes(type)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
                           setSelectedIntelligenceTypes([...selectedIntelligenceTypes, type]);
+                        } else {
+                          setSelectedIntelligenceTypes(selectedIntelligenceTypes.filter(t => t !== type));
                         }
                       }}
-                      className={`
-                        px-4 py-2.5 rounded-full font-medium text-sm transition-all duration-300
-                        border-2 cursor-pointer select-none
-                        ${isSelected 
-                          ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/25 scale-105' 
-                          : 'bg-card text-muted-foreground border-border hover:border-primary/50 hover:bg-accent/50 hover:text-foreground hover:shadow-md'
-                        }
-                      `}
+                    />
+                    <label
+                      htmlFor={type}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                     >
                       {type}
-                    </button>
-                  );
-                })}
+                    </label>
+                  </div>
+                ))}
               </div>
             </div>
 
