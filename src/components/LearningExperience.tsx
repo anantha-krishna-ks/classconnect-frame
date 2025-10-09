@@ -456,13 +456,12 @@ const [selectedIntelligenceTypes, setSelectedIntelligenceTypes] = useState<strin
                 {allIntelligenceTypes.map((type) => {
                   const isSelected = selectedIntelligenceTypes.includes(type);
                   return (
-                    <Badge
+                    <button
                       key={type}
-                      variant={isSelected ? "default" : "outline"}
-                      className={`cursor-pointer transition-all duration-200 px-4 py-2.5 text-sm font-medium ${
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                         isSelected
-                          ? 'bg-primary/90 text-primary-foreground shadow-lg hover:bg-primary hover:shadow-xl scale-105 border-primary'
-                          : 'bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground border-muted hover:border-primary/40 hover:shadow-sm'
+                          ? 'bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15'
+                          : 'bg-muted/50 text-muted-foreground border border-muted hover:bg-muted hover:border-border'
                       }`}
                       onClick={() => {
                         if (isSelected) {
@@ -472,9 +471,9 @@ const [selectedIntelligenceTypes, setSelectedIntelligenceTypes] = useState<strin
                         }
                       }}
                     >
-                      {isSelected && <Check className="h-3.5 w-3.5 mr-1.5" />}
                       {type}
-                    </Badge>
+                      {isSelected && <X className="h-4 w-4" />}
+                    </button>
                   );
                 })}
               </div>
