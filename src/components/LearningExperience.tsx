@@ -449,12 +449,12 @@ const [selectedIntelligenceTypes, setSelectedIntelligenceTypes] = useState<strin
 
             {/* Intelligence Types Multi-Select */}
             <div className="mb-6">
-              <h4 className="text-sm font-medium text-foreground mb-3">
+              <h4 className="text-sm font-medium text-gray-700 mb-3">
                 Select Intelligence Types
               </h4>
-              <div className="grid grid-cols-2 gap-3 p-4 bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow duration-200">
+              <div className="grid grid-cols-2 gap-3 p-4 bg-white rounded-lg border border-gray-200">
                 {allIntelligenceTypes.map((type) => (
-                  <div key={type} className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent/50 transition-colors">
+                  <div key={type} className="flex items-center space-x-2">
                     <Checkbox
                       id={type}
                       checked={selectedIntelligenceTypes.includes(type)}
@@ -468,7 +468,7 @@ const [selectedIntelligenceTypes, setSelectedIntelligenceTypes] = useState<strin
                     />
                     <label
                       htmlFor={type}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer text-foreground"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                     >
                       {type}
                     </label>
