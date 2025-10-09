@@ -452,17 +452,17 @@ const [selectedIntelligenceTypes, setSelectedIntelligenceTypes] = useState<strin
               <h4 className="text-sm font-medium text-foreground mb-3">
                 Select Intelligence Types
               </h4>
-              <div className="flex flex-wrap gap-2 p-4 bg-gradient-to-br from-background to-muted/30 rounded-lg border border-border">
+              <div className="flex flex-wrap gap-3 p-5 bg-gradient-to-br from-background to-muted/30 rounded-lg border border-border">
                 {allIntelligenceTypes.map((type) => {
                   const isSelected = selectedIntelligenceTypes.includes(type);
                   return (
                     <Badge
                       key={type}
                       variant={isSelected ? "default" : "outline"}
-                      className={`cursor-pointer transition-all duration-200 px-4 py-2 text-sm ${
+                      className={`cursor-pointer transition-all duration-200 px-4 py-2.5 text-sm font-medium ${
                         isSelected
-                          ? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/90 scale-105'
-                          : 'bg-background hover:bg-muted border-border hover:border-primary/50'
+                          ? 'bg-primary/90 text-primary-foreground shadow-lg hover:bg-primary hover:shadow-xl scale-105 border-primary'
+                          : 'bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground border-muted hover:border-primary/40 hover:shadow-sm'
                       }`}
                       onClick={() => {
                         if (isSelected) {
@@ -472,7 +472,7 @@ const [selectedIntelligenceTypes, setSelectedIntelligenceTypes] = useState<strin
                         }
                       }}
                     >
-                      {isSelected && <Check className="h-3 w-3 mr-1" />}
+                      {isSelected && <Check className="h-3.5 w-3.5 mr-1.5" />}
                       {type}
                     </Badge>
                   );
