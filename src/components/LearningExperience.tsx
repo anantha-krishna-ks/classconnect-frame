@@ -408,7 +408,7 @@ const [selectedIntelligenceTypes] = useState<string[]>(allIntelligenceTypes); //
             onClick={handleGeneratePedagogicalApproaches}
             disabled={loadingPedagogical || !elos || elos.length === 0}
           >
-            {loadingPedagogical ? 'Generating...' : 'Generate Pedagogical Approaches and Resources'}
+            {loadingPedagogical ? 'Generating...' : 'Generate Pedagogical Approaches'}
           </Button>
         </div>
 
