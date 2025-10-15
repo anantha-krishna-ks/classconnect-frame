@@ -1086,6 +1086,16 @@ const ResourceVault = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Close Button */}
+                <div className="mt-6 flex justify-end">
+                  <Button 
+                    onClick={() => setSelectedResource(null)}
+                    className="bg-purple-500 hover:bg-purple-600"
+                  >
+                    Close
+                  </Button>
+                </div>
               </div>
             </>
           )}
