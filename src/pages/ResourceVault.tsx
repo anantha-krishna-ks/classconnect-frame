@@ -1386,7 +1386,7 @@ const ResourceVault = () => {
       {/* Resource Detail Dialog */}
       <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
         <DialogContent 
-          className="max-w-7xl h-[85vh] p-0 select-text overflow-hidden"
+          className="max-w-[100vw] w-[100vw] h-[100vh] p-0 select-text overflow-hidden m-0 rounded-none"
           onInteractOutside={(e) => {
             const el = (e.target as HTMLElement)?.closest('[data-selection-popup="true"]');
             if (el) e.preventDefault();
