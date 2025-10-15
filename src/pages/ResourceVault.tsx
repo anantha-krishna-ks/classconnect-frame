@@ -982,14 +982,6 @@ const ResourceVault = () => {
                     </div>
                   )}
                 </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-3 pt-4 border-t">
-                  <Button variant="outline" className="w-full">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Resource
-                  </Button>
-                </div>
               </div>
             </>
           )}
