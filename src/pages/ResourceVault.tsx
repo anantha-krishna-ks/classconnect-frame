@@ -1169,7 +1169,7 @@ const ResourceVault = () => {
 
                 {/* Resource Detail Modal */}
                 <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto select-text">
                     {selectedResource && (
                       <>
                         <DialogHeader>
@@ -1177,6 +1177,9 @@ const ResourceVault = () => {
                             {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-500" })}
                             {selectedResource.title}
                           </DialogTitle>
+                          <DialogDescription className="sr-only">
+                            Resource details and content
+                          </DialogDescription>
                           <div className="flex items-center gap-3 mt-2">
                             <Badge variant="secondary">{selectedResource.type}</Badge>
                             {selectedResource.content.difficulty && (
@@ -1442,7 +1445,7 @@ const ResourceVault = () => {
 
             {/* Resource Detail Modal */}
             <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto select-text">
                 {selectedResource && (
                   <>
                     <DialogHeader>
@@ -1450,6 +1453,9 @@ const ResourceVault = () => {
                         {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-500" })}
                         {selectedResource.title}
                       </DialogTitle>
+                      <DialogDescription className="sr-only">
+                        Resource details and content
+                      </DialogDescription>
                       <div className="flex items-center gap-3 mt-2">
                         <Badge variant="secondary">{selectedResource.type}</Badge>
                         {selectedResource.content.difficulty && (
@@ -1602,7 +1608,7 @@ const ResourceVault = () => {
 
       {/* Resource Detail Dialog */}
       <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto select-text">
           {selectedResource && (
             <>
               <DialogHeader>
