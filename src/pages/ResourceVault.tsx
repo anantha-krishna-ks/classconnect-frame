@@ -153,7 +153,9 @@ const ResourceVault = () => {
     e.stopPropagation();
     e.preventDefault();
     if (!selectedText?.trim() || isAddingToNotes) return;
+    
     setIsAddingToNotes(true);
+    
     try {
       const newNote = {
         id: Date.now(),
@@ -164,14 +166,26 @@ const ResourceVault = () => {
         updatedAt: new Date()
       };
       setNotes((prev) => [...prev, newNote]);
+      
       toast({
         title: "Added to Notes",
         description: "Your selected text has been saved to My Notes.",
       });
-    } finally {
-      setSelectedText('');
-      setSelectionPosition(null);
+      
+      // Delay clearing selection to ensure toast shows and UI doesn't break
+      setTimeout(() => {
+        setSelectedText('');
+        setSelectionPosition(null);
+        setIsAddingToNotes(false);
+      }, 300);
+    } catch (error) {
+      console.error('Error adding note:', error);
       setIsAddingToNotes(false);
+      toast({
+        title: "Error",
+        description: "Failed to add note. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -1353,19 +1367,30 @@ const ResourceVault = () => {
       {selectedText && selectionPosition && (
         <div
           data-selection-popup="true"
-          className="fixed z-[100] bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex gap-2 pointer-events-none"
+          className="fixed z-[200] bg-white rounded-lg shadow-xl border-2 border-purple-300 p-2 flex gap-2 pointer-events-none"
           style={{
             left: `${selectionPosition.x}px`,
             top: `${selectionPosition.y}px`,
             transform: 'translate(-50%, -100%)',
           }}
-          onMouseDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+          onTouchStart={(e) => {
+            e.stopPropagation();
+          }}
         >
           <Button
             size="sm"
             variant="outline"
-            onClick={handleCopyText}
-            className="h-8 px-3 pointer-events-auto"
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleCopyText(e);
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
+            className="h-8 px-3 pointer-events-auto hover:bg-blue-50 hover:border-blue-300"
           >
             <Copy className="w-3 h-3 mr-1" />
             Copy
@@ -1373,12 +1398,17 @@ const ResourceVault = () => {
           <Button
             size="sm"
             variant="outline"
-            onClick={handleAddToNotes}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleAddToNotes(e);
+            }}
+            onMouseDown={(e) => e.stopPropagation()}
             disabled={isAddingToNotes}
-            className="h-8 px-3 pointer-events-auto"
+            className="h-8 px-3 pointer-events-auto hover:bg-purple-50 hover:border-purple-300"
           >
             <StickyNote className="w-3 h-3 mr-1" />
-            Add to Notes
+            {isAddingToNotes ? 'Adding...' : 'Add to Notes'}
           </Button>
         </div>
       )}
