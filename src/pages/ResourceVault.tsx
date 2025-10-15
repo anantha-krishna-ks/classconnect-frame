@@ -26,11 +26,8 @@ import {
   Target,
   Trash2,
   Copy,
-  StickyNote,
-  X
+  StickyNote
 } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -60,11 +57,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from '@/components/ui/resizable';
 
 const ResourceVault = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const isMobile = useIsMobile();
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedChapter, setSelectedChapter] = useState('');
   const [searchTopic, setSearchTopic] = useState('');
@@ -749,220 +750,10 @@ const ResourceVault = () => {
     }
   };
 
-  // StudyPal Component
-  const StudyPalContent = () => (
-    <div className="h-full flex flex-col bg-white">
-      <div className="p-4 border-b flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-            <MessageCircle className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900">StudyPal</h3>
-            <p className="text-xs text-gray-500">Your AI learning assistant</p>
-          </div>
-        </div>
-        {!isMobile && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowStudyPal(false)}
-            className="h-8 w-8"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        )}
-      </div>
-      
-      <div className="flex-1 flex flex-col min-h-0">
-        {/* Chat Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {chatHistory.length === 0 ? (
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Brain className="w-8 h-8 text-purple-500" />
-                </div>
-                <h3 className="font-medium text-gray-900 mb-2">Hello! I'm StudyPal</h3>
-                <p className="text-sm text-gray-500 max-w-xs">
-                  I'm here to help you understand any concept you're struggling with. Just ask me anything!
-                </p>
-              </div>
-            </div>
-          ) : (
-            <>
-              {chatHistory.map((chat) => (
-                <div key={chat.id} className="space-y-3">
-                  {/* User Message */}
-                  <div className="flex justify-end">
-                    <div className="max-w-[80%] bg-purple-500 text-white rounded-2xl rounded-br-md px-4 py-2">
-                      <p className="text-sm">{chat.user}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Bot Message */}
-                  <div className="flex justify-start">
-                    <div className="flex items-start gap-2 max-w-[80%]">
-                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Brain className="w-4 h-4 text-purple-500" />
-                      </div>
-                      <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-2">
-                        <p className="text-sm text-gray-800">{chat.bot}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Additional Resources Section */}
-                  {chat.hasResources && (
-                    <div className="flex justify-start mt-4">
-                      <div className="flex items-start gap-2 max-w-[85%]">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Lightbulb className="w-4 h-4 text-blue-500" />
-                        </div>
-                        <div className="bg-blue-50 rounded-2xl rounded-bl-md px-4 py-3 border border-blue-200">
-                          <p className="text-sm text-gray-800 mb-3">Here are some visual resources to help you understand better:</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openResourceWindow(chat.topic, 'mindmap')}
-                              className="text-xs h-8 border-blue-300 text-blue-700 hover:bg-blue-100"
-                            >
-                              <Brain className="w-3 h-3 mr-1" />
-                              Mind Map
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openResourceWindow(chat.topic, 'diagram')}
-                              className="text-xs h-8 border-green-300 text-green-700 hover:bg-green-100"
-                            >
-                              <Target className="w-3 h-3 mr-1" />
-                              Diagram
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openResourceWindow(chat.topic, 'flowchart')}
-                              className="text-xs h-8 border-purple-300 text-purple-700 hover:bg-purple-100"
-                            >
-                              <BookOpen className="w-3 h-3 mr-1" />
-                              Flowchart
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openResourceWindow(chat.topic, 'concept-map')}
-                              className="text-xs h-8 border-orange-300 text-orange-700 hover:bg-orange-100"
-                            >
-                              <Lightbulb className="w-3 h-3 mr-1" />
-                              Concept Map
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-              
-              {/* Resource Feedback Section - Show after conversation */}
-              {chatHistory.length > 0 && resources.length > 0 && !resourceFeedback && (
-                <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
-                  <div className="flex items-start gap-2 mb-3">
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Brain className="w-4 h-4 text-purple-500" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-1">Quick Feedback</h4>
-                      <p className="text-sm text-gray-600 mb-3">Were the resources I provided helpful for your learning?</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleResourceFeedback('yes')}
-                      className="flex-1 border-green-200 text-green-700 hover:bg-green-50"
-                    >
-                      <ThumbsUp className="w-4 h-4 mr-2" />
-                      Yes, helpful
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleResourceFeedback('no')}
-                      className="flex-1 border-red-200 text-red-700 hover:bg-red-50"
-                    >
-                      <ThumbsDown className="w-4 h-4 mr-2" />
-                      Not helpful
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Quick Test Section - Show after conversation */}
-              {chatHistory.length > 0 && (
-                <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                  <div className="flex items-start gap-2 mb-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Brain className="w-4 h-4 text-blue-500" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-1">Test Your Knowledge</h4>
-                      <p className="text-sm text-gray-600 mb-3">
-                        Ready to test what you've learned? Take a quick 5-question quiz in a new window!
-                      </p>
-                    </div>
-                  </div>
-                  <Button 
-                    onClick={() => openTestWindow(chatHistory[chatHistory.length - 1]?.topic || 'General Knowledge')} 
-                    className="w-full bg-blue-500 hover:bg-blue-600"
-                  >
-                    <Brain className="w-4 h-4 mr-2" />
-                    Start Quick Test
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-        
-        {/* Message Input Area */}
-        <div className="border-t p-4 bg-white flex-shrink-0">
-          <div className="flex gap-2">
-            <Textarea
-              placeholder="Ask me about any concept you're struggling with..."
-              value={chatMessage}
-              onChange={(e) => setChatMessage(e.target.value)}
-              rows={2}
-              className="resize-none flex-1"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleStudyPalMessage();
-                }
-              }}
-            />
-            <Button 
-              onClick={handleStudyPalMessage} 
-              className="bg-purple-500 hover:bg-purple-600 px-4"
-              disabled={!chatMessage.trim()}
-              size="icon"
-            >
-              <MessageSquare className="w-4 h-4" />
-            </Button>
-          </div>
-          <p className="text-xs text-gray-500 mt-2">Press Enter to send, Shift+Enter for new line</p>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Main Header */}
-      <header className="border-b border-gray-100 px-6 py-3 flex-shrink-0" style={{ backgroundColor: '#3B54A5' }}>
+      <header className="border-b border-gray-100 px-6 py-3" style={{ backgroundColor: '#3B54A5' }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <img 
             src="/lovable-uploads/c278e3c9-20de-45b8-a466-41c546111a8a.png" 
@@ -999,7 +790,7 @@ const ResourceVault = () => {
       </header>
 
       {/* Breadcrumbs Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4 flex-shrink-0">
+      <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <nav className="flex items-center space-x-2 text-sm text-gray-500">
             <Home className="w-4 h-4" />
@@ -1025,972 +816,292 @@ const ResourceVault = () => {
         </div>
       </header>
 
-      {/* Main Content Area with Split Screen */}
-      {showStudyPal && !isMobile ? (
-        <ResizablePanelGroup direction="horizontal" className="flex-1">
-          <ResizablePanel defaultSize={75} minSize={50}>
-            <div className="h-full overflow-y-auto">
-              <div className="max-w-7xl mx-auto px-6 py-8 bg-slate-50/30 animate-fade-in">
-                {/* Page Header */}
-                <div className="mb-10 animate-fade-in">
-                  <div className="flex items-center gap-5 mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-md">
-                    <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center border-2 border-purple-200 hover:scale-105 transition-transform duration-200">
-                      <BookOpen className="w-7 h-7 text-purple-600" />
-                    </div>
-                    <div>
-                      <h1 className="text-3xl font-bold text-slate-800 mb-1">Resource Vault</h1>
-                      <p className="text-slate-600">Access all your study materials and get help with any concept</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Main Content */}
-                <div className="space-y-8">
-                  {/* Resource Finder */}
-                  <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm">
-                    <CardHeader className="pb-4">
-                      <CardTitle className="text-slate-800 flex items-center gap-2">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                        Find Resources by Subject & Chapter
-                      </CardTitle>
-                      <CardDescription className="text-slate-600">
-                        Select your subject and chapter to access relevant study materials
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-5">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div className="space-y-3 group">
-                          <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Subject</label>
-                          <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                            <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white">
-                              <SelectValue placeholder="Select a subject" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {subjects.map((subject) => (
-                                <SelectItem key={subject.id} value={subject.id} className="hover:bg-purple-50">
-                                  {subject.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div className="space-y-3 group">
-                          <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Chapter</label>
-                          <Select 
-                            value={selectedChapter} 
-                            onValueChange={setSelectedChapter}
-                            disabled={!selectedSubject}
-                          >
-                            <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white disabled:opacity-50">
-                              <SelectValue placeholder="Select a chapter" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {selectedSubject && chapters[selectedSubject as keyof typeof chapters]?.map((chapter) => (
-                                <SelectItem key={chapter.id} value={chapter.id} className="hover:bg-purple-50">
-                                  {chapter.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-
-                      <Button 
-                        onClick={handleProvideResources}
-                        disabled={!selectedSubject || !selectedChapter}
-                        className="w-full bg-purple-500 hover:bg-purple-600 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100"
-                      >
-                        <BookOpen className="w-4 h-4 mr-2" />
-                        Provide Resources
-                      </Button>
-                    </CardContent>
-                  </Card>
-
-                  {/* Resources Display */}
-                  {resources.length > 0 && (
-                    <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm animate-fade-in">
-                      <CardHeader className="pb-4">
-                        <CardTitle className="text-slate-800 flex items-center gap-2">
-                          <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                          Available Resources
-                        </CardTitle>
-                        <CardDescription className="text-slate-600">
-                          Found {resources.length} resources for your selection
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          {resources.map((resource, index) => {
-                            const IconComponent = getResourceIcon(resource.type);
-                            return (
-                              <div 
-                                key={resource.id} 
-                                className="group border-2 border-slate-200/80 hover:border-purple-300/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
-                                style={{ animationDelay: `${index * 100}ms` }}
-                                onClick={() => setSelectedResource(resource)}
-                              >
-                                <div className="flex items-start gap-4 mb-4">
-                                  <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-200">
-                                    <IconComponent className="w-5 h-5 text-purple-600 group-hover:text-purple-700 transition-colors duration-200" />
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <h4 className="font-medium text-slate-800 mb-1 group-hover:text-purple-700 transition-colors duration-200 line-clamp-2">
-                                      {highlightText(resource.title, searchHighlight)}
-                                    </h4>
-                                    <p className="text-sm text-slate-600 group-hover:text-slate-700 transition-colors duration-200 line-clamp-2">
-                                      {highlightText(resource.description, searchHighlight)}
-                                    </p>
-                                  </div>
-                                  <Badge variant="secondary" className="bg-slate-100 text-slate-700 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors duration-200 shrink-0">
-                                    {resource.type}
-                                  </Badge>
-                                </div>
-                                <Button 
-                                  variant="outline" 
-                                  size="sm" 
-                                  className="w-full group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedResource(resource);
-                                  }}
-                                >
-                                  <ExternalLink className="w-4 h-4 mr-2" />
-                                  View Details
-                                </Button>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-
-                {/* Resource Detail Modal */}
-                <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    {selectedResource && (
-                      <>
-                        <DialogHeader>
-                          <DialogTitle className="flex items-center gap-3 text-xl">
-                            {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-500" })}
-                            {selectedResource.title}
-                          </DialogTitle>
-                          <div className="flex items-center gap-3 mt-2">
-                            <Badge variant="secondary">{selectedResource.type}</Badge>
-                            {selectedResource.content.difficulty && (
-                              <Badge variant="outline">{selectedResource.content.difficulty}</Badge>
-                            )}
-                          </div>
-                        </DialogHeader>
-                        
-                        <div className="space-y-6 mt-6">
-                          <div>
-                            <h3 className="text-lg font-semibold mb-2">Overview</h3>
-                            <p className="text-gray-600 select-text">{selectedResource.content.summary}</p>
-                          </div>
-
-                          <div>
-                            <h3 className="text-lg font-semibold mb-3">Key Topics Covered</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {selectedResource.content.keyTopics.map((topic: string, index: number) => (
-                                <div key={index} className="flex items-center gap-2 p-2 bg-purple-50 rounded select-text">
-                                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                                  <span className="text-sm">{topic}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          {selectedResource.content.examples && (
-                            <div>
-                              <h3 className="text-lg font-semibold mb-3">Examples & Applications</h3>
-                              <ul className="space-y-2">
-                                {selectedResource.content.examples.map((example: string, index: number) => (
-                                  <li key={index} className="flex items-start gap-2 select-text">
-                                    <span className="text-purple-500 mt-1">•</span>
-                                    <span className="text-sm text-gray-600">{example}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {selectedResource.content.features && (
-                            <div>
-                              <h3 className="text-lg font-semibold mb-3">Features</h3>
-                              <ul className="space-y-2">
-                                {selectedResource.content.features.map((feature: string, index: number) => (
-                                  <li key={index} className="flex items-start gap-2 select-text">
-                                    <span className="text-purple-500 mt-1">•</span>
-                                    <span className="text-sm text-gray-600">{feature}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                            {selectedResource.content.duration && (
-                              <div>
-                                <span className="font-medium text-sm">Duration:</span>
-                                <p className="text-sm text-gray-600">{selectedResource.content.duration}</p>
-                              </div>
-                            )}
-                            {selectedResource.content.exercises && (
-                              <div>
-                                <span className="font-medium text-sm">Exercises:</span>
-                                <p className="text-sm text-gray-600">{selectedResource.content.exercises}</p>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="mt-6 flex justify-center">
-                            <Button 
-                              onClick={() => setSelectedResource(null)}
-                              className="bg-purple-500 hover:bg-purple-600"
-                            >
-                              Close
-                            </Button>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </DialogContent>
-                </Dialog>
-
-                {/* Text Selection Popup */}
-                {selectedText && selectionPosition && (
-                  <div
-                    className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex gap-2"
-                    style={{
-                      left: `${selectionPosition.x}px`,
-                      top: `${selectionPosition.y}px`,
-                      transform: 'translate(-50%, -100%)',
-                    }}
-                  >
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleCopyText}
-                      className="h-8 px-3"
-                    >
-                      <Copy className="w-3 h-3 mr-1" />
-                      Copy
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleAddToNotes}
-                      disabled={isAddingToNotes}
-                      className="h-8 px-3"
-                    >
-                      <StickyNote className="w-3 h-3 mr-1" />
-                      Add to Notes
-                    </Button>
-                  </div>
-                )}
-
-                {/* My Notes Sheet */}
-                <Sheet open={showNotes} onOpenChange={setShowNotes}>
-                  <SheetTrigger asChild>
-                    <Button
-                      className="fixed bottom-8 left-8 rounded-full w-14 h-14 bg-blue-500 hover:bg-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm"
-                      size="icon"
-                    >
-                      <StickyNote className="w-6 h-6 text-white" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="left" className="w-full sm:max-w-lg flex flex-col h-screen">
-                    <SheetHeader className="pb-4 border-b flex-shrink-0">
-                      <SheetTitle className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                          <StickyNote className="w-4 h-4 text-white" />
-                        </div>
-                        My Notes
-                      </SheetTitle>
-                      <SheetDescription>
-                        Save and organize your study notes
-                      </SheetDescription>
-                    </SheetHeader>
-
-                    <div className="flex-1 flex flex-col min-h-0">
-                      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        {notes.length === 0 ? (
-                          <div className="h-full flex items-center justify-center">
-                            <div className="text-center">
-                              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <StickyNote className="w-8 h-8 text-blue-500" />
-                              </div>
-                              <h3 className="font-medium text-gray-900 mb-2">No notes yet</h3>
-                              <p className="text-sm text-gray-500 max-w-xs">
-                                Select text from resources and click "Add to Notes" to save them here.
-                              </p>
-                            </div>
-                          </div>
-                        ) : (
-                          notes.map((note) => (
-                            <div key={note.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                              <div className="flex items-start justify-between mb-2">
-                                <h4 className="font-medium text-gray-900">{note.title}</h4>
-                                <div className="flex gap-1">
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    onClick={() => handleEditNote(note)}
-                                    className="h-6 w-6"
-                                  >
-                                    <Copy className="w-3 h-3" />
-                                  </Button>
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        className="h-6 w-6 text-red-500 hover:text-red-700"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Delete Note</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          Are you sure you want to delete this note? This action cannot be undone.
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction
-                                          onClick={() => handleDeleteNote(note.id)}
-                                          className="bg-red-600 hover:bg-red-700"
-                                        >
-                                          Delete
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-                                </div>
-                              </div>
-                              <p className="text-sm text-gray-700 mb-2 whitespace-pre-wrap">{note.content}</p>
-                              {note.tags && (
-                                <div className="flex flex-wrap gap-1 mb-2">
-                                  {note.tags.split(',').map((tag: string, idx: number) => (
-                                    <Badge key={idx} variant="secondary" className="text-xs">
-                                      {tag.trim()}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                              <p className="text-xs text-gray-500">
-                                {note.updatedAt && `Updated: ${safeFormatDateTime(note.updatedAt)}`}
-                                {!note.updatedAt && note.createdAt && `Created: ${safeFormatDateTime(note.createdAt)}`}
-                              </p>
-                            </div>
-                          ))
-                        )}
-                      </div>
-
-                      <div className="border-t p-4 bg-white flex-shrink-0 space-y-3">
-                        <Input
-                          placeholder="Note title"
-                          value={currentNote.title}
-                          onChange={(e) => setCurrentNote({ ...currentNote, title: e.target.value })}
-                        />
-                        <Textarea
-                          placeholder="Write your note here..."
-                          value={currentNote.content}
-                          onChange={(e) => setCurrentNote({ ...currentNote, content: e.target.value })}
-                          rows={3}
-                          className="resize-none"
-                        />
-                        <Input
-                          placeholder="Tags (comma separated)"
-                          value={currentNote.tags}
-                          onChange={(e) => setCurrentNote({ ...currentNote, tags: e.target.value })}
-                        />
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={handleSaveNote}
-                            disabled={!currentNote.title.trim() || !currentNote.content.trim()}
-                            className="flex-1 bg-blue-500 hover:bg-blue-600"
-                          >
-                            {editingNoteId !== null ? 'Update Note' : 'Save Note'}
-                          </Button>
-                          {editingNoteId !== null && (
-                            <Button
-                              onClick={handleCancelEdit}
-                              variant="outline"
-                              className="flex-1"
-                            >
-                              Cancel
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </SheetContent>
-                </Sheet>
-              </div>
+      {/* Split Screen Layout */}
+      <ResizablePanelGroup direction="horizontal" className="flex-1 w-full">
+        {/* Left Panel - Resource Vault (75%) */}
+        <ResizablePanel defaultSize={75} minSize={50}>
+          <div className="h-full overflow-y-auto px-6 py-8 bg-slate-50/30 animate-fade-in">
+        {/* Page Header */}
+        <div className="mb-10 animate-fade-in">
+          <div className="flex items-center gap-5 mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-md">
+            <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center border-2 border-purple-200 hover:scale-105 transition-transform duration-200">
+              <BookOpen className="w-7 h-7 text-purple-600" />
             </div>
-          </ResizablePanel>
-          
-          <ResizableHandle withHandle className="w-2 bg-slate-200 hover:bg-purple-300 transition-colors" />
-          
-          <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
-            <StudyPalContent />
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      ) : (
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto px-6 py-8 bg-slate-50/30 animate-fade-in">
-            {/* Page Header */}
-            <div className="mb-10 animate-fade-in">
-              <div className="flex items-center gap-5 mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-md">
-                <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center border-2 border-purple-200 hover:scale-105 transition-transform duration-200">
-                  <BookOpen className="w-7 h-7 text-purple-600" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-slate-800 mb-1">Resource Vault</h1>
-                  <p className="text-slate-600">Access all your study materials and get help with any concept</p>
-                </div>
-              </div>
+            <div>
+              <h1 className="text-3xl font-bold text-slate-800 mb-1">Resource Vault</h1>
+              <p className="text-slate-600">Access all your study materials and get help with any concept</p>
             </div>
-
-            {/* Main Content */}
-            <div className="space-y-8">
-              {/* Resource Finder */}
-              <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-slate-800 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    Find Resources by Subject & Chapter
-                  </CardTitle>
-                  <CardDescription className="text-slate-600">
-                    Select your subject and chapter to access relevant study materials
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div className="space-y-3 group">
-                      <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Subject</label>
-                      <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                        <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white">
-                          <SelectValue placeholder="Select a subject" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {subjects.map((subject) => (
-                            <SelectItem key={subject.id} value={subject.id} className="hover:bg-purple-50">
-                              {subject.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className="space-y-3 group">
-                      <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Chapter</label>
-                      <Select 
-                        value={selectedChapter} 
-                        onValueChange={setSelectedChapter}
-                        disabled={!selectedSubject}
-                      >
-                        <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white disabled:opacity-50">
-                          <SelectValue placeholder="Select a chapter" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {selectedSubject && chapters[selectedSubject as keyof typeof chapters]?.map((chapter) => (
-                            <SelectItem key={chapter.id} value={chapter.id} className="hover:bg-purple-50">
-                              {chapter.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <Button 
-                    onClick={handleProvideResources}
-                    disabled={!selectedSubject || !selectedChapter}
-                    className="w-full bg-purple-500 hover:bg-purple-600 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100"
-                  >
-                    <BookOpen className="w-4 h-4 mr-2" />
-                    Provide Resources
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Resources Display */}
-              {resources.length > 0 && (
-                <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm animate-fade-in">
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-slate-800 flex items-center gap-2">
-                      <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                      Available Resources
-                    </CardTitle>
-                    <CardDescription className="text-slate-600">
-                      Found {resources.length} resources for your selection
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      {resources.map((resource, index) => {
-                        const IconComponent = getResourceIcon(resource.type);
-                        return (
-                          <div 
-                            key={resource.id} 
-                            className="group border-2 border-slate-200/80 hover:border-purple-300/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
-                            style={{ animationDelay: `${index * 100}ms` }}
-                            onClick={() => setSelectedResource(resource)}
-                          >
-                            <div className="flex items-start gap-4 mb-4">
-                              <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-200">
-                                <IconComponent className="w-5 h-5 text-purple-600 group-hover:text-purple-700 transition-colors duration-200" />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-slate-800 mb-1 group-hover:text-purple-700 transition-colors duration-200 line-clamp-2">
-                                  {highlightText(resource.title, searchHighlight)}
-                                </h4>
-                                <p className="text-sm text-slate-600 group-hover:text-slate-700 transition-colors duration-200 line-clamp-2">
-                                  {highlightText(resource.description, searchHighlight)}
-                                </p>
-                              </div>
-                              <Badge variant="secondary" className="bg-slate-100 text-slate-700 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors duration-200 shrink-0">
-                                {resource.type}
-                              </Badge>
-                            </div>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              className="w-full group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedResource(resource);
-                              }}
-                            >
-                              <ExternalLink className="w-4 h-4 mr-2" />
-                              View Details
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-
-            {/* Resource Detail Modal */}
-            <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                {selectedResource && (
-                  <>
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-3 text-xl">
-                        {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-500" })}
-                        {selectedResource.title}
-                      </DialogTitle>
-                      <div className="flex items-center gap-3 mt-2">
-                        <Badge variant="secondary">{selectedResource.type}</Badge>
-                        {selectedResource.content.difficulty && (
-                          <Badge variant="outline">{selectedResource.content.difficulty}</Badge>
-                        )}
-                      </div>
-                    </DialogHeader>
-                    
-                    <div className="space-y-6 mt-6">
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">Overview</h3>
-                        <p className="text-gray-600 select-text">{selectedResource.content.summary}</p>
-                      </div>
-
-                      <div>
-                        <h3 className="text-lg font-semibold mb-3">Key Topics Covered</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {selectedResource.content.keyTopics.map((topic: string, index: number) => (
-                            <div key={index} className="flex items-center gap-2 p-2 bg-purple-50 rounded select-text">
-                              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                              <span className="text-sm">{topic}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {selectedResource.content.examples && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-3">Examples & Applications</h3>
-                          <ul className="space-y-2">
-                            {selectedResource.content.examples.map((example: string, index: number) => (
-                              <li key={index} className="flex items-start gap-2 select-text">
-                                <span className="text-purple-500 mt-1">•</span>
-                                <span className="text-sm text-gray-600">{example}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      {selectedResource.content.features && (
-                        <div>
-                          <h3 className="text-lg font-semibold mb-3">Features</h3>
-                          <ul className="space-y-2">
-                            {selectedResource.content.features.map((feature: string, index: number) => (
-                              <li key={index} className="flex items-start gap-2 select-text">
-                                <span className="text-purple-500 mt-1">•</span>
-                                <span className="text-sm text-gray-600">{feature}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                        {selectedResource.content.duration && (
-                          <div>
-                            <span className="font-medium text-sm">Duration:</span>
-                            <p className="text-sm text-gray-600">{selectedResource.content.duration}</p>
-                          </div>
-                        )}
-                        {selectedResource.content.exercises && (
-                          <div>
-                            <span className="font-medium text-sm">Exercises:</span>
-                            <p className="text-sm text-gray-600">{selectedResource.content.exercises}</p>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="mt-6 flex justify-center">
-                        <Button 
-                          onClick={() => setSelectedResource(null)}
-                          className="bg-purple-500 hover:bg-purple-600"
-                        >
-                          Close
-                        </Button>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </DialogContent>
-            </Dialog>
-
-            {/* Text Selection Popup */}
-            {selectedText && selectionPosition && (
-              <div
-                className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex gap-2"
-                style={{
-                  left: `${selectionPosition.x}px`,
-                  top: `${selectionPosition.y}px`,
-                  transform: 'translate(-50%, -100%)',
-                }}
-              >
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleCopyText}
-                  className="h-8 px-3"
-                >
-                  <Copy className="w-3 h-3 mr-1" />
-                  Copy
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleAddToNotes}
-                  disabled={isAddingToNotes}
-                  className="h-8 px-3"
-                >
-                  <StickyNote className="w-3 h-3 mr-1" />
-                  Add to Notes
-                </Button>
-              </div>
-            )}
-
-            {/* My Notes Sheet */}
-            <Sheet open={showNotes} onOpenChange={setShowNotes}>
-              <SheetTrigger asChild>
-                <Button
-                  className="fixed bottom-8 left-8 rounded-full w-14 h-14 bg-blue-500 hover:bg-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm"
-                  size="icon"
-                >
-                  <StickyNote className="w-6 h-6 text-white" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-full sm:max-w-lg flex flex-col h-screen">
-                <SheetHeader className="pb-4 border-b flex-shrink-0">
-                  <SheetTitle className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                      <StickyNote className="w-4 h-4 text-white" />
-                    </div>
-                    My Notes
-                  </SheetTitle>
-                  <SheetDescription>
-                    Save and organize your study notes
-                  </SheetDescription>
-                </SheetHeader>
-
-                <div className="flex-1 flex flex-col min-h-0">
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {notes.length === 0 ? (
-                      <div className="h-full flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <StickyNote className="w-8 h-8 text-blue-500" />
-                          </div>
-                          <h3 className="font-medium text-gray-900 mb-2">No notes yet</h3>
-                          <p className="text-sm text-gray-500 max-w-xs">
-                            Select text from resources and click "Add to Notes" to save them here.
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      notes.map((note) => (
-                        <div key={note.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                          <div className="flex items-start justify-between mb-2">
-                            <h4 className="font-medium text-gray-900">{note.title}</h4>
-                            <div className="flex gap-1">
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => handleEditNote(note)}
-                                className="h-6 w-6"
-                              >
-                                <Copy className="w-3 h-3" />
-                              </Button>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-6 w-6 text-red-500 hover:text-red-700"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete Note</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to delete this note? This action cannot be undone.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => handleDeleteNote(note.id)}
-                                      className="bg-red-600 hover:bg-red-700"
-                                    >
-                                      Delete
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-700 mb-2 whitespace-pre-wrap">{note.content}</p>
-                          {note.tags && (
-                            <div className="flex flex-wrap gap-1 mb-2">
-                              {note.tags.split(',').map((tag: string, idx: number) => (
-                                <Badge key={idx} variant="secondary" className="text-xs">
-                                  {tag.trim()}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
-                          <p className="text-xs text-gray-500">
-                            {note.updatedAt && `Updated: ${safeFormatDateTime(note.updatedAt)}`}
-                            {!note.updatedAt && note.createdAt && `Created: ${safeFormatDateTime(note.createdAt)}`}
-                          </p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  <div className="border-t p-4 bg-white flex-shrink-0 space-y-3">
-                    <Input
-                      placeholder="Note title"
-                      value={currentNote.title}
-                      onChange={(e) => setCurrentNote({ ...currentNote, title: e.target.value })}
-                    />
-                    <Textarea
-                      placeholder="Write your note here..."
-                      value={currentNote.content}
-                      onChange={(e) => setCurrentNote({ ...currentNote, content: e.target.value })}
-                      rows={3}
-                      className="resize-none"
-                    />
-                    <Input
-                      placeholder="Tags (comma separated)"
-                      value={currentNote.tags}
-                      onChange={(e) => setCurrentNote({ ...currentNote, tags: e.target.value })}
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={handleSaveNote}
-                        disabled={!currentNote.title.trim() || !currentNote.content.trim()}
-                        className="flex-1 bg-blue-500 hover:bg-blue-600"
-                      >
-                        {editingNoteId !== null ? 'Update Note' : 'Save Note'}
-                      </Button>
-                      {editingNoteId !== null && (
-                        <Button
-                          onClick={handleCancelEdit}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          Cancel
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
           </div>
         </div>
-      )}
 
-      {/* Text Selection Popup */}
-      {selectedText && selectionPosition && (
-        <div
-          className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex gap-2"
-          style={{
-            left: `${selectionPosition.x}px`,
-            top: `${selectionPosition.y}px`,
-            transform: 'translate(-50%, -100%)',
-          }}
-        >
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleCopyText}
-            className="h-8 px-3"
-          >
-            <Copy className="w-3 h-3 mr-1" />
-            Copy
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleAddToNotes}
-            disabled={isAddingToNotes}
-            className="h-8 px-3"
-          >
-            <StickyNote className="w-3 h-3 mr-1" />
-            Add to Notes
-          </Button>
+        {/* Main Content */}
+        <div className="space-y-8">
+          {/* Resource Finder */}
+          <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-slate-800 flex items-center gap-2">
+                <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                Find Resources by Subject & Chapter
+              </CardTitle>
+              <CardDescription className="text-slate-600">
+                Select your subject and chapter to access relevant study materials
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="space-y-3 group">
+                  <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Subject</label>
+                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                    <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white">
+                      <SelectValue placeholder="Select a subject" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {subjects.map((subject) => (
+                        <SelectItem key={subject.id} value={subject.id} className="hover:bg-purple-50">
+                          {subject.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3 group">
+                  <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Chapter</label>
+                  <Select 
+                    value={selectedChapter} 
+                    onValueChange={setSelectedChapter}
+                    disabled={!selectedSubject}
+                  >
+                    <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white disabled:opacity-50">
+                      <SelectValue placeholder="Select a chapter" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedSubject && chapters[selectedSubject as keyof typeof chapters]?.map((chapter) => (
+                        <SelectItem key={chapter.id} value={chapter.id} className="hover:bg-purple-50">
+                          {chapter.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Button 
+                onClick={handleProvideResources}
+                disabled={!selectedSubject || !selectedChapter}
+                className="w-full bg-purple-500 hover:bg-purple-600 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Provide Resources
+              </Button>
+            </CardContent>
+          </Card>
+
         </div>
-      )}
 
-      {/* Resource Detail Dialog */}
+        {/* Resources Display */}
+        {resources.length > 0 && (
+          <Card className="mt-8 border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm animate-fade-in">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-slate-800 flex items-center gap-2">
+                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                Available Resources
+              </CardTitle>
+              <CardDescription className="text-slate-600">
+                Found {resources.length} resources for your selection
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {resources.map((resource, index) => {
+                  const IconComponent = getResourceIcon(resource.type);
+                  return (
+                    <div 
+                      key={resource.id} 
+                      className="group border-2 border-slate-200/80 hover:border-purple-300/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                      onClick={() => setSelectedResource(resource)}
+                    >
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-200">
+                          <IconComponent className="w-5 h-5 text-purple-600 group-hover:text-purple-700 transition-colors duration-200" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-slate-800 mb-1 group-hover:text-purple-700 transition-colors duration-200 line-clamp-2">
+                            {highlightText(resource.title, searchHighlight)}
+                          </h4>
+                          <p className="text-sm text-slate-600 group-hover:text-slate-700 transition-colors duration-200 line-clamp-2">
+                            {highlightText(resource.description, searchHighlight)}
+                          </p>
+                        </div>
+                        <Badge variant="secondary" className="bg-slate-100 text-slate-700 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors duration-200 shrink-0">
+                          {resource.type}
+                        </Badge>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedResource(resource);
+                        }}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        View Details
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Resource Detail Modal */}
       <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           {selectedResource && (
             <>
               <DialogHeader>
-                <DialogTitle className="flex items-center gap-3">
-                  {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-600" })}
+                <DialogTitle className="flex items-center gap-3 text-xl">
+                  {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-500" })}
                   {selectedResource.title}
                 </DialogTitle>
-                <DialogDescription>
-                  {selectedResource.description}
-                </DialogDescription>
+                <div className="flex items-center gap-3 mt-2">
+                  <Badge variant="secondary">{selectedResource.type}</Badge>
+                  {selectedResource.content.difficulty && (
+                    <Badge variant="outline">{selectedResource.content.difficulty}</Badge>
+                  )}
+                  
+                  {/* Compact Search Icon */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                    className="ml-auto h-8"
+                    title="Search for related resources"
+                  >
+                    <Search className="w-4 h-4 mr-2" />
+                    Search
+                  </Button>
+                </div>
               </DialogHeader>
 
-              <div className="space-y-6 mt-4">
-                {/* Summary Section */}
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                    Summary
-                  </h3>
-                  <p className="text-gray-700 leading-relaxed">{selectedResource.content.summary}</p>
+              {/* Expandable Search Bar */}
+              {isSearchExpanded && (
+                <div className="mt-4 p-3 bg-muted border rounded-lg animate-fade-in">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Search for related resources..."
+                      value={searchTopic}
+                      onChange={(e) => setSearchTopic(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleInModalSearch(searchTopic)}
+                      className="flex-1 h-9 text-sm"
+                      autoFocus
+                    />
+                    <Button 
+                      onClick={() => handleInModalSearch(searchTopic)} 
+                      size="sm"
+                    >
+                      <Search className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
+              )}
+              
+              <div className="space-y-6 mt-6">
+                {/* Summary */}
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Overview</h3>
+                  <p className="text-gray-600 select-text">{selectedResource.content.summary}</p>
+                </div>
+
+                {/* PDF Content Section */}
+                {selectedResource.type === 'PDF' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">PDF Content</h3>
+                    <div className="bg-muted/50 rounded-lg p-4 border select-text">
+                      <div className="prose prose-sm max-w-none text-gray-700">
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap select-text">
+                          {selectedResource.content.pdfContent || 'PDF content will be displayed here once the document is loaded.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Key Topics */}
                 <div>
-                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    Key Topics Covered
-                  </h3>
+                  <h3 className="text-lg font-semibold mb-3">Key Topics Covered</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {selectedResource.content.keyTopics.map((topic: string, index: number) => (
-                      <div key={index} className="flex items-start gap-2 bg-blue-50 p-3 rounded-lg border border-blue-100">
-                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-sm text-gray-700">{topic}</span>
+                      <div key={index} className="flex items-center gap-2 p-2 bg-purple-50 rounded select-text">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                        <span className="text-sm">{topic}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Examples/Features Section */}
-                {(selectedResource.content.examples || selectedResource.content.features) && (
+                {/* Examples or Features */}
+                {selectedResource.content.examples && (
                   <div>
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                      {selectedResource.content.examples ? 'Examples Included' : 'Features'}
-                    </h3>
-                    <div className="space-y-2">
-                      {(selectedResource.content.examples || selectedResource.content.features).map((item: string, index: number) => (
-                        <div key={index} className="flex items-start gap-2 bg-green-50 p-3 rounded-lg border border-green-100">
-                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-sm text-gray-700">{item}</span>
-                        </div>
+                    <h3 className="text-lg font-semibold mb-3">Examples & Applications</h3>
+                    <ul className="space-y-2">
+                      {selectedResource.content.examples.map((example: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2 select-text">
+                          <span className="text-purple-500 mt-1">•</span>
+                          <span className="text-sm text-gray-600">{example}</span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
+                  </div>
+                )}
+
+                {selectedResource.content.features && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Features</h3>
+                    <ul className="space-y-2">
+                      {selectedResource.content.features.map((feature: string, index: number) => (
+                        <li key={index} className="flex items-start gap-2 select-text">
+                          <span className="text-purple-500 mt-1">•</span>
+                          <span className="text-sm text-gray-600">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
 
                 {/* Additional Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedResource.content.exercises && (
-                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                      <h4 className="font-medium text-purple-900 mb-1">Exercises</h4>
-                      <p className="text-sm text-purple-700">{selectedResource.content.exercises}</p>
-                    </div>
-                  )}
-                  {selectedResource.content.difficulty && (
-                    <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
-                      <h4 className="font-medium text-orange-900 mb-1">Difficulty Level</h4>
-                      <p className="text-sm text-orange-700">{selectedResource.content.difficulty}</p>
-                    </div>
-                  )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                   {selectedResource.content.duration && (
-                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                      <h4 className="font-medium text-blue-900 mb-1">Duration</h4>
-                      <p className="text-sm text-blue-700">{selectedResource.content.duration}</p>
+                    <div>
+                      <span className="font-medium text-sm">Duration:</span>
+                      <p className="text-sm text-gray-600">{selectedResource.content.duration}</p>
                     </div>
                   )}
-                </div>
-
-                {/* Search within Resource */}
-                <div className="border-t pt-4">
-                  <h3 className="font-semibold text-lg mb-3">Search within this resource</h3>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Search for specific topics..."
-                      value={searchHighlight}
-                      onChange={(e) => setSearchHighlight(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button 
-                      onClick={() => handleInModalSearch(searchHighlight)}
-                      className="bg-purple-500 hover:bg-purple-600"
-                    >
-                      <Search className="w-4 h-4 mr-2" />
-                      Search
-                    </Button>
-                  </div>
+                  {selectedResource.content.exercises && (
+                    <div>
+                      <span className="font-medium text-sm">Exercises:</span>
+                      <p className="text-sm text-gray-600">{selectedResource.content.exercises}</p>
+                    </div>
+                  )}
+                  {selectedResource.content.transcript && (
+                    <div>
+                      <span className="font-medium text-sm">Additional:</span>
+                      <p className="text-sm text-gray-600">{selectedResource.content.transcript}</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Close Button */}
-                <div className="flex justify-center pt-4 border-t">
+                <div className="mt-6 flex justify-center">
                   <Button 
-                    variant="outline" 
                     onClick={() => setSelectedResource(null)}
-                    className="px-8"
+                    className="bg-purple-500 hover:bg-purple-600"
                   >
-                    <X className="w-4 h-4 mr-2" />
                     Close
                   </Button>
                 </div>
@@ -2000,21 +1111,191 @@ const ResourceVault = () => {
         </DialogContent>
       </Dialog>
 
-      {/* My Notes Sheet */}
-      <Sheet open={showNotes} onOpenChange={setShowNotes}>
+      {/* Notes Floating Button - Always visible and clickable */}
+      <Button
+        onClick={() => setShowNotes(true)}
+        className="fixed bottom-28 right-8 rounded-full w-16 h-16 bg-emerald-500 hover:bg-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm animate-fade-in z-[9999] pointer-events-auto"
+        size="icon"
+      >
+        <FileText className="w-7 h-7 text-white" />
+      </Button>
+
+      {/* Notes Modal Dialog */}
+      <Dialog open={showNotes} onOpenChange={setShowNotes}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-emerald-500" />
+              My Notes
+            </DialogTitle>
+            <DialogDescription>
+              Save and organize your study notes while browsing resources
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+            {/* Note Editor Column */}
+            <div className="space-y-4">
+              <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                <h3 className="font-semibold text-emerald-800 mb-3 flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  {editingNoteId !== null ? 'Edit Note' : 'Create New Note'}
+                </h3>
+                <div className="space-y-3">
+                  <Input
+                    placeholder="Note title..."
+                    value={currentNote.title}
+                    onChange={(e) => setCurrentNote({...currentNote, title: e.target.value})}
+                    className="font-medium bg-white"
+                  />
+                  <Textarea
+                    placeholder="Write your note here..."
+                    value={currentNote.content}
+                    onChange={(e) => setCurrentNote({...currentNote, content: e.target.value})}
+                    rows={6}
+                    className="resize-none bg-white"
+                  />
+                  <Input
+                    placeholder="Tags (comma separated)..."
+                    value={currentNote.tags}
+                    onChange={(e) => setCurrentNote({...currentNote, tags: e.target.value})}
+                    className="text-sm bg-white"
+                  />
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={handleSaveNote}
+                      disabled={!currentNote.title.trim() || !currentNote.content.trim()}
+                      className="bg-emerald-500 hover:bg-emerald-600 flex-1"
+                    >
+                      {editingNoteId !== null ? 'Update Note' : 'Save Note'}
+                    </Button>
+                    {editingNoteId !== null && (
+                      <Button 
+                        onClick={handleCancelEdit}
+                        variant="outline"
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Notes List Column */}
+            <div className="space-y-4">
+              <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                Saved Notes ({notes.length})
+              </h3>
+              
+              <div className="max-h-96 overflow-y-auto pr-2 space-y-3">
+                {notes.length === 0 ? (
+                  <div className="text-center py-8">
+                    <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <FileText className="w-6 h-6 text-emerald-500" />
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      No notes yet. Create your first note to get started!
+                    </p>
+                  </div>
+                ) : (
+                  notes.map((note) => (
+                    <div key={note.id} className="border border-gray-200 rounded-lg p-3 bg-white hover:shadow-sm transition-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <h4 className="font-medium text-gray-900 text-sm flex-1 line-clamp-1">{note.title}</h4>
+                        <div className="flex gap-1 ml-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditNote(note)}
+                            className="h-7 w-7 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                          >
+                            <FileText className="w-3 h-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteNote(note.id)}
+                            className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-600 mb-2 line-clamp-2">{note.content}</p>
+                      {note.tags && (
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {note.tags.split(',').slice(0, 3).map((tag: string, index: number) => (
+                            <Badge key={index} variant="secondary" className="text-xs px-1 py-0">
+                              {tag.trim()}
+                            </Badge>
+                          ))}
+                          {note.tags.split(',').length > 3 && (
+                            <Badge variant="outline" className="text-xs px-1 py-0">
+                              +{note.tags.split(',').length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-400">
+                        {safeFormatDate(note?.updatedAt || note?.createdAt || note?.date)}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Text Selection Menu */}
+      {selectedText && selectionPosition && (
+        <div
+          className="fixed z-[10000] bg-white border border-gray-200 rounded-lg shadow-lg p-1 flex gap-1 animate-fade-in pointer-events-auto"
+          style={{
+            left: `${selectionPosition.x}px`,
+            top: `${selectionPosition.y}px`,
+            transform: 'translate(-50%, -100%)'
+          }}
+        >
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8 px-3 text-xs hover:bg-purple-50"
+            onClick={handleAddToNotes}
+          >
+            <StickyNote className="w-3.5 h-3.5 mr-1.5" />
+            Add to Notes
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8 px-3 text-xs hover:bg-purple-50"
+            onClick={handleCopyText}
+          >
+            <Copy className="w-3.5 h-3.5 mr-1.5" />
+            Copy
+          </Button>
+        </div>
+      )}
+
+      {/* StudyPal Floating Button - Always visible and clickable */}
+      <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
         <SheetTrigger asChild>
           <Button
-            className="fixed bottom-8 left-8 rounded-full w-14 h-14 bg-blue-500 hover:bg-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm"
+            className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
             size="icon"
           >
-            <StickyNote className="w-6 h-6 text-white" />
+            <MessageSquare className="w-7 h-7 text-white" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-full sm:max-w-lg flex flex-col h-screen">
+        <SheetContent className="w-full sm:max-w-lg flex flex-col h-screen">
           <SheetHeader className="pb-4 border-b flex-shrink-0">
             <SheetTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <StickyNote className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
+                <FileText className="w-4 h-4 text-white" />
               </div>
               My Notes
             </SheetTitle>
@@ -2022,146 +1303,319 @@ const ResourceVault = () => {
               Save and organize your study notes
             </SheetDescription>
           </SheetHeader>
-
+          
           <div className="flex-1 flex flex-col min-h-0">
+            {/* Note Editor Section */}
+            <div className="border-b p-4 bg-emerald-50/50 flex-shrink-0">
+              <div className="space-y-3">
+                <Input
+                  placeholder="Note title..."
+                  value={currentNote.title}
+                  onChange={(e) => setCurrentNote({...currentNote, title: e.target.value})}
+                  className="font-medium"
+                />
+                <Textarea
+                  placeholder="Write your note here..."
+                  value={currentNote.content}
+                  onChange={(e) => setCurrentNote({...currentNote, content: e.target.value})}
+                  rows={4}
+                  className="resize-none"
+                />
+                <Input
+                  placeholder="Tags (comma separated)..."
+                  value={currentNote.tags}
+                  onChange={(e) => setCurrentNote({...currentNote, tags: e.target.value})}
+                  className="text-sm"
+                />
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={handleSaveNote}
+                    disabled={!currentNote.title.trim() || !currentNote.content.trim()}
+                    className="bg-emerald-500 hover:bg-emerald-600 flex-1"
+                    size="sm"
+                  >
+                    {editingNoteId !== null ? 'Update Note' : 'Save Note'}
+                  </Button>
+                  {editingNoteId !== null && (
+                    <Button 
+                      onClick={handleCancelEdit}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Notes List */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4">
               {notes.length === 0 ? (
                 <div className="h-full flex items-center justify-center">
                   <div className="text-center">
-                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <StickyNote className="w-8 h-8 text-blue-500" />
+                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <FileText className="w-8 h-8 text-emerald-500" />
                     </div>
                     <h3 className="font-medium text-gray-900 mb-2">No notes yet</h3>
                     <p className="text-sm text-gray-500 max-w-xs">
-                      Select text from resources and click "Add to Notes" to save them here.
+                      Start taking notes to organize your learning and keep track of important concepts.
                     </p>
                   </div>
                 </div>
               ) : (
-                notes.map((note) => (
-                  <div key={note.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-medium text-gray-900">{note.title}</h4>
-                      <div className="flex gap-1">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => handleEditNote(note)}
-                          className="h-6 w-6"
-                        >
-                          <Copy className="w-3 h-3" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              size="icon"
-                              variant="ghost"
-                              className="h-6 w-6 text-red-500 hover:text-red-700"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete Note</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                Are you sure you want to delete this note? This action cannot be undone.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => handleDeleteNote(note.id)}
-                                className="bg-red-600 hover:bg-red-700"
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
+                <div className="space-y-4">
+                  {notes.map((note) => (
+                    <div key={note.id} className="border border-emerald-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between mb-2">
+                        <h4 className="font-medium text-gray-900 flex-1">{note.title}</h4>
+                        <div className="flex gap-1 ml-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditNote(note)}
+                            className="h-8 w-8 p-0 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                          >
+                            <FileText className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteNote(note.id)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-3">{note.content}</p>
+                      {note.tags && (
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {note.tags.split(',').map((tag: string, index: number) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {tag.trim()}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-400">
+                        {safeFormatDateTime(note?.updatedAt || note?.createdAt || note?.date)}
+                      </p>
                     </div>
-                    <p className="text-sm text-gray-700 mb-2 whitespace-pre-wrap">{note.content}</p>
-                    {note.tags && (
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {note.tags.split(',').map((tag: string, idx: number) => (
-                          <Badge key={idx} variant="secondary" className="text-xs">
-                            {tag.trim()}
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
-                    <p className="text-xs text-gray-500">
-                      {note.updatedAt && `Updated: ${safeFormatDateTime(note.updatedAt)}`}
-                      {!note.updatedAt && note.createdAt && `Created: ${safeFormatDateTime(note.createdAt)}`}
-                    </p>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
-            </div>
-
-            {/* Note Editor */}
-            <div className="border-t p-4 bg-white flex-shrink-0 space-y-3">
-              <Input
-                placeholder="Note title"
-                value={currentNote.title}
-                onChange={(e) => setCurrentNote({ ...currentNote, title: e.target.value })}
-              />
-              <Textarea
-                placeholder="Write your note here..."
-                value={currentNote.content}
-                onChange={(e) => setCurrentNote({ ...currentNote, content: e.target.value })}
-                rows={3}
-                className="resize-none"
-              />
-              <Input
-                placeholder="Tags (comma separated)"
-                value={currentNote.tags}
-                onChange={(e) => setCurrentNote({ ...currentNote, tags: e.target.value })}
-              />
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleSaveNote}
-                  disabled={!currentNote.title.trim() || !currentNote.content.trim()}
-                  className="flex-1 bg-blue-500 hover:bg-blue-600"
-                >
-                  {editingNoteId !== null ? 'Update Note' : 'Save Note'}
-                </Button>
-                {editingNoteId !== null && (
-                  <Button
-                    onClick={handleCancelEdit}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    Cancel
-                  </Button>
-                )}
-              </div>
             </div>
           </div>
         </SheetContent>
       </Sheet>
 
-      {/* StudyPal Floater Button & Mobile Bottom Sheet */}
-      {!showStudyPal && (
-        <Button
-          onClick={() => setShowStudyPal(true)}
-          className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-50"
-          size="icon"
-        >
-          <MessageSquare className="w-7 h-7 text-white" />
-        </Button>
-      )}
+        </ResizablePanel>
 
-      {/* Mobile Bottom Sheet for StudyPal */}
-      {isMobile && (
-        <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
-          <SheetContent side="bottom" className="h-[80vh] flex flex-col">
-            <StudyPalContent />
-          </SheetContent>
-        </Sheet>
-      )}
+        <ResizableHandle withHandle />
+
+        {/* Right Panel - StudyPal (25%) */}
+        <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+          <div className="h-full flex flex-col bg-white border-l border-gray-200">
+            {/* StudyPal Header */}
+            <div className="pb-4 pt-6 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-50 to-white">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                  <MessageCircle className="w-4 h-4 text-white" />
+                </div>
+                <h2 className="text-lg font-semibold text-gray-900">StudyPal</h2>
+              </div>
+              <p className="text-sm text-gray-600">
+                Your AI learning assistant is here to help!
+              </p>
+            </div>
+            
+            <div className="flex-1 flex flex-col min-h-0">
+              {/* Chat Messages Area */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {chatHistory.length === 0 ? (
+                  <div className="h-full flex items-center justify-center">
+                    <div className="text-center px-4">
+                      <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Brain className="w-8 h-8 text-purple-500" />
+                      </div>
+                      <h3 className="font-medium text-gray-900 mb-2">Hello! I'm StudyPal</h3>
+                      <p className="text-sm text-gray-500 max-w-xs">
+                        I'm here to help you understand any concept you're struggling with. Just ask me anything!
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {chatHistory.map((chat) => (
+                      <div key={chat.id} className="space-y-3">
+                        {/* User Message */}
+                        <div className="flex justify-end">
+                          <div className="max-w-[80%] bg-purple-500 text-white rounded-2xl rounded-br-md px-4 py-2">
+                            <p className="text-sm">{chat.user}</p>
+                          </div>
+                        </div>
+                        
+                        {/* Bot Message */}
+                        <div className="flex justify-start">
+                          <div className="flex items-start gap-2 max-w-[80%]">
+                            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Brain className="w-4 h-4 text-purple-500" />
+                            </div>
+                            <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-2">
+                              <p className="text-sm text-gray-800">{chat.bot}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Additional Resources Section */}
+                        {chat.hasResources && (
+                          <div className="flex justify-start mt-4">
+                            <div className="flex items-start gap-2 max-w-[85%]">
+                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <Lightbulb className="w-4 h-4 text-blue-500" />
+                              </div>
+                              <div className="bg-blue-50 rounded-2xl rounded-bl-md px-4 py-3 border border-blue-200">
+                                <p className="text-sm text-gray-800 mb-3">Here are some visual resources to help you understand better:</p>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openResourceWindow(chat.topic, 'mindmap')}
+                                    className="text-xs h-8 border-blue-300 text-blue-700 hover:bg-blue-100"
+                                  >
+                                    <Brain className="w-3 h-3 mr-1" />
+                                    Mind Map
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openResourceWindow(chat.topic, 'diagram')}
+                                    className="text-xs h-8 border-green-300 text-green-700 hover:bg-green-100"
+                                  >
+                                    <Target className="w-3 h-3 mr-1" />
+                                    Diagram
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openResourceWindow(chat.topic, 'flowchart')}
+                                    className="text-xs h-8 border-purple-300 text-purple-700 hover:bg-purple-100"
+                                  >
+                                    <BookOpen className="w-3 h-3 mr-1" />
+                                    Flowchart
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openResourceWindow(chat.topic, 'concept-map')}
+                                    className="text-xs h-8 border-orange-300 text-orange-700 hover:bg-orange-100"
+                                  >
+                                    <Lightbulb className="w-3 h-3 mr-1" />
+                                    Concept Map
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    
+                    {/* Resource Feedback Section - Show after conversation */}
+                    {chatHistory.length > 0 && resources.length > 0 && !resourceFeedback && (
+                      <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
+                        <div className="flex items-start gap-2 mb-3">
+                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Brain className="w-4 h-4 text-purple-500" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-1">Quick Feedback</h4>
+                            <p className="text-sm text-gray-600 mb-3">Were the resources I provided helpful for your learning?</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleResourceFeedback('yes')}
+                            className="flex-1 border-green-200 text-green-700 hover:bg-green-50"
+                          >
+                            <ThumbsUp className="w-4 h-4 mr-2" />
+                            Yes, helpful
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleResourceFeedback('no')}
+                            className="flex-1 border-red-200 text-red-700 hover:bg-red-50"
+                          >
+                            <ThumbsDown className="w-4 h-4 mr-2" />
+                            Not helpful
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Quick Test Section - Show after conversation */}
+                    {chatHistory.length > 0 && (
+                      <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                        <div className="flex items-start gap-2 mb-3">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Brain className="w-4 h-4 text-blue-500" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-1">Test Your Knowledge</h4>
+                            <p className="text-sm text-gray-600 mb-3">
+                              Ready to test what you've learned? Take a quick 5-question quiz in a new window!
+                            </p>
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => openTestWindow(chatHistory[chatHistory.length - 1]?.topic || 'General Knowledge')} 
+                          className="w-full bg-blue-500 hover:bg-blue-600"
+                        >
+                          <Brain className="w-4 h-4 mr-2" />
+                          Start Quick Test
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+
+              </div>
+              
+              {/* Message Input Area */}
+              <div className="border-t p-4 bg-white flex-shrink-0">
+                <div className="flex gap-2">
+                  <Textarea
+                    placeholder="Ask me about any concept you're struggling with..."
+                    value={chatMessage}
+                    onChange={(e) => setChatMessage(e.target.value)}
+                    rows={2}
+                    className="resize-none flex-1"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleStudyPalMessage();
+                      }
+                    }}
+                  />
+                  <Button 
+                    onClick={handleStudyPalMessage} 
+                    className="bg-purple-500 hover:bg-purple-600 px-4"
+                    disabled={!chatMessage.trim()}
+                    size="icon"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Press Enter to send, Shift+Enter for new line</p>
+              </div>
+            </div>
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 };
