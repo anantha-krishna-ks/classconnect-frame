@@ -1983,21 +1983,15 @@ const ResourceVault = () => {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3 pt-4 border-t">
-                  <Button className="flex-1 bg-purple-500 hover:bg-purple-600">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Resource
-                  </Button>
-                  {selectedResource.type === 'Video' && (
-                    <Button variant="outline" className="flex-1">
-                      <Play className="w-4 h-4 mr-2" />
-                      Play Video
-                    </Button>
-                  )}
-                  <Button variant="outline" className="flex-1">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Open in New Tab
+                {/* Close Button */}
+                <div className="flex justify-center pt-4 border-t">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSelectedResource(null)}
+                    className="px-8"
+                  >
+                    <X className="w-4 h-4 mr-2" />
+                    Close
                   </Button>
                 </div>
               </div>
