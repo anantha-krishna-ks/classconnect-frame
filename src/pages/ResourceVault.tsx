@@ -87,6 +87,7 @@ const ResourceVault = () => {
   const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
   const [isAddingToNotes, setIsAddingToNotes] = useState(false);
   const [showStudyPalInDialog, setShowStudyPalInDialog] = useState(true);
+  const isInteractingWithSelectionPopup = React.useRef(false);
 
   const handleLogout = () => {
     navigate('/student-login');
@@ -99,6 +100,11 @@ const ResourceVault = () => {
   // Text selection handlers
   useEffect(() => {
     const handleTextSelection = () => {
+      // Don't clear selection if user is interacting with the selection popup
+      if (isInteractingWithSelectionPopup.current) {
+        return;
+      }
+      
       const selection = window.getSelection();
       const text = selection?.toString().trim();
       
@@ -138,6 +144,8 @@ const ResourceVault = () => {
   const handleCopyText = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    isInteractingWithSelectionPopup.current = false;
+    
     if (selectedText) {
       navigator.clipboard.writeText(selectedText);
       toast({
@@ -152,6 +160,8 @@ const ResourceVault = () => {
   const handleAddToNotes = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    isInteractingWithSelectionPopup.current = false;
+    
     if (!selectedText?.trim() || isAddingToNotes) return;
     
     setIsAddingToNotes(true);
@@ -424,6 +434,70 @@ const ResourceVault = () => {
   const handleCancelEdit = () => {
     setEditingNoteId(null);
     setCurrentNote({ title: '', content: '', tags: '' });
+  };
+
+  // Selection floater component
+  const renderSelectionFloater = (insideDialog = false) => {
+    if (!selectedText || !selectionPosition) return null;
+
+    return (
+      <div
+        data-selection-popup="true"
+        className={`fixed bg-white rounded-lg shadow-xl border-2 border-purple-300 p-2 flex gap-2 ${
+          insideDialog ? 'z-[1000] pointer-events-auto' : 'z-[200] pointer-events-none'
+        }`}
+        style={{
+          left: `${selectionPosition.x}px`,
+          top: `${selectionPosition.y}px`,
+          transform: 'translate(-50%, -100%)',
+        }}
+        onMouseDown={(e) => {
+          isInteractingWithSelectionPopup.current = true;
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onTouchStart={(e) => {
+          isInteractingWithSelectionPopup.current = true;
+          e.stopPropagation();
+        }}
+      >
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            handleCopyText(e);
+          }}
+          onMouseDown={(e) => {
+            isInteractingWithSelectionPopup.current = true;
+            e.stopPropagation();
+          }}
+          className="h-8 px-3 pointer-events-auto hover:bg-blue-50 hover:border-blue-300"
+        >
+          <Copy className="w-3 h-3 mr-1" />
+          Copy
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            handleAddToNotes(e);
+          }}
+          onMouseDown={(e) => {
+            isInteractingWithSelectionPopup.current = true;
+            e.stopPropagation();
+          }}
+          disabled={isAddingToNotes}
+          className="h-8 px-3 pointer-events-auto hover:bg-purple-50 hover:border-purple-300"
+        >
+          <StickyNote className="w-3 h-3 mr-1" />
+          {isAddingToNotes ? 'Adding...' : 'Add to Notes'}
+        </Button>
+      </div>
+    );
   };
 
   const handleStudyPalMessage = () => {
@@ -1363,55 +1437,8 @@ const ResourceVault = () => {
         </div>
       )}
 
-      {/* Text Selection Popup */}
-      {selectedText && selectionPosition && (
-        <div
-          data-selection-popup="true"
-          className="fixed z-[200] bg-white rounded-lg shadow-xl border-2 border-purple-300 p-2 flex gap-2 pointer-events-none"
-          style={{
-            left: `${selectionPosition.x}px`,
-            top: `${selectionPosition.y}px`,
-            transform: 'translate(-50%, -100%)',
-          }}
-          onMouseDown={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-          onTouchStart={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              handleCopyText(e);
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-            className="h-8 px-3 pointer-events-auto hover:bg-blue-50 hover:border-blue-300"
-          >
-            <Copy className="w-3 h-3 mr-1" />
-            Copy
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              handleAddToNotes(e);
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-            disabled={isAddingToNotes}
-            className="h-8 px-3 pointer-events-auto hover:bg-purple-50 hover:border-purple-300"
-          >
-            <StickyNote className="w-3 h-3 mr-1" />
-            {isAddingToNotes ? 'Adding...' : 'Add to Notes'}
-          </Button>
-        </div>
-      )}
+      {/* Text Selection Popup - Outside Dialog */}
+      {!selectedResource && renderSelectionFloater(false)}
 
       {/* Resource Detail Dialog */}
       <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
@@ -1428,6 +1455,9 @@ const ResourceVault = () => {
         >
           {selectedResource && (
             <>
+              {/* Text Selection Popup - Inside Dialog */}
+              {renderSelectionFloater(true)}
+              
               {/* Desktop Layout - Resizable Panels */}
               {!isMobile ? (
                 <ResizablePanelGroup direction="horizontal" className="h-full">
