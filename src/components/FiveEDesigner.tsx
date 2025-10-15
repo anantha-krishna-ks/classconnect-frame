@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { GripVertical, Plus, X, Merge, ChevronDown, Brain, Loader2, AlertCircle, CheckCircle, Edit3, RefreshCw, Save, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -58,6 +59,11 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   // Edit content state
   const [editingContent, setEditingContent] = useState<{stepKey: string; resourceName: string} | null>(null);
   const [editedContent, setEditedContent] = useState('');
+  
+  // Regenerate dialog state
+  const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
+  const [regenerateTarget, setRegenerateTarget] = useState<{stepKey: string; resourceName: string} | null>(null);
+  const [additionalInstructions, setAdditionalInstructions] = useState('');
   
   // Merge tracking state
   const [mergedELOs, setMergedELOs] = useState<{[mergedKey: string]: string[]}>({});
@@ -1731,7 +1737,13 @@ Students use the story framework to reflect on:
     });
   };
 
-  const regenerateContentForResource = async (stepKey: string, resourceName: string) => {
+  const openRegenerateDialog = (stepKey: string, resourceName: string) => {
+    setRegenerateTarget({ stepKey, resourceName });
+    setAdditionalInstructions('');
+    setRegenerateDialogOpen(true);
+  };
+
+  const regenerateContentForResource = async (stepKey: string, resourceName: string, instructions?: string) => {
     const [eloIndex, stepId] = stepKey.split('_');
     const stepName = fiveESteps.find(s => s.id === stepId)?.name || stepId;
     
@@ -1745,7 +1757,12 @@ Students use the story framework to reflect on:
       // Map resource to type and generate content
       const mappedType = mapResourceToType(resourceName);
       if (mappedType) {
-        const content = getPredefinedContent(stepName, mappedType, eloIndex);
+        let content = getPredefinedContent(stepName, mappedType, eloIndex);
+        
+        // If additional instructions provided, append them to the content
+        if (instructions && instructions.trim()) {
+          content = `${content}\n\n[Additional Instructions Applied: ${instructions}]`;
+        }
         
         // Update content for this specific resource
         setGeneratedContentData(prev => ({
@@ -1776,6 +1793,17 @@ Students use the story framework to reflect on:
     } finally {
       setGeneratingContent(prev => ({ ...prev, [stepKey]: false }));
     }
+  };
+
+  const handleRegenerateSubmit = () => {
+    if (regenerateTarget) {
+      regenerateContentForResource(
+        regenerateTarget.stepKey,
+        regenerateTarget.resourceName,
+        additionalInstructions
+      );
+    }
+    setRegenerateDialogOpen(false);
   };
 
   return (
@@ -2052,15 +2080,15 @@ Students use the story framework to reflect on:
                                                        >
                                                          <Edit3 className="w-3 h-3" />
                                                        </Button>
-                                                       <Button
-                                                         variant="outline"
-                                                         size="sm"
-                                                         onClick={() => regenerateContentForResource(stepKey, resource)}
-                                                         className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 h-6 w-6 p-0"
-                                                         title="Regenerate content"
-                                                       >
-                                                         <RefreshCw className="w-3 h-3" />
-                                                       </Button>
+                                                        <Button
+                                                          variant="outline"
+                                                          size="sm"
+                                                          onClick={() => openRegenerateDialog(stepKey, resource)}
+                                                          className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 h-6 w-6 p-0"
+                                                          title="Regenerate content"
+                                                        >
+                                                          <RefreshCw className="w-3 h-3" />
+                                                        </Button>
                                                      </div>
                                                    )}
                                                   <Button
@@ -2176,6 +2204,38 @@ Students use the story framework to reflect on:
             </Button>
           </div>
         )}
+        
+        {/* Regenerate Dialog */}
+        <Dialog open={regenerateDialogOpen} onOpenChange={setRegenerateDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Additional Instructions</DialogTitle>
+              <DialogDescription>
+                Enter specific instructions for what you need in the regenerated content.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              <Textarea
+                placeholder="E.g., Include more examples, focus on practical applications, add diagrams..."
+                value={additionalInstructions}
+                onChange={(e) => setAdditionalInstructions(e.target.value)}
+                rows={4}
+                className="w-full"
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setRegenerateDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={handleRegenerateSubmit}>
+                Regenerate
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </Card>
 
     </div>
