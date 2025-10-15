@@ -127,13 +127,23 @@ const ResourceVault = () => {
     };
   }, []);
 
-  const handleCopyText = () => {
-    navigator.clipboard.writeText(selectedText);
-    setSelectedText('');
-    setSelectionPosition(null);
+  const handleCopyText = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (selectedText) {
+      navigator.clipboard.writeText(selectedText);
+      toast({
+        title: "Copied!",
+        description: "Text copied to clipboard.",
+      });
+      setSelectedText('');
+      setSelectionPosition(null);
+    }
   };
 
-  const handleAddToNotes = () => {
+  const handleAddToNotes = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (!selectedText?.trim() || isAddingToNotes) return;
     setIsAddingToNotes(true);
     try {
@@ -1515,12 +1525,13 @@ const ResourceVault = () => {
       {/* Text Selection Popup */}
       {selectedText && selectionPosition && (
         <div
-          className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex gap-2 pointer-events-none"
+          className="fixed z-[100] bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex gap-2 pointer-events-none"
           style={{
             left: `${selectionPosition.x}px`,
             top: `${selectionPosition.y}px`,
             transform: 'translate(-50%, -100%)',
           }}
+          onMouseDown={(e) => e.stopPropagation()}
         >
           <Button
             size="sm"
