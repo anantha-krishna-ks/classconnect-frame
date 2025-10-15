@@ -770,16 +770,7 @@ const ResourceVault = () => {
   // StudyPal Component
   const StudyPalContent = ({ inDialog = false }: { inDialog?: boolean }) => (
     <div className="h-full flex flex-col bg-white">
-      <div className="p-4 border-b flex items-center justify-between flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-            <MessageCircle className="w-4 h-4 text-white" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-gray-900">StudyPal</h3>
-            <p className="text-xs text-gray-500">Your AI learning assistant</p>
-          </div>
-        </div>
+      <div className="p-4 border-b flex items-center gap-3 flex-shrink-0">
         {inDialog ? (
           <Button
             variant="ghost"
@@ -800,6 +791,15 @@ const ResourceVault = () => {
             <X className="w-4 h-4" />
           </Button>
         ) : null}
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+            <MessageCircle className="w-4 h-4 text-white" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">StudyPal</h3>
+            <p className="text-xs text-gray-500">Your AI learning assistant</p>
+          </div>
+        </div>
       </div>
       
       <div className="flex-1 flex flex-col min-h-0">
