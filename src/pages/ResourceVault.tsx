@@ -919,6 +919,20 @@ const ResourceVault = () => {
                   <p className="text-gray-600">{selectedResource.content.summary}</p>
                 </div>
 
+                {/* PDF Content Section */}
+                {selectedResource.type === 'PDF' && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">PDF Content</h3>
+                    <div className="bg-muted/50 rounded-lg p-4 border">
+                      <div className="prose prose-sm max-w-none text-gray-700">
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                          {selectedResource.content.pdfContent || 'PDF content will be displayed here once the document is loaded.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Key Topics */}
                 <div>
                   <h3 className="text-lg font-semibold mb-3">Key Topics Covered</h3>
