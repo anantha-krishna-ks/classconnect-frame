@@ -1963,34 +1963,13 @@ const ResourceVault = () => {
                   )}
                 </div>
 
-                {/* Search within Resource */}
-                <div className="border-t pt-4">
-                  <h3 className="font-semibold text-lg mb-3">Search within this resource</h3>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Search for specific topics..."
-                      value={searchHighlight}
-                      onChange={(e) => setSearchHighlight(e.target.value)}
-                      className="flex-1"
-                    />
-                    <Button 
-                      onClick={() => handleInModalSearch(searchHighlight)}
-                      className="bg-purple-500 hover:bg-purple-600"
-                    >
-                      <Search className="w-4 h-4 mr-2" />
-                      Search
-                    </Button>
-                  </div>
-                </div>
 
                 {/* Close Button */}
                 <div className="flex justify-center pt-4 border-t">
                   <Button 
-                    variant="outline" 
                     onClick={() => setSelectedResource(null)}
-                    className="px-8"
+                    className="px-8 bg-purple-500 hover:bg-purple-600"
                   >
-                    <X className="w-4 h-4 mr-2" />
                     Close
                   </Button>
                 </div>
