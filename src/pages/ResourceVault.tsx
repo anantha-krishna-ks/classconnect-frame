@@ -1633,16 +1633,8 @@ const ResourceVault = () => {
         </div>
       )}
 
-      {/* StudyPal Floating Button - Always visible and clickable */}
-      <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
-        <SheetTrigger asChild>
-          <Button
-            className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
-            size="icon"
-          >
-            <MessageSquare className="w-7 h-7 text-white" />
-          </Button>
-        </SheetTrigger>
+      {/* My Notes Sheet */}
+      <Sheet open={showNotes} onOpenChange={setShowNotes}>
         <SheetContent className="w-full sm:max-w-lg flex flex-col h-screen">
           <SheetHeader className="pb-4 border-b flex-shrink-0">
             <SheetTitle className="flex items-center gap-2">
