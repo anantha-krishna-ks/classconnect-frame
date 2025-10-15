@@ -1557,97 +1557,98 @@ const ResourceVault = () => {
 
       {/* Resource Detail Dialog */}
       <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto select-text">
+        <DialogContent className="max-w-7xl max-h-[85vh] p-0 select-text">
           {selectedResource && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-3">
-                  {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-600" })}
-                  {selectedResource.title}
-                </DialogTitle>
-                <DialogDescription>
-                  {selectedResource.description}
-                </DialogDescription>
-              </DialogHeader>
+            <ResizablePanelGroup direction="horizontal" className="h-[85vh]">
+              {/* Resource Content Panel */}
+              <ResizablePanel defaultSize={60} minSize={40}>
+                <div className="h-full overflow-y-auto p-6">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-3">
+                      {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-600" })}
+                      {selectedResource.title}
+                    </DialogTitle>
+                    <DialogDescription>
+                      {selectedResource.description}
+                    </DialogDescription>
+                  </DialogHeader>
 
-              <div className="space-y-6 mt-4">
-                {/* Summary Section */}
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                    Summary
-                  </h3>
-                  <p className="text-gray-700 leading-relaxed">{selectedResource.content.summary}</p>
-                </div>
+                  <div className="space-y-6 mt-4">
+                    {/* Summary Section */}
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                        Summary
+                      </h3>
+                      <p className="text-gray-700 leading-relaxed">{selectedResource.content.summary}</p>
+                    </div>
 
-                {/* Key Topics */}
-                <div>
-                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                    Key Topics Covered
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {selectedResource.content.keyTopics.map((topic: string, index: number) => (
-                      <div key={index} className="flex items-start gap-2 bg-blue-50 p-3 rounded-lg border border-blue-100">
-                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                        <span className="text-sm text-gray-700">{topic}</span>
+                    {/* Key Topics */}
+                    <div>
+                      <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                        Key Topics Covered
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {selectedResource.content.keyTopics.map((topic: string, index: number) => (
+                          <div key={index} className="flex items-start gap-2 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <span className="text-sm text-gray-700">{topic}</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
+                    </div>
 
-                {/* Examples/Features Section */}
-                {(selectedResource.content.examples || selectedResource.content.features) && (
-                  <div>
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                      {selectedResource.content.examples ? 'Examples Included' : 'Features'}
-                    </h3>
-                    <div className="space-y-2">
-                      {(selectedResource.content.examples || selectedResource.content.features).map((item: string, index: number) => (
-                        <div key={index} className="flex items-start gap-2 bg-green-50 p-3 rounded-lg border border-green-100">
-                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-sm text-gray-700">{item}</span>
+                    {/* Examples/Features Section */}
+                    {(selectedResource.content.examples || selectedResource.content.features) && (
+                      <div>
+                        <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                          {selectedResource.content.examples ? 'Examples Included' : 'Features'}
+                        </h3>
+                        <div className="space-y-2">
+                          {(selectedResource.content.examples || selectedResource.content.features).map((item: string, index: number) => (
+                            <div key={index} className="flex items-start gap-2 bg-green-50 p-3 rounded-lg border border-green-100">
+                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                              <span className="text-sm text-gray-700">{item}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                    )}
+
+                    {/* Additional Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {selectedResource.content.exercises && (
+                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                          <h4 className="font-medium text-purple-900 mb-1">Exercises</h4>
+                          <p className="text-sm text-purple-700">{selectedResource.content.exercises}</p>
+                        </div>
+                      )}
+                      {selectedResource.content.difficulty && (
+                        <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
+                          <h4 className="font-medium text-orange-900 mb-1">Difficulty Level</h4>
+                          <p className="text-sm text-orange-700">{selectedResource.content.difficulty}</p>
+                        </div>
+                      )}
+                      {selectedResource.content.duration && (
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                          <h4 className="font-medium text-blue-900 mb-1">Duration</h4>
+                          <p className="text-sm text-blue-700">{selectedResource.content.duration}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
-
-                {/* Additional Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedResource.content.exercises && (
-                    <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                      <h4 className="font-medium text-purple-900 mb-1">Exercises</h4>
-                      <p className="text-sm text-purple-700">{selectedResource.content.exercises}</p>
-                    </div>
-                  )}
-                  {selectedResource.content.difficulty && (
-                    <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
-                      <h4 className="font-medium text-orange-900 mb-1">Difficulty Level</h4>
-                      <p className="text-sm text-orange-700">{selectedResource.content.difficulty}</p>
-                    </div>
-                  )}
-                  {selectedResource.content.duration && (
-                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                      <h4 className="font-medium text-blue-900 mb-1">Duration</h4>
-                      <p className="text-sm text-blue-700">{selectedResource.content.duration}</p>
-                    </div>
-                  )}
                 </div>
+              </ResizablePanel>
 
+              <ResizableHandle withHandle />
 
-                {/* Close Button */}
-                <div className="flex justify-center pt-4 border-t">
-                  <Button 
-                    onClick={() => setSelectedResource(null)}
-                    className="px-8 bg-purple-500 hover:bg-purple-600"
-                  >
-                    Close
-                  </Button>
-                </div>
-              </div>
-            </>
+              {/* Study Pal Panel */}
+              <ResizablePanel defaultSize={40} minSize={30}>
+                <StudyPalContent />
+              </ResizablePanel>
+            </ResizablePanelGroup>
           )}
         </DialogContent>
       </Dialog>
