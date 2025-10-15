@@ -132,7 +132,8 @@ const ResourceVault = () => {
       title: `Note ${notes.length + 1}`,
       content: selectedText,
       tags: selectedResource?.subject || '',
-      date: new Date().toLocaleDateString()
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     setNotes([...notes, newNote]);
     setSelectedText('');
