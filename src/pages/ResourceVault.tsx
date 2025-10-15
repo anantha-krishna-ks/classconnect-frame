@@ -1398,122 +1398,114 @@ const ResourceVault = () => {
         >
           {selectedResource && (
             <>
-              {/* Desktop Layout - Resizable Panels */}
+              {/* Desktop Layout - Fixed Study Pal with Scrollable Content */}
               {!isMobile ? (
-                <ResizablePanelGroup direction="horizontal" className="h-full">
-                  {/* Resource Content Panel */}
-                  <ResizablePanel defaultSize={showStudyPalInDialog ? 60 : 100} minSize={40}>
-                    <div className="h-full flex flex-col">
-                      <div className="flex-shrink-0 p-6 pb-4 border-b">
-                        <DialogHeader>
-                          <DialogTitle className="flex items-center gap-3">
-                            {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-600" })}
-                            {selectedResource.title}
-                          </DialogTitle>
-                          <DialogDescription>
-                            {selectedResource.description}
-                          </DialogDescription>
-                        </DialogHeader>
-                        
-                        {/* Toggle Study Pal Button */}
-                        {!showStudyPalInDialog && (
-                          <div className="mt-4">
-                            <Button
-                              onClick={() => setShowStudyPalInDialog(true)}
-                              className="bg-purple-500 hover:bg-purple-600"
-                              size="sm"
-                            >
-                              <MessageCircle className="w-4 h-4 mr-2" />
-                              Show StudyPal
-                            </Button>
-                          </div>
-                        )}
-                      </div>
+                <div className="h-full flex">
+                  {/* Resource Content Panel - Flexible with Scroll */}
+                  <div className="flex-1 min-w-0 h-full flex flex-col">
+                    <div className="flex-shrink-0 p-6 pb-4 border-b">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center gap-3">
+                          {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-600" })}
+                          {selectedResource.title}
+                        </DialogTitle>
+                        <DialogDescription>
+                          {selectedResource.description}
+                        </DialogDescription>
+                      </DialogHeader>
                       
-                      <div className="flex-1 overflow-y-auto p-6">
-                        <div className="space-y-6">
-                          {/* Summary Section */}
-                          <div>
-                            <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                              Summary
-                            </h3>
-                            <p className="text-gray-700 leading-relaxed">{selectedResource.content.summary}</p>
-                          </div>
+                      {/* Toggle Study Pal Button */}
+                      {!showStudyPalInDialog && (
+                        <div className="mt-4">
+                          <Button
+                            onClick={() => setShowStudyPalInDialog(true)}
+                            className="bg-purple-500 hover:bg-purple-600"
+                            size="sm"
+                          >
+                            <MessageCircle className="w-4 h-4 mr-2" />
+                            Show StudyPal
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto p-6">
+                      <div className="space-y-6">
+                        {/* Summary Section */}
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                            Summary
+                          </h3>
+                          <p className="text-gray-700 leading-relaxed">{selectedResource.content.summary}</p>
+                        </div>
 
-                          {/* Key Topics */}
+                        {/* Key Topics */}
+                        <div>
+                          <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                            Key Topics Covered
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {selectedResource.content.keyTopics.map((topic: string, index: number) => (
+                              <div key={index} className="flex items-start gap-2 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                                <span className="text-sm text-gray-700">{topic}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Examples/Features Section */}
+                        {(selectedResource.content.examples || selectedResource.content.features) && (
                           <div>
                             <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
-                              Key Topics Covered
+                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+                              {selectedResource.content.examples ? 'Examples Included' : 'Features'}
                             </h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {selectedResource.content.keyTopics.map((topic: string, index: number) => (
-                                <div key={index} className="flex items-start gap-2 bg-blue-50 p-3 rounded-lg border border-blue-100">
-                                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                                  <span className="text-sm text-gray-700">{topic}</span>
+                            <div className="space-y-2">
+                              {(selectedResource.content.examples || selectedResource.content.features).map((item: string, index: number) => (
+                                <div key={index} className="flex items-start gap-2 bg-green-50 p-3 rounded-lg border border-green-100">
+                                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                                  <span className="text-sm text-gray-700">{item}</span>
                                 </div>
                               ))}
                             </div>
                           </div>
+                        )}
 
-                          {/* Examples/Features Section */}
-                          {(selectedResource.content.examples || selectedResource.content.features) && (
-                            <div>
-                              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-                                {selectedResource.content.examples ? 'Examples Included' : 'Features'}
-                              </h3>
-                              <div className="space-y-2">
-                                {(selectedResource.content.examples || selectedResource.content.features).map((item: string, index: number) => (
-                                  <div key={index} className="flex items-start gap-2 bg-green-50 p-3 rounded-lg border border-green-100">
-                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                                    <span className="text-sm text-gray-700">{item}</span>
-                                  </div>
-                                ))}
-                              </div>
+                        {/* Additional Info */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {selectedResource.content.exercises && (
+                            <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                              <h4 className="font-medium text-purple-900 mb-1">Exercises</h4>
+                              <p className="text-sm text-purple-700">{selectedResource.content.exercises}</p>
                             </div>
                           )}
-
-                          {/* Additional Info */}
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {selectedResource.content.exercises && (
-                              <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                                <h4 className="font-medium text-purple-900 mb-1">Exercises</h4>
-                                <p className="text-sm text-purple-700">{selectedResource.content.exercises}</p>
-                              </div>
-                            )}
-                            {selectedResource.content.difficulty && (
-                              <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
-                                <h4 className="font-medium text-orange-900 mb-1">Difficulty Level</h4>
-                                <p className="text-sm text-orange-700">{selectedResource.content.difficulty}</p>
-                              </div>
-                            )}
-                            {selectedResource.content.duration && (
-                              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                                <h4 className="font-medium text-blue-900 mb-1">Duration</h4>
-                                <p className="text-sm text-blue-700">{selectedResource.content.duration}</p>
-                              </div>
-                            )}
-                          </div>
+                          {selectedResource.content.difficulty && (
+                            <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
+                              <h4 className="font-medium text-orange-900 mb-1">Difficulty Level</h4>
+                              <p className="text-sm text-orange-700">{selectedResource.content.difficulty}</p>
+                            </div>
+                          )}
+                          {selectedResource.content.duration && (
+                            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                              <h4 className="font-medium text-blue-900 mb-1">Duration</h4>
+                              <p className="text-sm text-blue-700">{selectedResource.content.duration}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
-                  </ResizablePanel>
+                  </div>
 
+                  {/* Study Pal Panel - Fixed Width */}
                   {showStudyPalInDialog && (
-                    <>
-                      <ResizableHandle withHandle />
-
-                      {/* Study Pal Panel - Fixed Height */}
-                      <ResizablePanel defaultSize={40} minSize={30}>
-                        <div className="h-full">
-                          <StudyPalContent inDialog={true} />
-                        </div>
-                      </ResizablePanel>
-                    </>
+                    <div className="w-[400px] flex-shrink-0 border-l h-full">
+                      <StudyPalContent inDialog={true} />
+                    </div>
                   )}
-                </ResizablePanelGroup>
+                </div>
               ) : (
                 /* Mobile Layout - Single Scrollable View */
                 <div className="h-full flex flex-col">
