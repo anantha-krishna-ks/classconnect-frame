@@ -1002,10 +1002,10 @@ const ResourceVault = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Notes Floating Button - Always visible */}
+      {/* Notes Floating Button - Always visible and clickable */}
       <Button
         onClick={() => setShowNotes(true)}
-        className="fixed bottom-28 right-8 rounded-full w-16 h-16 bg-emerald-500 hover:bg-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm animate-fade-in z-[100]"
+        className="fixed bottom-28 right-8 rounded-full w-16 h-16 bg-emerald-500 hover:bg-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm animate-fade-in z-[9999] pointer-events-auto"
         size="icon"
       >
         <FileText className="w-7 h-7 text-white" />
@@ -1141,11 +1141,11 @@ const ResourceVault = () => {
         </DialogContent>
       </Dialog>
 
-      {/* StudyPal Floating Button - Always visible */}
+      {/* StudyPal Floating Button - Always visible and clickable */}
       <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
         <SheetTrigger asChild>
           <Button
-            className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[100]"
+            className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
             size="icon"
           >
             <MessageSquare className="w-7 h-7 text-white" />
