@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,7 +24,9 @@ import {
   Brain,
   Lightbulb,
   Target,
-  Trash2
+  Trash2,
+  Copy,
+  StickyNote
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -75,6 +77,8 @@ const ResourceVault = () => {
   const [currentNote, setCurrentNote] = useState({ title: '', content: '', tags: '' });
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [selectedText, setSelectedText] = useState('');
+  const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
 
   const handleLogout = () => {
     navigate('/student-login');
@@ -82,6 +86,57 @@ const ResourceVault = () => {
 
   const handleBack = () => {
     navigate('/student-dashboard');
+  };
+
+  // Text selection handlers
+  useEffect(() => {
+    const handleTextSelection = () => {
+      const selection = window.getSelection();
+      const text = selection?.toString().trim();
+      
+      if (text && text.length > 0) {
+        const range = selection?.getRangeAt(0);
+        const rect = range?.getBoundingClientRect();
+        
+        if (rect) {
+          setSelectedText(text);
+          setSelectionPosition({
+            x: rect.left + rect.width / 2,
+            y: rect.top - 10
+          });
+        }
+      } else {
+        setSelectedText('');
+        setSelectionPosition(null);
+      }
+    };
+
+    document.addEventListener('mouseup', handleTextSelection);
+    document.addEventListener('touchend', handleTextSelection);
+
+    return () => {
+      document.removeEventListener('mouseup', handleTextSelection);
+      document.removeEventListener('touchend', handleTextSelection);
+    };
+  }, []);
+
+  const handleCopyText = () => {
+    navigator.clipboard.writeText(selectedText);
+    setSelectedText('');
+    setSelectionPosition(null);
+  };
+
+  const handleAddToNotes = () => {
+    const newNote = {
+      id: Date.now(),
+      title: `Note ${notes.length + 1}`,
+      content: selectedText,
+      tags: selectedResource?.subject || '',
+      date: new Date().toLocaleDateString()
+    };
+    setNotes([...notes, newNote]);
+    setSelectedText('');
+    setSelectionPosition(null);
   };
 
   // Mock data for subjects and chapters
@@ -916,16 +971,16 @@ const ResourceVault = () => {
                 {/* Summary */}
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Overview</h3>
-                  <p className="text-gray-600">{selectedResource.content.summary}</p>
+                  <p className="text-gray-600 select-text">{selectedResource.content.summary}</p>
                 </div>
 
                 {/* PDF Content Section */}
                 {selectedResource.type === 'PDF' && (
                   <div>
                     <h3 className="text-lg font-semibold mb-3">PDF Content</h3>
-                    <div className="bg-muted/50 rounded-lg p-4 border">
+                    <div className="bg-muted/50 rounded-lg p-4 border select-text">
                       <div className="prose prose-sm max-w-none text-gray-700">
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap select-text">
                           {selectedResource.content.pdfContent || 'PDF content will be displayed here once the document is loaded.'}
                         </p>
                       </div>
@@ -938,7 +993,7 @@ const ResourceVault = () => {
                   <h3 className="text-lg font-semibold mb-3">Key Topics Covered</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {selectedResource.content.keyTopics.map((topic: string, index: number) => (
-                      <div key={index} className="flex items-center gap-2 p-2 bg-purple-50 rounded">
+                      <div key={index} className="flex items-center gap-2 p-2 bg-purple-50 rounded select-text">
                         <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                         <span className="text-sm">{topic}</span>
                       </div>
@@ -952,7 +1007,7 @@ const ResourceVault = () => {
                     <h3 className="text-lg font-semibold mb-3">Examples & Applications</h3>
                     <ul className="space-y-2">
                       {selectedResource.content.examples.map((example: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2">
+                        <li key={index} className="flex items-start gap-2 select-text">
                           <span className="text-purple-500 mt-1">•</span>
                           <span className="text-sm text-gray-600">{example}</span>
                         </li>
@@ -966,7 +1021,7 @@ const ResourceVault = () => {
                     <h3 className="text-lg font-semibold mb-3">Features</h3>
                     <ul className="space-y-2">
                       {selectedResource.content.features.map((feature: string, index: number) => (
-                        <li key={index} className="flex items-start gap-2">
+                        <li key={index} className="flex items-start gap-2 select-text">
                           <span className="text-purple-500 mt-1">•</span>
                           <span className="text-sm text-gray-600">{feature}</span>
                         </li>
@@ -1140,6 +1195,37 @@ const ResourceVault = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Text Selection Menu */}
+      {selectedText && selectionPosition && (
+        <div
+          className="fixed z-[10000] bg-white border border-gray-200 rounded-lg shadow-lg p-1 flex gap-1 animate-fade-in pointer-events-auto"
+          style={{
+            left: `${selectionPosition.x}px`,
+            top: `${selectionPosition.y}px`,
+            transform: 'translate(-50%, -100%)'
+          }}
+        >
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8 px-3 text-xs hover:bg-purple-50"
+            onClick={handleAddToNotes}
+          >
+            <StickyNote className="w-3.5 h-3.5 mr-1.5" />
+            Add to Notes
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8 px-3 text-xs hover:bg-purple-50"
+            onClick={handleCopyText}
+          >
+            <Copy className="w-3.5 h-3.5 mr-1.5" />
+            Copy
+          </Button>
+        </div>
+      )}
 
       {/* StudyPal Floating Button - Always visible and clickable */}
       <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
