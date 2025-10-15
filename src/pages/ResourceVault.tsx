@@ -87,6 +87,7 @@ const ResourceVault = () => {
   const [selectedText, setSelectedText] = useState('');
   const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
   const [isAddingToNotes, setIsAddingToNotes] = useState(false);
+  const [showStudyPalPanel, setShowStudyPalPanel] = useState(true);
 
   const handleLogout = () => {
     navigate('/student-login');
@@ -1282,15 +1283,15 @@ const ResourceVault = () => {
       )}
 
       {/* StudyPal Floating Button - Always visible and clickable */}
+      <Button
+        onClick={() => setShowStudyPalPanel(!showStudyPalPanel)}
+        className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
+        size="icon"
+      >
+        <MessageSquare className="w-7 h-7 text-white" />
+      </Button>
+
       <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
-        <SheetTrigger asChild>
-          <Button
-            className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
-            size="icon"
-          >
-            <MessageSquare className="w-7 h-7 text-white" />
-          </Button>
-        </SheetTrigger>
         <SheetContent className="w-full sm:max-w-lg flex flex-col h-screen">
           <SheetHeader className="pb-4 border-b flex-shrink-0">
             <SheetTitle className="flex items-center gap-2">
@@ -1412,10 +1413,10 @@ const ResourceVault = () => {
 
         </ResizablePanel>
 
-        <ResizableHandle withHandle />
+        {showStudyPalPanel && <ResizableHandle withHandle />}
 
         {/* Right Panel - StudyPal (25%) */}
-        <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+        {showStudyPalPanel && <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
           <div className="h-full flex flex-col bg-white border-l border-gray-200">
             {/* StudyPal Header */}
             <div className="pb-4 pt-6 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-50 to-white">
@@ -1614,7 +1615,7 @@ const ResourceVault = () => {
               </div>
             </div>
           </div>
-        </ResizablePanel>
+        </ResizablePanel>}
       </ResizablePanelGroup>
     </div>
   );
