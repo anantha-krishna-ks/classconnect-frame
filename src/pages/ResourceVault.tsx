@@ -29,6 +29,7 @@ import {
   StickyNote
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,6 +60,7 @@ import {
 
 const ResourceVault = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedChapter, setSelectedChapter] = useState('');
   const [searchTopic, setSearchTopic] = useState('');
@@ -140,6 +142,10 @@ const ResourceVault = () => {
         updatedAt: new Date()
       };
       setNotes((prev) => [...prev, newNote]);
+      toast({
+        title: "Added to Notes",
+        description: "Your selected text has been saved to My Notes.",
+      });
     } finally {
       setSelectedText('');
       setSelectionPosition(null);
