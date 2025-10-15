@@ -900,7 +900,6 @@ const ResourceVault = () => {
                       </Button>
                     </CardContent>
                   </Card>
-                </div>
 
                 {/* Resources Display */}
                 {resources.length > 0 && (
@@ -956,11 +955,10 @@ const ResourceVault = () => {
                             </div>
                           );
                         })}
-                      </div>
-                    </CardContent>
-                  </Card>
+                       </div>
+                     </CardContent>
+                    </Card>
                 )}
-              </div>
             </div>
           </div>
         </div>
@@ -1189,7 +1187,6 @@ const ResourceVault = () => {
             </div>
           </div>
         )}
-      )}
 
       {/* Mobile StudyPal - Bottom Sheet */}
       {isMobile && (
@@ -1849,13 +1846,15 @@ const ResourceVault = () => {
       </Sheet>
 
       {/* StudyPal Floating Button */}
-      <Button
-        onClick={() => setShowStudyPal(!showStudyPal)}
-        className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
-        size="icon"
-      >
-        <MessageSquare className="w-7 h-7 text-white" />
-      </Button>
+      {!showStudyPal && (
+        <Button
+          onClick={() => setShowStudyPal(true)}
+          className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
+          size="icon"
+        >
+          <MessageSquare className="w-7 h-7 text-white" />
+        </Button>
+      )}
     </div>
   );
 };
