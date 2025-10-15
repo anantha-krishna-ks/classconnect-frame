@@ -74,6 +74,7 @@ const ResourceVault = () => {
   const [notes, setNotes] = useState<any[]>([]);
   const [currentNote, setCurrentNote] = useState({ title: '', content: '', tags: '' });
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
   const handleLogout = () => {
     navigate('/student-login');
@@ -865,44 +866,54 @@ const ResourceVault = () => {
           {selectedResource && (
             <>
               <DialogHeader>
-                <DialogTitle className="flex items-center gap-3 text-xl">
-                  {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-500" })}
-                  {selectedResource.title}
-                </DialogTitle>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="secondary">{selectedResource.type}</Badge>
-                  {selectedResource.content.difficulty && (
-                    <Badge variant="outline">{selectedResource.content.difficulty}</Badge>
-                  )}
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex-1">
+                    <DialogTitle className="flex items-center gap-3 text-xl">
+                      {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-500" })}
+                      {selectedResource.title}
+                    </DialogTitle>
+                    <div className="flex items-center gap-2 mt-2">
+                      <Badge variant="secondary">{selectedResource.type}</Badge>
+                      {selectedResource.content.difficulty && (
+                        <Badge variant="outline">{selectedResource.content.difficulty}</Badge>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Compact Search Icon */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                    className="shrink-0"
+                    title="Search for related resources"
+                  >
+                    <Search className="w-5 h-5" />
+                  </Button>
                 </div>
               </DialogHeader>
 
-              {/* Search Functionality inside Modal */}
-              <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg">
-                <h3 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                  <Search className="w-4 h-4 text-blue-500" />
-                  Search
-                </h3>
-                <p className="text-xs text-gray-600 mb-3">
-                  Search for more resources related to any concept or topic
-                </p>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Enter a concept, topic, or phrase..."
-                    value={searchTopic}
-                    onChange={(e) => setSearchTopic(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleInModalSearch(searchTopic)}
-                    className="flex-1 h-9 text-sm hover:border-blue-300 focus:border-blue-400 transition-colors duration-200"
-                  />
-                  <Button 
-                    onClick={() => handleInModalSearch(searchTopic)} 
-                    size="sm"
-                    className="bg-blue-500 hover:bg-blue-600 px-3"
-                  >
-                    <Search className="w-4 h-4" />
-                  </Button>
+              {/* Expandable Search Bar */}
+              {isSearchExpanded && (
+                <div className="mt-4 p-3 bg-muted border rounded-lg animate-fade-in">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Search for related resources..."
+                      value={searchTopic}
+                      onChange={(e) => setSearchTopic(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleInModalSearch(searchTopic)}
+                      className="flex-1 h-9 text-sm"
+                      autoFocus
+                    />
+                    <Button 
+                      onClick={() => handleInModalSearch(searchTopic)} 
+                      size="sm"
+                    >
+                      <Search className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
               
               <div className="space-y-6 mt-6">
                 {/* Summary */}
