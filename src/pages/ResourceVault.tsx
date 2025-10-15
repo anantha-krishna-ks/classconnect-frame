@@ -1291,147 +1291,6 @@ const ResourceVault = () => {
                     </Button>
                   </div>
                 )}
-
-                {/* My Notes Sheet */}
-                <Sheet open={showNotes} onOpenChange={setShowNotes}>
-                  <SheetTrigger asChild>
-                    <Button
-                      className="fixed bottom-8 left-8 rounded-full w-14 h-14 bg-blue-500 hover:bg-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm"
-                      size="icon"
-                    >
-                      <StickyNote className="w-6 h-6 text-white" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="left" className="w-full sm:max-w-lg flex flex-col h-screen">
-                    <SheetHeader className="pb-4 border-b flex-shrink-0">
-                      <SheetTitle className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                          <StickyNote className="w-4 h-4 text-white" />
-                        </div>
-                        My Notes
-                      </SheetTitle>
-                      <SheetDescription>
-                        Save and organize your study notes
-                      </SheetDescription>
-                    </SheetHeader>
-
-                    <div className="flex-1 flex flex-col min-h-0">
-                      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        {notes.length === 0 ? (
-                          <div className="h-full flex items-center justify-center">
-                            <div className="text-center">
-                              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <StickyNote className="w-8 h-8 text-blue-500" />
-                              </div>
-                              <h3 className="font-medium text-gray-900 mb-2">No notes yet</h3>
-                              <p className="text-sm text-gray-500 max-w-xs">
-                                Select text from resources and click "Add to Notes" to save them here.
-                              </p>
-                            </div>
-                          </div>
-                        ) : (
-                          notes.map((note) => (
-                            <div key={note.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                              <div className="flex items-start justify-between mb-2">
-                                <h4 className="font-medium text-gray-900">{note.title}</h4>
-                                <div className="flex gap-1">
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    onClick={() => handleEditNote(note)}
-                                    className="h-6 w-6"
-                                  >
-                                    <Copy className="w-3 h-3" />
-                                  </Button>
-                                  <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                      <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        className="h-6 w-6 text-red-500 hover:text-red-700"
-                                      >
-                                        <Trash2 className="w-3 h-3" />
-                                      </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                      <AlertDialogHeader>
-                                        <AlertDialogTitle>Delete Note</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                          Are you sure you want to delete this note? This action cannot be undone.
-                                        </AlertDialogDescription>
-                                      </AlertDialogHeader>
-                                      <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction
-                                          onClick={() => handleDeleteNote(note.id)}
-                                          className="bg-red-600 hover:bg-red-700"
-                                        >
-                                          Delete
-                                        </AlertDialogAction>
-                                      </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                  </AlertDialog>
-                                </div>
-                              </div>
-                              <p className="text-sm text-gray-700 mb-2 whitespace-pre-wrap">{note.content}</p>
-                              {note.tags && (
-                                <div className="flex flex-wrap gap-1 mb-2">
-                                  {note.tags.split(',').map((tag: string, idx: number) => (
-                                    <Badge key={idx} variant="secondary" className="text-xs">
-                                      {tag.trim()}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                              <p className="text-xs text-gray-500">
-                                {note.updatedAt && `Updated: ${safeFormatDateTime(note.updatedAt)}`}
-                                {!note.updatedAt && note.createdAt && `Created: ${safeFormatDateTime(note.createdAt)}`}
-                              </p>
-                            </div>
-                          ))
-                        )}
-                      </div>
-
-                      <div className="border-t p-4 bg-white flex-shrink-0 space-y-3">
-                        <Input
-                          placeholder="Note title"
-                          value={currentNote.title}
-                          onChange={(e) => setCurrentNote({ ...currentNote, title: e.target.value })}
-                        />
-                        <Textarea
-                          placeholder="Write your note here..."
-                          value={currentNote.content}
-                          onChange={(e) => setCurrentNote({ ...currentNote, content: e.target.value })}
-                          rows={3}
-                          className="resize-none"
-                        />
-                        <Input
-                          placeholder="Tags (comma separated)"
-                          value={currentNote.tags}
-                          onChange={(e) => setCurrentNote({ ...currentNote, tags: e.target.value })}
-                        />
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={handleSaveNote}
-                            disabled={!currentNote.title.trim() || !currentNote.content.trim()}
-                            className="flex-1 bg-blue-500 hover:bg-blue-600"
-                          >
-                            {editingNoteId !== null ? 'Update Note' : 'Save Note'}
-                          </Button>
-                          {editingNoteId !== null && (
-                            <Button
-                              onClick={handleCancelEdit}
-                              variant="outline"
-                              className="flex-1"
-                            >
-                              Cancel
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </SheetContent>
-                </Sheet>
               </div>
             </div>
           </ResizablePanel>
@@ -1705,147 +1564,6 @@ const ResourceVault = () => {
                 </Button>
               </div>
             )}
-
-            {/* My Notes Sheet */}
-            <Sheet open={showNotes} onOpenChange={setShowNotes}>
-              <SheetTrigger asChild>
-                <Button
-                  className="fixed bottom-8 left-8 rounded-full w-14 h-14 bg-blue-500 hover:bg-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm"
-                  size="icon"
-                >
-                  <StickyNote className="w-6 h-6 text-white" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-full sm:max-w-lg flex flex-col h-screen">
-                <SheetHeader className="pb-4 border-b flex-shrink-0">
-                  <SheetTitle className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                      <StickyNote className="w-4 h-4 text-white" />
-                    </div>
-                    My Notes
-                  </SheetTitle>
-                  <SheetDescription>
-                    Save and organize your study notes
-                  </SheetDescription>
-                </SheetHeader>
-
-                <div className="flex-1 flex flex-col min-h-0">
-                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    {notes.length === 0 ? (
-                      <div className="h-full flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <StickyNote className="w-8 h-8 text-blue-500" />
-                          </div>
-                          <h3 className="font-medium text-gray-900 mb-2">No notes yet</h3>
-                          <p className="text-sm text-gray-500 max-w-xs">
-                            Select text from resources and click "Add to Notes" to save them here.
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      notes.map((note) => (
-                        <div key={note.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                          <div className="flex items-start justify-between mb-2">
-                            <h4 className="font-medium text-gray-900">{note.title}</h4>
-                            <div className="flex gap-1">
-                              <Button
-                                size="icon"
-                                variant="ghost"
-                                onClick={() => handleEditNote(note)}
-                                className="h-6 w-6"
-                              >
-                                <Copy className="w-3 h-3" />
-                              </Button>
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-6 w-6 text-red-500 hover:text-red-700"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete Note</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Are you sure you want to delete this note? This action cannot be undone.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => handleDeleteNote(note.id)}
-                                      className="bg-red-600 hover:bg-red-700"
-                                    >
-                                      Delete
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                          </div>
-                          <p className="text-sm text-gray-700 mb-2 whitespace-pre-wrap">{note.content}</p>
-                          {note.tags && (
-                            <div className="flex flex-wrap gap-1 mb-2">
-                              {note.tags.split(',').map((tag: string, idx: number) => (
-                                <Badge key={idx} variant="secondary" className="text-xs">
-                                  {tag.trim()}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
-                          <p className="text-xs text-gray-500">
-                            {note.updatedAt && `Updated: ${safeFormatDateTime(note.updatedAt)}`}
-                            {!note.updatedAt && note.createdAt && `Created: ${safeFormatDateTime(note.createdAt)}`}
-                          </p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  <div className="border-t p-4 bg-white flex-shrink-0 space-y-3">
-                    <Input
-                      placeholder="Note title"
-                      value={currentNote.title}
-                      onChange={(e) => setCurrentNote({ ...currentNote, title: e.target.value })}
-                    />
-                    <Textarea
-                      placeholder="Write your note here..."
-                      value={currentNote.content}
-                      onChange={(e) => setCurrentNote({ ...currentNote, content: e.target.value })}
-                      rows={3}
-                      className="resize-none"
-                    />
-                    <Input
-                      placeholder="Tags (comma separated)"
-                      value={currentNote.tags}
-                      onChange={(e) => setCurrentNote({ ...currentNote, tags: e.target.value })}
-                    />
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={handleSaveNote}
-                        disabled={!currentNote.title.trim() || !currentNote.content.trim()}
-                        className="flex-1 bg-blue-500 hover:bg-blue-600"
-                      >
-                        {editingNoteId !== null ? 'Update Note' : 'Save Note'}
-                      </Button>
-                      {editingNoteId !== null && (
-                        <Button
-                          onClick={handleCancelEdit}
-                          variant="outline"
-                          className="flex-1"
-                        >
-                          Cancel
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
           </div>
         </div>
       )}
@@ -1983,8 +1701,9 @@ const ResourceVault = () => {
       <Sheet open={showNotes} onOpenChange={setShowNotes}>
         <SheetTrigger asChild>
           <Button
-            className="fixed bottom-8 left-8 rounded-full w-14 h-14 bg-blue-500 hover:bg-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm"
+            className="fixed bottom-8 left-8 rounded-full w-14 h-14 bg-blue-500 hover:bg-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[100]"
             size="icon"
+            aria-label="Open My Notes"
           >
             <StickyNote className="w-6 h-6 text-white" />
           </Button>
@@ -2126,8 +1845,9 @@ const ResourceVault = () => {
       {!showStudyPal && (
         <Button
           onClick={() => setShowStudyPal(true)}
-          className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-50"
+          className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[100]"
           size="icon"
+          aria-label="Open Study Pal"
         >
           <MessageSquare className="w-7 h-7 text-white" />
         </Button>
