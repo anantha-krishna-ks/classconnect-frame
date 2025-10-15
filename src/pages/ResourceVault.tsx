@@ -866,29 +866,26 @@ const ResourceVault = () => {
           {selectedResource && (
             <>
               <DialogHeader>
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <DialogTitle className="flex items-center gap-3 text-xl">
-                      {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-500" })}
-                      {selectedResource.title}
-                    </DialogTitle>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="secondary">{selectedResource.type}</Badge>
-                      {selectedResource.content.difficulty && (
-                        <Badge variant="outline">{selectedResource.content.difficulty}</Badge>
-                      )}
-                    </div>
-                  </div>
+                <DialogTitle className="flex items-center gap-3 text-xl">
+                  {React.createElement(getResourceIcon(selectedResource.type), { className: "w-6 h-6 text-purple-500" })}
+                  {selectedResource.title}
+                </DialogTitle>
+                <div className="flex items-center gap-3 mt-2">
+                  <Badge variant="secondary">{selectedResource.type}</Badge>
+                  {selectedResource.content.difficulty && (
+                    <Badge variant="outline">{selectedResource.content.difficulty}</Badge>
+                  )}
                   
                   {/* Compact Search Icon */}
                   <Button
-                    variant="ghost"
-                    size="icon"
+                    variant="outline"
+                    size="sm"
                     onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                    className="shrink-0 bg-gradient-to-br from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                    className="ml-auto h-8"
                     title="Search for related resources"
                   >
-                    <Search className="w-5 h-5" />
+                    <Search className="w-4 h-4 mr-2" />
+                    Search
                   </Button>
                 </div>
               </DialogHeader>
