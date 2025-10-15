@@ -86,6 +86,7 @@ const ResourceVault = () => {
   const [selectedText, setSelectedText] = useState('');
   const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
   const [isAddingToNotes, setIsAddingToNotes] = useState(false);
+  const [showStudyPalInDialog, setShowStudyPalInDialog] = useState(true);
 
   const handleLogout = () => {
     navigate('/student-login');
@@ -126,6 +127,13 @@ const ResourceVault = () => {
       document.removeEventListener('touchend', handleTextSelection);
     };
   }, []);
+
+  // Reset Study Pal visibility when dialog opens
+  useEffect(() => {
+    if (selectedResource) {
+      setShowStudyPalInDialog(true);
+    }
+  }, [selectedResource]);
 
   const handleCopyText = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -760,7 +768,7 @@ const ResourceVault = () => {
   };
 
   // StudyPal Component
-  const StudyPalContent = () => (
+  const StudyPalContent = ({ inDialog = false }: { inDialog?: boolean }) => (
     <div className="h-full flex flex-col bg-white">
       <div className="p-4 border-b flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-2">
@@ -772,7 +780,17 @@ const ResourceVault = () => {
             <p className="text-xs text-gray-500">Your AI learning assistant</p>
           </div>
         </div>
-        {!isMobile && (
+        {inDialog ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowStudyPalInDialog(false)}
+            className="h-8 w-8"
+            title="Hide Study Pal"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        ) : !isMobile ? (
           <Button
             variant="ghost"
             size="icon"
@@ -781,7 +799,7 @@ const ResourceVault = () => {
           >
             <X className="w-4 h-4" />
           </Button>
-        )}
+        ) : null}
       </div>
       
       <div className="flex-1 flex flex-col min-h-0">
@@ -1384,7 +1402,7 @@ const ResourceVault = () => {
               {!isMobile ? (
                 <ResizablePanelGroup direction="horizontal" className="h-full">
                   {/* Resource Content Panel */}
-                  <ResizablePanel defaultSize={60} minSize={40}>
+                  <ResizablePanel defaultSize={showStudyPalInDialog ? 60 : 100} minSize={40}>
                     <div className="h-full flex flex-col">
                       <div className="flex-shrink-0 p-6 pb-4 border-b">
                         <DialogHeader>
@@ -1396,6 +1414,20 @@ const ResourceVault = () => {
                             {selectedResource.description}
                           </DialogDescription>
                         </DialogHeader>
+                        
+                        {/* Toggle Study Pal Button */}
+                        {!showStudyPalInDialog && (
+                          <div className="mt-4">
+                            <Button
+                              onClick={() => setShowStudyPalInDialog(true)}
+                              className="bg-purple-500 hover:bg-purple-600"
+                              size="sm"
+                            >
+                              <MessageCircle className="w-4 h-4 mr-2" />
+                              Show StudyPal
+                            </Button>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="flex-1 overflow-y-auto p-6">
@@ -1469,14 +1501,18 @@ const ResourceVault = () => {
                     </div>
                   </ResizablePanel>
 
-                  <ResizableHandle withHandle />
+                  {showStudyPalInDialog && (
+                    <>
+                      <ResizableHandle withHandle />
 
-                  {/* Study Pal Panel - Fixed Height */}
-                  <ResizablePanel defaultSize={40} minSize={30}>
-                    <div className="h-full">
-                      <StudyPalContent />
-                    </div>
-                  </ResizablePanel>
+                      {/* Study Pal Panel - Fixed Height */}
+                      <ResizablePanel defaultSize={40} minSize={30}>
+                        <div className="h-full">
+                          <StudyPalContent inDialog={true} />
+                        </div>
+                      </ResizablePanel>
+                    </>
+                  )}
                 </ResizablePanelGroup>
               ) : (
                 /* Mobile Layout - Single Scrollable View */
