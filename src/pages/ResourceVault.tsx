@@ -79,6 +79,7 @@ const ResourceVault = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [selectedText, setSelectedText] = useState('');
   const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
+  const [isAddingToNotes, setIsAddingToNotes] = useState(false);
 
   const handleLogout = () => {
     navigate('/student-login');
@@ -127,17 +128,23 @@ const ResourceVault = () => {
   };
 
   const handleAddToNotes = () => {
-    const newNote = {
-      id: Date.now(),
-      title: `Note ${notes.length + 1}`,
-      content: selectedText,
-      tags: selectedResource?.subject || '',
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    setNotes([...notes, newNote]);
-    setSelectedText('');
-    setSelectionPosition(null);
+    if (!selectedText?.trim() || isAddingToNotes) return;
+    setIsAddingToNotes(true);
+    try {
+      const newNote = {
+        id: Date.now(),
+        title: `Note ${notes.length + 1}`,
+        content: selectedText,
+        tags: selectedResource?.subject || '',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      setNotes((prev) => [...prev, newNote]);
+    } finally {
+      setSelectedText('');
+      setSelectionPosition(null);
+      setIsAddingToNotes(false);
+    }
   };
 
   // Mock data for subjects and chapters
@@ -311,6 +318,27 @@ const ResourceVault = () => {
           className: 'bg-yellow-200 text-yellow-900 px-1 rounded' 
         }, part) : part
     );
+  };
+
+  // Safe date formatting helpers to avoid runtime errors with legacy notes
+  const safeFormatDate = (d: any) => {
+    try {
+      if (!d) return '';
+      const date = typeof d === 'string' ? new Date(d) : d;
+      return date.toLocaleDateString();
+    } catch {
+      return '';
+    }
+  };
+
+  const safeFormatDateTime = (d: any) => {
+    try {
+      if (!d) return '';
+      const date = typeof d === 'string' ? new Date(d) : d;
+      return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString();
+    } catch {
+      return '';
+    }
   };
 
   // Notes management functions
@@ -1186,7 +1214,7 @@ const ResourceVault = () => {
                         </div>
                       )}
                       <p className="text-xs text-gray-400">
-                        {note.updatedAt.toLocaleDateString()}
+                        {safeFormatDate(note?.updatedAt || note?.createdAt || note?.date)}
                       </p>
                     </div>
                   ))
@@ -1346,7 +1374,7 @@ const ResourceVault = () => {
                         </div>
                       )}
                       <p className="text-xs text-gray-400">
-                        {note.updatedAt.toLocaleDateString()} at {note.updatedAt.toLocaleTimeString()}
+                        {safeFormatDateTime(note?.updatedAt || note?.createdAt || note?.date)}
                       </p>
                     </div>
                   ))}
