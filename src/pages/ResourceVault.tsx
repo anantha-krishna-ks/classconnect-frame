@@ -885,7 +885,7 @@ const ResourceVault = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                    className="shrink-0"
+                    className="shrink-0 bg-gradient-to-br from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
                     title="Search for related resources"
                   >
                     <Search className="w-5 h-5" />
