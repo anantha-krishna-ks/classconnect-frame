@@ -57,6 +57,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@/components/ui/resizable';
 
 const ResourceVault = () => {
   const navigate = useNavigate();
@@ -811,144 +816,500 @@ const ResourceVault = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 bg-slate-50/30 animate-fade-in">
-        {/* Page Header */}
-        <div className="mb-10 animate-fade-in">
-          <div className="flex items-center gap-5 mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-md">
-            <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center border-2 border-purple-200 hover:scale-105 transition-transform duration-200">
-              <BookOpen className="w-7 h-7 text-purple-600" />
+      {showStudyPal ? (
+        <ResizablePanelGroup direction="horizontal" className="min-h-[calc(100vh-180px)]">
+          <ResizablePanel defaultSize={75} minSize={50}>
+            <div className="h-full overflow-auto">
+              <div className="max-w-7xl mx-auto px-6 py-8 bg-slate-50/30 animate-fade-in">
+                {/* Page Header */}
+                <div className="mb-10 animate-fade-in">
+                  <div className="flex items-center gap-5 mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-md">
+                    <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center border-2 border-purple-200 hover:scale-105 transition-transform duration-200">
+                      <BookOpen className="w-7 h-7 text-purple-600" />
+                    </div>
+                    <div>
+                      <h1 className="text-3xl font-bold text-slate-800 mb-1">Resource Vault</h1>
+                      <p className="text-slate-600">Access all your study materials and get help with any concept</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="space-y-8">
+                  {/* Resource Finder */}
+                  <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-slate-800 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                        Find Resources by Subject & Chapter
+                      </CardTitle>
+                      <CardDescription className="text-slate-600">
+                        Select your subject and chapter to access relevant study materials
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-5">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-3 group">
+                          <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Subject</label>
+                          <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                            <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white">
+                              <SelectValue placeholder="Select a subject" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {subjects.map((subject) => (
+                                <SelectItem key={subject.id} value={subject.id} className="hover:bg-purple-50">
+                                  {subject.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div className="space-y-3 group">
+                          <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Chapter</label>
+                          <Select 
+                            value={selectedChapter} 
+                            onValueChange={setSelectedChapter}
+                            disabled={!selectedSubject}
+                          >
+                            <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white disabled:opacity-50">
+                              <SelectValue placeholder="Select a chapter" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {selectedSubject && chapters[selectedSubject as keyof typeof chapters]?.map((chapter) => (
+                                <SelectItem key={chapter.id} value={chapter.id} className="hover:bg-purple-50">
+                                  {chapter.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      <Button 
+                        onClick={handleProvideResources}
+                        disabled={!selectedSubject || !selectedChapter}
+                        className="w-full bg-purple-500 hover:bg-purple-600 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100"
+                      >
+                        <BookOpen className="w-4 h-4 mr-2" />
+                        Provide Resources
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Resources Display */}
+                {resources.length > 0 && (
+                  <Card className="mt-8 border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm animate-fade-in">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-slate-800 flex items-center gap-2">
+                        <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                        Available Resources
+                      </CardTitle>
+                      <CardDescription className="text-slate-600">
+                        Found {resources.length} resources for your selection
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {resources.map((resource, index) => {
+                          const IconComponent = getResourceIcon(resource.type);
+                          return (
+                            <div 
+                              key={resource.id} 
+                              className="group border-2 border-slate-200/80 hover:border-purple-300/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
+                              style={{ animationDelay: `${index * 100}ms` }}
+                              onClick={() => setSelectedResource(resource)}
+                            >
+                              <div className="flex items-start gap-4 mb-4">
+                                <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-200">
+                                  <IconComponent className="w-5 h-5 text-purple-600 group-hover:text-purple-700 transition-colors duration-200" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-medium text-slate-800 mb-1 group-hover:text-purple-700 transition-colors duration-200 line-clamp-2">
+                                    {highlightText(resource.title, searchHighlight)}
+                                  </h4>
+                                  <p className="text-sm text-slate-600 group-hover:text-slate-700 transition-colors duration-200 line-clamp-2">
+                                    {highlightText(resource.description, searchHighlight)}
+                                  </p>
+                                </div>
+                                <Badge variant="secondary" className="bg-slate-100 text-slate-700 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors duration-200 shrink-0">
+                                  {resource.type}
+                                </Badge>
+                              </div>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                className="w-full group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedResource(resource);
+                                }}
+                              >
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                View Details
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-slate-800 mb-1">Resource Vault</h1>
-              <p className="text-slate-600">Access all your study materials and get help with any concept</p>
+          </ResizablePanel>
+          
+          <ResizableHandle withHandle className="bg-slate-200 hover:bg-purple-300 transition-colors" />
+          
+          <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
+            <div className="h-full flex flex-col bg-white border-l border-slate-200">
+              {/* StudyPal Header */}
+              <div className="flex-shrink-0 p-4 border-b bg-gradient-to-r from-purple-500 to-purple-600">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                      <MessageCircle className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white">StudyPal</h3>
+                      <p className="text-xs text-white/80">Your AI learning assistant</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowStudyPal(false)}
+                    className="text-white hover:bg-white/20 h-8 w-8 p-0"
+                  >
+                    ✕
+                  </Button>
+                </div>
+              </div>
+
+              {/* Chat Messages Area */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {chatHistory.length === 0 ? (
+                  <div className="h-full flex items-center justify-center">
+                    <div className="text-center px-4">
+                      <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Brain className="w-8 h-8 text-purple-500" />
+                      </div>
+                      <h3 className="font-medium text-gray-900 mb-2">Hello! I'm StudyPal</h3>
+                      <p className="text-sm text-gray-500">
+                        I'm here to help you understand any concept you're struggling with. Just ask me anything!
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {chatHistory.map((chat) => (
+                      <div key={chat.id} className="space-y-3">
+                        {/* User Message */}
+                        <div className="flex justify-end">
+                          <div className="max-w-[85%] bg-purple-500 text-white rounded-2xl rounded-br-md px-4 py-2">
+                            <p className="text-sm">{chat.user}</p>
+                          </div>
+                        </div>
+                        
+                        {/* Bot Message */}
+                        <div className="flex justify-start">
+                          <div className="flex items-start gap-2 max-w-[85%]">
+                            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Brain className="w-4 h-4 text-purple-500" />
+                            </div>
+                            <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-2">
+                              <p className="text-sm text-gray-800">{chat.bot}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Additional Resources Section */}
+                        {chat.hasResources && (
+                          <div className="flex justify-start mt-4">
+                            <div className="flex items-start gap-2 max-w-[90%]">
+                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <Lightbulb className="w-4 h-4 text-blue-500" />
+                              </div>
+                              <div className="bg-blue-50 rounded-2xl rounded-bl-md px-4 py-3 border border-blue-200">
+                                <p className="text-sm text-gray-800 mb-3">Here are some visual resources to help you understand better:</p>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openResourceWindow(chat.topic, 'mindmap')}
+                                    className="text-xs h-8 border-blue-300 text-blue-700 hover:bg-blue-100"
+                                  >
+                                    <Brain className="w-3 h-3 mr-1" />
+                                    Mind Map
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openResourceWindow(chat.topic, 'diagram')}
+                                    className="text-xs h-8 border-green-300 text-green-700 hover:bg-green-100"
+                                  >
+                                    <Target className="w-3 h-3 mr-1" />
+                                    Diagram
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openResourceWindow(chat.topic, 'flowchart')}
+                                    className="text-xs h-8 border-purple-300 text-purple-700 hover:bg-purple-100"
+                                  >
+                                    <BookOpen className="w-3 h-3 mr-1" />
+                                    Flowchart
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => openResourceWindow(chat.topic, 'concept-map')}
+                                    className="text-xs h-8 border-orange-300 text-orange-700 hover:bg-orange-100"
+                                  >
+                                    <Lightbulb className="w-3 h-3 mr-1" />
+                                    Concept Map
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    
+                    {/* Resource Feedback Section */}
+                    {chatHistory.length > 0 && resources.length > 0 && !resourceFeedback && (
+                      <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
+                        <div className="flex items-start gap-2 mb-3">
+                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Brain className="w-4 h-4 text-purple-500" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-1">Quick Feedback</h4>
+                            <p className="text-sm text-gray-600 mb-3">Were the resources I provided helpful for your learning?</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleResourceFeedback('yes')}
+                            className="flex-1 border-green-200 text-green-700 hover:bg-green-50"
+                          >
+                            <ThumbsUp className="w-4 h-4 mr-2" />
+                            Yes, helpful
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleResourceFeedback('no')}
+                            className="flex-1 border-red-200 text-red-700 hover:bg-red-50"
+                          >
+                            <ThumbsDown className="w-4 h-4 mr-2" />
+                            Not helpful
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Quick Test Section */}
+                    {chatHistory.length > 0 && (
+                      <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                        <div className="flex items-start gap-2 mb-3">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Brain className="w-4 h-4 text-blue-500" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900 mb-1">Test Your Knowledge</h4>
+                            <p className="text-sm text-gray-600 mb-3">
+                              Ready to test what you've learned? Take a quick 5-question quiz in a new window!
+                            </p>
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => openTestWindow(chatHistory[chatHistory.length - 1]?.topic || 'General Knowledge')} 
+                          className="w-full bg-blue-500 hover:bg-blue-600"
+                        >
+                          <Brain className="w-4 h-4 mr-2" />
+                          Start Quick Test
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+              
+              {/* Message Input Area */}
+              <div className="flex-shrink-0 border-t p-4 bg-white">
+                <div className="flex gap-2">
+                  <Textarea
+                    placeholder="Ask me about any concept you're struggling with..."
+                    value={chatMessage}
+                    onChange={(e) => setChatMessage(e.target.value)}
+                    rows={2}
+                    className="resize-none flex-1"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleStudyPalMessage();
+                      }
+                    }}
+                  />
+                  <Button 
+                    onClick={handleStudyPalMessage} 
+                    className="bg-purple-500 hover:bg-purple-600 px-4"
+                    disabled={!chatMessage.trim()}
+                    size="icon"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Press Enter to send, Shift+Enter for new line</p>
+              </div>
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      ) : (
+        <div className="max-w-7xl mx-auto px-6 py-8 bg-slate-50/30 animate-fade-in">
+          {/* Page Header */}
+          <div className="mb-10 animate-fade-in">
+            <div className="flex items-center gap-5 mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-md">
+              <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center border-2 border-purple-200 hover:scale-105 transition-transform duration-200">
+                <BookOpen className="w-7 h-7 text-purple-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-slate-800 mb-1">Resource Vault</h1>
+                <p className="text-slate-600">Access all your study materials and get help with any concept</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Main Content */}
-        <div className="space-y-8">
-          {/* Resource Finder */}
-          <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-slate-800 flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                Find Resources by Subject & Chapter
-              </CardTitle>
-              <CardDescription className="text-slate-600">
-                Select your subject and chapter to access relevant study materials
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div className="space-y-3 group">
-                  <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Subject</label>
-                  <Select value={selectedSubject} onValueChange={setSelectedSubject}>
-                    <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white">
-                      <SelectValue placeholder="Select a subject" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {subjects.map((subject) => (
-                        <SelectItem key={subject.id} value={subject.id} className="hover:bg-purple-50">
-                          {subject.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          {/* Main Content */}
+          <div className="space-y-8">
+            {/* Resource Finder */}
+            <Card className="border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-slate-800 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                  Find Resources by Subject & Chapter
+                </CardTitle>
+                <CardDescription className="text-slate-600">
+                  Select your subject and chapter to access relevant study materials
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div className="space-y-3 group">
+                    <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Subject</label>
+                    <Select value={selectedSubject} onValueChange={setSelectedSubject}>
+                      <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white">
+                        <SelectValue placeholder="Select a subject" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {subjects.map((subject) => (
+                          <SelectItem key={subject.id} value={subject.id} className="hover:bg-purple-50">
+                            {subject.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                <div className="space-y-3 group">
-                  <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Chapter</label>
-                  <Select 
-                    value={selectedChapter} 
-                    onValueChange={setSelectedChapter}
-                    disabled={!selectedSubject}
-                  >
-                    <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white disabled:opacity-50">
-                      <SelectValue placeholder="Select a chapter" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {selectedSubject && chapters[selectedSubject as keyof typeof chapters]?.map((chapter) => (
-                        <SelectItem key={chapter.id} value={chapter.id} className="hover:bg-purple-50">
-                          {chapter.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <Button 
-                onClick={handleProvideResources}
-                disabled={!selectedSubject || !selectedChapter}
-                className="w-full bg-purple-500 hover:bg-purple-600 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100"
-              >
-                <BookOpen className="w-4 h-4 mr-2" />
-                Provide Resources
-              </Button>
-            </CardContent>
-          </Card>
-
-        </div>
-
-        {/* Resources Display */}
-        {resources.length > 0 && (
-          <Card className="mt-8 border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm animate-fade-in">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-slate-800 flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                Available Resources
-              </CardTitle>
-              <CardDescription className="text-slate-600">
-                Found {resources.length} resources for your selection
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {resources.map((resource, index) => {
-                  const IconComponent = getResourceIcon(resource.type);
-                  return (
-                    <div 
-                      key={resource.id} 
-                      className="group border-2 border-slate-200/80 hover:border-purple-300/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
-                      style={{ animationDelay: `${index * 100}ms` }}
-                      onClick={() => setSelectedResource(resource)}
+                  <div className="space-y-3 group">
+                    <label className="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors duration-200">Chapter</label>
+                    <Select 
+                      value={selectedChapter} 
+                      onValueChange={setSelectedChapter}
+                      disabled={!selectedSubject}
                     >
-                      <div className="flex items-start gap-4 mb-4">
-                        <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-200">
-                          <IconComponent className="w-5 h-5 text-purple-600 group-hover:text-purple-700 transition-colors duration-200" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-slate-800 mb-1 group-hover:text-purple-700 transition-colors duration-200 line-clamp-2">
-                            {highlightText(resource.title, searchHighlight)}
-                          </h4>
-                          <p className="text-sm text-slate-600 group-hover:text-slate-700 transition-colors duration-200 line-clamp-2">
-                            {highlightText(resource.description, searchHighlight)}
-                          </p>
-                        </div>
-                        <Badge variant="secondary" className="bg-slate-100 text-slate-700 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors duration-200 shrink-0">
-                          {resource.type}
-                        </Badge>
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedResource(resource);
-                        }}
+                      <SelectTrigger className="hover:border-purple-300 transition-colors duration-200 bg-slate-50/50 hover:bg-white disabled:opacity-50">
+                        <SelectValue placeholder="Select a chapter" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectedSubject && chapters[selectedSubject as keyof typeof chapters]?.map((chapter) => (
+                          <SelectItem key={chapter.id} value={chapter.id} className="hover:bg-purple-50">
+                            {chapter.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handleProvideResources}
+                  disabled={!selectedSubject || !selectedChapter}
+                  className="w-full bg-purple-500 hover:bg-purple-600 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] disabled:hover:scale-100"
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Provide Resources
+                </Button>
+              </CardContent>
+            </Card>
+
+          </div>
+
+          {/* Resources Display */}
+          {resources.length > 0 && (
+            <Card className="mt-8 border-2 border-slate-200/80 shadow-sm bg-white/90 backdrop-blur-sm animate-fade-in">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-slate-800 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                  Available Resources
+                </CardTitle>
+                <CardDescription className="text-slate-600">
+                  Found {resources.length} resources for your selection
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {resources.map((resource, index) => {
+                    const IconComponent = getResourceIcon(resource.type);
+                    return (
+                      <div 
+                        key={resource.id} 
+                        className="group border-2 border-slate-200/80 hover:border-purple-300/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
+                        style={{ animationDelay: `${index * 100}ms` }}
+                        onClick={() => setSelectedResource(resource)}
                       >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View Details
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-200">
+                            <IconComponent className="w-5 h-5 text-purple-600 group-hover:text-purple-700 transition-colors duration-200" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-slate-800 mb-1 group-hover:text-purple-700 transition-colors duration-200 line-clamp-2">
+                              {highlightText(resource.title, searchHighlight)}
+                            </h4>
+                            <p className="text-sm text-slate-600 group-hover:text-slate-700 transition-colors duration-200 line-clamp-2">
+                              {highlightText(resource.description, searchHighlight)}
+                            </p>
+                          </div>
+                          <Badge variant="secondary" className="bg-slate-100 text-slate-700 group-hover:bg-purple-100 group-hover:text-purple-700 transition-colors duration-200 shrink-0">
+                            {resource.type}
+                          </Badge>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedResource(resource);
+                          }}
+                        >
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          View Details
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
 
       {/* Resource Detail Modal */}
       <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
@@ -1401,214 +1762,14 @@ const ResourceVault = () => {
         </SheetContent>
       </Sheet>
 
-      {/* StudyPal Right Side Drawer */}
-      <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
-        <SheetTrigger asChild>
-          <Button
-            className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm"
-            size="icon"
-          >
-            <MessageSquare className="w-7 h-7 text-white" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent className="w-full sm:max-w-lg flex flex-col h-screen">
-          <SheetHeader className="pb-4 border-b flex-shrink-0">
-            <SheetTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                <MessageCircle className="w-4 h-4 text-white" />
-              </div>
-              StudyPal
-            </SheetTitle>
-            <SheetDescription>
-              Your AI learning assistant is here to help!
-            </SheetDescription>
-          </SheetHeader>
-          
-          <div className="flex-1 flex flex-col min-h-0">
-            {/* Chat Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ maxHeight: 'calc(100vh - 200px)' }}>
-              {chatHistory.length === 0 ? (
-                <div className="h-full flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Brain className="w-8 h-8 text-purple-500" />
-                    </div>
-                    <h3 className="font-medium text-gray-900 mb-2">Hello! I'm StudyPal</h3>
-                    <p className="text-sm text-gray-500 max-w-xs">
-                      I'm here to help you understand any concept you're struggling with. Just ask me anything!
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {chatHistory.map((chat) => (
-                    <div key={chat.id} className="space-y-3">
-                      {/* User Message */}
-                      <div className="flex justify-end">
-                        <div className="max-w-[80%] bg-purple-500 text-white rounded-2xl rounded-br-md px-4 py-2">
-                          <p className="text-sm">{chat.user}</p>
-                        </div>
-                      </div>
-                      
-                      {/* Bot Message */}
-                      <div className="flex justify-start">
-                        <div className="flex items-start gap-2 max-w-[80%]">
-                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Brain className="w-4 h-4 text-purple-500" />
-                          </div>
-                          <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-2">
-                            <p className="text-sm text-gray-800">{chat.bot}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Additional Resources Section */}
-                      {chat.hasResources && (
-                        <div className="flex justify-start mt-4">
-                          <div className="flex items-start gap-2 max-w-[85%]">
-                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <Lightbulb className="w-4 h-4 text-blue-500" />
-                            </div>
-                            <div className="bg-blue-50 rounded-2xl rounded-bl-md px-4 py-3 border border-blue-200">
-                              <p className="text-sm text-gray-800 mb-3">Here are some visual resources to help you understand better:</p>
-                              <div className="grid grid-cols-2 gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openResourceWindow(chat.topic, 'mindmap')}
-                                  className="text-xs h-8 border-blue-300 text-blue-700 hover:bg-blue-100"
-                                >
-                                  <Brain className="w-3 h-3 mr-1" />
-                                  Mind Map
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openResourceWindow(chat.topic, 'diagram')}
-                                  className="text-xs h-8 border-green-300 text-green-700 hover:bg-green-100"
-                                >
-                                  <Target className="w-3 h-3 mr-1" />
-                                  Diagram
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openResourceWindow(chat.topic, 'flowchart')}
-                                  className="text-xs h-8 border-purple-300 text-purple-700 hover:bg-purple-100"
-                                >
-                                  <BookOpen className="w-3 h-3 mr-1" />
-                                  Flowchart
-                                </Button>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => openResourceWindow(chat.topic, 'concept-map')}
-                                  className="text-xs h-8 border-orange-300 text-orange-700 hover:bg-orange-100"
-                                >
-                                  <Lightbulb className="w-3 h-3 mr-1" />
-                                  Concept Map
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  
-                  {/* Resource Feedback Section - Show after conversation */}
-                  {chatHistory.length > 0 && resources.length > 0 && !resourceFeedback && (
-                    <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
-                      <div className="flex items-start gap-2 mb-3">
-                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Brain className="w-4 h-4 text-purple-500" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-1">Quick Feedback</h4>
-                          <p className="text-sm text-gray-600 mb-3">Were the resources I provided helpful for your learning?</p>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleResourceFeedback('yes')}
-                          className="flex-1 border-green-200 text-green-700 hover:bg-green-50"
-                        >
-                          <ThumbsUp className="w-4 h-4 mr-2" />
-                          Yes, helpful
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleResourceFeedback('no')}
-                          className="flex-1 border-red-200 text-red-700 hover:bg-red-50"
-                        >
-                          <ThumbsDown className="w-4 h-4 mr-2" />
-                          Not helpful
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Quick Test Section - Show after conversation */}
-                  {chatHistory.length > 0 && (
-                    <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                      <div className="flex items-start gap-2 mb-3">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Brain className="w-4 h-4 text-blue-500" />
-                        </div>
-                        <div>
-                          <h4 className="font-medium text-gray-900 mb-1">Test Your Knowledge</h4>
-                          <p className="text-sm text-gray-600 mb-3">
-                            Ready to test what you've learned? Take a quick 5-question quiz in a new window!
-                          </p>
-                        </div>
-                      </div>
-                      <Button 
-                        onClick={() => openTestWindow(chatHistory[chatHistory.length - 1]?.topic || 'General Knowledge')} 
-                        className="w-full bg-blue-500 hover:bg-blue-600"
-                      >
-                        <Brain className="w-4 h-4 mr-2" />
-                        Start Quick Test
-                      </Button>
-                    </div>
-                  )}
-                </>
-              )}
-
-            </div>
-            
-            {/* Message Input Area */}
-            <div className="border-t p-4 bg-white flex-shrink-0">
-              <div className="flex gap-2">
-                <Textarea
-                  placeholder="Ask me about any concept you're struggling with..."
-                  value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                  rows={2}
-                  className="resize-none flex-1"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleStudyPalMessage();
-                    }
-                  }}
-                />
-                <Button 
-                  onClick={handleStudyPalMessage} 
-                  className="bg-purple-500 hover:bg-purple-600 px-4"
-                  disabled={!chatMessage.trim()}
-                  size="icon"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">Press Enter to send, Shift+Enter for new line</p>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
+      {/* StudyPal Floating Button */}
+      <Button
+        onClick={() => setShowStudyPal(!showStudyPal)}
+        className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
+        size="icon"
+      >
+        <MessageSquare className="w-7 h-7 text-white" />
+      </Button>
     </div>
   );
 };
