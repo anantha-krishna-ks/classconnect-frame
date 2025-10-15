@@ -1263,37 +1263,6 @@ const ResourceVault = () => {
                   </DialogContent>
                 </Dialog>
 
-                {/* Text Selection Popup */}
-                {selectedText && selectionPosition && (
-                  <div
-                    className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex gap-2"
-                    style={{
-                      left: `${selectionPosition.x}px`,
-                      top: `${selectionPosition.y}px`,
-                      transform: 'translate(-50%, -100%)',
-                    }}
-                  >
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleCopyText}
-                      className="h-8 px-3"
-                    >
-                      <Copy className="w-3 h-3 mr-1" />
-                      Copy
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={handleAddToNotes}
-                      disabled={isAddingToNotes}
-                      className="h-8 px-3"
-                    >
-                      <StickyNote className="w-3 h-3 mr-1" />
-                      Add to Notes
-                    </Button>
-                  </div>
-                )}
               </div>
             </div>
           </ResizablePanel>
@@ -1539,37 +1508,6 @@ const ResourceVault = () => {
               </DialogContent>
             </Dialog>
 
-            {/* Text Selection Popup */}
-            {selectedText && selectionPosition && (
-              <div
-                className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex gap-2"
-                style={{
-                  left: `${selectionPosition.x}px`,
-                  top: `${selectionPosition.y}px`,
-                  transform: 'translate(-50%, -100%)',
-                }}
-              >
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleCopyText}
-                  className="h-8 px-3"
-                >
-                  <Copy className="w-3 h-3 mr-1" />
-                  Copy
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleAddToNotes}
-                  disabled={isAddingToNotes}
-                  className="h-8 px-3"
-                >
-                  <StickyNote className="w-3 h-3 mr-1" />
-                  Add to Notes
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -1577,7 +1515,7 @@ const ResourceVault = () => {
       {/* Text Selection Popup */}
       {selectedText && selectionPosition && (
         <div
-          className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex gap-2"
+          className="fixed z-50 bg-white rounded-lg shadow-lg border border-gray-200 p-2 flex gap-2 pointer-events-none"
           style={{
             left: `${selectionPosition.x}px`,
             top: `${selectionPosition.y}px`,
@@ -1588,7 +1526,7 @@ const ResourceVault = () => {
             size="sm"
             variant="outline"
             onClick={handleCopyText}
-            className="h-8 px-3"
+            className="h-8 px-3 pointer-events-auto"
           >
             <Copy className="w-3 h-3 mr-1" />
             Copy
@@ -1598,7 +1536,7 @@ const ResourceVault = () => {
             variant="outline"
             onClick={handleAddToNotes}
             disabled={isAddingToNotes}
-            className="h-8 px-3"
+            className="h-8 px-3 pointer-events-auto"
           >
             <StickyNote className="w-3 h-3 mr-1" />
             Add to Notes
