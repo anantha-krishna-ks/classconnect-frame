@@ -1499,9 +1499,9 @@ const ResourceVault = () => {
                     </div>
                   </div>
 
-                  {/* Study Pal Panel - Fixed Width */}
+                  {/* Study Pal Panel - Fixed Width and Height */}
                   {showStudyPalInDialog && (
-                    <div className="w-[400px] flex-shrink-0 border-l h-full">
+                    <div className="w-[400px] h-screen flex-shrink-0 border-l">
                       <StudyPalContent inDialog={true} />
                     </div>
                   )}
