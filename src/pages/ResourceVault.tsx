@@ -941,23 +941,23 @@ const ResourceVault = () => {
                           {resource.type}
                         </Badge>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1.5 w-full">
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="flex-1 group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
+                          className="flex-1 min-w-0 group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105 text-xs" 
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedResource(resource);
                           }}
                         >
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Overview
+                          <Eye className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                          <span className="truncate">Overview</span>
                         </Button>
                         <Button 
                           variant="outline" 
                           size="sm" 
-                          className="flex-1 group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
+                          className="flex-1 min-w-0 group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105 text-xs" 
                           onClick={(e) => {
                             e.stopPropagation();
                             if (resource.url) {
@@ -965,8 +965,8 @@ const ResourceVault = () => {
                             }
                           }}
                         >
-                          <Eye className="w-4 h-4 mr-2" />
-                          View PDF
+                          <Eye className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                          <span className="truncate">PDF</span>
                         </Button>
                       </div>
                     </div>
