@@ -99,7 +99,7 @@ const AdminDashboard = () => {
     },
     {
       id: 'subscription-allocation',
-      title: 'Subscription Allocation',
+      title: 'Subscription Portal',
       description: 'Customize and assign learning tools to individual teachers, manage subscriptions, and activate SarasSchool AI for your institution.',
       icon: Users,
       color: 'bg-cyan-500',

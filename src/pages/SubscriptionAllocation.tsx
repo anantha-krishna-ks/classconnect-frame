@@ -172,10 +172,10 @@ const SubscriptionAllocation = () => {
             <span className="mx-2">/</span>
             <span className="text-gray-900">Admin Dashboard</span>
             <span className="mx-2">/</span>
-            <span className="text-blue-600 font-medium">Subscription Allocation</span>
+            <span className="text-blue-600 font-medium">Subscription Portal</span>
           </nav>
           <div className="mt-2">
-            <h1 className="text-2xl font-bold text-gray-900">Subscription Allocation</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Subscription Portal</h1>
             <p className="text-gray-600 text-sm mt-1">
               School: <span className="font-semibold text-gray-900">{SCHOOL_NAME}</span>
             </p>
