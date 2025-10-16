@@ -79,6 +79,9 @@ const SubscriptionAllocation = () => {
   const [viewDialogSearch, setViewDialogSearch] = useState('');
   const [viewDialogDepartmentFilter, setViewDialogDepartmentFilter] = useState('all');
   const [viewDialogSortBy, setViewDialogSortBy] = useState('name');
+  const [toolDialogSearch, setToolDialogSearch] = useState('');
+  const [toolDialogDepartmentFilter, setToolDialogDepartmentFilter] = useState('all');
+  const [toolDialogSortBy, setToolDialogSortBy] = useState('name');
 
   const handleOpenDialog = (teacherId: number) => {
     setSelectedTeacher(teacherId);
@@ -141,7 +144,58 @@ const SubscriptionAllocation = () => {
 
   const handleOpenToolDialog = (toolId: string) => {
     setSelectedTool(toolId);
+    setToolDialogSearch('');
+    setToolDialogDepartmentFilter('all');
+    setToolDialogSortBy('name');
     setIsToolDialogOpen(true);
+  };
+
+  const handleSelectAllTeachers = () => {
+    if (selectedTool) {
+      const allTeacherIds = TEACHERS.map(t => t.id);
+      setToolTeachers(prev => ({
+        ...prev,
+        [selectedTool]: allTeacherIds
+      }));
+      
+      // Sync with teacherTools
+      allTeacherIds.forEach(teacherId => {
+        setTeacherTools(prev => {
+          const currentTools = prev[teacherId] || [];
+          if (!currentTools.includes(selectedTool)) {
+            return {
+              ...prev,
+              [teacherId]: [...currentTools, selectedTool]
+            };
+          }
+          return prev;
+        });
+      });
+      toast.success('All teachers selected');
+    }
+  };
+
+  const handleDeselectAllTeachers = () => {
+    if (selectedTool) {
+      const currentTeachers = toolTeachers[selectedTool] || [];
+      
+      setToolTeachers(prev => ({
+        ...prev,
+        [selectedTool]: []
+      }));
+      
+      // Sync with teacherTools
+      currentTeachers.forEach(teacherId => {
+        setTeacherTools(prev => {
+          const currentTools = prev[teacherId] || [];
+          return {
+            ...prev,
+            [teacherId]: currentTools.filter(id => id !== selectedTool)
+          };
+        });
+      });
+      toast.success('All teachers deselected');
+    }
   };
 
   const handleRemoveTool = (teacherId: number, toolId: string) => {
@@ -657,48 +711,155 @@ const SubscriptionAllocation = () => {
       </Dialog>
 
       {/* Tool Teacher Assignment Dialog */}
-      <Dialog open={isToolDialogOpen} onOpenChange={setIsToolDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              Assign Teachers to {AVAILABLE_TOOLS.find(t => t.id === selectedTool)?.name}
-            </DialogTitle>
-            <DialogDescription>
-              Select the teachers who should have access to this tool
-            </DialogDescription>
-          </DialogHeader>
-          <ScrollArea className="max-h-[400px] pr-4">
-            <div className="space-y-3 py-4">
-              {TEACHERS.map((teacher) => {
-                const isAssigned = selectedTool 
-                  ? toolTeachers[selectedTool]?.includes(teacher.id) 
-                  : false;
+      <Dialog open={isToolDialogOpen} onOpenChange={(open) => {
+        setIsToolDialogOpen(open);
+        if (!open) {
+          setToolDialogSearch('');
+          setToolDialogDepartmentFilter('all');
+          setToolDialogSortBy('name');
+        }
+      }}>
+        <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0">
+          <div className="p-6 pb-4">
+            <DialogHeader className="mb-4">
+              <DialogTitle>
+                Assign Teachers to {AVAILABLE_TOOLS.find(t => t.id === selectedTool)?.name}
+              </DialogTitle>
+              <DialogDescription>
+                Select the teachers who should have access to this tool
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-3">
+              <div className="flex gap-3 items-center">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Search teachers..."
+                    className="pl-10"
+                    value={toolDialogSearch}
+                    onChange={(e) => setToolDialogSearch(e.target.value)}
+                  />
+                </div>
                 
-                return (
-                  <div key={teacher.id} className="flex items-start space-x-3">
-                    <Checkbox
-                      id={`tool-dialog-${teacher.id}`}
-                      checked={isAssigned}
-                      onCheckedChange={() => 
-                        selectedTool && handleTeacherToggleForTool(selectedTool, teacher.id)
-                      }
-                    />
-                    <Label
-                      htmlFor={`tool-dialog-${teacher.id}`}
-                      className="text-sm font-normal cursor-pointer flex-1"
+                <Select value={toolDialogDepartmentFilter} onValueChange={setToolDialogDepartmentFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Departments</SelectItem>
+                    {departments.map(dept => (
+                      <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={toolDialogSortBy} onValueChange={setToolDialogSortBy}>
+                  <SelectTrigger className="w-[160px]">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name">Name (A-Z)</SelectItem>
+                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                    <SelectItem value="department">Department</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSelectAllTeachers}
+                  className="flex-1"
+                >
+                  Select All ({TEACHERS.length})
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDeselectAllTeachers}
+                  className="flex-1"
+                  disabled={!selectedTool || !toolTeachers[selectedTool] || toolTeachers[selectedTool].length === 0}
+                >
+                  Deselect All
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <ScrollArea className="flex-1 px-6 min-h-0">
+            <div className="space-y-1.5 py-2">
+              {TEACHERS
+                .filter(teacher => {
+                  const matchesSearch = teacher.name.toLowerCase().includes(toolDialogSearch.toLowerCase()) ||
+                                      teacher.department.toLowerCase().includes(toolDialogSearch.toLowerCase());
+                  const matchesDepartment = toolDialogDepartmentFilter === 'all' || teacher.department === toolDialogDepartmentFilter;
+                  return matchesSearch && matchesDepartment;
+                })
+                .sort((a, b) => {
+                  if (toolDialogSortBy === 'name') return a.name.localeCompare(b.name);
+                  if (toolDialogSortBy === 'name-desc') return b.name.localeCompare(a.name);
+                  if (toolDialogSortBy === 'department') return a.department.localeCompare(b.department);
+                  return 0;
+                })
+                .map((teacher) => {
+                  const isAssigned = selectedTool 
+                    ? toolTeachers[selectedTool]?.includes(teacher.id) 
+                    : false;
+                  
+                  return (
+                    <div 
+                      key={teacher.id} 
+                      className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer border border-transparent hover:border-border"
+                      onClick={() => selectedTool && handleTeacherToggleForTool(selectedTool, teacher.id)}
                     >
-                      <div>
-                        <div className="font-medium">{teacher.name}</div>
-                        <div className="text-xs text-gray-500">{teacher.department}</div>
-                      </div>
-                    </Label>
-                  </div>
-                );
-              })}
+                      <Checkbox
+                        id={`tool-dialog-${teacher.id}`}
+                        checked={isAssigned}
+                        onCheckedChange={() => 
+                          selectedTool && handleTeacherToggleForTool(selectedTool, teacher.id)
+                        }
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <Label
+                        htmlFor={`tool-dialog-${teacher.id}`}
+                        className="text-sm font-normal cursor-pointer flex-1"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary flex-shrink-0">
+                            {teacher.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-foreground text-sm">{teacher.name}</div>
+                            <div className="text-xs text-muted-foreground">{teacher.department}</div>
+                          </div>
+                        </div>
+                      </Label>
+                    </div>
+                  );
+                })}
+              {TEACHERS.filter(teacher => {
+                const matchesSearch = teacher.name.toLowerCase().includes(toolDialogSearch.toLowerCase()) ||
+                                    teacher.department.toLowerCase().includes(toolDialogSearch.toLowerCase());
+                const matchesDepartment = toolDialogDepartmentFilter === 'all' || teacher.department === toolDialogDepartmentFilter;
+                return matchesSearch && matchesDepartment;
+              }).length === 0 && (
+                <p className="text-center text-muted-foreground py-8">No teachers found matching your filters</p>
+              )}
             </div>
           </ScrollArea>
-          <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => setIsToolDialogOpen(false)}>
+          
+          <div className="flex justify-between items-center gap-2 p-6 pt-4 border-t">
+            <p className="text-sm text-muted-foreground">
+              {selectedTool && toolTeachers[selectedTool] ? toolTeachers[selectedTool].length : 0} of {TEACHERS.length} selected
+            </p>
+            <Button variant="outline" onClick={() => {
+              setIsToolDialogOpen(false);
+              setToolDialogSearch('');
+              setToolDialogDepartmentFilter('all');
+              setToolDialogSortBy('name');
+            }}>
               Done
             </Button>
           </div>
