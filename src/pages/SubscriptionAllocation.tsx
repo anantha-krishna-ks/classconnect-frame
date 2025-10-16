@@ -719,31 +719,31 @@ const SubscriptionAllocation = () => {
           setToolDialogSortBy('name');
         }
       }}>
-        <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0">
-          <div className="p-6 pb-4">
-            <DialogHeader className="mb-4">
-              <DialogTitle>
+        <DialogContent className="max-w-6xl h-[95vh] flex flex-col p-0">
+          <div className="p-6 pb-3">
+            <DialogHeader className="mb-3">
+              <DialogTitle className="text-xl">
                 Assign Teachers to {AVAILABLE_TOOLS.find(t => t.id === selectedTool)?.name}
               </DialogTitle>
               <DialogDescription>
-                Select the teachers who should have access to this tool
+                Select teachers who should have access to this tool • {selectedTool && toolTeachers[selectedTool] ? toolTeachers[selectedTool].length : 0} of {TEACHERS.length} selected
               </DialogDescription>
             </DialogHeader>
             
-            <div className="space-y-3">
-              <div className="flex gap-3 items-center">
+            <div className="space-y-2.5">
+              <div className="flex gap-2.5 items-center">
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
-                    placeholder="Search teachers..."
-                    className="pl-10"
+                    placeholder="Search teachers by name or department..."
+                    className="pl-10 h-9"
                     value={toolDialogSearch}
                     onChange={(e) => setToolDialogSearch(e.target.value)}
                   />
                 </div>
                 
                 <Select value={toolDialogDepartmentFilter} onValueChange={setToolDialogDepartmentFilter}>
-                  <SelectTrigger className="w-[180px]">
+                  <SelectTrigger className="w-[160px] h-9">
                     <SelectValue placeholder="Department" />
                   </SelectTrigger>
                   <SelectContent>
@@ -755,12 +755,12 @@ const SubscriptionAllocation = () => {
                 </Select>
                 
                 <Select value={toolDialogSortBy} onValueChange={setToolDialogSortBy}>
-                  <SelectTrigger className="w-[160px]">
-                    <SelectValue placeholder="Sort by" />
+                  <SelectTrigger className="w-[140px] h-9">
+                    <SelectValue placeholder="Sort" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="name">Name (A-Z)</SelectItem>
-                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                    <SelectItem value="name">Name A-Z</SelectItem>
+                    <SelectItem value="name-desc">Name Z-A</SelectItem>
                     <SelectItem value="department">Department</SelectItem>
                   </SelectContent>
                 </Select>
@@ -771,7 +771,7 @@ const SubscriptionAllocation = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleSelectAllTeachers}
-                  className="flex-1"
+                  className="flex-1 h-8 text-xs"
                 >
                   Select All ({TEACHERS.length})
                 </Button>
@@ -779,7 +779,7 @@ const SubscriptionAllocation = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleDeselectAllTeachers}
-                  className="flex-1"
+                  className="flex-1 h-8 text-xs"
                   disabled={!selectedTool || !toolTeachers[selectedTool] || toolTeachers[selectedTool].length === 0}
                 >
                   Deselect All
@@ -789,7 +789,7 @@ const SubscriptionAllocation = () => {
           </div>
           
           <ScrollArea className="flex-1 px-6 min-h-0">
-            <div className="space-y-1.5 py-2">
+            <div className="grid grid-cols-3 gap-2 py-2">
               {TEACHERS
                 .filter(teacher => {
                   const matchesSearch = teacher.name.toLowerCase().includes(toolDialogSearch.toLowerCase()) ||
@@ -811,7 +811,7 @@ const SubscriptionAllocation = () => {
                   return (
                     <div 
                       key={teacher.id} 
-                      className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer border border-transparent hover:border-border"
+                      className="flex items-center space-x-2 py-1.5 px-2.5 rounded-md hover:bg-muted/50 transition-colors cursor-pointer border border-transparent hover:border-border"
                       onClick={() => selectedTool && handleTeacherToggleForTool(selectedTool, teacher.id)}
                     >
                       <Checkbox
@@ -821,18 +821,19 @@ const SubscriptionAllocation = () => {
                           selectedTool && handleTeacherToggleForTool(selectedTool, teacher.id)
                         }
                         onClick={(e) => e.stopPropagation()}
+                        className="flex-shrink-0"
                       />
                       <Label
                         htmlFor={`tool-dialog-${teacher.id}`}
-                        className="text-sm font-normal cursor-pointer flex-1"
+                        className="text-xs cursor-pointer flex-1 min-w-0"
                       >
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary flex-shrink-0">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-medium text-primary flex-shrink-0">
                             {teacher.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium text-foreground text-sm">{teacher.name}</div>
-                            <div className="text-xs text-muted-foreground">{teacher.department}</div>
+                            <div className="font-medium text-foreground text-xs truncate">{teacher.name}</div>
+                            <div className="text-[10px] text-muted-foreground truncate">{teacher.department}</div>
                           </div>
                         </div>
                       </Label>
@@ -845,16 +846,13 @@ const SubscriptionAllocation = () => {
                 const matchesDepartment = toolDialogDepartmentFilter === 'all' || teacher.department === toolDialogDepartmentFilter;
                 return matchesSearch && matchesDepartment;
               }).length === 0 && (
-                <p className="text-center text-muted-foreground py-8">No teachers found matching your filters</p>
+                <div className="col-span-3 text-center text-muted-foreground py-12">No teachers found matching your filters</div>
               )}
             </div>
           </ScrollArea>
           
-          <div className="flex justify-between items-center gap-2 p-6 pt-4 border-t">
-            <p className="text-sm text-muted-foreground">
-              {selectedTool && toolTeachers[selectedTool] ? toolTeachers[selectedTool].length : 0} of {TEACHERS.length} selected
-            </p>
-            <Button variant="outline" onClick={() => {
+          <div className="flex justify-end items-center gap-2 p-4 border-t bg-muted/20">
+            <Button variant="outline" size="sm" onClick={() => {
               setIsToolDialogOpen(false);
               setToolDialogSearch('');
               setToolDialogDepartmentFilter('all');
