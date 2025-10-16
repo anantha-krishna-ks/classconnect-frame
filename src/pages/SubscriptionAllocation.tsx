@@ -73,6 +73,8 @@ const SubscriptionAllocation = () => {
   const [isToolDialogOpen, setIsToolDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [toolAssignmentFilter, setToolAssignmentFilter] = useState('all');
+  const [toolSortBy, setToolSortBy] = useState('name');
 
   const handleOpenDialog = (teacherId: number) => {
     setSelectedTeacher(teacherId);
@@ -286,14 +288,48 @@ const SubscriptionAllocation = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
+                <Select value={toolAssignmentFilter} onValueChange={setToolAssignmentFilter}>
+                  <SelectTrigger className="w-[200px] bg-background">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Tools</SelectItem>
+                    <SelectItem value="assigned">Assigned</SelectItem>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={toolSortBy} onValueChange={setToolSortBy}>
+                  <SelectTrigger className="w-[200px] bg-background">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name">Name (A-Z)</SelectItem>
+                    <SelectItem value="teachers-desc">Most Assigned</SelectItem>
+                    <SelectItem value="teachers-asc">Least Assigned</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             {/* Tools Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {AVAILABLE_TOOLS.filter(tool => 
-                tool.name.toLowerCase().includes(searchQuery.toLowerCase())
-              ).map((tool) => {
+              {AVAILABLE_TOOLS.filter(tool => {
+                const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase());
+                const assignedTeachers = toolTeachers[tool.id] || [];
+                const matchesFilter = 
+                  toolAssignmentFilter === 'all' ? true :
+                  toolAssignmentFilter === 'assigned' ? assignedTeachers.length > 0 :
+                  assignedTeachers.length === 0;
+                return matchesSearch && matchesFilter;
+              }).sort((a, b) => {
+                const aTeachers = (toolTeachers[a.id] || []).length;
+                const bTeachers = (toolTeachers[b.id] || []).length;
+                
+                if (toolSortBy === 'name') return a.name.localeCompare(b.name);
+                if (toolSortBy === 'teachers-desc') return bTeachers - aTeachers;
+                if (toolSortBy === 'teachers-asc') return aTeachers - bTeachers;
+                return 0;
+              }).map((tool) => {
                 const assignedTeachers = toolTeachers[tool.id] || [];
                 
                 return (
