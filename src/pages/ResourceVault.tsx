@@ -1446,7 +1446,7 @@ const ResourceVault = () => {
 
       {/* Study Pal Chat Popup - Facebook Style - Responsive */}
       {showStudyPalPanel && (
-        <div className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[70vh] sm:h-[600px] max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[9998] border-l border-r border-t border-gray-200 animate-fade-in">
+        <div className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[70vh] sm:h-[600px] max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[100] border-l border-r border-t border-gray-200 animate-fade-in">
           {/* Header - Facebook Blue Style */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 sm:px-4 py-3 sm:rounded-t-xl flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-2">
