@@ -393,8 +393,8 @@ const SubscriptionAllocation = () => {
               value="teachers" 
               className="flex items-center justify-center gap-2 h-10 px-6 text-base font-medium rounded-md border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary/20 hover:bg-accent hover:text-accent-foreground transition-all"
             >
-              <BarChart3 className="w-4 h-4" />
-              Subscription Analytics
+              <UsersIcon className="w-4 h-4" />
+              Teacher's Data
             </TabsTrigger>
           </TabsList>
 
