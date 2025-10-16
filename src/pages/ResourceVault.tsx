@@ -59,6 +59,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { createPortal } from 'react-dom';
 
 const ResourceVault = () => {
   const navigate = useNavigate();
@@ -985,6 +986,9 @@ const ResourceVault = () => {
                     <Badge variant="outline">{selectedResource.content.difficulty}</Badge>
                   )}
                 </div>
+                <DialogDescription>
+                  Detailed resource overview and key topics
+                </DialogDescription>
               </DialogHeader>
               
               <div className="space-y-6 mt-6">
@@ -1095,6 +1099,9 @@ const ResourceVault = () => {
               <FileText className="w-5 h-5 text-purple-500" />
               PDF Viewer
             </DialogTitle>
+            <DialogDescription>
+              View PDF within the app
+            </DialogDescription>
           </DialogHeader>
           <div className="flex-1 overflow-hidden rounded-lg border bg-muted">
             {pdfViewerUrl && pdfViewerUrl !== '#' ? (
@@ -1112,14 +1119,16 @@ const ResourceVault = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Notes Floating Button - Always visible and clickable */}
-      <Button
-        onClick={() => setShowNotes(true)}
-        className="fixed bottom-28 right-8 rounded-full w-16 h-16 bg-emerald-500 hover:bg-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm animate-fade-in z-[9999] pointer-events-auto"
-        size="icon"
-      >
-        <FileText className="w-7 h-7 text-white" />
-      </Button>
+      {/* Notes Floating Button - Hidden when StudyPal is open */}
+      {!showStudyPalPanel && (
+        <Button
+          onClick={() => setShowNotes(true)}
+          className="fixed bottom-28 right-8 rounded-full w-16 h-16 bg-emerald-500 hover:bg-emerald-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm animate-fade-in z-[9999] pointer-events-auto"
+          size="icon"
+        >
+          <FileText className="w-7 h-7 text-white" />
+        </Button>
+      )}
 
       {/* Notes Modal Dialog */}
       <Dialog open={showNotes} onOpenChange={setShowNotes}>
@@ -1445,8 +1454,8 @@ const ResourceVault = () => {
       </Sheet>
 
       {/* Study Pal Chat Popup - Facebook Style - Responsive */}
-      {showStudyPalPanel && (
-        <div className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[70vh] sm:h-[600px] max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[100] border-l border-r border-t border-gray-200 animate-fade-in">
+      {showStudyPalPanel && createPortal(
+        <div className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[70vh] sm:h-[600px] max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[10050] pointer-events-auto border-l border-r border-t border-gray-200 animate-fade-in">
           {/* Header - Facebook Blue Style */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 sm:px-4 py-3 sm:rounded-t-xl flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-2">
@@ -1645,7 +1654,8 @@ const ResourceVault = () => {
               </Button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
