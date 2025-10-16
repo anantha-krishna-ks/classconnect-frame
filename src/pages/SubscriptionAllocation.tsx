@@ -70,6 +70,8 @@ const SubscriptionAllocation = () => {
   const [selectedTeacher, setSelectedTeacher] = useState<number | null>(null);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [selectedToolForView, setSelectedToolForView] = useState<string | null>(null);
+  const [viewDialogSearch, setViewDialogSearch] = useState('');
+  const [selectedTeachersForRemoval, setSelectedTeachersForRemoval] = useState<number[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isToolDialogOpen, setIsToolDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -134,6 +136,26 @@ const SubscriptionAllocation = () => {
         [teacherId]: updatedTools
       };
     });
+  };
+
+  const handleBulkRemoveTeachers = () => {
+    if (!selectedToolForView || selectedTeachersForRemoval.length === 0) return;
+
+    selectedTeachersForRemoval.forEach(teacherId => {
+      handleTeacherToggleForTool(selectedToolForView, teacherId);
+    });
+
+    toast.success(`Removed ${selectedTeachersForRemoval.length} teacher(s)`, {
+      description: `from ${AVAILABLE_TOOLS.find(t => t.id === selectedToolForView)?.name}`,
+    });
+
+    setSelectedTeachersForRemoval([]);
+  };
+
+  const handleCloseViewDialog = () => {
+    setSelectedToolForView(null);
+    setViewDialogSearch('');
+    setSelectedTeachersForRemoval([]);
   };
 
   const handleOpenToolDialog = (toolId: string) => {
@@ -703,9 +725,9 @@ const SubscriptionAllocation = () => {
       </Dialog>
 
       {/* View Assigned Teachers Dialog */}
-      <Dialog open={!!selectedToolForView} onOpenChange={() => setSelectedToolForView(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
-          <DialogHeader>
+      <Dialog open={!!selectedToolForView} onOpenChange={handleCloseViewDialog}>
+        <DialogContent className="max-w-2xl h-[85vh] flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>
               Teachers assigned to {AVAILABLE_TOOLS.find(t => t.id === selectedToolForView)?.name}
             </DialogTitle>
@@ -713,40 +735,125 @@ const SubscriptionAllocation = () => {
               {selectedToolForView && (toolTeachers[selectedToolForView]?.length || 0)} teacher(s) have access to this tool
             </DialogDescription>
           </DialogHeader>
-          <ScrollArea className="max-h-[500px] pr-4">
-            <div className="space-y-2 py-4">
-              {selectedToolForView && toolTeachers[selectedToolForView]?.map((teacherId) => {
-                const teacher = TEACHERS.find(t => t.id === teacherId);
-                return teacher ? (
-                  <div key={teacherId} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary">
+          
+          {/* Search and Bulk Actions */}
+          <div className="flex-shrink-0 space-y-3 py-4 border-b">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search teachers..."
+                className="pl-10"
+                value={viewDialogSearch}
+                onChange={(e) => setViewDialogSearch(e.target.value)}
+              />
+            </div>
+            
+            {selectedTeachersForRemoval.length > 0 && (
+              <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg">
+                <span className="text-sm font-medium">
+                  {selectedTeachersForRemoval.length} teacher(s) selected
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedTeachersForRemoval([])}
+                  >
+                    Clear
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleBulkRemoveTeachers}
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Remove Selected
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Teachers List */}
+          <ScrollArea className="flex-1 pr-4">
+            <div className="space-y-2 py-2">
+              {selectedToolForView && toolTeachers[selectedToolForView]
+                ?.filter(teacherId => {
+                  const teacher = TEACHERS.find(t => t.id === teacherId);
+                  if (!teacher) return false;
+                  const searchLower = viewDialogSearch.toLowerCase();
+                  return teacher.name.toLowerCase().includes(searchLower) ||
+                         teacher.department.toLowerCase().includes(searchLower);
+                })
+                .map((teacherId) => {
+                  const teacher = TEACHERS.find(t => t.id === teacherId);
+                  const isSelected = selectedTeachersForRemoval.includes(teacherId);
+                  
+                  return teacher ? (
+                    <div 
+                      key={teacherId} 
+                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all cursor-pointer ${
+                        isSelected 
+                          ? 'border-primary bg-primary/5' 
+                          : 'border-border hover:bg-muted/50'
+                      }`}
+                      onClick={() => {
+                        setSelectedTeachersForRemoval(prev =>
+                          prev.includes(teacherId)
+                            ? prev.filter(id => id !== teacherId)
+                            : [...prev, teacherId]
+                        );
+                      }}
+                    >
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => {
+                          setSelectedTeachersForRemoval(prev =>
+                            prev.includes(teacherId)
+                              ? prev.filter(id => id !== teacherId)
+                              : [...prev, teacherId]
+                          );
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary flex-shrink-0">
                         {teacher.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </div>
-                      <div>
-                        <div className="font-medium text-foreground">{teacher.name}</div>
-                        <div className="text-sm text-muted-foreground">{teacher.department}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-foreground truncate">{teacher.name}</div>
+                        <div className="text-sm text-muted-foreground truncate">{teacher.department}</div>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTeacherToggleForTool(selectedToolForView, teacherId);
+                        }}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 flex-shrink-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleTeacherToggleForTool(selectedToolForView, teacherId)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <X className="w-4 h-4 mr-1" />
-                      Remove
-                    </Button>
-                  </div>
-                ) : null;
-              })}
-              {selectedToolForView && (!toolTeachers[selectedToolForView] || toolTeachers[selectedToolForView].length === 0) && (
-                <p className="text-center text-muted-foreground py-8">No teachers assigned yet</p>
+                  ) : null;
+                })}
+              {selectedToolForView && (!toolTeachers[selectedToolForView] || 
+                toolTeachers[selectedToolForView].filter(teacherId => {
+                  const teacher = TEACHERS.find(t => t.id === teacherId);
+                  if (!teacher) return false;
+                  const searchLower = viewDialogSearch.toLowerCase();
+                  return teacher.name.toLowerCase().includes(searchLower) ||
+                         teacher.department.toLowerCase().includes(searchLower);
+                }).length === 0) && (
+                <p className="text-center text-muted-foreground py-8">
+                  {viewDialogSearch ? 'No teachers found matching your search' : 'No teachers assigned yet'}
+                </p>
               )}
             </div>
           </ScrollArea>
-          <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => setSelectedToolForView(null)}>
+          
+          <div className="flex justify-end gap-2 pt-4 border-t flex-shrink-0">
+            <Button variant="outline" onClick={handleCloseViewDialog}>
               Close
             </Button>
           </div>
