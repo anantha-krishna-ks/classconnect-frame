@@ -971,8 +971,8 @@ const ResourceVault = () => {
       </div>
 
       {/* Resource Detail Modal */}
-      <Dialog open={!!selectedResource} modal={false} onOpenChange={(open) => !open && setSelectedResource(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
           {selectedResource && (
             <>
               <DialogHeader>
@@ -1092,7 +1092,7 @@ const ResourceVault = () => {
       </Dialog>
 
       {/* PDF Viewer Modal */}
-      <Dialog open={!!pdfViewerUrl} modal={false} onOpenChange={(open) => !open && setPdfViewerUrl(null)}>
+      <Dialog open={!!pdfViewerUrl} onOpenChange={(open) => !open && setPdfViewerUrl(null)}>
         <DialogContent className="max-w-6xl h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
