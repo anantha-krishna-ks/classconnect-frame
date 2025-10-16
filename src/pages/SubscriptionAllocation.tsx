@@ -158,9 +158,17 @@ const SubscriptionAllocation = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <nav className="flex items-center space-x-2 text-sm text-gray-500">
-              <Home className="w-4 h-4" />
+              <Home 
+                className="w-4 h-4 cursor-pointer hover:text-gray-700 transition-colors" 
+                onClick={() => navigate('/admin-dashboard')}
+              />
               <span className="mx-2">/</span>
-              <span className="text-gray-900">Admin Dashboard</span>
+              <span 
+                className="text-gray-900 cursor-pointer hover:text-gray-700 transition-colors"
+                onClick={() => navigate('/admin-dashboard')}
+              >
+                Admin Dashboard
+              </span>
               <span className="mx-2">/</span>
               <span className="text-blue-600 font-medium">Subscription Portal</span>
             </nav>
