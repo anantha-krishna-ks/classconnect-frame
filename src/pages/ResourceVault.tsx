@@ -86,6 +86,7 @@ const ResourceVault = () => {
   const [isAddingToNotes, setIsAddingToNotes] = useState(false);
   const [showStudyPalPanel, setShowStudyPalPanel] = useState(true);
   const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null);
+  const [notesSearchQuery, setNotesSearchQuery] = useState('');
 
   const handleLogout = () => {
     navigate('/student-login');
@@ -1184,23 +1185,54 @@ const ResourceVault = () => {
 
             {/* Notes List Column */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                <BookOpen className="w-4 h-4" />
-                Saved Notes ({notes.length})
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  Saved Notes ({notes.length})
+                </h3>
+              </div>
+              
+              {/* Search Input */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="Search by title or tags..."
+                  value={notesSearchQuery}
+                  onChange={(e) => setNotesSearchQuery(e.target.value)}
+                  className="pl-9 bg-white"
+                />
+              </div>
               
               <div className="max-h-96 overflow-y-auto pr-2 space-y-3">
-                {notes.length === 0 ? (
+                {notes.filter(note => {
+                  const query = notesSearchQuery.toLowerCase().trim();
+                  if (!query) return true;
+                  const titleMatch = note.title.toLowerCase().includes(query);
+                  const tagsMatch = note.tags?.toLowerCase().includes(query);
+                  return titleMatch || tagsMatch;
+                }).length === 0 ? (
                   <div className="text-center py-8">
                     <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <FileText className="w-6 h-6 text-emerald-500" />
+                      {notesSearchQuery ? (
+                        <Search className="w-6 h-6 text-emerald-500" />
+                      ) : (
+                        <FileText className="w-6 h-6 text-emerald-500" />
+                      )}
                     </div>
                     <p className="text-sm text-gray-500">
-                      No notes yet. Create your first note to get started!
+                      {notesSearchQuery 
+                        ? `No notes found matching "${notesSearchQuery}"`
+                        : 'No notes yet. Create your first note to get started!'}
                     </p>
                   </div>
                 ) : (
-                  notes.map((note) => (
+                  notes.filter(note => {
+                    const query = notesSearchQuery.toLowerCase().trim();
+                    if (!query) return true;
+                    const titleMatch = note.title.toLowerCase().includes(query);
+                    const tagsMatch = note.tags?.toLowerCase().includes(query);
+                    return titleMatch || tagsMatch;
+                  }).map((note) => (
                     <div key={note.id} className="border border-gray-200 rounded-lg p-3 bg-white hover:shadow-sm transition-shadow">
                       <div className="flex items-start justify-between mb-2">
                         <h4 className="font-medium text-gray-900 text-sm flex-1 line-clamp-1">{note.title}</h4>
