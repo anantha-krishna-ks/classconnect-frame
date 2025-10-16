@@ -297,7 +297,7 @@ const SubscriptionAllocation = () => {
                 const assignedTeachers = toolTeachers[tool.id] || [];
                 
                 return (
-                  <div key={tool.id} className="bg-muted/20 rounded-xl p-6 border border-border hover:shadow-md transition-shadow">
+                  <div key={tool.id} className="bg-card rounded-xl p-6 border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-start gap-4 mb-4">
                       <div className={`${tool.iconBg} rounded-xl p-3 flex-shrink-0`}>
                         <tool.icon className="w-6 h-6 text-white" />
