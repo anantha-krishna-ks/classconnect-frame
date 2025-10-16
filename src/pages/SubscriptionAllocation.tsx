@@ -267,33 +267,27 @@ const SubscriptionAllocation = () => {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <Tabs defaultValue="tools" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-            <TabsTrigger value="tools">Tools Allocation</TabsTrigger>
-            <TabsTrigger value="teachers">Teacher's Data</TabsTrigger>
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 h-12 bg-muted">
+            <TabsTrigger value="tools" className="text-base">Tools Allocation</TabsTrigger>
+            <TabsTrigger value="teachers" className="text-base">Teacher's Data</TabsTrigger>
           </TabsList>
 
           {/* Tools Allocation Tab */}
           <TabsContent value="tools" className="space-y-6">
             {/* Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Filter Tools</CardTitle>
-                <CardDescription>Search and filter tools to manage assignments</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                      placeholder="Search tools..."
-                      className="pl-10"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
+            <div className="bg-muted/30 rounded-lg p-4 border border-border">
+              <div className="flex gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Search tools..."
+                    className="pl-10 bg-background"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Tools Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -303,50 +297,46 @@ const SubscriptionAllocation = () => {
                 const assignedTeachers = toolTeachers[tool.id] || [];
                 
                 return (
-                  <Card key={tool.id} className="border border-gray-200">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg">{tool.name}</CardTitle>
-                          <CardDescription className="mt-2">
-                            {assignedTeachers.length} teacher{assignedTeachers.length !== 1 ? 's' : ''} assigned
-                          </CardDescription>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleOpenToolDialog(tool.id)}
-                        >
-                          <Settings2 className="w-4 h-4 mr-1" />
-                          Assign
-                        </Button>
+                  <div key={tool.id} className="bg-card rounded-xl p-6 border border-border hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-foreground mb-2">{tool.name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {assignedTeachers.length} teacher{assignedTeachers.length !== 1 ? 's' : ''} assigned
+                        </p>
                       </div>
-                    </CardHeader>
-                    <CardContent>
+                      <Button
+                        size="sm"
+                        onClick={() => handleOpenToolDialog(tool.id)}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                      >
+                        <Settings2 className="w-4 h-4 mr-1" />
+                        Assign
+                      </Button>
+                    </div>
+                    <div className="pt-4 border-t border-border">
                       {assignedTeachers.length > 0 ? (
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap gap-2">
-                            {assignedTeachers.map((teacherId) => {
-                              const teacher = TEACHERS.find(t => t.id === teacherId);
-                              return teacher ? (
-                                <Badge key={teacherId} variant="secondary" className="pr-1">
-                                  {teacher.name}
-                                  <button
-                                    onClick={() => handleTeacherToggleForTool(tool.id, teacherId)}
-                                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </Badge>
-                              ) : null;
-                            })}
-                          </div>
+                        <div className="flex flex-wrap gap-2">
+                          {assignedTeachers.map((teacherId) => {
+                            const teacher = TEACHERS.find(t => t.id === teacherId);
+                            return teacher ? (
+                              <Badge key={teacherId} variant="secondary" className="pr-1">
+                                {teacher.name}
+                                <button
+                                  onClick={() => handleTeacherToggleForTool(tool.id, teacherId)}
+                                  className="ml-1 hover:bg-muted rounded-full p-0.5 transition-colors"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </Badge>
+                            ) : null;
+                          })}
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-500">No teachers assigned yet</p>
+                        <p className="text-sm text-muted-foreground">No teachers assigned yet</p>
                       )}
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -356,78 +346,80 @@ const SubscriptionAllocation = () => {
           <TabsContent value="teachers" className="space-y-6">
             {/* Stats Widgets */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>Total Teachers</CardDescription>
-                  <CardTitle className="text-3xl">{totalTeachers}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <UsersIcon className="w-8 h-8 text-blue-500" />
-                </CardContent>
-              </Card>
+              <div className="bg-card rounded-xl p-6 border border-border">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Total Teachers</p>
+                    <p className="text-3xl font-bold text-foreground">{totalTeachers}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                    <UsersIcon className="w-6 h-6 text-blue-500" />
+                  </div>
+                </div>
+              </div>
               
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>Active Teachers</CardDescription>
-                  <CardTitle className="text-3xl">{teachersWithTools}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Award className="w-8 h-8 text-green-500" />
-                </CardContent>
-              </Card>
+              <div className="bg-card rounded-xl p-6 border border-border">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Active Teachers</p>
+                    <p className="text-3xl font-bold text-foreground">{teachersWithTools}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-green-500/10 rounded-lg flex items-center justify-center">
+                    <Award className="w-6 h-6 text-green-500" />
+                  </div>
+                </div>
+              </div>
               
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>Total Tools Assigned</CardDescription>
-                  <CardTitle className="text-3xl">{totalToolsAssigned}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <BookOpen className="w-8 h-8 text-purple-500" />
-                </CardContent>
-              </Card>
+              <div className="bg-card rounded-xl p-6 border border-border">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Total Tools Assigned</p>
+                    <p className="text-3xl font-bold text-foreground">{totalToolsAssigned}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                    <BookOpen className="w-6 h-6 text-purple-500" />
+                  </div>
+                </div>
+              </div>
               
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>Avg Tools/Teacher</CardDescription>
-                  <CardTitle className="text-3xl">{averageToolsPerTeacher}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TrendingUp className="w-8 h-8 text-orange-500" />
-                </CardContent>
-              </Card>
+              <div className="bg-card rounded-xl p-6 border border-border">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Avg Tools/Teacher</p>
+                    <p className="text-3xl font-bold text-foreground">{averageToolsPerTeacher}</p>
+                  </div>
+                  <div className="w-12 h-12 bg-orange-500/10 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-orange-500" />
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Filter Teachers</CardTitle>
-                <CardDescription>Search and filter teachers to view their data</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                      placeholder="Search teachers..."
-                      className="pl-10"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                    <SelectTrigger className="w-[200px]">
-                      <SelectValue placeholder="Filter by department" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Departments</SelectItem>
-                      {departments.map(dept => (
-                        <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+            <div className="bg-muted/30 rounded-lg p-4 border border-border">
+              <div className="flex gap-4">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Search teachers..."
+                    className="pl-10 bg-background"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
-              </CardContent>
-            </Card>
+                <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                  <SelectTrigger className="w-[200px] bg-background">
+                    <SelectValue placeholder="Filter by department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Departments</SelectItem>
+                    {departments.map(dept => (
+                      <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
             {/* Teachers Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -435,51 +427,44 @@ const SubscriptionAllocation = () => {
                 const assignedTools = teacherTools[teacher.id] || [];
                 
                 return (
-                  <Card key={teacher.id} className="border border-gray-200">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="text-lg">{teacher.name}</CardTitle>
-                          <CardDescription>{teacher.department}</CardDescription>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleOpenDialog(teacher.id)}
-                        >
-                          <Settings2 className="w-4 h-4 mr-1" />
-                          Assign
-                        </Button>
+                  <div key={teacher.id} className="bg-card rounded-xl p-6 border border-border hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-foreground mb-1">{teacher.name}</h3>
+                        <p className="text-sm text-muted-foreground">{teacher.department}</p>
                       </div>
-                    </CardHeader>
-                    <CardContent>
+                      <Button
+                        size="sm"
+                        onClick={() => handleOpenDialog(teacher.id)}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                      >
+                        <Settings2 className="w-4 h-4 mr-1" />
+                        Manage
+                      </Button>
+                    </div>
+                    <div className="pt-4 border-t border-border">
                       {assignedTools.length > 0 ? (
-                        <div className="space-y-2">
-                          <p className="text-xs text-gray-600 mb-2">
-                            {assignedTools.length} tool{assignedTools.length !== 1 ? 's' : ''} assigned
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {assignedTools.map((toolId) => {
-                              const tool = AVAILABLE_TOOLS.find(t => t.id === toolId);
-                              return (
-                                <Badge key={toolId} variant="secondary" className="pr-1">
-                                  {tool?.name}
-                                  <button
-                                    onClick={() => handleRemoveTool(teacher.id, toolId)}
-                                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </Badge>
-                              );
-                            })}
-                          </div>
+                        <div className="flex flex-wrap gap-2">
+                          {assignedTools.map(toolId => {
+                            const tool = AVAILABLE_TOOLS.find(t => t.id === toolId);
+                            return tool ? (
+                              <Badge key={toolId} variant="secondary" className="pr-1">
+                                {tool.name}
+                                <button
+                                  onClick={() => handleRemoveTool(teacher.id, toolId)}
+                                  className="ml-1 hover:bg-muted rounded-full p-0.5 transition-colors"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </Badge>
+                            ) : null;
+                          })}
                         </div>
                       ) : (
-                        <p className="text-sm text-gray-500">No tools assigned yet</p>
+                        <p className="text-sm text-muted-foreground">No tools assigned yet</p>
                       )}
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 );
               })}
             </div>
