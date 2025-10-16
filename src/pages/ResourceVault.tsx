@@ -917,7 +917,7 @@ const ResourceVault = () => {
                       key={resource.id} 
                       className="group border-2 border-slate-200/80 hover:border-purple-300/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
                       style={{ animationDelay: `${index * 100}ms` }}
-                      onClick={() => setSelectedResource(resource)}
+                      onClick={() => setPdfViewerUrl(resource.link || resource.url || '#')}
                     >
                       <div className="flex items-start gap-4 mb-4">
                         <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-200">
