@@ -1418,7 +1418,7 @@ const ResourceVault = () => {
 
         {/* Right Panel - StudyPal (25%) */}
         {showStudyPalPanel && <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
-          <div className="h-full flex flex-col bg-white border-l border-gray-200">
+          <div className="h-screen flex flex-col bg-white border-l border-gray-200">
             {/* StudyPal Header */}
             <div className="pb-4 pt-6 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-50 to-white">
               <div className="flex items-center justify-between mb-2">
