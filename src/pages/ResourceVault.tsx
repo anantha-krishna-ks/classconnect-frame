@@ -85,6 +85,7 @@ const ResourceVault = () => {
   const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
   const [isAddingToNotes, setIsAddingToNotes] = useState(false);
   const [showStudyPalPanel, setShowStudyPalPanel] = useState(true);
+  const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null);
 
   const handleLogout = () => {
     navigate('/student-login');
@@ -951,9 +952,7 @@ const ResourceVault = () => {
                           className="flex-1 min-w-0 group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105 text-xs" 
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (resource.url) {
-                              window.open(resource.url, '_blank');
-                            }
+                            setPdfViewerUrl(resource.link || resource.url || '#');
                           }}
                         >
                           <Eye className="w-3.5 h-3.5 mr-1.5 shrink-0" />
@@ -1084,6 +1083,31 @@ const ResourceVault = () => {
               </div>
             </>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* PDF Viewer Modal */}
+      <Dialog open={!!pdfViewerUrl} onOpenChange={(open) => !open && setPdfViewerUrl(null)}>
+        <DialogContent className="max-w-6xl h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-purple-500" />
+              PDF Viewer
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden rounded-lg border bg-muted">
+            {pdfViewerUrl && pdfViewerUrl !== '#' ? (
+              <iframe
+                src={pdfViewerUrl}
+                className="w-full h-full"
+                title="PDF Viewer"
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-muted-foreground">
+                <p>No PDF URL available</p>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
