@@ -69,6 +69,7 @@ const SubscriptionAllocation = () => {
   const [toolTeachers, setToolTeachers] = useState<ToolTeacherSelection>({});
   const [selectedTeacher, setSelectedTeacher] = useState<number | null>(null);
   const [selectedTool, setSelectedTool] = useState<string | null>(null);
+  const [selectedToolForView, setSelectedToolForView] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isToolDialogOpen, setIsToolDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -421,21 +422,37 @@ const SubscriptionAllocation = () => {
                     </div>
                     <div className="pt-4 border-t border-border">
                       {assignedTeachers.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {assignedTeachers.map((teacherId) => {
-                            const teacher = TEACHERS.find(t => t.id === teacherId);
-                            return teacher ? (
-                              <Badge key={teacherId} variant="secondary" className="pr-1">
-                                {teacher.name}
-                                <button
-                                  onClick={() => handleTeacherToggleForTool(tool.id, teacherId)}
-                                  className="ml-1 hover:bg-muted rounded-full p-0.5 transition-colors"
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-foreground">
+                              {assignedTeachers.length} teacher{assignedTeachers.length !== 1 ? 's' : ''}
+                            </span>
+                            {assignedTeachers.slice(0, 3).map((teacherId) => {
+                              const teacher = TEACHERS.find(t => t.id === teacherId);
+                              return teacher ? (
+                                <div 
+                                  key={teacherId}
+                                  className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary"
+                                  title={teacher.name}
                                 >
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </Badge>
-                            ) : null;
-                          })}
+                                  {teacher.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                </div>
+                              ) : null;
+                            })}
+                            {assignedTeachers.length > 3 && (
+                              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
+                                +{assignedTeachers.length - 3}
+                              </div>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedToolForView(tool.id)}
+                            className="text-xs"
+                          >
+                            View All
+                          </Button>
                         </div>
                       ) : (
                         <p className="text-sm text-muted-foreground">No teachers assigned yet</p>
@@ -549,21 +566,22 @@ const SubscriptionAllocation = () => {
                     </div>
                     <div className="pt-4 border-t border-border">
                       {assignedTools.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {assignedTools.map(toolId => {
-                            const tool = AVAILABLE_TOOLS.find(t => t.id === toolId);
-                            return tool ? (
-                              <Badge key={toolId} variant="secondary" className="pr-1">
-                                {tool.name}
-                                <button
-                                  onClick={() => handleRemoveTool(teacher.id, toolId)}
-                                  className="ml-1 hover:bg-muted rounded-full p-0.5 transition-colors"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {assignedTools.slice(0, 3).map(toolId => {
+                              const tool = AVAILABLE_TOOLS.find(t => t.id === toolId);
+                              return tool ? (
+                                <Badge key={toolId} variant="secondary" className="text-xs">
+                                  {tool.name}
+                                </Badge>
+                              ) : null;
+                            })}
+                            {assignedTools.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{assignedTools.length - 3} more
                               </Badge>
-                            ) : null;
-                          })}
+                            )}
+                          </div>
                         </div>
                       ) : (
                         <p className="text-sm text-muted-foreground">No tools assigned yet</p>
@@ -679,6 +697,57 @@ const SubscriptionAllocation = () => {
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button variant="outline" onClick={() => setIsToolDialogOpen(false)}>
               Done
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Assigned Teachers Dialog */}
+      <Dialog open={!!selectedToolForView} onOpenChange={() => setSelectedToolForView(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>
+              Teachers assigned to {AVAILABLE_TOOLS.find(t => t.id === selectedToolForView)?.name}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedToolForView && (toolTeachers[selectedToolForView]?.length || 0)} teacher(s) have access to this tool
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[500px] pr-4">
+            <div className="space-y-2 py-4">
+              {selectedToolForView && toolTeachers[selectedToolForView]?.map((teacherId) => {
+                const teacher = TEACHERS.find(t => t.id === teacherId);
+                return teacher ? (
+                  <div key={teacherId} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary">
+                        {teacher.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                      </div>
+                      <div>
+                        <div className="font-medium text-foreground">{teacher.name}</div>
+                        <div className="text-sm text-muted-foreground">{teacher.department}</div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleTeacherToggleForTool(selectedToolForView, teacherId)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      Remove
+                    </Button>
+                  </div>
+                ) : null;
+              })}
+              {selectedToolForView && (!toolTeachers[selectedToolForView] || toolTeachers[selectedToolForView].length === 0) && (
+                <p className="text-center text-muted-foreground py-8">No teachers assigned yet</p>
+              )}
+            </div>
+          </ScrollArea>
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setSelectedToolForView(null)}>
+              Close
             </Button>
           </div>
         </DialogContent>
