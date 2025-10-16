@@ -96,6 +96,15 @@ const AdminDashboard = () => {
       color: 'bg-red-500',
       buttonColor: 'bg-red-500 hover:bg-red-600',
       route: '/student-risk'
+    },
+    {
+      id: 'subscription-allocation',
+      title: 'Subscription Allocation',
+      description: 'Customize and assign learning tools to individual teachers, manage subscriptions, and activate SarasSchool AI for your institution.',
+      icon: Users,
+      color: 'bg-cyan-500',
+      buttonColor: 'bg-cyan-500 hover:bg-cyan-600',
+      route: '/subscription-allocation'
     }
   ];
 

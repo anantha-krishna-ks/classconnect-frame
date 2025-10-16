@@ -41,6 +41,7 @@ import StudentComingSoon from "./pages/StudentComingSoon";
 import ParentComingSoon from "./pages/ParentComingSoon";
 import ResourceVault from "./pages/ResourceVault";
 import ExamPrepRoom from "./pages/ExamPrepRoom";
+import SubscriptionAllocation from "./pages/SubscriptionAllocation";
 
 
 const queryClient = new QueryClient();
@@ -95,6 +96,7 @@ const App = () => (
           <Route path="/teacher-hiring" element={<AdminComingSoon />} />
           <Route path="/admission-fit" element={<AdminComingSoon />} />
           <Route path="/student-risk" element={<AdminComingSoon />} />
+          <Route path="/subscription-allocation" element={<SubscriptionAllocation />} />
 
           {/* Student Tools - Coming Soon */}
           <Route path="/focus-buddy" element={<StudentComingSoon />} />
