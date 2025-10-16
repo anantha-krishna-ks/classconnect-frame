@@ -77,6 +77,8 @@ const SubscriptionAllocation = () => {
   const [toolAssignmentFilter, setToolAssignmentFilter] = useState('all');
   const [toolSortBy, setToolSortBy] = useState('name');
   const [viewDialogSearch, setViewDialogSearch] = useState('');
+  const [viewDialogDepartmentFilter, setViewDialogDepartmentFilter] = useState('all');
+  const [viewDialogSortBy, setViewDialogSortBy] = useState('name');
 
   const handleOpenDialog = (teacherId: number) => {
     setSelectedTeacher(teacherId);
@@ -707,6 +709,8 @@ const SubscriptionAllocation = () => {
       <Dialog open={!!selectedToolForView} onOpenChange={() => {
         setSelectedToolForView(null);
         setViewDialogSearch('');
+        setViewDialogDepartmentFilter('all');
+        setViewDialogSortBy('name');
       }}>
         <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0">
           <div className="p-6 pb-4">
@@ -719,14 +723,41 @@ const SubscriptionAllocation = () => {
               </DialogDescription>
             </DialogHeader>
             
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search teachers..."
-                className="pl-10"
-                value={viewDialogSearch}
-                onChange={(e) => setViewDialogSearch(e.target.value)}
-              />
+            <div className="space-y-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search teachers..."
+                  className="pl-10"
+                  value={viewDialogSearch}
+                  onChange={(e) => setViewDialogSearch(e.target.value)}
+                />
+              </div>
+              
+              <div className="flex gap-3">
+                <Select value={viewDialogDepartmentFilter} onValueChange={setViewDialogDepartmentFilter}>
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Filter by department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Departments</SelectItem>
+                    {departments.map(dept => (
+                      <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                
+                <Select value={viewDialogSortBy} onValueChange={setViewDialogSortBy}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name">Name (A-Z)</SelectItem>
+                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                    <SelectItem value="department">Department</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
@@ -738,8 +769,17 @@ const SubscriptionAllocation = () => {
                   teacher && (
                     teacher.name.toLowerCase().includes(viewDialogSearch.toLowerCase()) ||
                     teacher.department.toLowerCase().includes(viewDialogSearch.toLowerCase())
+                  ) && (
+                    viewDialogDepartmentFilter === 'all' || teacher.department === viewDialogDepartmentFilter
                   )
                 )
+                .sort((a, b) => {
+                  if (!a || !b) return 0;
+                  if (viewDialogSortBy === 'name') return a.name.localeCompare(b.name);
+                  if (viewDialogSortBy === 'name-desc') return b.name.localeCompare(a.name);
+                  if (viewDialogSortBy === 'department') return a.department.localeCompare(b.department);
+                  return 0;
+                })
                 .map((teacher) => (
                   <div key={teacher!.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-3">
@@ -771,8 +811,10 @@ const SubscriptionAllocation = () => {
                  .filter(t => t && (
                    t.name.toLowerCase().includes(viewDialogSearch.toLowerCase()) ||
                    t.department.toLowerCase().includes(viewDialogSearch.toLowerCase())
+                 ) && (
+                   viewDialogDepartmentFilter === 'all' || t.department === viewDialogDepartmentFilter
                  )).length === 0 && (
-                <p className="text-center text-muted-foreground py-8">No teachers found matching "{viewDialogSearch}"</p>
+                <p className="text-center text-muted-foreground py-8">No teachers found matching your filters</p>
               )}
             </div>
           </ScrollArea>
@@ -781,6 +823,8 @@ const SubscriptionAllocation = () => {
             <Button variant="outline" onClick={() => {
               setSelectedToolForView(null);
               setViewDialogSearch('');
+              setViewDialogDepartmentFilter('all');
+              setViewDialogSortBy('name');
             }}>
               Close
             </Button>
