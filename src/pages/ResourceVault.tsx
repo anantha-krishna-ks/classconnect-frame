@@ -59,11 +59,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import {
-  ResizablePanelGroup,
-  ResizablePanel,
-  ResizableHandle,
-} from '@/components/ui/resizable';
 
 const ResourceVault = () => {
   const navigate = useNavigate();
@@ -819,11 +814,8 @@ const ResourceVault = () => {
         </div>
       </header>
 
-      {/* Split Screen Layout */}
-      <ResizablePanelGroup direction="horizontal" className="flex-1 w-full">
-        {/* Left Panel - Resource Vault (75%) */}
-        <ResizablePanel defaultSize={75} minSize={50}>
-          <div className="h-full overflow-y-auto px-6 py-8 bg-slate-50/30 animate-fade-in">
+      {/* Main Content Area */}
+      <div className="flex-1 w-full overflow-y-auto px-6 py-8 bg-slate-50/30 animate-fade-in">
         {/* Page Header */}
         <div className="mb-10 animate-fade-in">
           <div className="flex items-center gap-5 mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-md">
@@ -1303,10 +1295,10 @@ const ResourceVault = () => {
       {/* StudyPal Floating Button - Always visible and clickable */}
       <Button
         onClick={() => setShowStudyPalPanel(!showStudyPalPanel)}
-        className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-purple-500 hover:bg-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
+        className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
         size="icon"
       >
-        <MessageSquare className="w-7 h-7 text-white" />
+        <MessageCircle className="w-7 h-7 text-white" />
       </Button>
 
       <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
@@ -1429,220 +1421,208 @@ const ResourceVault = () => {
         </SheetContent>
       </Sheet>
 
-        </ResizablePanel>
-
-        {showStudyPalPanel && <ResizableHandle withHandle />}
-
-        {/* Right Panel - StudyPal (25%) */}
-        {showStudyPalPanel && <ResizablePanel defaultSize={25} minSize={20} maxSize={40}>
-          <div className="h-screen flex flex-col bg-white border-l border-gray-200">
-            {/* StudyPal Header */}
-            <div className="pb-4 pt-6 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-50 to-white">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                    <MessageCircle className="w-4 h-4 text-white" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-gray-900">StudyPal</h2>
-                </div>
-                <Button
-                  onClick={() => setShowStudyPalPanel(false)}
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 rounded-full hover:bg-purple-100"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+      {/* Study Pal Chat Popup - Facebook Style */}
+      {showStudyPalPanel && (
+        <div className="fixed bottom-0 right-6 w-[360px] h-[600px] bg-white rounded-t-xl shadow-2xl flex flex-col z-[9998] border-l border-r border-t border-gray-200 animate-fade-in">
+          {/* Header - Facebook Blue Style */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-t-xl flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <MessageCircle className="w-4 h-4 text-white" />
               </div>
-              <p className="text-sm text-gray-600">
-                Your AI learning assistant is here to help!
-              </p>
+              <span className="font-semibold text-base">StudyPal</span>
             </div>
-            
-            {/* Chat Messages Area - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
-                {chatHistory.length === 0 ? (
-                  <div className="h-full flex items-center justify-center">
-                    <div className="text-center px-4">
-                      <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Brain className="w-8 h-8 text-purple-500" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 text-white hover:bg-white/20 rounded-full"
+              onClick={() => setShowStudyPalPanel(false)}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          {/* Chat Messages Area - Scrollable */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 bg-gray-50">
+            {chatHistory.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center px-4">
+                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Brain className="w-8 h-8 text-purple-500" />
+                  </div>
+                  <h3 className="font-medium text-gray-900 mb-2">Hello! I'm StudyPal</h3>
+                  <p className="text-sm text-gray-500 max-w-xs">
+                    I'm here to help you understand any concept you're struggling with. Just ask me anything!
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {chatHistory.map((chat) => (
+                  <div key={chat.id} className="space-y-3">
+                    {/* User Message */}
+                    <div className="flex justify-end">
+                      <div className="max-w-[75%] bg-blue-600 text-white rounded-2xl rounded-br-sm px-4 py-2.5 shadow-sm">
+                        <p className="text-sm">{chat.user}</p>
                       </div>
-                      <h3 className="font-medium text-gray-900 mb-2">Hello! I'm StudyPal</h3>
-                      <p className="text-sm text-gray-500 max-w-xs">
-                        I'm here to help you understand any concept you're struggling with. Just ask me anything!
-                      </p>
+                    </div>
+                    
+                    {/* Bot Message */}
+                    <div className="flex justify-start">
+                      <div className="flex items-start gap-2 max-w-[75%]">
+                        <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Brain className="w-4 h-4 text-purple-500" />
+                        </div>
+                        <div className="bg-white rounded-2xl rounded-bl-sm px-4 py-2.5 shadow-sm border border-gray-100">
+                          <p className="text-sm text-gray-800">{chat.bot}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Additional Resources Section */}
+                    {chat.hasResources && (
+                      <div className="flex justify-start mt-4">
+                        <div className="flex items-start gap-2 max-w-[85%]">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Lightbulb className="w-4 h-4 text-blue-500" />
+                          </div>
+                          <div className="bg-blue-50 rounded-2xl rounded-bl-sm px-4 py-3 border border-blue-200">
+                            <p className="text-sm text-gray-800 mb-3">Here are some visual resources to help you understand better:</p>
+                            <div className="grid grid-cols-2 gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openResourceWindow(chat.topic, 'mindmap')}
+                                className="text-xs h-8 border-blue-300 text-blue-700 hover:bg-blue-100"
+                              >
+                                <Brain className="w-3 h-3 mr-1" />
+                                Mind Map
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openResourceWindow(chat.topic, 'diagram')}
+                                className="text-xs h-8 border-green-300 text-green-700 hover:bg-green-100"
+                              >
+                                <Target className="w-3 h-3 mr-1" />
+                                Diagram
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openResourceWindow(chat.topic, 'flowchart')}
+                                className="text-xs h-8 border-purple-300 text-purple-700 hover:bg-purple-100"
+                              >
+                                <BookOpen className="w-3 h-3 mr-1" />
+                                Flowchart
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => openResourceWindow(chat.topic, 'concept-map')}
+                                className="text-xs h-8 border-orange-300 text-orange-700 hover:bg-orange-100"
+                              >
+                                <Lightbulb className="w-3 h-3 mr-1" />
+                                Concept Map
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {/* Resource Feedback Section - Show after conversation */}
+                {chatHistory.length > 0 && resources.length > 0 && !resourceFeedback && (
+                  <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
+                    <div className="flex items-start gap-2 mb-3">
+                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Brain className="w-4 h-4 text-purple-500" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-1">Quick Feedback</h4>
+                        <p className="text-sm text-gray-600 mb-3">Were the resources I provided helpful for your learning?</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleResourceFeedback('yes')}
+                        className="flex-1 border-green-200 text-green-700 hover:bg-green-50"
+                      >
+                        <ThumbsUp className="w-4 h-4 mr-2" />
+                        Yes, helpful
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleResourceFeedback('no')}
+                        className="flex-1 border-red-200 text-red-700 hover:bg-red-50"
+                      >
+                        <ThumbsDown className="w-4 h-4 mr-2" />
+                        Not helpful
+                      </Button>
                     </div>
                   </div>
-                ) : (
-                  <>
-                    {chatHistory.map((chat) => (
-                      <div key={chat.id} className="space-y-3">
-                        {/* User Message */}
-                        <div className="flex justify-end">
-                          <div className="max-w-[80%] bg-purple-500 text-white rounded-2xl rounded-br-md px-4 py-2">
-                            <p className="text-sm">{chat.user}</p>
-                          </div>
-                        </div>
-                        
-                        {/* Bot Message */}
-                        <div className="flex justify-start">
-                          <div className="flex items-start gap-2 max-w-[80%]">
-                            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                              <Brain className="w-4 h-4 text-purple-500" />
-                            </div>
-                            <div className="bg-gray-100 rounded-2xl rounded-bl-md px-4 py-2">
-                              <p className="text-sm text-gray-800">{chat.bot}</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Additional Resources Section */}
-                        {chat.hasResources && (
-                          <div className="flex justify-start mt-4">
-                            <div className="flex items-start gap-2 max-w-[85%]">
-                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                <Lightbulb className="w-4 h-4 text-blue-500" />
-                              </div>
-                              <div className="bg-blue-50 rounded-2xl rounded-bl-md px-4 py-3 border border-blue-200">
-                                <p className="text-sm text-gray-800 mb-3">Here are some visual resources to help you understand better:</p>
-                                <div className="grid grid-cols-2 gap-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => openResourceWindow(chat.topic, 'mindmap')}
-                                    className="text-xs h-8 border-blue-300 text-blue-700 hover:bg-blue-100"
-                                  >
-                                    <Brain className="w-3 h-3 mr-1" />
-                                    Mind Map
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => openResourceWindow(chat.topic, 'diagram')}
-                                    className="text-xs h-8 border-green-300 text-green-700 hover:bg-green-100"
-                                  >
-                                    <Target className="w-3 h-3 mr-1" />
-                                    Diagram
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => openResourceWindow(chat.topic, 'flowchart')}
-                                    className="text-xs h-8 border-purple-300 text-purple-700 hover:bg-purple-100"
-                                  >
-                                    <BookOpen className="w-3 h-3 mr-1" />
-                                    Flowchart
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => openResourceWindow(chat.topic, 'concept-map')}
-                                    className="text-xs h-8 border-orange-300 text-orange-700 hover:bg-orange-100"
-                                  >
-                                    <Lightbulb className="w-3 h-3 mr-1" />
-                                    Concept Map
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    
-                    {/* Resource Feedback Section - Show after conversation */}
-                    {chatHistory.length > 0 && resources.length > 0 && !resourceFeedback && (
-                      <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
-                        <div className="flex items-start gap-2 mb-3">
-                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Brain className="w-4 h-4 text-purple-500" />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-gray-900 mb-1">Quick Feedback</h4>
-                            <p className="text-sm text-gray-600 mb-3">Were the resources I provided helpful for your learning?</p>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleResourceFeedback('yes')}
-                            className="flex-1 border-green-200 text-green-700 hover:bg-green-50"
-                          >
-                            <ThumbsUp className="w-4 h-4 mr-2" />
-                            Yes, helpful
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleResourceFeedback('no')}
-                            className="flex-1 border-red-200 text-red-700 hover:bg-red-50"
-                          >
-                            <ThumbsDown className="w-4 h-4 mr-2" />
-                            Not helpful
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Quick Test Section - Show after conversation */}
-                    {chatHistory.length > 0 && (
-                      <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                        <div className="flex items-start gap-2 mb-3">
-                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Brain className="w-4 h-4 text-blue-500" />
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-gray-900 mb-1">Test Your Knowledge</h4>
-                            <p className="text-sm text-gray-600 mb-3">
-                              Ready to test what you've learned? Take a quick 5-question quiz in a new window!
-                            </p>
-                          </div>
-                        </div>
-                        <Button 
-                          onClick={() => openTestWindow(chatHistory[chatHistory.length - 1]?.topic || 'General Knowledge')} 
-                          className="w-full bg-blue-500 hover:bg-blue-600"
-                        >
-                          <Brain className="w-4 h-4 mr-2" />
-                          Start Quick Test
-                        </Button>
-                      </div>
-                    )}
-                  </>
                 )}
 
-              </div>
-              
-              {/* Message Input Area - Fixed at bottom */}
-              <div className="border-t p-4 bg-white flex-shrink-0">
-                <div className="flex gap-2">
-                  <Textarea
-                    placeholder="Ask me about any concept you're struggling with..."
-                    value={chatMessage}
-                    onChange={(e) => setChatMessage(e.target.value)}
-                    rows={2}
-                    className="resize-none flex-1"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleStudyPalMessage();
-                      }
-                    }}
-                  />
-                  <Button 
-                    onClick={handleStudyPalMessage} 
-                    className="bg-purple-500 hover:bg-purple-600 px-4"
-                    disabled={!chatMessage.trim()}
-                    size="icon"
-                  >
-                    <MessageSquare className="w-4 h-4" />
-                  </Button>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">Press Enter to send, Shift+Enter for new line</p>
-              </div>
+                {/* Quick Test Section - Show after conversation */}
+                {chatHistory.length > 0 && (
+                  <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                    <div className="flex items-start gap-2 mb-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Brain className="w-4 h-4 text-blue-500" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium text-gray-900 mb-1">Test Your Knowledge</h4>
+                        <p className="text-sm text-gray-600 mb-3">
+                          Ready to test what you've learned? Take a quick 5-question quiz in a new window!
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      onClick={() => openTestWindow(chatHistory[chatHistory.length - 1]?.topic || 'General Knowledge')} 
+                      className="w-full bg-blue-500 hover:bg-blue-600"
+                    >
+                      <Brain className="w-4 h-4 mr-2" />
+                      Start Quick Test
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
           </div>
-        </ResizablePanel>}
-      </ResizablePanelGroup>
+          
+          {/* Message Input Area - Fixed at bottom */}
+          <div className="border-t p-3 bg-white flex-shrink-0 rounded-b-xl">
+            <div className="flex gap-2 items-end">
+              <Textarea
+                placeholder="Type a message..."
+                value={chatMessage}
+                onChange={(e) => setChatMessage(e.target.value)}
+                rows={1}
+                className="resize-none flex-1 text-sm min-h-[40px] max-h-[80px]"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleStudyPalMessage();
+                  }
+                }}
+              />
+              <Button 
+                onClick={handleStudyPalMessage} 
+                className="bg-blue-600 hover:bg-blue-700 h-10 px-4"
+                disabled={!chatMessage.trim()}
+              >
+                <MessageSquare className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      </div>
     </div>
   );
 };
