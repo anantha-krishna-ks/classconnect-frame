@@ -708,27 +708,29 @@ const SubscriptionAllocation = () => {
         setSelectedToolForView(null);
         setViewDialogSearch('');
       }}>
-        <DialogContent className="max-w-2xl h-[85vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>
-              Teachers assigned to {AVAILABLE_TOOLS.find(t => t.id === selectedToolForView)?.name}
-            </DialogTitle>
-            <DialogDescription>
-              {selectedToolForView && (toolTeachers[selectedToolForView]?.length || 0)} teacher(s) have access to this tool
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Search teachers..."
-              className="pl-10"
-              value={viewDialogSearch}
-              onChange={(e) => setViewDialogSearch(e.target.value)}
-            />
+        <DialogContent className="max-w-3xl h-[90vh] flex flex-col p-0">
+          <div className="p-6 pb-4">
+            <DialogHeader className="mb-4">
+              <DialogTitle>
+                Teachers assigned to {AVAILABLE_TOOLS.find(t => t.id === selectedToolForView)?.name}
+              </DialogTitle>
+              <DialogDescription>
+                {selectedToolForView && (toolTeachers[selectedToolForView]?.length || 0)} teacher(s) have access to this tool
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search teachers..."
+                className="pl-10"
+                value={viewDialogSearch}
+                onChange={(e) => setViewDialogSearch(e.target.value)}
+              />
+            </div>
           </div>
 
-          <ScrollArea className="flex-1 pr-4">
+          <ScrollArea className="flex-1 px-6 min-h-0">
             <div className="space-y-2 py-2">
               {selectedToolForView && toolTeachers[selectedToolForView]
                 ?.map((teacherId) => TEACHERS.find(t => t.id === teacherId))
@@ -775,7 +777,7 @@ const SubscriptionAllocation = () => {
             </div>
           </ScrollArea>
           
-          <div className="flex justify-end gap-2 pt-4 border-t mt-4">
+          <div className="flex justify-end gap-2 p-6 pt-4 border-t">
             <Button variant="outline" onClick={() => {
               setSelectedToolForView(null);
               setViewDialogSearch('');
