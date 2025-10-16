@@ -1292,14 +1292,16 @@ const ResourceVault = () => {
         </div>
       )}
 
-      {/* StudyPal Floating Button - Always visible and clickable */}
-      <Button
-        onClick={() => setShowStudyPalPanel(!showStudyPalPanel)}
-        className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
-        size="icon"
-      >
-        <MessageCircle className="w-7 h-7 text-white" />
-      </Button>
+      {/* StudyPal Floating Button - Visible only when popup is closed */}
+      {!showStudyPalPanel && (
+        <Button
+          onClick={() => setShowStudyPalPanel(true)}
+          className="fixed bottom-8 right-8 rounded-full w-16 h-16 bg-blue-600 hover:bg-blue-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 border-2 border-white/20 backdrop-blur-sm z-[9999] pointer-events-auto"
+          size="icon"
+        >
+          <MessageCircle className="w-7 h-7 text-white" />
+        </Button>
+      )}
 
       <Sheet open={showStudyPal} onOpenChange={setShowStudyPal}>
         <SheetContent className="w-full sm:max-w-lg flex flex-col h-screen">
