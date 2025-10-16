@@ -723,8 +723,8 @@ const SubscriptionAllocation = () => {
               </DialogDescription>
             </DialogHeader>
             
-            <div className="space-y-3">
-              <div className="relative">
+            <div className="flex gap-3 items-center">
+              <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   placeholder="Search teachers..."
@@ -734,69 +734,66 @@ const SubscriptionAllocation = () => {
                 />
               </div>
               
-              <div className="flex gap-3 items-center">
-                <Select value={viewDialogDepartmentFilter} onValueChange={setViewDialogDepartmentFilter}>
-                  <SelectTrigger className="w-[200px]">
-                    <SelectValue placeholder="Filter by department" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Departments</SelectItem>
-                    {departments.map(dept => (
-                      <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Select value={viewDialogSortBy} onValueChange={setViewDialogSortBy}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="name">Name (A-Z)</SelectItem>
-                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
-                    <SelectItem value="department">Department</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="ml-auto"
-                      disabled={!selectedToolForView || !toolTeachers[selectedToolForView] || toolTeachers[selectedToolForView].length === 0}
+              <Select value={viewDialogDepartmentFilter} onValueChange={setViewDialogDepartmentFilter}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Filter by department" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Departments</SelectItem>
+                  {departments.map(dept => (
+                    <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
+              <Select value={viewDialogSortBy} onValueChange={setViewDialogSortBy}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="name">Name (A-Z)</SelectItem>
+                  <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                  <SelectItem value="department">Department</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={!selectedToolForView || !toolTeachers[selectedToolForView] || toolTeachers[selectedToolForView].length === 0}
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Remove All
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Remove All Teachers?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will remove all {selectedToolForView && toolTeachers[selectedToolForView] ? toolTeachers[selectedToolForView].length : 0} teacher(s) from {AVAILABLE_TOOLS.find(t => t.id === selectedToolForView)?.name}. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => {
+                        if (selectedToolForView && toolTeachers[selectedToolForView]) {
+                          const teachersToRemove = [...toolTeachers[selectedToolForView]];
+                          teachersToRemove.forEach(teacherId => {
+                            handleTeacherToggleForTool(selectedToolForView, teacherId);
+                          });
+                          toast.success('All teachers removed successfully');
+                        }
+                      }}
+                      className="bg-red-600 hover:bg-red-700"
                     >
-                      <X className="w-4 h-4 mr-1" />
-                      Remove All
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Remove All Teachers?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This will remove all {selectedToolForView && toolTeachers[selectedToolForView] ? toolTeachers[selectedToolForView].length : 0} teacher(s) from {AVAILABLE_TOOLS.find(t => t.id === selectedToolForView)?.name}. This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction
-                        onClick={() => {
-                          if (selectedToolForView && toolTeachers[selectedToolForView]) {
-                            const teachersToRemove = [...toolTeachers[selectedToolForView]];
-                            teachersToRemove.forEach(teacherId => {
-                              handleTeacherToggleForTool(selectedToolForView, teacherId);
-                            });
-                            toast.success('All teachers removed successfully');
-                          }
-                        }}
-                        className="bg-red-600 hover:bg-red-700"
-                      >
-                        Yes, Remove All
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+                      Yes, Remove All
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </div>
 
