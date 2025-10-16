@@ -136,18 +136,17 @@ const ResourceVault = () => {
     if (!selectedText?.trim() || isAddingToNotes) return;
     setIsAddingToNotes(true);
     try {
-      const newNote = {
-        id: Date.now(),
+      // Pre-fill the note content with selected text
+      setCurrentNote({
         title: `Note ${notes.length + 1}`,
         content: selectedText,
-        tags: selectedResource?.subject || '',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      setNotes((prev) => [...prev, newNote]);
+        tags: selectedResource?.subject || ''
+      });
+      // Open the notes dialog for editing
+      setShowNotes(true);
       toast({
-        title: "Added to Notes",
-        description: "Your selected text has been saved to My Notes.",
+        title: "Text Added",
+        description: "Selected text has been added to your note. You can now edit and save it.",
       });
     } finally {
       setSelectedText('');
