@@ -50,6 +50,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogPortal,
+  DialogOverlay,
 } from '@/components/ui/dialog';
 import {
   Sheet,
@@ -1096,18 +1098,20 @@ const ResourceVault = () => {
         <FileText className="w-7 h-7 text-white" />
       </Button>
 
-      {/* Notes Modal Dialog */}
-      <Dialog open={showNotes} onOpenChange={setShowNotes}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-emerald-500" />
-              My Notes
-            </DialogTitle>
-            <DialogDescription>
-              Save and organize your study notes while browsing resources
-            </DialogDescription>
-          </DialogHeader>
+      {/* Notes Modal Dialog - Non-modal to work alongside resource dialog */}
+      <Dialog open={showNotes} onOpenChange={setShowNotes} modal={false}>
+        <DialogPortal>
+          <DialogOverlay className="z-[55]" />
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto z-[60]">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-emerald-500" />
+                My Notes
+              </DialogTitle>
+              <DialogDescription>
+                Save and organize your study notes while browsing resources
+              </DialogDescription>
+            </DialogHeader>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
             {/* Note Editor Column */}
@@ -1223,7 +1227,8 @@ const ResourceVault = () => {
               </div>
             </div>
           </div>
-        </DialogContent>
+          </DialogContent>
+        </DialogPortal>
       </Dialog>
 
       {/* Text Selection Menu */}
