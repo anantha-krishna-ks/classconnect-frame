@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Home, LogOut, Settings2, X, Search, Users as UsersIcon, BookOpen, TrendingUp, Award, Clock } from 'lucide-react';
+import { ArrowLeft, Save, Home, LogOut, Settings2, X, Users as UsersIcon, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -28,6 +23,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Mock data - Replace with actual API calls
@@ -66,13 +63,8 @@ type ToolTeacherSelection = {
 const SubscriptionAllocation = () => {
   const navigate = useNavigate();
   const [teacherTools, setTeacherTools] = useState<TeacherToolSelection>({});
-  const [toolTeachers, setToolTeachers] = useState<ToolTeacherSelection>({});
   const [selectedTeacher, setSelectedTeacher] = useState<number | null>(null);
-  const [selectedTool, setSelectedTool] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isToolDialogOpen, setIsToolDialogOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [departmentFilter, setDepartmentFilter] = useState('all');
 
   const handleOpenDialog = (teacherId: number) => {
     setSelectedTeacher(teacherId);
@@ -91,51 +83,6 @@ const SubscriptionAllocation = () => {
         [teacherId]: updatedTools
       };
     });
-
-    // Sync with toolTeachers
-    setToolTeachers(prev => {
-      const currentTeachers = prev[toolId] || [];
-      const updatedTeachers = currentTeachers.includes(teacherId)
-        ? currentTeachers.filter(id => id !== teacherId)
-        : [...currentTeachers, teacherId];
-      
-      return {
-        ...prev,
-        [toolId]: updatedTeachers
-      };
-    });
-  };
-
-  const handleTeacherToggleForTool = (toolId: string, teacherId: number) => {
-    setToolTeachers(prev => {
-      const currentTeachers = prev[toolId] || [];
-      const updatedTeachers = currentTeachers.includes(teacherId)
-        ? currentTeachers.filter(id => id !== teacherId)
-        : [...currentTeachers, teacherId];
-      
-      return {
-        ...prev,
-        [toolId]: updatedTeachers
-      };
-    });
-
-    // Sync with teacherTools
-    setTeacherTools(prev => {
-      const currentTools = prev[teacherId] || [];
-      const updatedTools = currentTools.includes(toolId)
-        ? currentTools.filter(id => id !== toolId)
-        : [...currentTools, toolId];
-      
-      return {
-        ...prev,
-        [teacherId]: updatedTools
-      };
-    });
-  };
-
-  const handleOpenToolDialog = (toolId: string) => {
-    setSelectedTool(toolId);
-    setIsToolDialogOpen(true);
   };
 
   const handleRemoveTool = (teacherId: number, toolId: string) => {
@@ -170,23 +117,6 @@ const SubscriptionAllocation = () => {
   const handleLogout = () => {
     navigate('/admin-login');
   };
-
-  // Filter teachers based on search and department
-  const filteredTeachers = TEACHERS.filter(teacher => {
-    const matchesSearch = teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         teacher.department.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDepartment = departmentFilter === 'all' || teacher.department === departmentFilter;
-    return matchesSearch && matchesDepartment;
-  });
-
-  // Get unique departments for filter
-  const departments = Array.from(new Set(TEACHERS.map(t => t.department)));
-
-  // Calculate stats
-  const totalTeachers = TEACHERS.length;
-  const teachersWithTools = Object.values(teacherTools).filter(tools => tools.length > 0).length;
-  const totalToolsAssigned = Object.values(teacherTools).reduce((sum, tools) => sum + tools.length, 0);
-  const averageToolsPerTeacher = teachersWithTools > 0 ? (totalToolsAssigned / teachersWithTools).toFixed(1) : '0';
 
   return (
     <div className="min-h-screen bg-white">
@@ -266,228 +196,98 @@ const SubscriptionAllocation = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <Tabs defaultValue="tools" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
-            <TabsTrigger value="tools">Tools Allocation</TabsTrigger>
-            <TabsTrigger value="teachers">Teacher's Data</TabsTrigger>
-          </TabsList>
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="border border-gray-200">
+            <CardHeader>
+              <CardDescription>Total Teachers</CardDescription>
+              <CardTitle className="text-3xl">{TEACHERS.length}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <UsersIcon className="w-8 h-8 text-blue-500" />
+            </CardContent>
+          </Card>
+          
+          <Card className="border border-gray-200">
+            <CardHeader>
+              <CardDescription>Teachers with Tools</CardDescription>
+              <CardTitle className="text-3xl">
+                {Object.values(teacherTools).filter(tools => tools.length > 0).length}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <UsersIcon className="w-8 h-8 text-green-500" />
+            </CardContent>
+          </Card>
+          
+          <Card className="border border-gray-200">
+            <CardHeader>
+              <CardDescription>Available Tools</CardDescription>
+              <CardTitle className="text-3xl">{AVAILABLE_TOOLS.length}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <BookOpen className="w-8 h-8 text-purple-500" />
+            </CardContent>
+          </Card>
+        </div>
 
-          {/* Tools Allocation Tab */}
-          <TabsContent value="tools" className="space-y-6">
-            {/* Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Filter Tools</CardTitle>
-                <CardDescription>Search and filter tools to manage assignments</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                      placeholder="Search tools..."
-                      className="pl-10"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+        {/* Teachers Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {TEACHERS.map((teacher) => {
+            const assignedTools = teacherTools[teacher.id] || [];
+            
+            return (
+              <Card key={teacher.id} className="border border-gray-200 hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg">{teacher.name}</CardTitle>
+                      <CardDescription>{teacher.department}</CardDescription>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Tools Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {AVAILABLE_TOOLS.filter(tool => 
-                tool.name.toLowerCase().includes(searchQuery.toLowerCase())
-              ).map((tool) => {
-                const assignedTeachers = toolTeachers[tool.id] || [];
-                
-                return (
-                  <Card key={tool.id} className="border border-gray-200">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg">{tool.name}</CardTitle>
-                          <CardDescription className="mt-2">
-                            {assignedTeachers.length} teacher{assignedTeachers.length !== 1 ? 's' : ''} assigned
-                          </CardDescription>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleOpenToolDialog(tool.id)}
-                        >
-                          <Settings2 className="w-4 h-4 mr-1" />
-                          Assign
-                        </Button>
+                </CardHeader>
+                <CardContent>
+                  {assignedTools.length > 0 ? (
+                    <div className="space-y-3">
+                      <p className="text-xs text-gray-600 mb-2">
+                        {assignedTools.length} tool{assignedTools.length !== 1 ? 's' : ''} assigned
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {assignedTools.map((toolId) => {
+                          const tool = AVAILABLE_TOOLS.find(t => t.id === toolId);
+                          return (
+                            <Badge key={toolId} variant="secondary" className="pr-1">
+                              {tool?.name}
+                              <button
+                                onClick={() => handleRemoveTool(teacher.id, toolId)}
+                                className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </Badge>
+                          );
+                        })}
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      {assignedTeachers.length > 0 ? (
-                        <div className="space-y-2">
-                          <div className="flex flex-wrap gap-2">
-                            {assignedTeachers.map((teacherId) => {
-                              const teacher = TEACHERS.find(t => t.id === teacherId);
-                              return teacher ? (
-                                <Badge key={teacherId} variant="secondary" className="pr-1">
-                                  {teacher.name}
-                                  <button
-                                    onClick={() => handleTeacherToggleForTool(tool.id, teacherId)}
-                                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </Badge>
-                              ) : null;
-                            })}
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-sm text-gray-500">No teachers assigned yet</p>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </TabsContent>
-
-          {/* Teacher's Data Tab */}
-          <TabsContent value="teachers" className="space-y-6">
-            {/* Stats Widgets */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>Total Teachers</CardDescription>
-                  <CardTitle className="text-3xl">{totalTeachers}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <UsersIcon className="w-8 h-8 text-blue-500" />
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 mb-3">No tools assigned yet</p>
+                  )}
+                  <Button
+                    className="w-full mt-3 bg-blue-600 hover:bg-blue-700"
+                    size="sm"
+                    onClick={() => handleOpenDialog(teacher.id)}
+                  >
+                    <Settings2 className="w-4 h-4 mr-1" />
+                    Manage Tools
+                  </Button>
                 </CardContent>
               </Card>
-              
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>Active Teachers</CardDescription>
-                  <CardTitle className="text-3xl">{teachersWithTools}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Award className="w-8 h-8 text-green-500" />
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>Total Tools Assigned</CardDescription>
-                  <CardTitle className="text-3xl">{totalToolsAssigned}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <BookOpen className="w-8 h-8 text-purple-500" />
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardDescription>Avg Tools/Teacher</CardDescription>
-                  <CardTitle className="text-3xl">{averageToolsPerTeacher}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TrendingUp className="w-8 h-8 text-orange-500" />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Filter Teachers</CardTitle>
-                <CardDescription>Search and filter teachers to view their data</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                      placeholder="Search teachers..."
-                      className="pl-10"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                  <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
-                    <SelectTrigger className="w-[200px]">
-                      <SelectValue placeholder="Filter by department" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Departments</SelectItem>
-                      {departments.map(dept => (
-                        <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Teachers Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredTeachers.map((teacher) => {
-                const assignedTools = teacherTools[teacher.id] || [];
-                
-                return (
-                  <Card key={teacher.id} className="border border-gray-200">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="text-lg">{teacher.name}</CardTitle>
-                          <CardDescription>{teacher.department}</CardDescription>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleOpenDialog(teacher.id)}
-                        >
-                          <Settings2 className="w-4 h-4 mr-1" />
-                          Assign
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      {assignedTools.length > 0 ? (
-                        <div className="space-y-2">
-                          <p className="text-xs text-gray-600 mb-2">
-                            {assignedTools.length} tool{assignedTools.length !== 1 ? 's' : ''} assigned
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {assignedTools.map((toolId) => {
-                              const tool = AVAILABLE_TOOLS.find(t => t.id === toolId);
-                              return (
-                                <Badge key={toolId} variant="secondary" className="pr-1">
-                                  {tool?.name}
-                                  <button
-                                    onClick={() => handleRemoveTool(teacher.id, toolId)}
-                                    className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </Badge>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ) : (
-                        <p className="text-sm text-gray-500">No tools assigned yet</p>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </TabsContent>
-        </Tabs>
+            );
+          })}
+        </div>
 
         {/* Save Button */}
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center">
           <Button
             size="lg"
             onClick={handleSaveAndSubscribe}
@@ -539,55 +339,6 @@ const SubscriptionAllocation = () => {
           </ScrollArea>
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Done
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Tool Teacher Assignment Dialog */}
-      <Dialog open={isToolDialogOpen} onOpenChange={setIsToolDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              Assign Teachers to {AVAILABLE_TOOLS.find(t => t.id === selectedTool)?.name}
-            </DialogTitle>
-            <DialogDescription>
-              Select the teachers who should have access to this tool
-            </DialogDescription>
-          </DialogHeader>
-          <ScrollArea className="max-h-[400px] pr-4">
-            <div className="space-y-3 py-4">
-              {TEACHERS.map((teacher) => {
-                const isAssigned = selectedTool 
-                  ? toolTeachers[selectedTool]?.includes(teacher.id) 
-                  : false;
-                
-                return (
-                  <div key={teacher.id} className="flex items-start space-x-3">
-                    <Checkbox
-                      id={`tool-dialog-${teacher.id}`}
-                      checked={isAssigned}
-                      onCheckedChange={() => 
-                        selectedTool && handleTeacherToggleForTool(selectedTool, teacher.id)
-                      }
-                    />
-                    <Label
-                      htmlFor={`tool-dialog-${teacher.id}`}
-                      className="text-sm font-normal cursor-pointer flex-1"
-                    >
-                      <div>
-                        <div className="font-medium">{teacher.name}</div>
-                        <div className="text-xs text-gray-500">{teacher.department}</div>
-                      </div>
-                    </Label>
-                  </div>
-                );
-              })}
-            </div>
-          </ScrollArea>
-          <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => setIsToolDialogOpen(false)}>
               Done
             </Button>
           </div>
