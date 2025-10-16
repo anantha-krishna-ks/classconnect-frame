@@ -150,6 +150,27 @@ const SubscriptionAllocation = () => {
     });
   };
 
+  const handleFullSubscription = () => {
+    // Assign all tools to all teachers
+    const allTeacherTools: TeacherToolSelection = {};
+    const allToolTeachers: ToolTeacherSelection = {};
+
+    TEACHERS.forEach(teacher => {
+      allTeacherTools[teacher.id] = AVAILABLE_TOOLS.map(tool => tool.id);
+    });
+
+    AVAILABLE_TOOLS.forEach(tool => {
+      allToolTeachers[tool.id] = TEACHERS.map(teacher => teacher.id);
+    });
+
+    setTeacherTools(allTeacherTools);
+    setToolTeachers(allToolTeachers);
+
+    toast.success('Full Subscription Activated!', {
+      description: `All ${TEACHERS.length} teachers assigned to all ${AVAILABLE_TOOLS.length} tools`,
+    });
+  };
+
   const handleSaveAndSubscribe = () => {
     const teachersWithTools = Object.entries(teacherTools).filter(
       ([_, tools]) => tools.length > 0
@@ -268,6 +289,39 @@ const SubscriptionAllocation = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Full Subscription Button */}
+        <div className="mb-6 flex justify-end">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Award className="w-5 h-5 mr-2" />
+                Full Subscription
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Activate Full Subscription?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will assign all {TEACHERS.length} teachers to all {AVAILABLE_TOOLS.length} tools. 
+                  Any existing assignments will be overwritten.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleFullSubscription}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  Yes, Activate Full Subscription
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+
         <Tabs defaultValue="tools" className="w-full">
           <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 h-12 bg-muted">
             <TabsTrigger value="tools" className="text-base">Tools Allocation</TabsTrigger>
