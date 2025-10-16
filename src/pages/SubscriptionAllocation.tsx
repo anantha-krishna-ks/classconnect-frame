@@ -124,17 +124,7 @@ const SubscriptionAllocation = () => {
             alt="ExcelSchoolAi" 
             className="h-10 w-auto"
           />
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 hover:text-white border border-white/20 hover:border-white/40"
-              onClick={() => navigate('/admin-dashboard')}
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
-            <AlertDialog>
+          <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
                   variant="ghost"
@@ -160,20 +150,29 @@ const SubscriptionAllocation = () => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          </div>
         </div>
       </header>
 
       {/* Breadcrumb Header */}
       <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
         <div className="max-w-7xl mx-auto">
-          <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-2">
-            <Home className="w-4 h-4" />
-            <span className="mx-2">/</span>
-            <span className="text-gray-900">Admin Dashboard</span>
-            <span className="mx-2">/</span>
-            <span className="text-blue-600 font-medium">Subscription Portal</span>
-          </nav>
+          <div className="flex items-center justify-between mb-2">
+            <nav className="flex items-center space-x-2 text-sm text-gray-500">
+              <Home className="w-4 h-4" />
+              <span className="mx-2">/</span>
+              <span className="text-gray-900">Admin Dashboard</span>
+              <span className="mx-2">/</span>
+              <span className="text-blue-600 font-medium">Subscription Portal</span>
+            </nav>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/admin-dashboard')}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+          </div>
           <div className="mt-2">
             <h1 className="text-2xl font-bold text-gray-900">Subscription Portal</h1>
             <p className="text-gray-600 text-sm mt-1">
