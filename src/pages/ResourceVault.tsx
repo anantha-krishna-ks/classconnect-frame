@@ -1622,7 +1622,6 @@ const ResourceVault = () => {
           </div>
         </div>
       )}
-      </div>
     </div>
   );
 };
