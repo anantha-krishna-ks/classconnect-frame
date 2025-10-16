@@ -1459,9 +1459,8 @@ const ResourceVault = () => {
               </p>
             </div>
             
-            <div className="flex-1 flex flex-col min-h-0">
-              {/* Chat Messages Area */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Chat Messages Area - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
                 {chatHistory.length === 0 ? (
                   <div className="h-full flex items-center justify-center">
                     <div className="text-center px-4">
@@ -1614,7 +1613,7 @@ const ResourceVault = () => {
 
               </div>
               
-              {/* Message Input Area */}
+              {/* Message Input Area - Fixed at bottom */}
               <div className="border-t p-4 bg-white flex-shrink-0">
                 <div className="flex gap-2">
                   <Textarea
@@ -1641,7 +1640,6 @@ const ResourceVault = () => {
                 </div>
                 <p className="text-xs text-gray-500 mt-2">Press Enter to send, Shift+Enter for new line</p>
               </div>
-            </div>
           </div>
         </ResizablePanel>}
       </ResizablePanelGroup>
