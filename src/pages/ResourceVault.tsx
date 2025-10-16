@@ -27,7 +27,8 @@ import {
   Trash2,
   Copy,
   StickyNote,
-  X
+  X,
+  Eye
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -940,18 +941,34 @@ const ResourceVault = () => {
                           {resource.type}
                         </Badge>
                       </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedResource(resource);
-                        }}
-                      >
-                        <ExternalLink className="w-4 h-4 mr-2" />
-                        View Details
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedResource(resource);
+                          }}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Overview
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="flex-1 group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (resource.url) {
+                              window.open(resource.url, '_blank');
+                            }
+                          }}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          View PDF
+                        </Button>
+                      </div>
                     </div>
                   );
                 })}
