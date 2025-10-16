@@ -985,42 +985,8 @@ const ResourceVault = () => {
                   {selectedResource.content.difficulty && (
                     <Badge variant="outline">{selectedResource.content.difficulty}</Badge>
                   )}
-                  
-                  {/* Compact Search Icon */}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                    className="ml-auto h-8"
-                    title="Search for related resources"
-                  >
-                    <Search className="w-4 h-4 mr-2" />
-                    Search
-                  </Button>
                 </div>
               </DialogHeader>
-
-              {/* Expandable Search Bar */}
-              {isSearchExpanded && (
-                <div className="mt-4 p-3 bg-muted border rounded-lg animate-fade-in">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Search for related resources..."
-                      value={searchTopic}
-                      onChange={(e) => setSearchTopic(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleInModalSearch(searchTopic)}
-                      className="flex-1 h-9 text-sm"
-                      autoFocus
-                    />
-                    <Button 
-                      onClick={() => handleInModalSearch(searchTopic)} 
-                      size="sm"
-                    >
-                      <Search className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
               
               <div className="space-y-6 mt-6">
                 {/* Summary */}
