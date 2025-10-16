@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Home, LogOut, Settings2, X, Search, Users as UsersIcon, BookOpen, TrendingUp, Award, Clock } from 'lucide-react';
+import { ArrowLeft, Save, Home, LogOut, Settings2, X, Search, Users as UsersIcon, BookOpen, TrendingUp, Award, Clock, Book, FileCheck, Presentation, GraduationCap, Video, FolderOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -47,12 +47,48 @@ const TEACHERS = [
 ];
 
 const AVAILABLE_TOOLS = [
-  { id: 'lesson-plan', name: 'Lesson Plan Assistant' },
-  { id: 'assessment', name: 'Assessment Creator' },
-  { id: 'slide-generator', name: 'Slide Generator' },
-  { id: 'exam-prep', name: 'Exam Prep Assistant' },
-  { id: 'video-editor', name: 'Video Clip Editor' },
-  { id: 'resource-vault', name: 'Resource Vault' },
+  { 
+    id: 'lesson-plan', 
+    name: 'Lesson Plan Assistant',
+    description: 'Create comprehensive lesson plans with AI assistance',
+    icon: Book,
+    iconBg: 'bg-blue-500'
+  },
+  { 
+    id: 'assessment', 
+    name: 'Assessment Creator',
+    description: 'Streamline grading with intelligent analytics',
+    icon: FileCheck,
+    iconBg: 'bg-green-500'
+  },
+  { 
+    id: 'slide-generator', 
+    name: 'Slide Generator',
+    description: 'Create stunning presentations with AI-powered tools',
+    icon: Presentation,
+    iconBg: 'bg-pink-500'
+  },
+  { 
+    id: 'exam-prep', 
+    name: 'Exam Prep Assistant',
+    description: 'Smart retrieval of CBSE questions with AI generation',
+    icon: GraduationCap,
+    iconBg: 'bg-indigo-500'
+  },
+  { 
+    id: 'video-editor', 
+    name: 'Video Clip Editor',
+    description: 'Create and edit video clips with advanced editing tools',
+    icon: Video,
+    iconBg: 'bg-cyan-500'
+  },
+  { 
+    id: 'resource-vault', 
+    name: 'Resource Vault',
+    description: 'Organize and access teaching resources efficiently',
+    icon: FolderOpen,
+    iconBg: 'bg-purple-500'
+  },
 ];
 
 type TeacherToolSelection = {
@@ -290,52 +326,57 @@ const SubscriptionAllocation = () => {
             </div>
 
             {/* Tools Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {AVAILABLE_TOOLS.filter(tool => 
                 tool.name.toLowerCase().includes(searchQuery.toLowerCase())
               ).map((tool) => {
                 const assignedTeachers = toolTeachers[tool.id] || [];
+                const IconComponent = tool.icon;
                 
                 return (
-                  <div key={tool.id} className="bg-card rounded-xl p-6 border border-border hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-foreground mb-2">{tool.name}</h3>
-                        <p className="text-sm text-muted-foreground">
+                  <div key={tool.id} className="bg-card rounded-2xl p-6 border border-border hover:shadow-lg transition-all">
+                    {/* Tool Header with Icon */}
+                    <div className="flex items-start gap-4 mb-6">
+                      <div className={`w-14 h-14 ${tool.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                        <IconComponent className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-xl font-semibold text-foreground mb-1">{tool.name}</h3>
+                        <p className="text-sm text-muted-foreground">{tool.description}</p>
+                      </div>
+                    </div>
+
+                    {/* Assigned Teachers */}
+                    {assignedTeachers.length > 0 && (
+                      <div className="mb-4 pb-4 border-b border-border">
+                        <p className="text-xs text-muted-foreground mb-2 font-medium">
                           {assignedTeachers.length} teacher{assignedTeachers.length !== 1 ? 's' : ''} assigned
                         </p>
-                      </div>
-                      <Button
-                        size="sm"
-                        onClick={() => handleOpenToolDialog(tool.id)}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                      >
-                        <Settings2 className="w-4 h-4 mr-1" />
-                        Assign
-                      </Button>
-                    </div>
-                    <div className="pt-4 border-t border-border">
-                      {assignedTeachers.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
-                          {assignedTeachers.map((teacherId) => {
+                          {assignedTeachers.slice(0, 3).map((teacherId) => {
                             const teacher = TEACHERS.find(t => t.id === teacherId);
                             return teacher ? (
-                              <Badge key={teacherId} variant="secondary" className="pr-1">
+                              <Badge key={teacherId} variant="secondary" className="text-xs">
                                 {teacher.name}
-                                <button
-                                  onClick={() => handleTeacherToggleForTool(tool.id, teacherId)}
-                                  className="ml-1 hover:bg-muted rounded-full p-0.5 transition-colors"
-                                >
-                                  <X className="w-3 h-3" />
-                                </button>
                               </Badge>
                             ) : null;
                           })}
+                          {assignedTeachers.length > 3 && (
+                            <Badge variant="secondary" className="text-xs">
+                              +{assignedTeachers.length - 3} more
+                            </Badge>
+                          )}
                         </div>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">No teachers assigned yet</p>
-                      )}
-                    </div>
+                      </div>
+                    )}
+
+                    {/* Assign Button */}
+                    <Button
+                      onClick={() => handleOpenToolDialog(tool.id)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-5 rounded-lg"
+                    >
+                      Assign Teachers
+                    </Button>
                   </div>
                 );
               })}
