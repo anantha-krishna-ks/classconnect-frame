@@ -734,7 +734,7 @@ const SubscriptionAllocation = () => {
                 />
               </div>
               
-              <div className="flex gap-3">
+              <div className="flex gap-3 items-center">
                 <Select value={viewDialogDepartmentFilter} onValueChange={setViewDialogDepartmentFilter}>
                   <SelectTrigger className="w-[200px]">
                     <SelectValue placeholder="Filter by department" />
@@ -757,6 +757,45 @@ const SubscriptionAllocation = () => {
                     <SelectItem value="department">Department</SelectItem>
                   </SelectContent>
                 </Select>
+                
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="ml-auto"
+                      disabled={!selectedToolForView || !toolTeachers[selectedToolForView] || toolTeachers[selectedToolForView].length === 0}
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      Remove All
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Remove All Teachers?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will remove all {selectedToolForView && toolTeachers[selectedToolForView] ? toolTeachers[selectedToolForView].length : 0} teacher(s) from {AVAILABLE_TOOLS.find(t => t.id === selectedToolForView)?.name}. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          if (selectedToolForView && toolTeachers[selectedToolForView]) {
+                            const teachersToRemove = [...toolTeachers[selectedToolForView]];
+                            teachersToRemove.forEach(teacherId => {
+                              handleTeacherToggleForTool(selectedToolForView, teacherId);
+                            });
+                            toast.success('All teachers removed successfully');
+                          }
+                        }}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        Yes, Remove All
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </div>
