@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ArrowLeft, Save, CheckCircle2 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, Save, Home, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 // Mock data - Replace with actual API calls
 const SCHOOL_NAME = "Saras International School";
@@ -24,12 +35,12 @@ const TEACHERS = [
 ];
 
 const AVAILABLE_TOOLS = [
-  { id: 'lesson-plan', name: 'Lesson Plan Assistant', description: 'Create comprehensive lesson plans' },
-  { id: 'assessment', name: 'Assessment Creator', description: 'Generate assessments and quizzes' },
-  { id: 'slide-generator', name: 'Slide Generator', description: 'Create presentation slides' },
-  { id: 'exam-prep', name: 'Exam Prep Assistant', description: 'Prepare exam materials' },
-  { id: 'video-editor', name: 'Video Clip Editor', description: 'Edit and create educational videos' },
-  { id: 'resource-vault', name: 'Resource Vault', description: 'Access teaching resources' },
+  { id: 'lesson-plan', name: 'Lesson Plan Assistant' },
+  { id: 'assessment', name: 'Assessment Creator' },
+  { id: 'slide-generator', name: 'Slide Generator' },
+  { id: 'exam-prep', name: 'Exam Prep Assistant' },
+  { id: 'video-editor', name: 'Video Clip Editor' },
+  { id: 'resource-vault', name: 'Resource Vault' },
 ];
 
 type TeacherToolSelection = {
@@ -38,27 +49,7 @@ type TeacherToolSelection = {
 
 const SubscriptionAllocation = () => {
   const navigate = useNavigate();
-  const [selectedTeachers, setSelectedTeachers] = useState<number[]>([]);
   const [teacherTools, setTeacherTools] = useState<TeacherToolSelection>({});
-  const [selectAllMode, setSelectAllMode] = useState(false);
-
-  const handleTeacherToggle = (teacherId: number) => {
-    setSelectedTeachers(prev =>
-      prev.includes(teacherId)
-        ? prev.filter(id => id !== teacherId)
-        : [...prev, teacherId]
-    );
-  };
-
-  const handleSelectAll = () => {
-    if (selectAllMode) {
-      setSelectedTeachers([]);
-      setSelectAllMode(false);
-    } else {
-      setSelectedTeachers(TEACHERS.map(t => t.id));
-      setSelectAllMode(true);
-    }
-  };
 
   const handleToolToggle = (teacherId: number, toolId: string) => {
     setTeacherTools(prev => {
@@ -74,26 +65,6 @@ const SubscriptionAllocation = () => {
     });
   };
 
-  const handleBulkToolAssignment = (toolId: string) => {
-    if (selectedTeachers.length === 0) {
-      toast.error('Please select at least one teacher');
-      return;
-    }
-
-    setTeacherTools(prev => {
-      const updated = { ...prev };
-      selectedTeachers.forEach(teacherId => {
-        const currentTools = updated[teacherId] || [];
-        if (!currentTools.includes(toolId)) {
-          updated[teacherId] = [...currentTools, toolId];
-        }
-      });
-      return updated;
-    });
-
-    toast.success(`Tool assigned to ${selectedTeachers.length} teacher(s)`);
-  };
-
   const handleSaveAndSubscribe = () => {
     const teachersWithTools = Object.entries(teacherTools).filter(
       ([_, tools]) => tools.length > 0
@@ -104,170 +75,144 @@ const SubscriptionAllocation = () => {
       return;
     }
 
-    // Here you would make an API call to save the subscription
     toast.success('Subscription activated successfully!', {
       description: `${teachersWithTools.length} teacher(s) configured with tools`,
     });
     
-    // Navigate back to dashboard after a short delay
     setTimeout(() => {
       navigate('/admin-dashboard');
     }, 2000);
   };
 
-  const getTeacherToolCount = (teacherId: number) => {
-    return teacherTools[teacherId]?.length || 0;
+  const handleLogout = () => {
+    navigate('/admin-login');
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b px-6 py-3" style={{ backgroundColor: '#3B54A5' }}>
+    <div className="min-h-screen bg-white">
+      {/* Main Header */}
+      <header className="border-b border-gray-100 px-6 py-3" style={{ backgroundColor: '#3B54A5' }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <img 
             src="/lovable-uploads/c278e3c9-20de-45b8-a466-41c546111a8a.png" 
             alt="ExcelSchoolAi" 
             className="h-10 w-auto"
           />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20"
-            onClick={() => navigate('/admin-dashboard')}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 hover:text-white border border-white/20 hover:border-white/40"
+              onClick={() => navigate('/admin-dashboard')}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/20 hover:text-white border border-white/20 hover:border-white/40"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to logout?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleLogout} className="bg-red-600 hover:bg-red-700">
+                    Yes, Logout
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+      </header>
+
+      {/* Breadcrumb Header */}
+      <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+        <div className="max-w-7xl mx-auto">
+          <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-2">
+            <Home className="w-4 h-4" />
+            <span className="mx-2">/</span>
+            <span className="text-gray-900">Admin Dashboard</span>
+            <span className="mx-2">/</span>
+            <span className="text-blue-600 font-medium">Subscription Allocation</span>
+          </nav>
+          <div className="mt-2">
+            <h1 className="text-2xl font-bold text-gray-900">Subscription Allocation</h1>
+            <p className="text-gray-600 text-sm mt-1">
+              School: <span className="font-semibold text-gray-900">{SCHOOL_NAME}</span>
+            </p>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Subscription Allocation</h1>
-          <p className="text-muted-foreground">
-            School: <span className="font-semibold text-foreground">{SCHOOL_NAME}</span>
-          </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {TEACHERS.map((teacher) => {
+            const assignedTools = teacherTools[teacher.id] || [];
+            
+            return (
+              <Card key={teacher.id} className="border border-gray-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">{teacher.name}</CardTitle>
+                  <CardDescription>{teacher.department}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {AVAILABLE_TOOLS.map((tool) => {
+                      const isAssigned = assignedTools.includes(tool.id);
+                      return (
+                        <div key={tool.id} className="flex items-center justify-between">
+                          <Label 
+                            htmlFor={`${teacher.id}-${tool.id}`}
+                            className="text-sm font-normal cursor-pointer flex-1"
+                          >
+                            {tool.name}
+                          </Label>
+                          <Switch
+                            id={`${teacher.id}-${tool.id}`}
+                            checked={isAssigned}
+                            onCheckedChange={() => handleToolToggle(teacher.id, tool.id)}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {assignedTools.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <p className="text-xs text-gray-600">
+                        {assignedTools.length} tool{assignedTools.length !== 1 ? 's' : ''} assigned
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Teachers List */}
-          <Card className="lg:col-span-1">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Teachers</CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleSelectAll}
-                >
-                  {selectAllMode ? 'Deselect All' : 'Select All'}
-                </Button>
-              </div>
-              <CardDescription>
-                Select teachers to assign tools
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[600px] pr-4">
-                <div className="space-y-3">
-                  {TEACHERS.map((teacher) => {
-                    const toolCount = getTeacherToolCount(teacher.id);
-                    const isSelected = selectedTeachers.includes(teacher.id);
-                    
-                    return (
-                      <div
-                        key={teacher.id}
-                        className={`flex items-start space-x-3 p-3 rounded-lg border transition-colors ${
-                          isSelected ? 'border-primary bg-primary/5' : 'border-border'
-                        }`}
-                      >
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => handleTeacherToggle(teacher.id)}
-                          className="mt-1"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm">{teacher.name}</p>
-                          <p className="text-xs text-muted-foreground">{teacher.department}</p>
-                          {toolCount > 0 && (
-                            <p className="text-xs text-primary mt-1 flex items-center">
-                              <CheckCircle2 className="w-3 h-3 mr-1" />
-                              {toolCount} tool{toolCount !== 1 ? 's' : ''} assigned
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-
-          {/* Tools Assignment */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Available Learning Tools</CardTitle>
-              <CardDescription>
-                Assign tools individually or to selected teachers
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {AVAILABLE_TOOLS.map((tool) => (
-                  <div key={tool.id} className="border rounded-lg p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-base mb-1">{tool.name}</h3>
-                        <p className="text-sm text-muted-foreground">{tool.description}</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        onClick={() => handleBulkToolAssignment(tool.id)}
-                        disabled={selectedTeachers.length === 0}
-                      >
-                        Assign to Selected
-                      </Button>
-                    </div>
-                    
-                    {/* Individual teacher checkboxes */}
-                    <ScrollArea className="h-[120px] mt-3 border-t pt-3">
-                      <div className="grid grid-cols-2 gap-2">
-                        {TEACHERS.map((teacher) => (
-                          <div key={`${teacher.id}-${tool.id}`} className="flex items-center space-x-2">
-                            <Checkbox
-                              checked={teacherTools[teacher.id]?.includes(tool.id) || false}
-                              onCheckedChange={() => handleToolToggle(teacher.id, tool.id)}
-                              id={`${teacher.id}-${tool.id}`}
-                            />
-                            <label
-                              htmlFor={`${teacher.id}-${tool.id}`}
-                              className="text-sm cursor-pointer truncate"
-                            >
-                              {teacher.name.split(' ').slice(-1)[0]}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </div>
-                ))}
-              </div>
-
-              {/* Action Button */}
-              <div className="mt-6 pt-6 border-t">
-                <Button
-                  size="lg"
-                  className="w-full"
-                  onClick={handleSaveAndSubscribe}
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save & Activate Subscription
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Save Button */}
+        <div className="flex justify-center">
+          <Button
+            size="lg"
+            onClick={handleSaveAndSubscribe}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Save & Activate Subscription
+          </Button>
         </div>
       </div>
     </div>
