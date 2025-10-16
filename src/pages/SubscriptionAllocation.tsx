@@ -736,14 +736,14 @@ const SubscriptionAllocation = () => {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                   <Input
                     placeholder="Search teachers by name or department..."
-                    className="pl-10 h-9"
+                    className="pl-10"
                     value={toolDialogSearch}
                     onChange={(e) => setToolDialogSearch(e.target.value)}
                   />
                 </div>
                 
                 <Select value={toolDialogDepartmentFilter} onValueChange={setToolDialogDepartmentFilter}>
-                  <SelectTrigger className="w-[160px] h-9">
+                  <SelectTrigger className="w-[160px]">
                     <SelectValue placeholder="Department" />
                   </SelectTrigger>
                   <SelectContent>
@@ -755,7 +755,7 @@ const SubscriptionAllocation = () => {
                 </Select>
                 
                 <Select value={toolDialogSortBy} onValueChange={setToolDialogSortBy}>
-                  <SelectTrigger className="w-[140px] h-9">
+                  <SelectTrigger className="w-[140px]">
                     <SelectValue placeholder="Sort" />
                   </SelectTrigger>
                   <SelectContent>
@@ -764,25 +764,21 @@ const SubscriptionAllocation = () => {
                     <SelectItem value="department">Department</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-              
-              <div className="flex gap-2">
+                
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleSelectAllTeachers}
-                  className="flex-1 h-8 text-xs"
                 >
-                  Select All ({TEACHERS.length})
+                  Select All
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleDeselectAllTeachers}
-                  className="flex-1 h-8 text-xs"
                   disabled={!selectedTool || !toolTeachers[selectedTool] || toolTeachers[selectedTool].length === 0}
                 >
-                  Deselect All
+                  Clear
                 </Button>
               </div>
             </div>
@@ -811,7 +807,7 @@ const SubscriptionAllocation = () => {
                   return (
                     <div 
                       key={teacher.id} 
-                      className="flex items-center space-x-2 py-1.5 px-2.5 rounded-md hover:bg-muted/50 transition-colors cursor-pointer border border-transparent hover:border-border"
+                      className="flex items-center space-x-2.5 py-2.5 px-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer border border-border/50 hover:border-border"
                       onClick={() => selectedTool && handleTeacherToggleForTool(selectedTool, teacher.id)}
                     >
                       <Checkbox
@@ -825,15 +821,15 @@ const SubscriptionAllocation = () => {
                       />
                       <Label
                         htmlFor={`tool-dialog-${teacher.id}`}
-                        className="text-xs cursor-pointer flex-1 min-w-0"
+                        className="cursor-pointer flex-1 min-w-0"
                       >
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-medium text-primary flex-shrink-0">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary flex-shrink-0">
                             {teacher.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium text-foreground text-xs truncate">{teacher.name}</div>
-                            <div className="text-[10px] text-muted-foreground truncate">{teacher.department}</div>
+                            <div className="font-medium text-foreground text-sm truncate">{teacher.name}</div>
+                            <div className="text-xs text-muted-foreground truncate">{teacher.department}</div>
                           </div>
                         </div>
                       </Label>
