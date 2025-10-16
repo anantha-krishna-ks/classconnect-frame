@@ -76,6 +76,7 @@ const SubscriptionAllocation = () => {
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [toolAssignmentFilter, setToolAssignmentFilter] = useState('all');
   const [toolSortBy, setToolSortBy] = useState('name');
+  const [viewDialogSearch, setViewDialogSearch] = useState('');
 
   const handleOpenDialog = (teacherId: number) => {
     setSelectedTeacher(teacherId);
@@ -703,8 +704,11 @@ const SubscriptionAllocation = () => {
       </Dialog>
 
       {/* View Assigned Teachers Dialog */}
-      <Dialog open={!!selectedToolForView} onOpenChange={() => setSelectedToolForView(null)}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
+      <Dialog open={!!selectedToolForView} onOpenChange={() => {
+        setSelectedToolForView(null);
+        setViewDialogSearch('');
+      }}>
+        <DialogContent className="max-w-2xl h-[85vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>
               Teachers assigned to {AVAILABLE_TOOLS.find(t => t.id === selectedToolForView)?.name}
@@ -713,40 +717,69 @@ const SubscriptionAllocation = () => {
               {selectedToolForView && (toolTeachers[selectedToolForView]?.length || 0)} teacher(s) have access to this tool
             </DialogDescription>
           </DialogHeader>
-          <ScrollArea className="max-h-[500px] pr-4">
-            <div className="space-y-2 py-4">
-              {selectedToolForView && toolTeachers[selectedToolForView]?.map((teacherId) => {
-                const teacher = TEACHERS.find(t => t.id === teacherId);
-                return teacher ? (
-                  <div key={teacherId} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
+          
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              placeholder="Search teachers..."
+              className="pl-10"
+              value={viewDialogSearch}
+              onChange={(e) => setViewDialogSearch(e.target.value)}
+            />
+          </div>
+
+          <ScrollArea className="flex-1 pr-4">
+            <div className="space-y-2 py-2">
+              {selectedToolForView && toolTeachers[selectedToolForView]
+                ?.map((teacherId) => TEACHERS.find(t => t.id === teacherId))
+                .filter(teacher => 
+                  teacher && (
+                    teacher.name.toLowerCase().includes(viewDialogSearch.toLowerCase()) ||
+                    teacher.department.toLowerCase().includes(viewDialogSearch.toLowerCase())
+                  )
+                )
+                .map((teacher) => (
+                  <div key={teacher!.id} className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary">
-                        {teacher.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        {teacher!.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                       </div>
                       <div>
-                        <div className="font-medium text-foreground">{teacher.name}</div>
-                        <div className="text-sm text-muted-foreground">{teacher.department}</div>
+                        <div className="font-medium text-foreground">{teacher!.name}</div>
+                        <div className="text-sm text-muted-foreground">{teacher!.department}</div>
                       </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleTeacherToggleForTool(selectedToolForView, teacherId)}
+                      onClick={() => handleTeacherToggleForTool(selectedToolForView, teacher!.id)}
                       className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <X className="w-4 h-4 mr-1" />
                       Remove
                     </Button>
                   </div>
-                ) : null;
-              })}
+                ))}
               {selectedToolForView && (!toolTeachers[selectedToolForView] || toolTeachers[selectedToolForView].length === 0) && (
                 <p className="text-center text-muted-foreground py-8">No teachers assigned yet</p>
               )}
+              {selectedToolForView && toolTeachers[selectedToolForView]?.length > 0 && 
+               toolTeachers[selectedToolForView]
+                 .map(id => TEACHERS.find(t => t.id === id))
+                 .filter(t => t && (
+                   t.name.toLowerCase().includes(viewDialogSearch.toLowerCase()) ||
+                   t.department.toLowerCase().includes(viewDialogSearch.toLowerCase())
+                 )).length === 0 && (
+                <p className="text-center text-muted-foreground py-8">No teachers found matching "{viewDialogSearch}"</p>
+              )}
             </div>
           </ScrollArea>
-          <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => setSelectedToolForView(null)}>
+          
+          <div className="flex justify-end gap-2 pt-4 border-t mt-4">
+            <Button variant="outline" onClick={() => {
+              setSelectedToolForView(null);
+              setViewDialogSearch('');
+            }}>
               Close
             </Button>
           </div>
