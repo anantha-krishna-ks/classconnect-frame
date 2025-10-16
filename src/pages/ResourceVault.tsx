@@ -26,7 +26,8 @@ import {
   Target,
   Trash2,
   Copy,
-  StickyNote
+  StickyNote,
+  X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -1420,11 +1421,21 @@ const ResourceVault = () => {
           <div className="h-full flex flex-col bg-white border-l border-gray-200">
             {/* StudyPal Header */}
             <div className="pb-4 pt-6 px-6 border-b flex-shrink-0 bg-gradient-to-r from-purple-50 to-white">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                  <MessageCircle className="w-4 h-4 text-white" />
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-white" />
+                  </div>
+                  <h2 className="text-lg font-semibold text-gray-900">StudyPal</h2>
                 </div>
-                <h2 className="text-lg font-semibold text-gray-900">StudyPal</h2>
+                <Button
+                  onClick={() => setShowStudyPalPanel(false)}
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 rounded-full hover:bg-purple-100"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
               <p className="text-sm text-gray-600">
                 Your AI learning assistant is here to help!
