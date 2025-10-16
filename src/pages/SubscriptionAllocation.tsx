@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Home, LogOut, Settings2, X, Search, Users as UsersIcon, BookOpen, TrendingUp, Award, Clock } from 'lucide-react';
+import { ArrowLeft, Save, Home, LogOut, Settings2, X, Search, Users as UsersIcon, BookOpen, TrendingUp, Award, Clock, BarChart3, Presentation, GraduationCap, Video, FolderOpen, LucideIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -46,13 +46,13 @@ const TEACHERS = [
   { id: 10, name: "Ms. Deepa Agarwal", department: "Computer Science" },
 ];
 
-const AVAILABLE_TOOLS = [
-  { id: 'lesson-plan', name: 'Lesson Plan Assistant' },
-  { id: 'assessment', name: 'Assessment Creator' },
-  { id: 'slide-generator', name: 'Slide Generator' },
-  { id: 'exam-prep', name: 'Exam Prep Assistant' },
-  { id: 'video-editor', name: 'Video Clip Editor' },
-  { id: 'resource-vault', name: 'Resource Vault' },
+const AVAILABLE_TOOLS: Array<{ id: string; name: string; icon: LucideIcon; iconBg: string }> = [
+  { id: 'lesson-plan', name: 'Lesson Plan Assistant', icon: BookOpen, iconBg: 'bg-blue-500' },
+  { id: 'assessment', name: 'Assessment Creator', icon: BarChart3, iconBg: 'bg-green-500' },
+  { id: 'slide-generator', name: 'Slide Generator', icon: Presentation, iconBg: 'bg-rose-500' },
+  { id: 'exam-prep', name: 'Exam Prep Assistant', icon: GraduationCap, iconBg: 'bg-indigo-500' },
+  { id: 'video-editor', name: 'Video Clip Editor', icon: Video, iconBg: 'bg-cyan-500' },
+  { id: 'resource-vault', name: 'Resource Vault', icon: FolderOpen, iconBg: 'bg-amber-500' },
 ];
 
 type TeacherToolSelection = {
@@ -298,9 +298,12 @@ const SubscriptionAllocation = () => {
                 
                 return (
                   <div key={tool.id} className="bg-card rounded-xl p-6 border border-border hover:shadow-md transition-shadow">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-foreground mb-2">{tool.name}</h3>
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className={`${tool.iconBg} rounded-xl p-3 flex-shrink-0`}>
+                        <tool.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold text-foreground mb-1">{tool.name}</h3>
                         <p className="text-sm text-muted-foreground">
                           {assignedTeachers.length} teacher{assignedTeachers.length !== 1 ? 's' : ''} assigned
                         </p>
@@ -308,7 +311,7 @@ const SubscriptionAllocation = () => {
                       <Button
                         size="sm"
                         onClick={() => handleOpenToolDialog(tool.id)}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0"
                       >
                         <Settings2 className="w-4 h-4 mr-1" />
                         Assign
