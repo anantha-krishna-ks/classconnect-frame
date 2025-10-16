@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Save, Home, LogOut } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Save, Home, LogOut, Settings2, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
@@ -17,6 +18,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Mock data - Replace with actual API calls
 const SCHOOL_NAME = "Saras International School";
@@ -50,6 +59,13 @@ type TeacherToolSelection = {
 const SubscriptionAllocation = () => {
   const navigate = useNavigate();
   const [teacherTools, setTeacherTools] = useState<TeacherToolSelection>({});
+  const [selectedTeacher, setSelectedTeacher] = useState<number | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleOpenDialog = (teacherId: number) => {
+    setSelectedTeacher(teacherId);
+    setIsDialogOpen(true);
+  };
 
   const handleToolToggle = (teacherId: number, toolId: string) => {
     setTeacherTools(prev => {
@@ -61,6 +77,16 @@ const SubscriptionAllocation = () => {
       return {
         ...prev,
         [teacherId]: updatedTools
+      };
+    });
+  };
+
+  const handleRemoveTool = (teacherId: number, toolId: string) => {
+    setTeacherTools(prev => {
+      const currentTools = prev[teacherId] || [];
+      return {
+        ...prev,
+        [teacherId]: currentTools.filter(id => id !== toolId)
       };
     });
   };
@@ -166,36 +192,46 @@ const SubscriptionAllocation = () => {
             return (
               <Card key={teacher.id} className="border border-gray-200">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">{teacher.name}</CardTitle>
-                  <CardDescription>{teacher.department}</CardDescription>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-lg">{teacher.name}</CardTitle>
+                      <CardDescription>{teacher.department}</CardDescription>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleOpenDialog(teacher.id)}
+                    >
+                      <Settings2 className="w-4 h-4 mr-1" />
+                      Assign
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {AVAILABLE_TOOLS.map((tool) => {
-                      const isAssigned = assignedTools.includes(tool.id);
-                      return (
-                        <div key={tool.id} className="flex items-center justify-between">
-                          <Label 
-                            htmlFor={`${teacher.id}-${tool.id}`}
-                            className="text-sm font-normal cursor-pointer flex-1"
-                          >
-                            {tool.name}
-                          </Label>
-                          <Switch
-                            id={`${teacher.id}-${tool.id}`}
-                            checked={isAssigned}
-                            onCheckedChange={() => handleToolToggle(teacher.id, tool.id)}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                  {assignedTools.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
-                      <p className="text-xs text-gray-600">
+                  {assignedTools.length > 0 ? (
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-600 mb-2">
                         {assignedTools.length} tool{assignedTools.length !== 1 ? 's' : ''} assigned
                       </p>
+                      <div className="flex flex-wrap gap-2">
+                        {assignedTools.map((toolId) => {
+                          const tool = AVAILABLE_TOOLS.find(t => t.id === toolId);
+                          return (
+                            <Badge key={toolId} variant="secondary" className="pr-1">
+                              {tool?.name}
+                              <button
+                                onClick={() => handleRemoveTool(teacher.id, toolId)}
+                                className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </Badge>
+                          );
+                        })}
+                      </div>
                     </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">No tools assigned yet</p>
                   )}
                 </CardContent>
               </Card>
@@ -215,6 +251,52 @@ const SubscriptionAllocation = () => {
           </Button>
         </div>
       </div>
+
+      {/* Tool Assignment Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              Assign Tools to {TEACHERS.find(t => t.id === selectedTeacher)?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Select the tools this teacher should have access to
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[400px] pr-4">
+            <div className="space-y-3 py-4">
+              {AVAILABLE_TOOLS.map((tool) => {
+                const isAssigned = selectedTeacher 
+                  ? teacherTools[selectedTeacher]?.includes(tool.id) 
+                  : false;
+                
+                return (
+                  <div key={tool.id} className="flex items-start space-x-3">
+                    <Checkbox
+                      id={`dialog-${tool.id}`}
+                      checked={isAssigned}
+                      onCheckedChange={() => 
+                        selectedTeacher && handleToolToggle(selectedTeacher, tool.id)
+                      }
+                    />
+                    <Label
+                      htmlFor={`dialog-${tool.id}`}
+                      className="text-sm font-normal cursor-pointer flex-1"
+                    >
+                      {tool.name}
+                    </Label>
+                  </div>
+                );
+              })}
+            </div>
+          </ScrollArea>
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Done
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
