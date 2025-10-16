@@ -970,7 +970,7 @@ const ResourceVault = () => {
       </div>
 
       {/* Resource Detail Modal */}
-      <Dialog open={!!selectedResource} onOpenChange={() => setSelectedResource(null)}>
+      <Dialog open={!!selectedResource} onOpenChange={(open) => { if (!open) setSelectedResource(null) }}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           {selectedResource && (
             <>
@@ -1097,7 +1097,7 @@ const ResourceVault = () => {
       </Button>
 
       {/* Notes Modal Dialog */}
-      <Dialog open={showNotes} onOpenChange={setShowNotes}>
+      <Dialog open={showNotes} onOpenChange={setShowNotes} modal={false}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
