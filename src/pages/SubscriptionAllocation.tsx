@@ -323,9 +323,21 @@ const SubscriptionAllocation = () => {
         </div>
 
         <Tabs defaultValue="tools" className="w-full">
-          <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8 h-12 bg-muted">
-            <TabsTrigger value="tools" className="text-base">Tools Allocation</TabsTrigger>
-            <TabsTrigger value="teachers" className="text-base">Teacher's Data</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 h-14 p-2 bg-card border border-border rounded-lg mb-8 max-w-2xl mx-auto">
+            <TabsTrigger 
+              value="tools" 
+              className="flex items-center justify-center gap-2 h-10 px-6 text-base font-medium rounded-md border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary/20 hover:bg-accent hover:text-accent-foreground transition-all"
+            >
+              <Settings2 className="w-4 h-4" />
+              Tools Allocation
+            </TabsTrigger>
+            <TabsTrigger 
+              value="teachers" 
+              className="flex items-center justify-center gap-2 h-10 px-6 text-base font-medium rounded-md border border-transparent data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-primary/20 hover:bg-accent hover:text-accent-foreground transition-all"
+            >
+              <UsersIcon className="w-4 h-4" />
+              Teacher's Data
+            </TabsTrigger>
           </TabsList>
 
           {/* Tools Allocation Tab */}
