@@ -1455,9 +1455,9 @@ const ResourceVault = () => {
 
       {/* Study Pal Chat Popup - Facebook Style - Responsive */}
       {showStudyPalPanel && createPortal(
-        <div className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[70vh] sm:h-[600px] max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[10050] pointer-events-auto border-l border-r border-t border-gray-200 animate-fade-in">
+        <div className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[75vh] sm:h-[85vh] md:h-[600px] max-h-[90vh] md:max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[10050] pointer-events-auto border-l border-r border-t border-gray-200 animate-fade-in safe-area-pb">
           {/* Header - Facebook Blue Style */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 sm:px-4 py-3 sm:rounded-t-xl flex items-center justify-between flex-shrink-0">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:px-4 py-3.5 sm:py-3 sm:rounded-t-xl flex items-center justify-between flex-shrink-0 safe-area-pt">
             <div className="flex items-center gap-2">
               <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
                 <MessageCircle className="w-4 h-4 text-white" />
@@ -1467,7 +1467,7 @@ const ResourceVault = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-white hover:bg-white/20 rounded-full"
+              className="h-8 w-8 sm:h-7 sm:w-7 text-white hover:bg-white/20 rounded-full touch-manipulation"
               onClick={() => setShowStudyPalPanel(false)}
             >
               <X className="w-4 h-4" />
@@ -1475,15 +1475,15 @@ const ResourceVault = () => {
           </div>
           
           {/* Chat Messages Area - Scrollable */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 min-h-0 bg-gray-50">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-4 space-y-4 sm:space-y-4 min-h-0 bg-gray-50 touch-pan-y">
             {chatHistory.length === 0 ? (
-              <div className="h-full flex items-center justify-center">
-                <div className="text-center px-4">
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <Brain className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
+                  <div className="h-full flex items-center justify-center">
+                <div className="text-center px-4 py-8">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Brain className="w-7 h-7 sm:w-8 sm:h-8 text-purple-500" />
                   </div>
-                  <h3 className="font-medium text-gray-900 mb-2 text-sm sm:text-base">Hello! I'm StudyPal</h3>
-                  <p className="text-xs sm:text-sm text-gray-500 max-w-xs">
+                  <h3 className="font-medium text-gray-900 mb-2 text-base sm:text-base">Hello! I'm StudyPal</h3>
+                  <p className="text-sm sm:text-sm text-gray-500 max-w-xs mx-auto leading-relaxed">
                     I'm here to help you understand any concept you're struggling with. Just ask me anything!
                   </p>
                 </div>
@@ -1494,19 +1494,19 @@ const ResourceVault = () => {
                   <div key={chat.id} className="space-y-2 sm:space-y-3">
                     {/* User Message */}
                     <div className="flex justify-end">
-                      <div className="max-w-[80%] sm:max-w-[75%] bg-blue-600 text-white rounded-2xl rounded-br-sm px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm">
-                        <p className="text-xs sm:text-sm">{chat.user}</p>
+                      <div className="max-w-[85%] sm:max-w-[75%] bg-blue-600 text-white rounded-2xl rounded-br-sm px-4 sm:px-4 py-2.5 sm:py-2.5 shadow-sm">
+                        <p className="text-sm sm:text-sm break-words">{chat.user}</p>
                       </div>
                     </div>
                     
                     {/* Bot Message */}
                     <div className="flex justify-start">
-                      <div className="flex items-start gap-1.5 sm:gap-2 max-w-[80%] sm:max-w-[75%]">
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-500" />
+                      <div className="flex items-start gap-2 sm:gap-2 max-w-[85%] sm:max-w-[75%]">
+                        <div className="w-8 h-8 sm:w-8 sm:h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Brain className="w-4 h-4 sm:w-4 sm:h-4 text-purple-500" />
                         </div>
-                        <div className="bg-white rounded-2xl rounded-bl-sm px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm border border-gray-100">
-                          <p className="text-xs sm:text-sm text-gray-800">{chat.bot}</p>
+                        <div className="bg-white rounded-2xl rounded-bl-sm px-4 sm:px-4 py-2.5 sm:py-2.5 shadow-sm border border-gray-100">
+                          <p className="text-sm sm:text-sm text-gray-800 break-words">{chat.bot}</p>
                         </div>
                       </div>
                     </div>
@@ -1525,36 +1525,36 @@ const ResourceVault = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => openResourceWindow(chat.topic, 'mindmap')}
-                                className="text-[10px] sm:text-xs h-7 sm:h-8 border-blue-300 text-blue-700 hover:bg-blue-100"
+                                className="text-xs sm:text-xs h-9 sm:h-8 border-blue-300 text-blue-700 hover:bg-blue-100 touch-manipulation"
                               >
-                                <Brain className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
+                                <Brain className="w-3 h-3 sm:w-3 sm:h-3 mr-1 sm:mr-1" />
                                 Mind Map
                               </Button>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => openResourceWindow(chat.topic, 'diagram')}
-                                className="text-[10px] sm:text-xs h-7 sm:h-8 border-green-300 text-green-700 hover:bg-green-100"
+                                className="text-xs sm:text-xs h-9 sm:h-8 border-green-300 text-green-700 hover:bg-green-100 touch-manipulation"
                               >
-                                <Target className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
+                                <Target className="w-3 h-3 sm:w-3 sm:h-3 mr-1 sm:mr-1" />
                                 Diagram
                               </Button>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => openResourceWindow(chat.topic, 'flowchart')}
-                                className="text-[10px] sm:text-xs h-7 sm:h-8 border-purple-300 text-purple-700 hover:bg-purple-100"
+                                className="text-xs sm:text-xs h-9 sm:h-8 border-purple-300 text-purple-700 hover:bg-purple-100 touch-manipulation"
                               >
-                                <BookOpen className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
+                                <BookOpen className="w-3 h-3 sm:w-3 sm:h-3 mr-1 sm:mr-1" />
                                 Flowchart
                               </Button>
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => openResourceWindow(chat.topic, 'concept-map')}
-                                className="text-[10px] sm:text-xs h-7 sm:h-8 border-orange-300 text-orange-700 hover:bg-orange-100"
+                                className="text-xs sm:text-xs h-9 sm:h-8 border-orange-300 text-orange-700 hover:bg-orange-100 touch-manipulation"
                               >
-                                <Lightbulb className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-0.5 sm:mr-1" />
+                                <Lightbulb className="w-3 h-3 sm:w-3 sm:h-3 mr-1 sm:mr-1" />
                                 Concept Map
                               </Button>
                             </div>
@@ -1582,9 +1582,9 @@ const ResourceVault = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => handleResourceFeedback('yes')}
-                        className="flex-1 border-green-200 text-green-700 hover:bg-green-50 text-xs h-8"
+                        className="flex-1 border-green-200 text-green-700 hover:bg-green-50 text-xs h-10 touch-manipulation"
                       >
-                        <ThumbsUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                        <ThumbsUp className="w-4 h-4 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                         <span className="hidden sm:inline">Yes, helpful</span>
                         <span className="sm:hidden">Yes</span>
                       </Button>
@@ -1592,9 +1592,9 @@ const ResourceVault = () => {
                         variant="outline" 
                         size="sm"
                         onClick={() => handleResourceFeedback('no')}
-                        className="flex-1 border-red-200 text-red-700 hover:bg-red-50 text-xs h-8"
+                        className="flex-1 border-red-200 text-red-700 hover:bg-red-50 text-xs h-10 touch-manipulation"
                       >
-                        <ThumbsDown className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                        <ThumbsDown className="w-4 h-4 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
                         <span className="hidden sm:inline">Not helpful</span>
                         <span className="sm:hidden">No</span>
                       </Button>
@@ -1618,9 +1618,9 @@ const ResourceVault = () => {
                     </div>
                     <Button 
                       onClick={() => openTestWindow(chatHistory[chatHistory.length - 1]?.topic || 'General Knowledge')} 
-                      className="w-full bg-blue-500 hover:bg-blue-600 text-xs sm:text-sm h-8 sm:h-10"
+                      className="w-full bg-blue-500 hover:bg-blue-600 text-sm sm:text-sm h-11 sm:h-10 touch-manipulation"
                     >
-                      <Brain className="w-3 h-3 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+                      <Brain className="w-4 h-4 sm:w-4 sm:h-4 mr-2 sm:mr-2" />
                       Start Quick Test
                     </Button>
                   </div>
@@ -1630,14 +1630,14 @@ const ResourceVault = () => {
           </div>
           
           {/* Message Input Area - Fixed at bottom */}
-          <div className="border-t p-2 sm:p-3 bg-white flex-shrink-0 sm:rounded-b-xl">
-            <div className="flex gap-1.5 sm:gap-2 items-end">
+          <div className="border-t p-3 sm:p-3 bg-white flex-shrink-0 sm:rounded-b-xl safe-area-pb">
+            <div className="flex gap-2 sm:gap-2 items-end">
               <Textarea
                 placeholder="Type a message..."
                 value={chatMessage}
                 onChange={(e) => setChatMessage(e.target.value)}
                 rows={1}
-                className="resize-none flex-1 text-xs sm:text-sm min-h-[36px] sm:min-h-[40px] max-h-[72px] sm:max-h-[80px]"
+                className="resize-none flex-1 text-sm sm:text-sm min-h-[44px] sm:min-h-[40px] max-h-[88px] sm:max-h-[80px] touch-manipulation"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
@@ -1647,7 +1647,7 @@ const ResourceVault = () => {
               />
               <Button 
                 onClick={handleStudyPalMessage} 
-                className="bg-blue-600 hover:bg-blue-700 h-9 sm:h-10 px-3 sm:px-4"
+                className="bg-blue-600 hover:bg-blue-700 h-11 sm:h-10 px-4 sm:px-4 touch-manipulation"
                 disabled={!chatMessage.trim()}
               >
                 <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
