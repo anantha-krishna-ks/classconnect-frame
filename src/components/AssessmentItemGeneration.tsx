@@ -645,47 +645,26 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   return (
                     <Card key={key} className="border-2">
                       <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge className={getBadgeColor(group.bloomsLevel)}>
-                                {group.bloomsLevel}
-                              </Badge>
-                              <span className="text-sm font-medium text-muted-foreground">
-                                {group.eloTitle}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm">
-                              <span className="text-muted-foreground">
-                                Required: <span className="font-semibold text-foreground">{requiredCount}</span>
-                              </span>
-                              <span className="text-muted-foreground">
-                                Generated: <span className="font-semibold text-foreground">{totalGenerated}</span>
-                              </span>
-                              <span className={`font-semibold ${selectedCount === requiredCount ? 'text-green-600' : selectedCount > requiredCount ? 'text-amber-600' : 'text-red-600'}`}>
-                                Selected: {selectedCount}
-                              </span>
-                            </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge className={getBadgeColor(group.bloomsLevel)}>
+                              {group.bloomsLevel}
+                            </Badge>
+                            <span className="text-sm font-medium text-muted-foreground">
+                              {group.eloTitle}
+                            </span>
                           </div>
-                          <Button
-                            variant={selectedCount === requiredCount ? "secondary" : "default"}
-                            size="sm"
-                            onClick={handleSelectRequired}
-                            disabled={requiredCount === 0}
-                            className="whitespace-nowrap"
-                          >
-                            {selectedCount === requiredCount ? (
-                              <>
-                                <CheckCircle2 className="h-4 w-4 mr-1" />
-                                Required Selected
-                              </>
-                            ) : (
-                              <>
-                                <Target className="h-4 w-4 mr-1" />
-                                Select {requiredCount}
-                              </>
-                            )}
-                          </Button>
+                          <div className="flex items-center gap-4 text-sm">
+                            <span className="text-muted-foreground">
+                              Required: <span className="font-semibold text-foreground">{requiredCount}</span>
+                            </span>
+                            <span className="text-muted-foreground">
+                              Generated: <span className="font-semibold text-foreground">{totalGenerated}</span>
+                            </span>
+                            <span className={`font-semibold ${selectedCount === requiredCount ? 'text-green-600' : selectedCount > requiredCount ? 'text-amber-600' : 'text-red-600'}`}>
+                              Selected: {selectedCount}
+                            </span>
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent>
