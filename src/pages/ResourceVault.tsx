@@ -1111,6 +1111,18 @@ const ResourceVault = () => {
         <DialogContent 
           className="max-w-6xl h-[90vh] flex flex-col"
           allowClickThrough={showStudyPalPanel}
+          onInteractOutside={(e) => {
+            if (showStudyPalPanel) {
+              // Allow clicks to pass through to StudyPal when it's open
+              const target = e.target as HTMLElement;
+              if (target.closest('[data-studypal-panel]')) {
+                e.preventDefault();
+                return;
+              }
+            } else {
+              e.preventDefault();
+            }
+          }}
         >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
