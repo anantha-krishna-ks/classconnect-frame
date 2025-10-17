@@ -971,7 +971,7 @@ const ResourceVault = () => {
       </div>
 
       {/* Resource Detail Modal */}
-      <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)}>
+      <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)} modal={!showStudyPalPanel}>
         <DialogContent 
           className="max-w-4xl max-h-[90vh] overflow-y-auto" 
           allowClickThrough={showStudyPalPanel}
@@ -1107,7 +1107,7 @@ const ResourceVault = () => {
       </Dialog>
 
       {/* PDF Viewer Modal */}
-      <Dialog open={!!pdfViewerUrl} onOpenChange={(open) => !open && setPdfViewerUrl(null)}>
+      <Dialog open={!!pdfViewerUrl} onOpenChange={(open) => !open && setPdfViewerUrl(null)} modal={!showStudyPalPanel}>
         <DialogContent 
           className="max-w-6xl h-[90vh] flex flex-col"
           allowClickThrough={showStudyPalPanel}
@@ -1149,7 +1149,7 @@ const ResourceVault = () => {
       )}
 
       {/* Notes Modal Dialog */}
-      <Dialog open={showNotes} onOpenChange={setShowNotes}>
+      <Dialog open={showNotes} onOpenChange={setShowNotes} modal={!showStudyPalPanel}>
         <DialogContent 
           className="max-w-4xl max-h-[90vh] overflow-y-auto"
           allowClickThrough={showStudyPalPanel}
