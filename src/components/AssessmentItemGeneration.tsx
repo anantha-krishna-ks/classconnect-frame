@@ -102,6 +102,9 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const [currentImportTarget, setCurrentImportTarget] = useState<{ sectionIdx: number; subsectionIdx: number } | null>(null);
   const [itemsToImport, setItemsToImport] = useState<string[]>([]);
   
+  // Marks display preference: 'perQuestion' or 'perSubsection'
+  const [marksDisplayMode, setMarksDisplayMode] = useState<'perQuestion' | 'perSubsection'>('perQuestion');
+  
   const [builderData, setBuilderData] = useState({
     totalMarks: assessmentData.marks || '',
     totalTime: assessmentData.duration ? 
@@ -1320,25 +1323,40 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold">Question Sections</h3>
-                    <Button 
-                      onClick={() => {
-                        const newSection = {
-                          id: Date.now(),
-                          title: `SECTION ${String.fromCharCode(65 + builderData.sections.length)}`,
-                          instruction: 'Answer all questions',
-                          questions: []
-                        };
-                        setBuilderData(prev => ({ 
-                          ...prev, 
-                          sections: [...prev.sections, newSection] 
-                        }));
-                      }}
-                      size="sm"
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Plus className="h-4 w-4 mr-1" />
-                      Add Section
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Select 
+                        value={marksDisplayMode} 
+                        onValueChange={(value: 'perQuestion' | 'perSubsection') => setMarksDisplayMode(value)}
+                      >
+                        <SelectTrigger className="w-48 h-9 text-xs bg-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="perQuestion">Marks per Question</SelectItem>
+                          <SelectItem value="perSubsection">Marks per Subsection</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        onClick={() => {
+                          const newSection = {
+                            id: Date.now(),
+                            title: `SECTION ${String.fromCharCode(65 + builderData.sections.length)}`,
+                            instruction: 'Answer all questions',
+                            questions: [],
+                            subsections: []
+                          };
+                          setBuilderData(prev => ({ 
+                            ...prev, 
+                            sections: [...prev.sections, newSection] 
+                          }));
+                        }}
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add Section
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Global DndContext for cross-section drag and drop */}
@@ -1453,6 +1471,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                           generatedItems={generatedItems}
                           setImportDialogOpen={setImportDialogOpen}
                           setCurrentImportTarget={setCurrentImportTarget}
+                          marksDisplayMode={marksDisplayMode}
                         />
                       ))}
                     </SortableContext>
@@ -1808,11 +1827,31 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 };
 
 // Droppable Section Card Component with Subsections
-const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData, generatedItems, setImportDialogOpen, setCurrentImportTarget }: any) => {
+const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData, generatedItems, setImportDialogOpen, setCurrentImportTarget, marksDisplayMode }: any) => {
   // Initialize subsections if not exists
   if (!section.subsections) {
     section.subsections = [];
   }
+
+  // Calculate subsection marks summary
+  const calculateSubsectionMarks = (subsection: any) => {
+    if (!subsection.questions || subsection.questions.length === 0) {
+      return null;
+    }
+    
+    const itemCount = subsection.questions.length;
+    const marksPerItem = subsection.questions[0]?.marks || 0;
+    const allSameMarks = subsection.questions.every((q: any) => q.marks === marksPerItem);
+    
+    if (allSameMarks) {
+      const totalMarks = itemCount * marksPerItem;
+      return { itemCount, marksPerItem, totalMarks };
+    }
+    
+    // If marks vary, just show total
+    const totalMarks = subsection.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0);
+    return { itemCount, marksPerItem: null, totalMarks };
+  };
 
   const addSubsection = () => {
     const updatedSections = [...builderData.sections];
@@ -1904,6 +1943,21 @@ const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData
                 <Badge variant="secondary" className="text-xs">
                   {subsection.questions?.length || 0} items
                 </Badge>
+                {marksDisplayMode === 'perSubsection' && (() => {
+                  const marksSummary = calculateSubsectionMarks(subsection);
+                  if (marksSummary) {
+                    const { itemCount, marksPerItem, totalMarks } = marksSummary;
+                    return (
+                      <Badge variant="outline" className="text-xs font-semibold border-primary text-primary">
+                        {marksPerItem !== null 
+                          ? `[${itemCount} × ${marksPerItem} = ${totalMarks}]`
+                          : `[Total: ${totalMarks} marks]`
+                        }
+                      </Badge>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
               <div className="flex items-center gap-2">
                 <Button 
@@ -1936,6 +1990,7 @@ const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData
                   key={question.id}
                   question={question}
                   questionNumber={questionIdx + 1}
+                  showMarks={marksDisplayMode === 'perQuestion'}
                   onUpdate={(updatedQuestion: any) => {
                     const updatedSections = [...builderData.sections];
                     updatedSections[sectionIdx].subsections[subsectionIdx].questions[questionIdx] = updatedQuestion;
@@ -1970,7 +2025,7 @@ const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData
 };
 
 // Draggable Exam Question Card Component for Assessment Builder  
-const DraggableExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete }: any) => {
+const DraggableExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, showMarks = true }: any) => {
   const {
     attributes,
     listeners,
@@ -1991,6 +2046,7 @@ const DraggableExamQuestionCard = ({ question, questionNumber, onUpdate, onDelet
       <ExamQuestionCard
         question={question}
         questionNumber={questionNumber}
+        showMarks={showMarks}
         onUpdate={onUpdate}
         onDelete={onDelete}
         dragHandleProps={{ ...attributes, ...listeners }}
@@ -2002,7 +2058,7 @@ const DraggableExamQuestionCard = ({ question, questionNumber, onUpdate, onDelet
 
 
 // Exam Question Card Component for Assessment Preview
-const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHandleProps, isDragging, isDragOverlay }: any) => {
+const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHandleProps, isDragging, isDragOverlay, showMarks = true }: any) => {
   const [imageFiles, setImageFiles] = useState<{[key: string]: File}>({});
   const [imagePreviews, setImagePreviews] = useState<{[key: string]: string}>({});
   const [subQuestionNumbering, setSubQuestionNumbering] = useState('123');
@@ -2147,19 +2203,21 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
                 placeholder="Enter question text..."
               />
             </div>
-            <div className="flex items-center gap-2">
-              <div className="text-center">
-                <label className="text-xs text-muted-foreground">Marks</label>
-              <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={question.marks}
-                  onChange={(e) => onUpdate({ ...question, marks: parseFloat(e.target.value) || 0 })}
-                  className="w-20 h-8 text-center font-bold"
-                />
+            {showMarks && (
+              <div className="flex items-center gap-2">
+                <div className="text-center">
+                  <label className="text-xs text-muted-foreground">Marks</label>
+                <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={question.marks}
+                    onChange={(e) => onUpdate({ ...question, marks: parseFloat(e.target.value) || 0 })}
+                    className="w-20 h-8 text-center font-bold"
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
           
           {/* Main Question Image Upload */}
@@ -2232,17 +2290,19 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
                     className="flex-1 min-h-[30px] text-sm resize-none"
                     placeholder="Enter sub-question..."
                   />
-                  <Input
-                    type="number"
-                    value={subQ.marks}
-                    onChange={(e) => {
-                      const updatedSubQuestions = [...(question.subQuestions || [])];
-                      updatedSubQuestions[subIdx] = { ...subQ, marks: parseInt(e.target.value) || 0 };
-                      onUpdate({ ...question, subQuestions: updatedSubQuestions });
-                    }}
-                    className="w-12 h-6 text-xs text-center"
-                    min="1"
-                  />
+                  {showMarks && (
+                    <Input
+                      type="number"
+                      value={subQ.marks}
+                      onChange={(e) => {
+                        const updatedSubQuestions = [...(question.subQuestions || [])];
+                        updatedSubQuestions[subIdx] = { ...subQ, marks: parseInt(e.target.value) || 0 };
+                        onUpdate({ ...question, subQuestions: updatedSubQuestions });
+                      }}
+                      className="w-12 h-6 text-xs text-center"
+                      min="1"
+                    />
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"
