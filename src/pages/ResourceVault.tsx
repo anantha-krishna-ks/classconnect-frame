@@ -971,7 +971,7 @@ const ResourceVault = () => {
       </div>
 
       {/* Resource Detail Modal */}
-      <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)}>
+      <Dialog open={!!selectedResource} modal={!showStudyPalPanel} onOpenChange={(open) => !open && setSelectedResource(null)}>
         <DialogContent 
           className="max-w-4xl max-h-[90vh] overflow-y-auto" 
           allowClickThrough={showStudyPalPanel}
@@ -1107,7 +1107,7 @@ const ResourceVault = () => {
       </Dialog>
 
       {/* PDF Viewer Modal */}
-      <Dialog open={!!pdfViewerUrl} onOpenChange={(open) => !open && setPdfViewerUrl(null)}>
+      <Dialog open={!!pdfViewerUrl} modal={!showStudyPalPanel} onOpenChange={(open) => !open && setPdfViewerUrl(null)}>
         <DialogContent 
           className="max-w-6xl h-[90vh] flex flex-col"
           allowClickThrough={showStudyPalPanel}
@@ -1161,7 +1161,7 @@ const ResourceVault = () => {
       )}
 
       {/* Notes Modal Dialog */}
-      <Dialog open={showNotes} onOpenChange={setShowNotes}>
+      <Dialog open={showNotes} modal={!showStudyPalPanel} onOpenChange={setShowNotes}>
         <DialogContent 
           className="max-w-4xl max-h-[90vh] overflow-y-auto"
           allowClickThrough={showStudyPalPanel}
@@ -1682,11 +1682,13 @@ const ResourceVault = () => {
                     handleStudyPalMessage();
                   }
                 }}
+                onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => e.stopPropagation()}
                 onFocus={(e) => e.stopPropagation()}
               />
               <Button 
-                onClick={handleStudyPalMessage} 
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => { e.stopPropagation(); handleStudyPalMessage(); }} 
                 className="bg-blue-600 hover:bg-blue-700 h-11 sm:h-10 px-4 sm:px-4 touch-manipulation"
                 disabled={!chatMessage.trim()}
               >
