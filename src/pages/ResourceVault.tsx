@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -88,6 +88,7 @@ const ResourceVault = () => {
   const [showStudyPalPanel, setShowStudyPalPanel] = useState(true);
   const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null);
   const [notesSearchQuery, setNotesSearchQuery] = useState('');
+  const chatInputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleLogout = () => {
     navigate('/student-login');
@@ -128,6 +129,33 @@ const ResourceVault = () => {
       document.removeEventListener('touchend', handleTextSelection);
     };
   }, []);
+
+  // Auto-focus chat input when StudyPal panel opens
+  useEffect(() => {
+    if (showStudyPalPanel && chatInputRef.current) {
+      setTimeout(() => chatInputRef.current?.focus(), 100);
+    }
+  }, [showStudyPalPanel]);
+
+  // Guard StudyPal from being made inert by dialogs
+  useEffect(() => {
+    if (!showStudyPalPanel) return;
+    const el = document.getElementById('studypal-root');
+    if (!el) return;
+    
+    const observer = new MutationObserver(() => {
+      try {
+        el.removeAttribute('inert');
+        el.removeAttribute('aria-hidden');
+        el.style.pointerEvents = 'auto';
+        el.style.zIndex = '2147483647';
+      } catch {}
+    });
+    
+    observer.observe(el, { attributes: true });
+    
+    return () => observer.disconnect();
+  }, [showStudyPalPanel]);
 
   const handleCopyText = () => {
     navigator.clipboard.writeText(selectedText);
@@ -971,8 +999,14 @@ const ResourceVault = () => {
       </div>
 
       {/* Resource Detail Modal */}
-      <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
+      <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)} modal={!showStudyPalPanel}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => {
+          const target = e.target as HTMLElement;
+          if (target.closest('[data-studypal-panel]')) {
+            return;
+          }
+          e.preventDefault();
+        }}>
           {selectedResource && (
             <>
               <DialogHeader>
@@ -1092,7 +1126,7 @@ const ResourceVault = () => {
       </Dialog>
 
       {/* PDF Viewer Modal */}
-      <Dialog open={!!pdfViewerUrl} onOpenChange={(open) => !open && setPdfViewerUrl(null)}>
+      <Dialog open={!!pdfViewerUrl} onOpenChange={(open) => !open && setPdfViewerUrl(null)} modal={!showStudyPalPanel}>
         <DialogContent className="max-w-6xl h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -1131,7 +1165,7 @@ const ResourceVault = () => {
       )}
 
       {/* Notes Modal Dialog */}
-      <Dialog open={showNotes} onOpenChange={setShowNotes}>
+      <Dialog open={showNotes} onOpenChange={setShowNotes} modal={!showStudyPalPanel}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -1455,7 +1489,15 @@ const ResourceVault = () => {
 
       {/* Study Pal Chat Popup - Facebook Style - Responsive */}
       {showStudyPalPanel && createPortal(
-        <div className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[75vh] sm:h-[85vh] md:h-[600px] max-h-[90vh] md:max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[10050] pointer-events-auto border-l border-r border-t border-gray-200 animate-fade-in safe-area-pb">
+        <div 
+          id="studypal-root"
+          data-studypal-panel
+          role="dialog"
+          aria-modal="false"
+          onMouseDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+          className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[75vh] sm:h-[85vh] md:h-[600px] max-h-[90vh] md:max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[2147483647] pointer-events-auto border-l border-r border-t border-gray-200 animate-fade-in safe-area-pb"
+        >
           {/* Header - Facebook Blue Style */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:px-4 py-3.5 sm:py-3 sm:rounded-t-xl flex items-center justify-between flex-shrink-0 safe-area-pt">
             <div className="flex items-center gap-2">
@@ -1633,11 +1675,17 @@ const ResourceVault = () => {
           <div className="border-t p-3 sm:p-3 bg-white flex-shrink-0 sm:rounded-b-xl safe-area-pb">
             <div className="flex gap-2 sm:gap-2 items-end">
               <Textarea
+                ref={chatInputRef}
+                autoFocus={showStudyPalPanel}
+                tabIndex={0}
                 placeholder="Type a message..."
                 value={chatMessage}
                 onChange={(e) => setChatMessage(e.target.value)}
                 rows={1}
                 className="resize-none flex-1 text-sm sm:text-sm min-h-[44px] sm:min-h-[40px] max-h-[88px] sm:max-h-[80px] touch-manipulation"
+                onMouseDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+                onFocus={(e) => e.stopPropagation()}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
