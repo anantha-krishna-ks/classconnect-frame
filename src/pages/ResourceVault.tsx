@@ -971,23 +971,8 @@ const ResourceVault = () => {
       </div>
 
       {/* Resource Detail Modal */}
-      <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)} modal={!showStudyPalPanel}>
-        <DialogContent 
-          className="max-w-4xl max-h-[90vh] overflow-y-auto" 
-          allowClickThrough={showStudyPalPanel}
-          onInteractOutside={(e) => {
-            if (showStudyPalPanel) {
-              // Allow clicks to pass through to StudyPal when it's open
-              const target = e.target as HTMLElement;
-              if (target.closest('[data-studypal-panel]')) {
-                e.preventDefault();
-                return;
-              }
-            } else {
-              e.preventDefault();
-            }
-          }}
-        >
+      <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" onInteractOutside={(e) => e.preventDefault()}>
           {selectedResource && (
             <>
               <DialogHeader>
@@ -1107,11 +1092,8 @@ const ResourceVault = () => {
       </Dialog>
 
       {/* PDF Viewer Modal */}
-      <Dialog open={!!pdfViewerUrl} onOpenChange={(open) => !open && setPdfViewerUrl(null)} modal={!showStudyPalPanel}>
-        <DialogContent 
-          className="max-w-6xl h-[90vh] flex flex-col"
-          allowClickThrough={showStudyPalPanel}
-        >
+      <Dialog open={!!pdfViewerUrl} onOpenChange={(open) => !open && setPdfViewerUrl(null)}>
+        <DialogContent className="max-w-6xl h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-purple-500" />
@@ -1149,11 +1131,8 @@ const ResourceVault = () => {
       )}
 
       {/* Notes Modal Dialog */}
-      <Dialog open={showNotes} onOpenChange={setShowNotes} modal={!showStudyPalPanel}>
-        <DialogContent 
-          className="max-w-4xl max-h-[90vh] overflow-y-auto"
-          allowClickThrough={showStudyPalPanel}
-        >
+      <Dialog open={showNotes} onOpenChange={setShowNotes}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-emerald-500" />
@@ -1476,11 +1455,7 @@ const ResourceVault = () => {
 
       {/* Study Pal Chat Popup - Facebook Style - Responsive */}
       {showStudyPalPanel && createPortal(
-        <div 
-          data-studypal-panel
-          className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[75vh] sm:h-[85vh] md:h-[600px] max-h-[90vh] md:max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[100] pointer-events-auto border-l border-r border-t border-gray-200 animate-fade-in safe-area-pb"
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[75vh] sm:h-[85vh] md:h-[600px] max-h-[90vh] md:max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[10050] pointer-events-auto border-l border-r border-t border-gray-200 animate-fade-in safe-area-pb">
           {/* Header - Facebook Blue Style */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:px-4 py-3.5 sm:py-3 sm:rounded-t-xl flex items-center justify-between flex-shrink-0 safe-area-pt">
             <div className="flex items-center gap-2">
@@ -1658,7 +1633,6 @@ const ResourceVault = () => {
           <div className="border-t p-3 sm:p-3 bg-white flex-shrink-0 sm:rounded-b-xl safe-area-pb">
             <div className="flex gap-2 sm:gap-2 items-end">
               <Textarea
-                autoFocus
                 placeholder="Type a message..."
                 value={chatMessage}
                 onChange={(e) => setChatMessage(e.target.value)}
@@ -1670,8 +1644,6 @@ const ResourceVault = () => {
                     handleStudyPalMessage();
                   }
                 }}
-                onClick={(e) => e.stopPropagation()}
-                onFocus={(e) => e.stopPropagation()}
               />
               <Button 
                 onClick={handleStudyPalMessage} 
