@@ -97,6 +97,11 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   });
   
   const sensors = useSensors(mouseSensor, touchSensor, pointerSensor);
+  // Subsections and import state
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [currentImportTarget, setCurrentImportTarget] = useState<{ sectionIdx: number; subsectionIdx: number } | null>(null);
+  const [itemsToImport, setItemsToImport] = useState<string[]>([]);
+  
   const [builderData, setBuilderData] = useState({
     totalMarks: assessmentData.marks || '',
     totalTime: assessmentData.duration ? 
@@ -1445,6 +1450,9 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                           sectionIdx={sectionIdx}
                           builderData={builderData}
                           setBuilderData={setBuilderData}
+                          generatedItems={generatedItems}
+                          setImportDialogOpen={setImportDialogOpen}
+                          setCurrentImportTarget={setCurrentImportTarget}
                         />
                       ))}
                     </SortableContext>
@@ -1518,6 +1526,113 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
         </Card>
       )}
       
+      {/* Import Items Dialog */}
+      <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Import Multiple Items</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+            {generatedItems.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                No items available to import
+              </div>
+            ) : (
+              generatedItems.map((item) => {
+                const isAlreadyImported = currentImportTarget && 
+                  builderData.sections[currentImportTarget.sectionIdx]?.subsections?.[currentImportTarget.subsectionIdx]?.questions?.some((q: any) => q.id === item.id);
+                
+                return (
+                  <div 
+                    key={item.id} 
+                    className={`border rounded-lg p-3 ${isAlreadyImported ? 'bg-gray-100 opacity-50' : 'bg-white hover:bg-blue-50'} transition-colors`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        checked={itemsToImport.includes(item.id)}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setItemsToImport([...itemsToImport, item.id]);
+                          } else {
+                            setItemsToImport(itemsToImport.filter(id => id !== item.id));
+                          }
+                        }}
+                        disabled={isAlreadyImported}
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="outline" className="text-xs">
+                            {item.bloomsLevel}
+                          </Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            {item.itemType}
+                          </Badge>
+                          <Badge className="text-xs bg-green-100 text-green-800">
+                            {item.marks} marks
+                          </Badge>
+                        </div>
+                        <p className="text-sm font-medium mb-1">{item.question}</p>
+                        <p className="text-xs text-gray-600">ELO: {item.eloTitle}</p>
+                        {isAlreadyImported && (
+                          <p className="text-xs text-orange-600 mt-1">Already in this subsection</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          <div className="flex items-center justify-between pt-4 border-t">
+            <div className="text-sm text-gray-600">
+              {itemsToImport.length} item(s) selected
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setImportDialogOpen(false);
+                  setItemsToImport([]);
+                  setCurrentImportTarget(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {
+                  if (!currentImportTarget || itemsToImport.length === 0) return;
+                  
+                  const updatedSections = [...builderData.sections];
+                  const targetSubsection = updatedSections[currentImportTarget.sectionIdx].subsections[currentImportTarget.subsectionIdx];
+                  
+                  // Get items to import
+                  const itemsToAdd = generatedItems.filter(item => itemsToImport.includes(item.id));
+                  
+                  // Filter out already imported items
+                  const newItems = itemsToAdd.filter(item => 
+                    !targetSubsection.questions?.some((q: any) => q.id === item.id)
+                  );
+                  
+                  // Add to subsection
+                  targetSubsection.questions = [...(targetSubsection.questions || []), ...newItems];
+                  
+                  setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+                  toast.success(`${newItems.length} item(s) imported successfully`);
+                  
+                  setImportDialogOpen(false);
+                  setItemsToImport([]);
+                  setCurrentImportTarget(null);
+                }}
+                disabled={itemsToImport.length === 0}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Import {itemsToImport.length > 0 ? `(${itemsToImport.length})` : ''}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Assessment Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -1692,13 +1807,43 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   );
 };
 
-// Droppable Section Card Component
-const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData }: any) => {
+// Droppable Section Card Component with Subsections
+const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData, generatedItems, setImportDialogOpen, setCurrentImportTarget }: any) => {
+  // Initialize subsections if not exists
+  if (!section.subsections) {
+    section.subsections = [];
+  }
+
+  const addSubsection = () => {
+    const updatedSections = [...builderData.sections];
+    const newSubsection = {
+      id: Date.now(),
+      name: `Subsection ${(section.subsections?.length || 0) + 1}`,
+      questions: []
+    };
+    updatedSections[sectionIdx].subsections = [...(updatedSections[sectionIdx].subsections || []), newSubsection];
+    setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+    toast.success('Subsection added');
+  };
+
+  const deleteSubsection = (subsectionIdx: number) => {
+    const updatedSections = [...builderData.sections];
+    updatedSections[sectionIdx].subsections.splice(subsectionIdx, 1);
+    setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+    toast.success('Subsection deleted');
+  };
+
+  const renameSubsection = (subsectionIdx: number, newName: string) => {
+    const updatedSections = [...builderData.sections];
+    updatedSections[sectionIdx].subsections[subsectionIdx].name = newName;
+    setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+  };
+
   return (
     <Card className="border border-blue-200 transition-all duration-200 hover:border-blue-300">
       <CardHeader className="bg-blue-50 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1">
             <Input 
               value={section.title}
               onChange={(e) => {
@@ -1719,74 +1864,106 @@ const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData
               className="text-sm flex-1"
             />
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => {
-              const updatedSections = builderData.sections.filter((_: any, idx: number) => idx !== sectionIdx);
-              setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-            }}
-            className="text-red-500"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={addSubsection}
+              className="bg-green-50 hover:bg-green-100 text-green-700 border-green-300"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add Subsection
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => {
+                const updatedSections = builderData.sections.filter((_: any, idx: number) => idx !== sectionIdx);
+                setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+              }}
+              className="text-red-500"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
       
-      <CardContent className="p-3 min-h-[100px] border-2 border-dashed border-transparent hover:border-blue-200 transition-all duration-200">
-        <div className="space-y-3">
-          {section.questions.map((question: any, questionIdx: number) => (
-            <DraggableExamQuestionCard
-              key={question.id}
-              question={question}
-              questionNumber={
-                builderData.numberingStyle === 'continuous' 
-                  ? builderData.sections.slice(0, sectionIdx).reduce((sum: number, s: any) => sum + s.questions.length, 0) + questionIdx + 1
-                  : questionIdx + 1
-              }
-              onUpdate={(updatedQuestion: any) => {
-                const updatedSections = [...builderData.sections];
-                updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
-                setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-              }}
-              onDelete={() => {
-                const updatedSections = [...builderData.sections];
-                updatedSections[sectionIdx].questions = updatedSections[sectionIdx].questions.filter((_: any, idx: number) => idx !== questionIdx);
-                setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-              }}
-            />
-          ))}
-          
-          {section.questions.length === 0 && (
-            <div className="text-center py-8 text-gray-400 text-sm">
-              Drop questions here or click "Add Question" to create new ones
+      <CardContent className="p-3 space-y-4">
+        {/* Subsections */}
+        {section.subsections?.map((subsection: any, subsectionIdx: number) => (
+          <div key={subsection.id} className="border border-purple-200 rounded-lg p-3 bg-purple-50/30">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2 flex-1">
+                <Input 
+                  value={subsection.name}
+                  onChange={(e) => renameSubsection(subsectionIdx, e.target.value)}
+                  className="font-semibold text-sm w-48 bg-white"
+                  placeholder="Subsection name"
+                />
+                <Badge variant="secondary" className="text-xs">
+                  {subsection.questions?.length || 0} items
+                </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    setCurrentImportTarget({ sectionIdx, subsectionIdx });
+                    setImportDialogOpen(true);
+                  }}
+                  className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300"
+                >
+                  <Upload className="h-4 w-4 mr-1" />
+                  Import Items
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => deleteSubsection(subsectionIdx)}
+                  className="text-red-500"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          )}
-        </div>
-        
-        <Button 
-          variant="outline" 
-          size="sm"
-          className="w-full border-dashed text-blue-600 mt-4"
-          onClick={() => {
-            const newQuestion = {
-              id: Date.now(),
-              text: 'Enter your question here...',
-              marks: 5,
-              subQuestions: [],
-              hasOROption: false,
-              orQuestion: '',
-              hasImage: false,
-              imageUrl: null
-            };
-            const updatedSections = [...builderData.sections];
-            updatedSections[sectionIdx].questions.push(newQuestion);
-            setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-          }}
-        >
-          <Plus className="h-4 w-4 mr-1" />
-          Add Question
-        </Button>
+            
+            {/* Subsection Questions */}
+            <div className="space-y-2">
+              {subsection.questions?.map((question: any, questionIdx: number) => (
+                <DraggableExamQuestionCard
+                  key={question.id}
+                  question={question}
+                  questionNumber={questionIdx + 1}
+                  onUpdate={(updatedQuestion: any) => {
+                    const updatedSections = [...builderData.sections];
+                    updatedSections[sectionIdx].subsections[subsectionIdx].questions[questionIdx] = updatedQuestion;
+                    setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+                  }}
+                  onDelete={() => {
+                    const updatedSections = [...builderData.sections];
+                    updatedSections[sectionIdx].subsections[subsectionIdx].questions.splice(questionIdx, 1);
+                    setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+                  }}
+                />
+              ))}
+              
+              {(!subsection.questions || subsection.questions.length === 0) && (
+                <div className="text-center py-4 text-gray-400 text-xs bg-white rounded border border-dashed">
+                  No items imported yet
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+
+        {/* Show message when no subsections */}
+        {(!section.subsections || section.subsections.length === 0) && (
+          <div className="text-center py-8 text-gray-400 text-sm border-2 border-dashed border-gray-300 rounded-lg">
+            No subsections yet. Click "Add Subsection" to create one.
+          </div>
+        )}
       </CardContent>
     </Card>
   );
