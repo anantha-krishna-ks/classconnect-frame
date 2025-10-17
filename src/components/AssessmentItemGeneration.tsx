@@ -74,12 +74,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const [filterType, setFilterType] = useState('all');
   const [showAssessmentBuilder, setShowAssessmentBuilder] = useState(false);
   
-  // Subsection state
-  const [subsections, setSubsections] = useState<Record<string, Array<{ id: string; name: string; itemIds: string[] }>>>({});
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const [currentImportSection, setCurrentImportSection] = useState<{ groupKey: string; subsectionId: string } | null>(null);
-  const [itemsToImport, setItemsToImport] = useState<string[]>([]);
-  
   // Drag and drop state
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isDragOverlay, setIsDragOverlay] = useState(false);
@@ -648,200 +642,49 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     toast.success(`Selected ${requiredCount} items for ${group.eloTitle} - ${group.bloomsLevel}`);
                   };
 
-                  // Subsection handlers
-                  const groupSubsections = subsections[key] || [];
-                  
-                  const addSubsection = () => {
-                    const newSubsection = {
-                      id: `subsection-${Date.now()}`,
-                      name: `Section ${(groupSubsections.length || 0) + 1}`,
-                      itemIds: []
-                    };
-                    setSubsections(prev => ({
-                      ...prev,
-                      [key]: [...(prev[key] || []), newSubsection]
-                    }));
-                    toast.success('Subsection created');
-                  };
-
-                  const openImportDialog = (subsectionId: string) => {
-                    setCurrentImportSection({ groupKey: key, subsectionId });
-                    setItemsToImport([]);
-                    setImportDialogOpen(true);
-                  };
-
-                  const deleteSubsection = (subsectionId: string) => {
-                    setSubsections(prev => ({
-                      ...prev,
-                      [key]: prev[key]?.filter(s => s.id !== subsectionId) || []
-                    }));
-                    toast.success('Subsection deleted');
-                  };
-
-                  const renameSubsection = (subsectionId: string, newName: string) => {
-                    setSubsections(prev => ({
-                      ...prev,
-                      [key]: prev[key]?.map(s => s.id === subsectionId ? { ...s, name: newName } : s) || []
-                    }));
-                  };
-
-                  // Get items not in any subsection (unassigned items)
-                  const assignedItemIds = new Set(groupSubsections.flatMap(s => s.itemIds));
-                  const unassignedItems = group.items.filter(item => !assignedItemIds.has(item.id));
-
                   return (
                     <Card key={key} className="border-2">
                       <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge className={getBadgeColor(group.bloomsLevel)}>
-                                {group.bloomsLevel}
-                              </Badge>
-                              <span className="text-sm font-medium text-muted-foreground">
-                                {group.eloTitle}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm">
-                              <span className="text-muted-foreground">
-                                Required: <span className="font-semibold text-foreground">{requiredCount}</span>
-                              </span>
-                              <span className="text-muted-foreground">
-                                Generated: <span className="font-semibold text-foreground">{totalGenerated}</span>
-                              </span>
-                              <span className={`font-semibold ${selectedCount === requiredCount ? 'text-green-600' : selectedCount > requiredCount ? 'text-amber-600' : 'text-red-600'}`}>
-                                Selected: {selectedCount}
-                              </span>
-                            </div>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge className={getBadgeColor(group.bloomsLevel)}>
+                              {group.bloomsLevel}
+                            </Badge>
+                            <span className="text-sm font-medium text-muted-foreground">
+                              {group.eloTitle}
+                            </span>
                           </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={addSubsection}
-                            className="gap-2"
-                          >
-                            <Plus className="h-4 w-4" />
-                            Add Subsection
-                          </Button>
+                          <div className="flex items-center gap-4 text-sm">
+                            <span className="text-muted-foreground">
+                              Required: <span className="font-semibold text-foreground">{requiredCount}</span>
+                            </span>
+                            <span className="text-muted-foreground">
+                              Generated: <span className="font-semibold text-foreground">{totalGenerated}</span>
+                            </span>
+                            <span className={`font-semibold ${selectedCount === requiredCount ? 'text-green-600' : selectedCount > requiredCount ? 'text-amber-600' : 'text-red-600'}`}>
+                              Selected: {selectedCount}
+                            </span>
+                          </div>
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <div className="space-y-4">
-                          {/* Subsections */}
-                          {groupSubsections.map((subsection) => {
-                            const subsectionItems = group.items.filter(item => subsection.itemIds.includes(item.id));
-                            return (
-                              <Card key={subsection.id} className="border border-primary/20 bg-muted/30">
-                                <CardHeader className="pb-3">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <Input
-                                      value={subsection.name}
-                                      onChange={(e) => renameSubsection(subsection.id, e.target.value)}
-                                      className="h-8 max-w-xs font-medium"
-                                    />
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-sm text-muted-foreground">
-                                        {subsectionItems.length} items
-                                      </span>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => openImportDialog(subsection.id)}
-                                        className="gap-1 h-8"
-                                      >
-                                        <Upload className="h-3 w-3" />
-                                        Import Items
-                                      </Button>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => deleteSubsection(subsection.id)}
-                                        className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </CardHeader>
-                                <CardContent>
-                                  <SortableContext items={subsection.itemIds} strategy={verticalListSortingStrategy}>
-                                    <div className="grid gap-3">
-                                      {subsectionItems.map((item, index) => (
-                                        <DraggableQuestionCard
-                                          key={item.id}
-                                          item={item}
-                                          index={index}
-                                          onSelect={() => toggleItemSelection(item.id)}
-                                          onPreview={() => setPreviewItem(item)}
-                                          onEdit={() => setEditingItem(item)}
-                                          onDelete={() => deleteItem(item.id)}
-                                          getTypeColor={getTypeColor}
-                                          getBadgeColor={getBadgeColor}
-                                        />
-                                      ))}
-                                      {subsectionItems.length === 0 && (
-                                        <div className="text-center py-8 text-muted-foreground text-sm">
-                                          No items in this subsection. Click "Import Items" to add items.
-                                        </div>
-                                      )}
-                                    </div>
-                                  </SortableContext>
-                                </CardContent>
-                              </Card>
-                            );
-                          })}
-
-                          {/* Unassigned Items */}
-                          {unassignedItems.length > 0 && (
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2 px-2">
-                                <Separator className="flex-1" />
-                                <span className="text-sm font-medium text-muted-foreground">
-                                  Unassigned Items ({unassignedItems.length})
-                                </span>
-                                <Separator className="flex-1" />
-                              </div>
-                              <SortableContext items={unassignedItems.map(item => item.id)} strategy={verticalListSortingStrategy}>
-                                <div className="grid gap-3">
-                                  {unassignedItems.map((item, index) => (
-                                    <DraggableQuestionCard
-                                      key={item.id}
-                                      item={item}
-                                      index={index}
-                                      onSelect={() => toggleItemSelection(item.id)}
-                                      onPreview={() => setPreviewItem(item)}
-                                      onEdit={() => setEditingItem(item)}
-                                      onDelete={() => deleteItem(item.id)}
-                                      getTypeColor={getTypeColor}
-                                      getBadgeColor={getBadgeColor}
-                                    />
-                                  ))}
-                                </div>
-                              </SortableContext>
-                            </div>
-                          )}
-
-                          {/* Show message when no subsections exist */}
-                          {groupSubsections.length === 0 && (
-                            <SortableContext items={group.items.map(item => item.id)} strategy={verticalListSortingStrategy}>
-                              <div className="grid gap-4">
-                                {group.items.map((item, index) => (
-                                  <DraggableQuestionCard
-                                    key={item.id}
-                                    item={item}
-                                    index={index}
-                                    onSelect={() => toggleItemSelection(item.id)}
-                                    onPreview={() => setPreviewItem(item)}
-                                    onEdit={() => setEditingItem(item)}
-                                    onDelete={() => deleteItem(item.id)}
-                                    getTypeColor={getTypeColor}
-                                    getBadgeColor={getBadgeColor}
-                                  />
-                                ))}
-                              </div>
-                            </SortableContext>
-                          )}
-                        </div>
+                        <SortableContext items={group.items.map(item => item.id)} strategy={verticalListSortingStrategy}>
+                          <div className="grid gap-4">
+                            {group.items.map((item, index) => (
+                              <DraggableQuestionCard
+                                key={item.id}
+                                item={item}
+                                index={index}
+                                onSelect={() => toggleItemSelection(item.id)}
+                                onPreview={() => setPreviewItem(item)}
+                                onEdit={() => setEditingItem(item)}
+                                onDelete={() => deleteItem(item.id)}
+                                getTypeColor={getTypeColor}
+                                getBadgeColor={getBadgeColor}
+                              />
+                            ))}
+                          </div>
+                        </SortableContext>
                       </CardContent>
                     </Card>
                   );
@@ -860,125 +703,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             </DragOverlay>
           </DndContext>
           
-          {/* Import Items Dialog */}
-          <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Import Items to Subsection</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Select multiple items to import into this subsection at once.
-                </p>
-                {currentImportSection && (() => {
-                  const groupItems = generatedItems.filter(item => {
-                    const itemKey = `${item.eloId}-${item.bloomsLevel}`;
-                    return itemKey === currentImportSection.groupKey;
-                  });
-                  
-                  // Filter out items already in subsections
-                  const currentGroupSubsections = subsections[currentImportSection.groupKey] || [];
-                  const assignedIds = new Set(currentGroupSubsections.flatMap(s => s.itemIds));
-                  const availableItems = groupItems.filter(item => !assignedIds.has(item.id) || 
-                    subsections[currentImportSection.groupKey]?.find(s => s.id === currentImportSection.subsectionId)?.itemIds.includes(item.id));
-
-                  return (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium">
-                          {itemsToImport.length} items selected
-                        </span>
-                        {itemsToImport.length > 0 && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setItemsToImport([])}
-                          >
-                            Clear Selection
-                          </Button>
-                        )}
-                      </div>
-                      {availableItems.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-start gap-3 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                          onClick={() => {
-                            setItemsToImport(prev => 
-                              prev.includes(item.id) 
-                                ? prev.filter(id => id !== item.id)
-                                : [...prev, item.id]
-                            );
-                          }}
-                        >
-                          <Checkbox
-                            checked={itemsToImport.includes(item.id)}
-                            onCheckedChange={(checked) => {
-                              if (checked) {
-                                setItemsToImport(prev => [...prev, item.id]);
-                              } else {
-                                setItemsToImport(prev => prev.filter(id => id !== item.id));
-                              }
-                            }}
-                          />
-                          <div className="flex-1 space-y-1">
-                            <p className="text-sm font-medium line-clamp-2">{item.question}</p>
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">
-                                {item.itemType}
-                              </Badge>
-                              <Badge variant="outline" className="text-xs">
-                                {item.difficulty}
-                              </Badge>
-                              <span className="text-xs text-muted-foreground">
-                                {item.marks} marks
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      {availableItems.length === 0 && (
-                        <div className="text-center py-8 text-muted-foreground text-sm">
-                          No available items to import. All items are already assigned to subsections.
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
-                <div className="flex justify-end gap-2 pt-4 border-t">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setImportDialogOpen(false);
-                      setItemsToImport([]);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      if (currentImportSection && itemsToImport.length > 0) {
-                        setSubsections(prev => ({
-                          ...prev,
-                          [currentImportSection.groupKey]: prev[currentImportSection.groupKey]?.map(s => 
-                            s.id === currentImportSection.subsectionId
-                              ? { ...s, itemIds: [...new Set([...s.itemIds, ...itemsToImport])] }
-                              : s
-                          ) || []
-                        }));
-                        toast.success(`Imported ${itemsToImport.length} items`);
-                        setImportDialogOpen(false);
-                        setItemsToImport([]);
-                      }
-                    }}
-                    disabled={itemsToImport.length === 0}
-                  >
-                    Import {itemsToImport.length} Items
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
           {/* Edit Dialog */}
           {editingItem && (
             <Dialog open={!!editingItem} onOpenChange={() => setEditingItem(null)}>
