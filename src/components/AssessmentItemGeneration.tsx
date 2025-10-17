@@ -582,7 +582,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             </div>
           </div>
 
-          {/* Items Grid with Drag and Drop */}
+          {/* Items Grid Grouped by ELO + Bloom's Level */}
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -590,23 +590,128 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={getItemsByType(filterType).map(item => item.id)} strategy={verticalListSortingStrategy}>
-              <div className="grid gap-4">
-                {getItemsByType(filterType).map((item, index) => (
-                  <DraggableQuestionCard
-                    key={item.id}
-                    item={item}
-                    index={index}
-                    onSelect={() => toggleItemSelection(item.id)}
-                    onPreview={() => setPreviewItem(item)}
-                    onEdit={() => setEditingItem(item)}
-                    onDelete={() => deleteItem(item.id)}
-                    getTypeColor={getTypeColor}
-                    getBadgeColor={getBadgeColor}
-                  />
-                ))}
-              </div>
-            </SortableContext>
+            <div className="space-y-6">
+              {(() => {
+                // Group items by ELO + Bloom's Level
+                const filteredItems = getItemsByType(filterType);
+                const groupedItems = filteredItems.reduce((acc, item) => {
+                  const key = `${item.eloId}-${item.bloomsLevel}`;
+                  if (!acc[key]) {
+                    acc[key] = {
+                      eloId: item.eloId,
+                      eloTitle: item.eloTitle,
+                      bloomsLevel: item.bloomsLevel,
+                      items: []
+                    };
+                  }
+                  acc[key].items.push(item);
+                  return acc;
+                }, {} as Record<string, { eloId: string; eloTitle: string; bloomsLevel: string; items: GeneratedItem[] }>);
+
+                return Object.entries(groupedItems).map(([key, group]) => {
+                  // Find configuration for this group
+                  const config = assessmentData.configuredItems?.find(
+                    (c: any) => c.eloId === group.eloId && c.bloomsLevel === group.bloomsLevel
+                  );
+                  const requiredCount = config?.noOfItems || 0;
+                  const selectedCount = group.items.filter(item => item.isSelected).length;
+                  const totalGenerated = group.items.length;
+
+                  // Auto-select function for this group
+                  const handleSelectRequired = () => {
+                    if (requiredCount === 0) return;
+                    
+                    setGeneratedItems(prev => {
+                      const newItems = [...prev];
+                      let selectedSoFar = 0;
+                      
+                      newItems.forEach(item => {
+                        if (item.eloId === group.eloId && item.bloomsLevel === group.bloomsLevel) {
+                          if (selectedSoFar < requiredCount) {
+                            item.isSelected = true;
+                            selectedSoFar++;
+                          } else {
+                            item.isSelected = false;
+                          }
+                        }
+                      });
+                      
+                      return newItems;
+                    });
+                    
+                    toast.success(`Selected ${requiredCount} items for ${group.eloTitle} - ${group.bloomsLevel}`);
+                  };
+
+                  return (
+                    <Card key={key} className="border-2">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge className={getBadgeColor(group.bloomsLevel)}>
+                                {group.bloomsLevel}
+                              </Badge>
+                              <span className="text-sm font-medium text-muted-foreground">
+                                {group.eloTitle}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 text-sm">
+                              <span className="text-muted-foreground">
+                                Required: <span className="font-semibold text-foreground">{requiredCount}</span>
+                              </span>
+                              <span className="text-muted-foreground">
+                                Generated: <span className="font-semibold text-foreground">{totalGenerated}</span>
+                              </span>
+                              <span className={`font-semibold ${selectedCount === requiredCount ? 'text-green-600' : selectedCount > requiredCount ? 'text-amber-600' : 'text-red-600'}`}>
+                                Selected: {selectedCount}
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            variant={selectedCount === requiredCount ? "secondary" : "default"}
+                            size="sm"
+                            onClick={handleSelectRequired}
+                            disabled={requiredCount === 0}
+                            className="whitespace-nowrap"
+                          >
+                            {selectedCount === requiredCount ? (
+                              <>
+                                <CheckCircle2 className="h-4 w-4 mr-1" />
+                                Required Selected
+                              </>
+                            ) : (
+                              <>
+                                <Target className="h-4 w-4 mr-1" />
+                                Select {requiredCount}
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <SortableContext items={group.items.map(item => item.id)} strategy={verticalListSortingStrategy}>
+                          <div className="grid gap-4">
+                            {group.items.map((item, index) => (
+                              <DraggableQuestionCard
+                                key={item.id}
+                                item={item}
+                                index={index}
+                                onSelect={() => toggleItemSelection(item.id)}
+                                onPreview={() => setPreviewItem(item)}
+                                onEdit={() => setEditingItem(item)}
+                                onDelete={() => deleteItem(item.id)}
+                                getTypeColor={getTypeColor}
+                                getBadgeColor={getBadgeColor}
+                              />
+                            ))}
+                          </div>
+                        </SortableContext>
+                      </CardContent>
+                    </Card>
+                  );
+                });
+              })()}
+            </div>
             
             <DragOverlay>
               {activeId ? (
