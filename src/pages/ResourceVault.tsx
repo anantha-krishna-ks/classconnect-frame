@@ -129,6 +129,32 @@ const ResourceVault = () => {
     };
   }, []);
 
+  // Ensure StudyPal is always interactable even when dialogs are open
+  useEffect(() => {
+    if (!showStudyPalPanel) return;
+    
+    const el = document.getElementById('studypal-root');
+    if (!el) return;
+
+    const ensureInteractable = () => {
+      el.removeAttribute('inert');
+      el.removeAttribute('aria-hidden');
+      el.style.pointerEvents = 'auto';
+      el.style.zIndex = '2147483647';
+    };
+    
+    ensureInteractable();
+
+    const observer = new MutationObserver(() => ensureInteractable());
+    observer.observe(document.body, { 
+      attributes: true, 
+      subtree: true, 
+      attributeFilter: ['inert', 'aria-hidden'] 
+    });
+    
+    return () => observer.disconnect();
+  }, [showStudyPalPanel]);
+
   const handleCopyText = () => {
     navigator.clipboard.writeText(selectedText);
     setSelectedText('');
@@ -971,10 +997,9 @@ const ResourceVault = () => {
       </div>
 
       {/* Resource Detail Modal */}
-      <Dialog open={!!selectedResource} modal={!showStudyPalPanel} onOpenChange={(open) => !open && setSelectedResource(null)}>
+      <Dialog open={!!selectedResource} onOpenChange={(open) => !open && setSelectedResource(null)}>
         <DialogContent 
           className="max-w-4xl max-h-[90vh] overflow-y-auto" 
-          allowClickThrough={showStudyPalPanel}
           onInteractOutside={(e) => {
             if (showStudyPalPanel) {
               // Allow clicks to pass through to StudyPal when it's open
@@ -1107,10 +1132,9 @@ const ResourceVault = () => {
       </Dialog>
 
       {/* PDF Viewer Modal */}
-      <Dialog open={!!pdfViewerUrl} modal={!showStudyPalPanel} onOpenChange={(open) => !open && setPdfViewerUrl(null)}>
+      <Dialog open={!!pdfViewerUrl} onOpenChange={(open) => !open && setPdfViewerUrl(null)}>
         <DialogContent 
           className="max-w-6xl h-[90vh] flex flex-col"
-          allowClickThrough={showStudyPalPanel}
           onInteractOutside={(e) => {
             if (showStudyPalPanel) {
               // Allow clicks to pass through to StudyPal when it's open
@@ -1161,10 +1185,9 @@ const ResourceVault = () => {
       )}
 
       {/* Notes Modal Dialog */}
-      <Dialog open={showNotes} modal={!showStudyPalPanel} onOpenChange={setShowNotes}>
+      <Dialog open={showNotes} onOpenChange={setShowNotes}>
         <DialogContent 
           className="max-w-4xl max-h-[90vh] overflow-y-auto"
-          allowClickThrough={showStudyPalPanel}
         >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -1489,8 +1512,10 @@ const ResourceVault = () => {
       {/* Study Pal Chat Popup - Facebook Style - Responsive */}
       {showStudyPalPanel && createPortal(
         <div 
+          id="studypal-root"
           data-studypal-panel
-          className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[75vh] sm:h-[85vh] md:h-[600px] max-h-[90vh] md:max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[100] pointer-events-auto border-l border-r border-t border-gray-200 animate-fade-in safe-area-pb"
+          className="fixed bottom-0 right-0 sm:right-6 w-full sm:w-[360px] md:w-[380px] h-[75vh] sm:h-[85vh] md:h-[600px] max-h-[90vh] md:max-h-[600px] bg-white sm:rounded-t-xl shadow-2xl flex flex-col z-[2147483647] pointer-events-auto border-l border-r border-t border-gray-200 animate-fade-in safe-area-pb"
+          onMouseDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header - Facebook Blue Style */}
