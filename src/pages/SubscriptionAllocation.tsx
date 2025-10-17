@@ -270,7 +270,10 @@ const SubscriptionAllocation = () => {
   const averageToolsPerTeacher = teachersWithTools > 0 ? (totalToolsAssigned / teachersWithTools).toFixed(1) : '0';
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" style={{
+      '--primary': '217 91% 60%',
+      '--primary-foreground': '0 0% 100%',
+    } as React.CSSProperties}>
       {/* Main Header */}
       <header className="border-b border-gray-100 px-6 py-3" style={{ backgroundColor: '#3B54A5' }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
