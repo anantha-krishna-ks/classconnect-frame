@@ -1756,15 +1756,20 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   // Check if importing to section or subsection
                   if (currentImportTarget.subsectionIdx !== null && currentImportTarget.subsectionIdx !== undefined) {
                     // Import to subsection
-                    const targetSubsection = updatedSections[currentImportTarget.sectionIdx].subsections[currentImportTarget.subsectionIdx];
+                    const targetSection = updatedSections[currentImportTarget.sectionIdx];
+                    const targetSubsection = targetSection.subsections[currentImportTarget.subsectionIdx];
                     
                     // Filter out already imported items
                     const newItems = itemsToAdd.filter(item => 
                       !targetSubsection.questions?.some((q: any) => q.id === item.id)
                     );
                     
-                    // Add to subsection
-                    targetSubsection.questions = [...(targetSubsection.questions || []), ...newItems];
+                    // Properly clone the subsections array and update the specific subsection
+                    targetSection.subsections = targetSection.subsections.map((sub: any, idx: number) => 
+                      idx === currentImportTarget.subsectionIdx
+                        ? { ...sub, questions: [...(sub.questions || []), ...newItems] }
+                        : sub
+                    );
                     
                     setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
                     toast.success(`${newItems.length} item(s) imported to subsection`);
