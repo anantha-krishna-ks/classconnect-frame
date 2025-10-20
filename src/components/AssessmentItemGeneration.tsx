@@ -1934,7 +1934,27 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
               return (
                 <div key={sectionIdx} className="border rounded-lg p-2 sm:p-4">
                   <div className="mb-2 sm:mb-4">
-                    <h3 className="text-sm sm:text-lg font-bold break-words">Section {String.fromCharCode(65 + sectionIdx)}: {section.title}</h3>
+                    <div className="flex flex-row items-center justify-between gap-2">
+                      <h3 className="text-sm sm:text-lg font-bold break-words">Section {String.fromCharCode(65 + sectionIdx)}: {section.title}</h3>
+                      {!hasSubsections && marksDisplayMode === 'perSubsection' && section.questions && section.questions.length > 0 && (() => {
+                        const itemCount = section.questions.length;
+                        const marksPerItem = section.questions[0]?.marks || 0;
+                        const allSameMarks = section.questions.every((q: any) => q.marks === marksPerItem);
+                        const totalMarks = allSameMarks 
+                          ? itemCount * marksPerItem 
+                          : section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0);
+                        
+                        const display = allSameMarks 
+                          ? `[${itemCount} × ${marksPerItem} = ${totalMarks} marks]`
+                          : `[Total: ${totalMarks} marks]`;
+                        
+                        return (
+                          <span className="text-[10px] sm:text-xs font-semibold text-primary border border-primary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
+                            {display}
+                          </span>
+                        );
+                      })()}
+                    </div>
                     {section.instruction && (
                       <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">{section.instruction}</p>
                     )}
@@ -1964,7 +1984,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       
                       return (
                         <div key={subsectionIdx} className="mb-3 sm:mb-6">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
+                          <div className="flex flex-row items-center justify-between gap-2 mb-2 sm:mb-3">
                             <h4 className="text-xs sm:text-base font-semibold break-words">{subsection.title}</h4>
                             {subsectionMarksDisplay && (
                               <span className="text-[10px] sm:text-xs font-semibold text-primary border border-primary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
@@ -2069,27 +2089,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   ) : (
                     /* Render section-level questions (no subsections) */
                     <>
-                      {marksDisplayMode === 'perSubsection' && section.questions && section.questions.length > 0 && (() => {
-                        const itemCount = section.questions.length;
-                        const marksPerItem = section.questions[0]?.marks || 0;
-                        const allSameMarks = section.questions.every((q: any) => q.marks === marksPerItem);
-                        const totalMarks = allSameMarks 
-                          ? itemCount * marksPerItem 
-                          : section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0);
-                        
-                        const display = allSameMarks 
-                          ? `[${itemCount} × ${marksPerItem} = ${totalMarks} marks]`
-                          : `[Total: ${totalMarks} marks]`;
-                        
-                        return (
-                          <div className="mb-2 sm:mb-3">
-                            <span className="text-[10px] sm:text-xs font-semibold text-primary border border-primary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
-                              {display}
-                            </span>
-                          </div>
-                        );
-                      })()}
-                      
                       {section.questions?.map((question: any, qIdx: number) => {
                         const questionNumber = builderData.numberingStyle === 'continuous' 
                           ? startingQuestionNumber + qIdx 
