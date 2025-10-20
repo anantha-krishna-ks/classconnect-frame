@@ -1964,7 +1964,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       
                       return (
                         <div key={subsectionIdx} className="mb-3 sm:mb-6">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
+                          <div className="flex flex-row items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
                             <h4 className="text-xs sm:text-base font-semibold break-words">{subsection.title}</h4>
                             {subsectionMarksDisplay && (
                               <span className="text-[10px] sm:text-xs font-semibold text-primary border border-primary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
