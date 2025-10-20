@@ -1558,8 +1558,12 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
               </div>
             ) : (
               generatedItems.map((item) => {
-                const isAlreadyImported = currentImportTarget && 
-                  builderData.sections[currentImportTarget.sectionIdx]?.subsections?.[currentImportTarget.subsectionIdx]?.questions?.some((q: any) => q.id === item.id);
+                // Check if importing to section or subsection
+                const isAlreadyImported = currentImportTarget && (
+                  currentImportTarget.subsectionIdx !== null && currentImportTarget.subsectionIdx !== undefined
+                    ? builderData.sections[currentImportTarget.sectionIdx]?.subsections?.[currentImportTarget.subsectionIdx]?.questions?.some((q: any) => q.id === item.id)
+                    : builderData.sections[currentImportTarget.sectionIdx]?.questions?.some((q: any) => q.id === item.id)
+                );
                 
                 return (
                   <div 
@@ -1622,21 +1626,45 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   if (!currentImportTarget || itemsToImport.length === 0) return;
                   
                   const updatedSections = [...builderData.sections];
-                  const targetSubsection = updatedSections[currentImportTarget.sectionIdx].subsections[currentImportTarget.subsectionIdx];
                   
                   // Get items to import
                   const itemsToAdd = generatedItems.filter(item => itemsToImport.includes(item.id));
                   
-                  // Filter out already imported items
-                  const newItems = itemsToAdd.filter(item => 
-                    !targetSubsection.questions?.some((q: any) => q.id === item.id)
-                  );
-                  
-                  // Add to subsection
-                  targetSubsection.questions = [...(targetSubsection.questions || []), ...newItems];
-                  
-                  setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-                  toast.success(`${newItems.length} item(s) imported successfully`);
+                  // Check if importing to section or subsection
+                  if (currentImportTarget.subsectionIdx !== null && currentImportTarget.subsectionIdx !== undefined) {
+                    // Import to subsection
+                    const targetSubsection = updatedSections[currentImportTarget.sectionIdx].subsections[currentImportTarget.subsectionIdx];
+                    
+                    // Filter out already imported items
+                    const newItems = itemsToAdd.filter(item => 
+                      !targetSubsection.questions?.some((q: any) => q.id === item.id)
+                    );
+                    
+                    // Add to subsection
+                    targetSubsection.questions = [...(targetSubsection.questions || []), ...newItems];
+                    
+                    setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+                    toast.success(`${newItems.length} item(s) imported to subsection`);
+                  } else {
+                    // Import to section (when no subsections)
+                    const targetSection = updatedSections[currentImportTarget.sectionIdx];
+                    
+                    // Initialize questions array if not exists
+                    if (!targetSection.questions) {
+                      targetSection.questions = [];
+                    }
+                    
+                    // Filter out already imported items
+                    const newItems = itemsToAdd.filter(item => 
+                      !targetSection.questions?.some((q: any) => q.id === item.id)
+                    );
+                    
+                    // Add to section
+                    targetSection.questions = [...targetSection.questions, ...newItems];
+                    
+                    setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+                    toast.success(`${newItems.length} item(s) imported to section`);
+                  }
                   
                   setImportDialogOpen(false);
                   setItemsToImport([]);
@@ -1929,42 +1957,124 @@ const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData
       </CardHeader>
       
       <CardContent className="p-3 space-y-4">
-        {/* Subsections */}
-        {section.subsections?.map((subsection: any, subsectionIdx: number) => (
-          <div key={subsection.id} className="border border-purple-200 rounded-lg p-3 bg-purple-50/30">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2 flex-1">
-                <Input 
-                  value={subsection.name}
-                  onChange={(e) => renameSubsection(subsectionIdx, e.target.value)}
-                  className="font-semibold text-sm w-48 bg-white"
-                  placeholder="Subsection name"
-                />
-                <Badge variant="secondary" className="text-xs">
-                  {subsection.questions?.length || 0} items
-                </Badge>
-                {marksDisplayMode === 'perSubsection' && (() => {
-                  const marksSummary = calculateSubsectionMarks(subsection);
-                  if (marksSummary) {
-                    const { itemCount, marksPerItem, totalMarks } = marksSummary;
+        {/* Show subsections if they exist */}
+        {section.subsections && section.subsections.length > 0 ? (
+          <>
+            {section.subsections.map((subsection: any, subsectionIdx: number) => (
+              <div key={subsection.id} className="border border-purple-200 rounded-lg p-3 bg-purple-50/30">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2 flex-1">
+                    <Input 
+                      value={subsection.name}
+                      onChange={(e) => renameSubsection(subsectionIdx, e.target.value)}
+                      className="font-semibold text-sm w-48 bg-white"
+                      placeholder="Subsection name"
+                    />
+                    <Badge variant="secondary" className="text-xs">
+                      {subsection.questions?.length || 0} items
+                    </Badge>
+                    {marksDisplayMode === 'perSubsection' && (() => {
+                      const marksSummary = calculateSubsectionMarks(subsection);
+                      if (marksSummary) {
+                        const { itemCount, marksPerItem, totalMarks } = marksSummary;
+                        return (
+                          <Badge variant="outline" className="text-xs font-semibold border-primary text-primary">
+                            {marksPerItem !== null 
+                              ? `[${itemCount} × ${marksPerItem} = ${totalMarks}]`
+                              : `[Total: ${totalMarks} marks]`
+                            }
+                          </Badge>
+                        );
+                      }
+                      return null;
+                    })()}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setCurrentImportTarget({ sectionIdx, subsectionIdx });
+                        setImportDialogOpen(true);
+                      }}
+                      className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300"
+                    >
+                      <Upload className="h-4 w-4 mr-1" />
+                      Import Items
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => deleteSubsection(subsectionIdx)}
+                      className="text-red-500"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Subsection Questions */}
+                <div className="space-y-2">
+                  {subsection.questions?.map((question: any, questionIdx: number) => (
+                    <DraggableExamQuestionCard
+                      key={question.id}
+                      question={question}
+                      questionNumber={questionIdx + 1}
+                      showMarks={marksDisplayMode === 'perQuestion'}
+                      onUpdate={(updatedQuestion: any) => {
+                        const updatedSections = [...builderData.sections];
+                        updatedSections[sectionIdx].subsections[subsectionIdx].questions[questionIdx] = updatedQuestion;
+                        setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+                      }}
+                      onDelete={() => {
+                        const updatedSections = [...builderData.sections];
+                        updatedSections[sectionIdx].subsections[subsectionIdx].questions.splice(questionIdx, 1);
+                        setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+                      }}
+                    />
+                  ))}
+                  
+                  {(!subsection.questions || subsection.questions.length === 0) && (
+                    <div className="text-center py-4 text-gray-400 text-xs bg-white rounded border border-dashed">
+                      No items imported yet
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            {/* Section-level items (when no subsections) */}
+            <div className="border border-green-200 rounded-lg p-3 bg-green-50/30">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {section.questions?.length || 0} items
+                  </Badge>
+                  {marksDisplayMode === 'perSubsection' && section.questions?.length > 0 && (() => {
+                    const itemCount = section.questions.length;
+                    const marksPerItem = section.questions[0]?.marks || 0;
+                    const allSameMarks = section.questions.every((q: any) => q.marks === marksPerItem);
+                    const totalMarks = allSameMarks 
+                      ? itemCount * marksPerItem 
+                      : section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0);
+                    
                     return (
                       <Badge variant="outline" className="text-xs font-semibold border-primary text-primary">
-                        {marksPerItem !== null 
+                        {allSameMarks 
                           ? `[${itemCount} × ${marksPerItem} = ${totalMarks}]`
                           : `[Total: ${totalMarks} marks]`
                         }
                       </Badge>
                     );
-                  }
-                  return null;
-                })()}
-              </div>
-              <div className="flex items-center gap-2">
+                  })()}
+                </div>
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => {
-                    setCurrentImportTarget({ sectionIdx, subsectionIdx });
+                    setCurrentImportTarget({ sectionIdx, subsectionIdx: null });
                     setImportDialogOpen(true);
                   }}
                   className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300"
@@ -1972,52 +2082,37 @@ const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData
                   <Upload className="h-4 w-4 mr-1" />
                   Import Items
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => deleteSubsection(subsectionIdx)}
-                  className="text-red-500"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+              </div>
+              
+              {/* Section Questions */}
+              <div className="space-y-2">
+                {section.questions?.map((question: any, questionIdx: number) => (
+                  <DraggableExamQuestionCard
+                    key={question.id}
+                    question={question}
+                    questionNumber={questionIdx + 1}
+                    showMarks={marksDisplayMode === 'perQuestion'}
+                    onUpdate={(updatedQuestion: any) => {
+                      const updatedSections = [...builderData.sections];
+                      updatedSections[sectionIdx].questions[questionIdx] = updatedQuestion;
+                      setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+                    }}
+                    onDelete={() => {
+                      const updatedSections = [...builderData.sections];
+                      updatedSections[sectionIdx].questions.splice(questionIdx, 1);
+                      setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
+                    }}
+                  />
+                ))}
+                
+                {(!section.questions || section.questions.length === 0) && (
+                  <div className="text-center py-4 text-gray-400 text-xs bg-white rounded border border-dashed">
+                    No items imported yet. Click "Import Items" to add questions.
+                  </div>
+                )}
               </div>
             </div>
-            
-            {/* Subsection Questions */}
-            <div className="space-y-2">
-              {subsection.questions?.map((question: any, questionIdx: number) => (
-                <DraggableExamQuestionCard
-                  key={question.id}
-                  question={question}
-                  questionNumber={questionIdx + 1}
-                  showMarks={marksDisplayMode === 'perQuestion'}
-                  onUpdate={(updatedQuestion: any) => {
-                    const updatedSections = [...builderData.sections];
-                    updatedSections[sectionIdx].subsections[subsectionIdx].questions[questionIdx] = updatedQuestion;
-                    setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-                  }}
-                  onDelete={() => {
-                    const updatedSections = [...builderData.sections];
-                    updatedSections[sectionIdx].subsections[subsectionIdx].questions.splice(questionIdx, 1);
-                    setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-                  }}
-                />
-              ))}
-              
-              {(!subsection.questions || subsection.questions.length === 0) && (
-                <div className="text-center py-4 text-gray-400 text-xs bg-white rounded border border-dashed">
-                  No items imported yet
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-
-        {/* Show message when no subsections */}
-        {(!section.subsections || section.subsections.length === 0) && (
-          <div className="text-center py-8 text-gray-400 text-sm border-2 border-dashed border-gray-300 rounded-lg">
-            No subsections yet. Click "Add Subsection" to create one.
-          </div>
+          </>
         )}
       </CardContent>
     </Card>
