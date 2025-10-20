@@ -1854,52 +1854,52 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 
       {/* Assessment Preview Dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-5xl max-h-[90vh] overflow-y-auto p-3 sm:p-6">
           <DialogHeader>
             <DialogTitle className="sr-only">Assessment Paper Preview</DialogTitle>
           </DialogHeader>
-          <div className="space-y-6 p-4">
+          <div className="space-y-4 sm:space-y-6 p-2 sm:p-4">
             {/* Paper Header */}
-            <div className="border-b-2 border-black pb-6 mb-6">
+            <div className="border-b-2 border-black pb-3 sm:pb-6 mb-3 sm:mb-6">
               {/* Top Section - School Name and Assessment Title */}
-              <div className="text-center space-y-1 mb-4">
-                <h1 className="text-xl font-bold uppercase tracking-wide">
+              <div className="text-center space-y-1 mb-2 sm:mb-4">
+                <h1 className="text-sm sm:text-xl font-bold uppercase tracking-wide break-words px-1">
                   {builderData.schoolName || "EXCEL PUBLIC SCHOOL, MYSURU"}
                 </h1>
-                <h2 className="text-lg font-semibold uppercase">
+                <h2 className="text-xs sm:text-lg font-semibold uppercase break-words px-1">
                   {builderData.assessmentTitle || "TERM 1 ASSESSMENT"} - {builderData.examDate ? new Date(builderData.examDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase() : "SEPTEMBER 2025"}
                 </h2>
               </div>
               
               {/* Middle Section - Class/Marks and Subject/Time */}
-              <div className="space-y-3 mb-4">
+              <div className="space-y-2 sm:space-y-3 mb-2 sm:mb-4">
                 {/* First Row - Class and Marks */}
-                <div className="flex justify-between items-center">
-                  <p className="text-lg font-medium italic">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                  <p className="text-xs sm:text-lg font-medium italic">
                     <span className="font-semibold">Class:</span> {builderData.classGrade || "VII"}
                   </p>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right w-full sm:w-auto">
                     {builderData.schoolLogo && (
-                      <div className="flex justify-end mb-2">
+                      <div className="flex justify-start sm:justify-end mb-1 sm:mb-2">
                         <img 
                           src={builderData.schoolLogo} 
                           alt="School Logo" 
-                          className="w-12 h-12"
+                          className="w-8 h-8 sm:w-12 sm:h-12"
                         />
                       </div>
                     )}
-                    <p className="text-lg font-bold">
+                    <p className="text-xs sm:text-lg font-bold">
                       <span className="font-semibold">Marks:</span> {builderData.totalMarks || "80"}
                     </p>
                   </div>
                 </div>
                 
                 {/* Second Row - Subject and Time */}
-                <div className="flex justify-between items-center">
-                  <p className="text-lg font-medium italic">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-0">
+                  <p className="text-xs sm:text-lg font-medium italic break-words">
                     <span className="font-semibold">Subject:</span> {builderData.subject?.toUpperCase() || "SCIENCE"}
                   </p>
-                  <p className="text-lg font-bold">
+                  <p className="text-xs sm:text-lg font-bold">
                     <span className="font-semibold">Time:</span> {builderData.timeHours || "3"} hours {builderData.timeMinutes ? `${builderData.timeMinutes} minutes` : ''}
                   </p>
                 </div>
@@ -1911,9 +1911,9 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 
             {/* General Instructions */}
             {builderData.generalInstructions && (
-              <div className="border rounded-lg p-4 bg-blue-50">
-                <h3 className="font-semibold mb-2">General Instructions:</h3>
-                <p className="whitespace-pre-line">{builderData.generalInstructions}</p>
+              <div className="border rounded-lg p-2 sm:p-4 bg-blue-50">
+                <h3 className="text-xs sm:text-base font-semibold mb-1 sm:mb-2">General Instructions:</h3>
+                <p className="text-xs sm:text-sm whitespace-pre-line break-words">{builderData.generalInstructions}</p>
               </div>
             )}
 
@@ -1922,100 +1922,263 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
               // Calculate starting question number for continuous numbering
               const startingQuestionNumber = builderData.sections
                 .slice(0, sectionIdx)
-                .reduce((acc: number, s: any) => acc + (s.questions?.length || 0), 0) + 1;
+                .reduce((acc: number, s: any) => {
+                  if (s.subsections && s.subsections.length > 0) {
+                    return acc + s.subsections.reduce((subAcc: number, sub: any) => subAcc + (sub.questions?.length || 0), 0);
+                  }
+                  return acc + (s.questions?.length || 0);
+                }, 0) + 1;
+              
+              const hasSubsections = section.subsections && section.subsections.length > 0;
               
               return (
-                <div key={sectionIdx} className="border rounded-lg p-4">
-                  <div className="mb-4">
-                    <h3 className="text-lg font-bold">Section {String.fromCharCode(65 + sectionIdx)}: {section.title}</h3>
+                <div key={sectionIdx} className="border rounded-lg p-2 sm:p-4">
+                  <div className="mb-2 sm:mb-4">
+                    <h3 className="text-sm sm:text-lg font-bold break-words">Section {String.fromCharCode(65 + sectionIdx)}: {section.title}</h3>
                     {section.instruction && (
-                      <p className="text-sm text-gray-600 mt-1">{section.instruction}</p>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">{section.instruction}</p>
                     )}
                   </div>
                   
-                  {section.questions?.map((question: any, qIdx: number) => {
-                    const questionNumber = builderData.numberingStyle === 'continuous' 
-                      ? startingQuestionNumber + qIdx 
-                      : qIdx + 1;
-                    
-                    return (
-                      <div key={question.id} className="mb-6 p-4 border-l-4 border-blue-500 bg-gray-50">
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-semibold">{questionNumber}:</h4>
-                      <span className="text-sm font-medium bg-blue-100 px-2 py-1 rounded">
-                        [{question.marks} marks]
-                      </span>
-                    </div>
-                    <p className="mb-3">{question.question}</p>
-                    
-                    {question.imageUrl && (
-                      <div className="mb-3">
-                        <img 
-                          src={question.imageUrl} 
-                          alt="Question" 
-                          className="max-w-md rounded border"
-                        />
-                      </div>
-                    )}
-                    
-                    {question.options && question.options.length > 0 && (
-                      <div className="ml-4 space-y-2">
-                        {question.options.map((option: string, optIdx: number) => (
-                          <div key={optIdx} className="flex items-center gap-2">
-                            <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
-                              {String.fromCharCode(97 + optIdx)}
-                            </span>
-                            <span>{option}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {question.subQuestions && question.subQuestions.length > 0 && (
-                      <div className="ml-4 mt-3 space-y-3">
-                        {question.subQuestions.map((subQ: any, subIdx: number) => (
-                          <div key={subQ.id} className="border-l-2 border-gray-300 pl-3">
-                            <div className="flex justify-between items-start mb-1">
-                              <span className="font-medium">({String.fromCharCode(97 + subIdx)})</span>
-                              <span className="text-xs bg-gray-200 px-2 py-1 rounded">
-                                [{subQ.marks} marks]
+                  {hasSubsections ? (
+                    /* Render subsections */
+                    section.subsections.map((subsection: any, subsectionIdx: number) => {
+                      const subsectionStartNumber = builderData.numberingStyle === 'continuous'
+                        ? startingQuestionNumber + section.subsections.slice(0, subsectionIdx).reduce((acc: number, sub: any) => acc + (sub.questions?.length || 0), 0)
+                        : subsectionIdx * 10 + 1;
+                      
+                      // Calculate subsection marks summary
+                      let subsectionMarksDisplay = null;
+                      if (marksDisplayMode === 'perSubsection' && subsection.questions && subsection.questions.length > 0) {
+                        const itemCount = subsection.questions.length;
+                        const marksPerItem = subsection.questions[0]?.marks || 0;
+                        const allSameMarks = subsection.questions.every((q: any) => q.marks === marksPerItem);
+                        const totalMarks = allSameMarks 
+                          ? itemCount * marksPerItem 
+                          : subsection.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0);
+                        
+                        subsectionMarksDisplay = allSameMarks 
+                          ? `[${itemCount} × ${marksPerItem} = ${totalMarks} marks]`
+                          : `[Total: ${totalMarks} marks]`;
+                      }
+                      
+                      return (
+                        <div key={subsectionIdx} className="mb-3 sm:mb-6">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2 sm:mb-3">
+                            <h4 className="text-xs sm:text-base font-semibold break-words">{subsection.title}</h4>
+                            {subsectionMarksDisplay && (
+                              <span className="text-[10px] sm:text-xs font-semibold text-primary border border-primary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
+                                {subsectionMarksDisplay}
                               </span>
+                            )}
+                          </div>
+                          {subsection.instruction && (
+                            <p className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 italic break-words">{subsection.instruction}</p>
+                          )}
+                          
+                          {subsection.questions?.map((question: any, qIdx: number) => {
+                            const questionNumber = builderData.numberingStyle === 'continuous' 
+                              ? subsectionStartNumber + qIdx 
+                              : qIdx + 1;
+                            
+                            return (
+                              <div key={question.id} className="mb-3 sm:mb-6 p-2 sm:p-4 border-l-2 sm:border-l-4 border-blue-500 bg-gray-50">
+                                <div className="flex justify-between items-start mb-1 sm:mb-2 gap-2">
+                                  <h4 className="text-xs sm:text-base font-semibold">{questionNumber}:</h4>
+                                  {marksDisplayMode === 'perQuestion' && (
+                                    <span className="text-[10px] sm:text-sm font-medium bg-blue-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
+                                      [{question.marks} marks]
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="mb-2 sm:mb-3 text-xs sm:text-base break-words">{question.text || question.question}</p>
+                                
+                                {question.imageUrl && (
+                                  <div className="mb-2 sm:mb-3">
+                                    <img 
+                                      src={question.imageUrl} 
+                                      alt="Question" 
+                                      className="max-w-full sm:max-w-md rounded border"
+                                    />
+                                  </div>
+                                )}
+                                
+                                {question.options && question.options.length > 0 && (
+                                  <div className="ml-2 sm:ml-4 space-y-1 sm:space-y-2">
+                                    {question.options.map((option: string, optIdx: number) => (
+                                      <div key={optIdx} className="flex items-center gap-1 sm:gap-2">
+                                        <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs sm:text-sm font-medium shrink-0">
+                                          {String.fromCharCode(97 + optIdx)}
+                                        </span>
+                                        <span className="text-xs sm:text-base break-words">{option}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                
+                                {question.subQuestions && question.subQuestions.length > 0 && (
+                                  <div className="ml-2 sm:ml-4 mt-2 sm:mt-3 space-y-2 sm:space-y-3">
+                                    {question.subQuestions.map((subQ: any, subIdx: number) => (
+                                      <div key={subQ.id} className="border-l-2 border-gray-300 pl-2 sm:pl-3">
+                                        <div className="flex justify-between items-start mb-1 gap-2">
+                                          <span className="text-xs sm:text-base font-medium">({String.fromCharCode(97 + subIdx)})</span>
+                                          {marksDisplayMode === 'perQuestion' && (
+                                            <span className="text-[10px] sm:text-xs bg-gray-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
+                                              [{subQ.marks} marks]
+                                            </span>
+                                          )}
+                                        </div>
+                                        <p className="text-xs sm:text-base break-words">{subQ.question}</p>
+                                        {subQ.imageUrl && (
+                                          <div className="mt-1 sm:mt-2">
+                                            <img 
+                                              src={subQ.imageUrl} 
+                                              alt="Sub-question" 
+                                              className="max-w-full sm:max-w-sm rounded border"
+                                            />
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                
+                                {question.orQuestion && (
+                                  <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-dashed border-gray-400">
+                                    <div className="flex justify-between items-start mb-1 sm:mb-2">
+                                      <h5 className="text-xs sm:text-base font-semibold text-center w-full">OR</h5>
+                                    </div>
+                                    <p className="mb-1 sm:mb-2 text-xs sm:text-base break-words">{question.orQuestion}</p>
+                                    {question.orQuestionImage && (
+                                      <div className="mb-1 sm:mb-2">
+                                        <img 
+                                          src={question.orQuestionImage} 
+                                          alt="OR Question" 
+                                          className="max-w-full sm:max-w-md rounded border"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    /* Render section-level questions (no subsections) */
+                    <>
+                      {marksDisplayMode === 'perSubsection' && section.questions && section.questions.length > 0 && (() => {
+                        const itemCount = section.questions.length;
+                        const marksPerItem = section.questions[0]?.marks || 0;
+                        const allSameMarks = section.questions.every((q: any) => q.marks === marksPerItem);
+                        const totalMarks = allSameMarks 
+                          ? itemCount * marksPerItem 
+                          : section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0);
+                        
+                        const display = allSameMarks 
+                          ? `[${itemCount} × ${marksPerItem} = ${totalMarks} marks]`
+                          : `[Total: ${totalMarks} marks]`;
+                        
+                        return (
+                          <div className="mb-2 sm:mb-3">
+                            <span className="text-[10px] sm:text-xs font-semibold text-primary border border-primary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+                              {display}
+                            </span>
+                          </div>
+                        );
+                      })()}
+                      
+                      {section.questions?.map((question: any, qIdx: number) => {
+                        const questionNumber = builderData.numberingStyle === 'continuous' 
+                          ? startingQuestionNumber + qIdx 
+                          : qIdx + 1;
+                        
+                        return (
+                          <div key={question.id} className="mb-3 sm:mb-6 p-2 sm:p-4 border-l-2 sm:border-l-4 border-blue-500 bg-gray-50">
+                            <div className="flex justify-between items-start mb-1 sm:mb-2 gap-2">
+                              <h4 className="text-xs sm:text-base font-semibold">{questionNumber}:</h4>
+                              {marksDisplayMode === 'perQuestion' && (
+                                <span className="text-[10px] sm:text-sm font-medium bg-blue-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
+                                  [{question.marks} marks]
+                                </span>
+                              )}
                             </div>
-                            <p>{subQ.question}</p>
-                            {subQ.imageUrl && (
-                              <div className="mt-2">
+                            <p className="mb-2 sm:mb-3 text-xs sm:text-base break-words">{question.text || question.question}</p>
+                            
+                            {question.imageUrl && (
+                              <div className="mb-2 sm:mb-3">
                                 <img 
-                                  src={subQ.imageUrl} 
-                                  alt="Sub-question" 
-                                  className="max-w-sm rounded border"
+                                  src={question.imageUrl} 
+                                  alt="Question" 
+                                  className="max-w-full sm:max-w-md rounded border"
                                 />
                               </div>
                             )}
+                            
+                            {question.options && question.options.length > 0 && (
+                              <div className="ml-2 sm:ml-4 space-y-1 sm:space-y-2">
+                                {question.options.map((option: string, optIdx: number) => (
+                                  <div key={optIdx} className="flex items-center gap-1 sm:gap-2">
+                                    <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs sm:text-sm font-medium shrink-0">
+                                      {String.fromCharCode(97 + optIdx)}
+                                    </span>
+                                    <span className="text-xs sm:text-base break-words">{option}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {question.subQuestions && question.subQuestions.length > 0 && (
+                              <div className="ml-2 sm:ml-4 mt-2 sm:mt-3 space-y-2 sm:space-y-3">
+                                {question.subQuestions.map((subQ: any, subIdx: number) => (
+                                  <div key={subQ.id} className="border-l-2 border-gray-300 pl-2 sm:pl-3">
+                                    <div className="flex justify-between items-start mb-1 gap-2">
+                                      <span className="text-xs sm:text-base font-medium">({String.fromCharCode(97 + subIdx)})</span>
+                                      {marksDisplayMode === 'perQuestion' && (
+                                        <span className="text-[10px] sm:text-xs bg-gray-200 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
+                                          [{subQ.marks} marks]
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="text-xs sm:text-base break-words">{subQ.question}</p>
+                                    {subQ.imageUrl && (
+                                      <div className="mt-1 sm:mt-2">
+                                        <img 
+                                          src={subQ.imageUrl} 
+                                          alt="Sub-question" 
+                                          className="max-w-full sm:max-w-sm rounded border"
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {question.orQuestion && (
+                              <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-dashed border-gray-400">
+                                <div className="flex justify-between items-start mb-1 sm:mb-2">
+                                  <h5 className="text-xs sm:text-base font-semibold text-center w-full">OR</h5>
+                                </div>
+                                <p className="mb-1 sm:mb-2 text-xs sm:text-base break-words">{question.orQuestion}</p>
+                                {question.orQuestionImage && (
+                                  <div className="mb-1 sm:mb-2">
+                                    <img 
+                                      src={question.orQuestionImage} 
+                                      alt="OR Question" 
+                                      className="max-w-full sm:max-w-md rounded border"
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {question.orQuestion && (
-                      <div className="mt-4 pt-4 border-t border-dashed border-gray-400">
-                        <div className="flex justify-between items-start mb-2">
-                          <h5 className="font-semibold text-center w-full">OR</h5>
-                        </div>
-                        <p className="mb-2">{question.orQuestion}</p>
-                        {question.orQuestionImage && (
-                          <div className="mb-2">
-                            <img 
-                              src={question.orQuestionImage} 
-                              alt="OR Question" 
-                              className="max-w-md rounded border"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                    );
-                  })}
+                        );
+                      })}
+                    </>
+                  )}
                 </div>
               );
             })}
