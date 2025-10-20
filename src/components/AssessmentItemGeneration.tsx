@@ -1936,12 +1936,24 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   <div className="mb-2 sm:mb-4">
                     <div className="flex flex-row items-center justify-between gap-2 mb-2">
                       <h3 className="text-sm sm:text-lg font-bold break-words">Section {String.fromCharCode(65 + sectionIdx)}: {section.title}</h3>
-                      {hasSubsections && section.subsections.some((sub: any) => sub.questions && sub.questions.length > 0) && (
-                        <span className="text-[10px] sm:text-xs font-semibold text-primary border border-primary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
-                          [Total: {section.subsections.reduce((sum: number, sub: any) => 
-                            sum + (sub.questions?.reduce((qSum: number, q: any) => qSum + (q.marks || 0), 0) || 0), 0)} marks]
-                        </span>
-                      )}
+                      {hasSubsections && section.subsections.some((sub: any) => sub.questions && sub.questions.length > 0) && (() => {
+                        const allQuestions = section.subsections.flatMap((sub: any) => sub.questions || []);
+                        const itemCount = allQuestions.length;
+                        const marksPerItem = allQuestions[0]?.marks || 0;
+                        const allSameMarks = allQuestions.every((q: any) => q.marks === marksPerItem);
+                        const totalMarks = allSameMarks 
+                          ? itemCount * marksPerItem 
+                          : allQuestions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0);
+                        const display = allSameMarks 
+                          ? `[${itemCount} × ${marksPerItem} = ${totalMarks}]`
+                          : `[Total: ${totalMarks} marks]`;
+                        
+                        return (
+                          <span className="text-[10px] sm:text-xs font-semibold text-primary border border-primary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
+                            {display}
+                          </span>
+                        );
+                      })()}
                     </div>
                     {section.instruction && (
                       <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">{section.instruction}</p>
