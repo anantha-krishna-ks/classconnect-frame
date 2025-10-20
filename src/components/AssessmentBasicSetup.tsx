@@ -366,39 +366,39 @@ const AssessmentBasicSetup = ({ assessmentData, updateAssessmentData, onComplete
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="space-y-3">
               <label className="text-base font-semibold text-foreground">Time Duration *</label>
-              <div className="flex gap-2 items-center">
-                <div className="flex-1 relative">
+              <div className="flex gap-2 items-start">
+                <div className="flex-1 space-y-2">
                   <Input
                     type="number"
                     min="0"
                     max="23"
-                    placeholder="0"
+                    placeholder="Hrs"
                     value={assessmentData.duration ? assessmentData.duration.split(':')[0] || '' : ''}
                     onChange={(e) => {
                       const hours = e.target.value;
                       const minutes = assessmentData.duration ? assessmentData.duration.split(':')[1] || '00' : '00';
                       updateAssessmentData({ duration: `${hours}:${minutes}` });
                     }}
-                    className="h-12 text-base border-2 hover:border-purple-300 focus:border-purple-500 transition-colors duration-200 bg-white/50 pr-12"
+                    className="h-12 text-base border-2 hover:border-purple-300 focus:border-purple-500 transition-colors duration-200 bg-white/50"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none">hrs</span>
+                  <span className="text-sm text-muted-foreground font-medium">hrs</span>
                 </div>
-                <span className="text-muted-foreground font-semibold">:</span>
-                <div className="flex-1 relative">
+                <span className="text-muted-foreground font-semibold mt-3">:</span>
+                <div className="flex-1 space-y-2">
                   <Input
                     type="number"
                     min="0"
                     max="59"
-                    placeholder="0"
+                    placeholder="Mins"
                     value={assessmentData.duration ? assessmentData.duration.split(':')[1] || '' : ''}
                     onChange={(e) => {
                       const minutes = e.target.value.padStart(2, '0');
                       const hours = assessmentData.duration ? assessmentData.duration.split(':')[0] || '0' : '0';
                       updateAssessmentData({ duration: `${hours}:${minutes}` });
                     }}
-                    className="h-12 text-base border-2 hover:border-purple-300 focus:border-purple-500 transition-colors duration-200 bg-white/50 pr-14"
+                    className="h-12 text-base border-2 hover:border-purple-300 focus:border-purple-500 transition-colors duration-200 bg-white/50"
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium pointer-events-none">mins</span>
+                  <span className="text-sm text-muted-foreground font-medium">mins</span>
                 </div>
               </div>
             </div>
