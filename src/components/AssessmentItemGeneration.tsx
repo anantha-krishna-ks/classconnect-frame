@@ -15,7 +15,7 @@ import {
   Eye, Edit, Trash2, CheckCircle2, Clock, BookOpen, Target, 
   BarChart3, PieChart, Save, Filter, X, Sparkles, Image, Upload,
   GripVertical, Plus, FileDown, Settings, ChevronDown, FileCheck,
-  Brain, Lightbulb, Wrench, Search, Scale, Palette
+  Brain, Lightbulb, Wrench, Search, Scale, Palette, CheckSquare, XCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -1758,17 +1758,19 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   });
                   setItemsToImport(filteredItems.map(item => item.id));
                 }}
-                className="text-xs"
+                className="text-sm"
               >
+                <CheckSquare className="h-4 w-4 mr-1.5" />
                 Select All Visible
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setItemsToImport([])}
-                className="text-xs"
+                className="text-sm"
                 disabled={itemsToImport.length === 0}
               >
+                <XCircle className="h-4 w-4 mr-1.5" />
                 Clear Selection
               </Button>
             </div>
