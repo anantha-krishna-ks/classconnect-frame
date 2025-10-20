@@ -1922,14 +1922,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
               // Calculate starting question number for continuous numbering
               const startingQuestionNumber = builderData.sections
                 .slice(0, sectionIdx)
-                .reduce((acc: number, s: any) => {
-                  if (s.subsections && s.subsections.length > 0) {
-                    return acc + s.subsections.reduce((subAcc: number, sub: any) => subAcc + (sub.questions?.length || 0), 0);
-                  }
-                  return acc + (s.questions?.length || 0);
-                }, 0) + 1;
-              
-              const hasSubsections = section.subsections && section.subsections.length > 0;
+                .reduce((acc: number, s: any) => acc + (s.questions?.length || 0), 0) + 1;
               
               return (
                 <div key={sectionIdx} className="border rounded-lg p-4">
@@ -1940,245 +1933,89 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     )}
                   </div>
                   
-                  {hasSubsections ? (
-                    /* Render subsections */
-                    section.subsections.map((subsection: any, subsectionIdx: number) => {
-                      const subsectionStartNumber = builderData.numberingStyle === 'continuous'
-                        ? startingQuestionNumber + section.subsections.slice(0, subsectionIdx).reduce((acc: number, sub: any) => acc + (sub.questions?.length || 0), 0)
-                        : subsectionIdx * 10 + 1;
-                      
-                      // Calculate subsection marks summary
-                      let subsectionMarksDisplay = null;
-                      if (marksDisplayMode === 'perSubsection' && subsection.questions && subsection.questions.length > 0) {
-                        const itemCount = subsection.questions.length;
-                        const marksPerItem = subsection.questions[0]?.marks || 0;
-                        const allSameMarks = subsection.questions.every((q: any) => q.marks === marksPerItem);
-                        const totalMarks = allSameMarks 
-                          ? itemCount * marksPerItem 
-                          : subsection.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0);
-                        
-                        subsectionMarksDisplay = allSameMarks 
-                          ? `[${itemCount} × ${marksPerItem} = ${totalMarks} marks]`
-                          : `[Total: ${totalMarks} marks]`;
-                      }
-                      
-                      return (
-                        <div key={subsectionIdx} className="mb-6">
-                          <div className="flex items-center gap-2 mb-3">
-                            <h4 className="text-md font-semibold">{subsection.title}</h4>
-                            {subsectionMarksDisplay && (
-                              <span className="text-xs font-semibold text-primary border border-primary px-2 py-1 rounded">
-                                {subsectionMarksDisplay}
-                              </span>
-                            )}
-                          </div>
-                          {subsection.instruction && (
-                            <p className="text-sm text-gray-600 mb-3 italic">{subsection.instruction}</p>
-                          )}
-                          
-                          {subsection.questions?.map((question: any, qIdx: number) => {
-                            const questionNumber = builderData.numberingStyle === 'continuous' 
-                              ? subsectionStartNumber + qIdx 
-                              : qIdx + 1;
-                            
-                            return (
-                              <div key={question.id} className="mb-6 p-4 border-l-4 border-blue-500 bg-gray-50">
-                                <div className="flex justify-between items-start mb-2">
-                                  <h4 className="font-semibold">{questionNumber}:</h4>
-                                  {marksDisplayMode === 'perQuestion' && (
-                                    <span className="text-sm font-medium bg-blue-100 px-2 py-1 rounded">
-                                      [{question.marks} marks]
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="mb-3">{question.text || question.question}</p>
-                                
-                                {question.imageUrl && (
-                                  <div className="mb-3">
-                                    <img 
-                                      src={question.imageUrl} 
-                                      alt="Question" 
-                                      className="max-w-md rounded border"
-                                    />
-                                  </div>
-                                )}
-                                
-                                {question.options && question.options.length > 0 && (
-                                  <div className="ml-4 space-y-2">
-                                    {question.options.map((option: string, optIdx: number) => (
-                                      <div key={optIdx} className="flex items-center gap-2">
-                                        <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
-                                          {String.fromCharCode(97 + optIdx)}
-                                        </span>
-                                        <span>{option}</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                                
-                                {question.subQuestions && question.subQuestions.length > 0 && (
-                                  <div className="ml-4 mt-3 space-y-3">
-                                    {question.subQuestions.map((subQ: any, subIdx: number) => (
-                                      <div key={subQ.id} className="border-l-2 border-gray-300 pl-3">
-                                        <div className="flex justify-between items-start mb-1">
-                                          <span className="font-medium">({String.fromCharCode(97 + subIdx)})</span>
-                                          {marksDisplayMode === 'perQuestion' && (
-                                            <span className="text-xs bg-gray-200 px-2 py-1 rounded">
-                                              [{subQ.marks} marks]
-                                            </span>
-                                          )}
-                                        </div>
-                                        <p>{subQ.question}</p>
-                                        {subQ.imageUrl && (
-                                          <div className="mt-2">
-                                            <img 
-                                              src={subQ.imageUrl} 
-                                              alt="Sub-question" 
-                                              className="max-w-sm rounded border"
-                                            />
-                                          </div>
-                                        )}
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                                
-                                {question.orQuestion && (
-                                  <div className="mt-4 pt-4 border-t border-dashed border-gray-400">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <h5 className="font-semibold text-center w-full">OR</h5>
-                                    </div>
-                                    <p className="mb-2">{question.orQuestion}</p>
-                                    {question.orQuestionImage && (
-                                      <div className="mb-2">
-                                        <img 
-                                          src={question.orQuestionImage} 
-                                          alt="OR Question" 
-                                          className="max-w-md rounded border"
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      );
-                    })
-                  ) : (
-                    /* Render section-level questions (no subsections) */
-                    <>
-                      {marksDisplayMode === 'perSubsection' && section.questions && section.questions.length > 0 && (() => {
-                        const itemCount = section.questions.length;
-                        const marksPerItem = section.questions[0]?.marks || 0;
-                        const allSameMarks = section.questions.every((q: any) => q.marks === marksPerItem);
-                        const totalMarks = allSameMarks 
-                          ? itemCount * marksPerItem 
-                          : section.questions.reduce((sum: number, q: any) => sum + (q.marks || 0), 0);
-                        
-                        const display = allSameMarks 
-                          ? `[${itemCount} × ${marksPerItem} = ${totalMarks} marks]`
-                          : `[Total: ${totalMarks} marks]`;
-                        
-                        return (
-                          <div className="mb-3">
-                            <span className="text-xs font-semibold text-primary border border-primary px-2 py-1 rounded">
-                              {display}
+                  {section.questions?.map((question: any, qIdx: number) => {
+                    const questionNumber = builderData.numberingStyle === 'continuous' 
+                      ? startingQuestionNumber + qIdx 
+                      : qIdx + 1;
+                    
+                    return (
+                      <div key={question.id} className="mb-6 p-4 border-l-4 border-blue-500 bg-gray-50">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold">{questionNumber}:</h4>
+                      <span className="text-sm font-medium bg-blue-100 px-2 py-1 rounded">
+                        [{question.marks} marks]
+                      </span>
+                    </div>
+                    <p className="mb-3">{question.question}</p>
+                    
+                    {question.imageUrl && (
+                      <div className="mb-3">
+                        <img 
+                          src={question.imageUrl} 
+                          alt="Question" 
+                          className="max-w-md rounded border"
+                        />
+                      </div>
+                    )}
+                    
+                    {question.options && question.options.length > 0 && (
+                      <div className="ml-4 space-y-2">
+                        {question.options.map((option: string, optIdx: number) => (
+                          <div key={optIdx} className="flex items-center gap-2">
+                            <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
+                              {String.fromCharCode(97 + optIdx)}
                             </span>
+                            <span>{option}</span>
                           </div>
-                        );
-                      })()}
-                      
-                      {section.questions?.map((question: any, qIdx: number) => {
-                        const questionNumber = builderData.numberingStyle === 'continuous' 
-                          ? startingQuestionNumber + qIdx 
-                          : qIdx + 1;
-                        
-                        return (
-                          <div key={question.id} className="mb-6 p-4 border-l-4 border-blue-500 bg-gray-50">
-                            <div className="flex justify-between items-start mb-2">
-                              <h4 className="font-semibold">{questionNumber}:</h4>
-                              {marksDisplayMode === 'perQuestion' && (
-                                <span className="text-sm font-medium bg-blue-100 px-2 py-1 rounded">
-                                  [{question.marks} marks]
-                                </span>
-                              )}
+                        ))}
+                      </div>
+                    )}
+                    
+                    {question.subQuestions && question.subQuestions.length > 0 && (
+                      <div className="ml-4 mt-3 space-y-3">
+                        {question.subQuestions.map((subQ: any, subIdx: number) => (
+                          <div key={subQ.id} className="border-l-2 border-gray-300 pl-3">
+                            <div className="flex justify-between items-start mb-1">
+                              <span className="font-medium">({String.fromCharCode(97 + subIdx)})</span>
+                              <span className="text-xs bg-gray-200 px-2 py-1 rounded">
+                                [{subQ.marks} marks]
+                              </span>
                             </div>
-                            <p className="mb-3">{question.text || question.question}</p>
-                            
-                            {question.imageUrl && (
-                              <div className="mb-3">
+                            <p>{subQ.question}</p>
+                            {subQ.imageUrl && (
+                              <div className="mt-2">
                                 <img 
-                                  src={question.imageUrl} 
-                                  alt="Question" 
-                                  className="max-w-md rounded border"
+                                  src={subQ.imageUrl} 
+                                  alt="Sub-question" 
+                                  className="max-w-sm rounded border"
                                 />
                               </div>
                             )}
-                            
-                            {question.options && question.options.length > 0 && (
-                              <div className="ml-4 space-y-2">
-                                {question.options.map((option: string, optIdx: number) => (
-                                  <div key={optIdx} className="flex items-center gap-2">
-                                    <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
-                                      {String.fromCharCode(97 + optIdx)}
-                                    </span>
-                                    <span>{option}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            
-                            {question.subQuestions && question.subQuestions.length > 0 && (
-                              <div className="ml-4 mt-3 space-y-3">
-                                {question.subQuestions.map((subQ: any, subIdx: number) => (
-                                  <div key={subQ.id} className="border-l-2 border-gray-300 pl-3">
-                                    <div className="flex justify-between items-start mb-1">
-                                      <span className="font-medium">({String.fromCharCode(97 + subIdx)})</span>
-                                      {marksDisplayMode === 'perQuestion' && (
-                                        <span className="text-xs bg-gray-200 px-2 py-1 rounded">
-                                          [{subQ.marks} marks]
-                                        </span>
-                                      )}
-                                    </div>
-                                    <p>{subQ.question}</p>
-                                    {subQ.imageUrl && (
-                                      <div className="mt-2">
-                                        <img 
-                                          src={subQ.imageUrl} 
-                                          alt="Sub-question" 
-                                          className="max-w-sm rounded border"
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            
-                            {question.orQuestion && (
-                              <div className="mt-4 pt-4 border-t border-dashed border-gray-400">
-                                <div className="flex justify-between items-start mb-2">
-                                  <h5 className="font-semibold text-center w-full">OR</h5>
-                                </div>
-                                <p className="mb-2">{question.orQuestion}</p>
-                                {question.orQuestionImage && (
-                                  <div className="mb-2">
-                                    <img 
-                                      src={question.orQuestionImage} 
-                                      alt="OR Question" 
-                                      className="max-w-md rounded border"
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                            )}
                           </div>
-                        );
-                      })}
-                    </>
-                  )}
+                        ))}
+                      </div>
+                    )}
+                    
+                    {question.orQuestion && (
+                      <div className="mt-4 pt-4 border-t border-dashed border-gray-400">
+                        <div className="flex justify-between items-start mb-2">
+                          <h5 className="font-semibold text-center w-full">OR</h5>
+                        </div>
+                        <p className="mb-2">{question.orQuestion}</p>
+                        {question.orQuestionImage && (
+                          <div className="mb-2">
+                            <img 
+                              src={question.orQuestionImage} 
+                              alt="OR Question" 
+                              className="max-w-md rounded border"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                    );
+                  })}
                 </div>
               );
             })}
