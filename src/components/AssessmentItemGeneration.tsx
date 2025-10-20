@@ -61,6 +61,42 @@ interface AssessmentItemGenerationProps {
   updateAssessmentData: (data: any) => void;
 }
 
+// Normalizes a generated item into the builder question shape so textareas display correctly
+type BuilderQuestion = {
+  id: string;
+  sourceId?: string;
+  question: string;
+  text: string;
+  marks: number;
+  options?: string[];
+  correctAnswer?: string;
+  itemType: string;
+  subQuestions: any[];
+  hasOROption: boolean;
+  orQuestion: string;
+  hasImage?: boolean;
+  imageUrl?: string | null;
+};
+
+function normalizeGeneratedItem(item: GeneratedItem): BuilderQuestion {
+  const uniqueId = `q-${item.id}-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
+  return {
+    id: uniqueId,
+    sourceId: item.id,
+    question: item.question,
+    text: item.question,
+    marks: item.marks,
+    options: item.options || [],
+    correctAnswer: item.correctAnswer,
+    itemType: item.itemType,
+    subQuestions: [],
+    hasOROption: false,
+    orQuestion: '',
+    hasImage: !!item.hasImage,
+    imageUrl: item.imageUrl || null,
+  };
+}
+
 const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: AssessmentItemGenerationProps) => {
   const [generatedItems, setGeneratedItems] = useState<GeneratedItem[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -430,9 +466,11 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
         // Move question to different section
         const updatedSections = builderData.sections.map(section => {
           if (section.id === overId) {
+            // Avoid duplicates when dragging over repeatedly; normalize shape for textarea binding
+            const alreadyExists = section.questions.some((q: any) => (q.sourceId || q.id) === activeQuestion.id);
             return {
               ...section,
-              questions: [...section.questions, activeQuestion]
+              questions: alreadyExists ? section.questions : [...section.questions, normalizeGeneratedItem(activeQuestion)]
             };
           }
           return {
@@ -1037,6 +1075,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       instruction: `Answer all questions`,
                       questions: items.map((item: any, qIndex: number) => ({
                         id: Date.now() + index * 1000 + qIndex,
+                        sourceId: item.id,
                         question: item.question,
                         text: item.question,
                         marks: item.marks,
@@ -1648,8 +1687,8 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 // Check if importing to section or subsection
                 const isAlreadyImported = currentImportTarget && (
                   currentImportTarget.subsectionIdx !== null && currentImportTarget.subsectionIdx !== undefined
-                    ? builderData.sections[currentImportTarget.sectionIdx]?.subsections?.[currentImportTarget.subsectionIdx]?.questions?.some((q: any) => q.id === item.id)
-                    : builderData.sections[currentImportTarget.sectionIdx]?.questions?.some((q: any) => q.id === item.id)
+                    ? builderData.sections[currentImportTarget.sectionIdx]?.subsections?.[currentImportTarget.subsectionIdx]?.questions?.some((q: any) => (q.sourceId || q.id) === item.id)
+                    : builderData.sections[currentImportTarget.sectionIdx]?.questions?.some((q: any) => (q.sourceId || q.id) === item.id)
                 );
                 
                 return (
@@ -1712,8 +1751,8 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     // Don't include already imported items
                     const isAlreadyImported = currentImportTarget && (
                       currentImportTarget.subsectionIdx !== null && currentImportTarget.subsectionIdx !== undefined
-                        ? builderData.sections[currentImportTarget.sectionIdx]?.subsections?.[currentImportTarget.subsectionIdx]?.questions?.some((q: any) => q.id === item.id)
-                        : builderData.sections[currentImportTarget.sectionIdx]?.questions?.some((q: any) => q.id === item.id)
+                        ? builderData.sections[currentImportTarget.sectionIdx]?.subsections?.[currentImportTarget.subsectionIdx]?.questions?.some((q: any) => (q.sourceId || q.id) === item.id)
+                        : builderData.sections[currentImportTarget.sectionIdx]?.questions?.some((q: any) => (q.sourceId || q.id) === item.id)
                     );
                     return !isAlreadyImported;
                   });
@@ -1759,20 +1798,21 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     const targetSection = updatedSections[currentImportTarget.sectionIdx];
                     const targetSubsection = targetSection.subsections[currentImportTarget.subsectionIdx];
                     
-                    // Filter out already imported items
-                    const newItems = itemsToAdd.filter(item => 
-                      !targetSubsection.questions?.some((q: any) => q.id === item.id)
+                    // Filter out already imported items (by sourceId or id)
+                    const filtered = itemsToAdd.filter(item => 
+                      !targetSubsection.questions?.some((q: any) => (q.sourceId || q.id) === item.id)
                     );
+                    const normalized = filtered.map(normalizeGeneratedItem);
                     
                     // Properly clone the subsections array and update the specific subsection
                     targetSection.subsections = targetSection.subsections.map((sub: any, idx: number) => 
                       idx === currentImportTarget.subsectionIdx
-                        ? { ...sub, questions: [...(sub.questions || []), ...newItems] }
+                        ? { ...sub, questions: [...(sub.questions || []), ...normalized] }
                         : sub
                     );
                     
                     setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-                    toast.success(`${newItems.length} item(s) imported to subsection`);
+                    toast.success(`${normalized.length} item(s) imported to subsection`);
                   } else {
                     // Import to section (when no subsections)
                     const targetSection = updatedSections[currentImportTarget.sectionIdx];
@@ -1782,16 +1822,17 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       targetSection.questions = [];
                     }
                     
-                    // Filter out already imported items
-                    const newItems = itemsToAdd.filter(item => 
-                      !targetSection.questions?.some((q: any) => q.id === item.id)
+                    // Filter out already imported items (by sourceId or id)
+                    const filtered = itemsToAdd.filter(item => 
+                      !targetSection.questions?.some((q: any) => (q.sourceId || q.id) === item.id)
                     );
+                    const normalized = filtered.map(normalizeGeneratedItem);
                     
                     // Add to section
-                    targetSection.questions = [...targetSection.questions, ...newItems];
+                    targetSection.questions = [...targetSection.questions, ...normalized];
                     
                     setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-                    toast.success(`${newItems.length} item(s) imported to section`);
+                    toast.success(`${normalized.length} item(s) imported to section`);
                   }
                   
                   setImportDialogOpen(false);
