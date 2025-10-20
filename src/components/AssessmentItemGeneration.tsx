@@ -102,6 +102,11 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const [currentImportTarget, setCurrentImportTarget] = useState<{ sectionIdx: number; subsectionIdx: number } | null>(null);
   const [itemsToImport, setItemsToImport] = useState<string[]>([]);
   
+  // Import dialog filters
+  const [filterBloomsLevel, setFilterBloomsLevel] = useState<string>('all');
+  const [filterItemType, setFilterItemType] = useState<string>('all');
+  const [filterELO, setFilterELO] = useState<string>('all');
+  
   // Marks display preference: 'perQuestion' or 'perSubsection'
   const [marksDisplayMode, setMarksDisplayMode] = useState<'perQuestion' | 'perSubsection'>('perQuestion');
   
@@ -1546,18 +1551,100 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
       )}
       
       {/* Import Items Dialog */}
-      <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+      <Dialog open={importDialogOpen} onOpenChange={(open) => {
+        setImportDialogOpen(open);
+        if (!open) {
+          // Reset filters when dialog closes
+          setFilterBloomsLevel('all');
+          setFilterItemType('all');
+          setFilterELO('all');
+          setItemsToImport([]);
+          setCurrentImportTarget(null);
+        }
+      }}>
+        <DialogContent className="max-w-6xl max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>Import Multiple Items</DialogTitle>
           </DialogHeader>
+          
+          {/* Filter Options */}
+          <div className="grid grid-cols-3 gap-3 pb-3 border-b">
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-600">Bloom's Level</label>
+              <Select value={filterBloomsLevel} onValueChange={setFilterBloomsLevel}>
+                <SelectTrigger className="h-9 text-sm bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  <SelectItem value="all">All Levels</SelectItem>
+                  <SelectItem value="Remember">Remember</SelectItem>
+                  <SelectItem value="Understand">Understand</SelectItem>
+                  <SelectItem value="Apply">Apply</SelectItem>
+                  <SelectItem value="Analyze">Analyze</SelectItem>
+                  <SelectItem value="Evaluate">Evaluate</SelectItem>
+                  <SelectItem value="Create">Create</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-600">Item Type</label>
+              <Select value={filterItemType} onValueChange={setFilterItemType}>
+                <SelectTrigger className="h-9 text-sm bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="MCQ">MCQ</SelectItem>
+                  <SelectItem value="True/False">True/False</SelectItem>
+                  <SelectItem value="Fill in the Blanks">Fill in the Blanks</SelectItem>
+                  <SelectItem value="Short Answer">Short Answer</SelectItem>
+                  <SelectItem value="Long Answer">Long Answer</SelectItem>
+                  <SelectItem value="Case Study">Case Study</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-1">
+              <label className="text-xs font-medium text-gray-600">ELO</label>
+              <Select value={filterELO} onValueChange={setFilterELO}>
+                <SelectTrigger className="h-9 text-sm bg-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  <SelectItem value="all">All ELOs</SelectItem>
+                  {Array.from(new Set(generatedItems.map(item => item.eloTitle))).map(elo => (
+                    <SelectItem key={elo} value={elo}>{elo}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
           <div className="flex-1 overflow-y-auto space-y-2 pr-2">
             {generatedItems.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
                 No items available to import
               </div>
             ) : (
-              generatedItems.map((item) => {
+              (() => {
+                // Apply filters
+                const filteredItems = generatedItems.filter(item => {
+                  if (filterBloomsLevel !== 'all' && item.bloomsLevel !== filterBloomsLevel) return false;
+                  if (filterItemType !== 'all' && item.itemType !== filterItemType) return false;
+                  if (filterELO !== 'all' && item.eloTitle !== filterELO) return false;
+                  return true;
+                });
+                
+                if (filteredItems.length === 0) {
+                  return (
+                    <div className="text-center py-8 text-gray-400">
+                      No items match the selected filters
+                    </div>
+                  );
+                }
+                
+                return filteredItems.map((item) => {
                 // Check if importing to section or subsection
                 const isAlreadyImported = currentImportTarget && (
                   currentImportTarget.subsectionIdx !== null && currentImportTarget.subsectionIdx !== undefined
@@ -1603,12 +1690,48 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                     </div>
                   </div>
                 );
-              })
+              });
+            })()
             )}
           </div>
           <div className="flex items-center justify-between pt-4 border-t">
-            <div className="text-sm text-gray-600">
-              {itemsToImport.length} item(s) selected
+            <div className="flex items-center gap-3">
+              <div className="text-sm text-gray-600">
+                {itemsToImport.length} item(s) selected
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  // Select all visible items
+                  const filteredItems = generatedItems.filter(item => {
+                    if (filterBloomsLevel !== 'all' && item.bloomsLevel !== filterBloomsLevel) return false;
+                    if (filterItemType !== 'all' && item.itemType !== filterItemType) return false;
+                    if (filterELO !== 'all' && item.eloTitle !== filterELO) return false;
+                    
+                    // Don't include already imported items
+                    const isAlreadyImported = currentImportTarget && (
+                      currentImportTarget.subsectionIdx !== null && currentImportTarget.subsectionIdx !== undefined
+                        ? builderData.sections[currentImportTarget.sectionIdx]?.subsections?.[currentImportTarget.subsectionIdx]?.questions?.some((q: any) => q.id === item.id)
+                        : builderData.sections[currentImportTarget.sectionIdx]?.questions?.some((q: any) => q.id === item.id)
+                    );
+                    return !isAlreadyImported;
+                  });
+                  setItemsToImport(filteredItems.map(item => item.id));
+                }}
+                className="text-xs"
+              >
+                Select All Visible
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setItemsToImport([])}
+                className="text-xs"
+                disabled={itemsToImport.length === 0}
+              >
+                Clear Selection
+              </Button>
             </div>
             <div className="flex gap-2">
               <Button 
@@ -1667,6 +1790,9 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                   }
                   
                   setImportDialogOpen(false);
+                  setFilterBloomsLevel('all');
+                  setFilterItemType('all');
+                  setFilterELO('all');
                   setItemsToImport([]);
                   setCurrentImportTarget(null);
                 }}
