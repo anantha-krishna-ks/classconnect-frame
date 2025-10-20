@@ -986,7 +986,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 <PieChart className="h-5 w-5 text-primary" />
                 Bloom's Taxonomy Distribution
               </h4>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {Object.entries(bloomsDistribution).map(([level, count]) => {
                   const getBarColor = (level: string) => {
                     const colors = {
