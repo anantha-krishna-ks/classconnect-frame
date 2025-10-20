@@ -653,13 +653,13 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
       </Card>
 
       {/* Continue Button */}
-      {getSelectedCount() > 0 && !showItemGeneration && (
+      {getSelectedCount() > 0 && (
         <div className="text-center animate-fade-in">
           <Button
             onClick={handleGenerateItems}
             className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold px-12 py-4 h-auto text-lg rounded-xl border border-blue-400/20 hover:scale-105 transition-all duration-300 transform"
           >
-            Generate Items Now
+            {showItemGeneration ? 'Regenerate Items' : 'Generate Items Now'}
           </Button>
         </div>
       )}
