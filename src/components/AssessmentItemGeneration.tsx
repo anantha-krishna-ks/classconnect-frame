@@ -1562,7 +1562,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
           setCurrentImportTarget(null);
         }
       }}>
-        <DialogContent className="max-w-6xl max-h-[85vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-6xl max-h-[95vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>Import Multiple Items</DialogTitle>
           </DialogHeader>
