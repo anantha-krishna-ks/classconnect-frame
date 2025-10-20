@@ -192,7 +192,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 
   useEffect(() => {
     generateItems();
-  }, []);
+  }, [assessmentData.configuredItems]);
 
   // Sync builder data when assessment data changes
   useEffect(() => {

@@ -43,6 +43,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
   const [chapterELOs, setChapterELOs] = useState<{ [key: string]: ELO[] }>({});
   const [loading, setLoading] = useState(false);
   const [showItemGeneration, setShowItemGeneration] = useState(false);
+  const [generationKey, setGenerationKey] = useState(0);
   const { toast } = useToast();
 
   // Item configuration options
@@ -331,8 +332,16 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
       )
     });
 
+    // Increment generation key to trigger regeneration
+    setGenerationKey(prev => prev + 1);
+    
     // Show the item generation component
     setShowItemGeneration(true);
+    
+    toast({
+      title: showItemGeneration ? "Regenerating Items" : "Generating Items",
+      description: "Creating assessment items based on your configuration...",
+    });
   };
 
   return (
@@ -667,6 +676,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
       {/* Assessment Item Generation */}
       {showItemGeneration && (
         <AssessmentItemGeneration
+          key={generationKey}
           assessmentData={assessmentData}
           updateAssessmentData={updateAssessmentData}
         />
