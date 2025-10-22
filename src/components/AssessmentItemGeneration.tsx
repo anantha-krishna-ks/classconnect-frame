@@ -1383,7 +1383,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="perQuestion">Marks per Question</SelectItem>
-                          <SelectItem value="perSubsection">Marks per Subsection</SelectItem>
+                          <SelectItem value="perSubsection">Marks per Section/ Sub-Section</SelectItem>
                         </SelectContent>
                       </Select>
                       <Button 
