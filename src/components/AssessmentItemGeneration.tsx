@@ -78,6 +78,12 @@ type BuilderQuestion = {
   imageUrl?: string | null;
 };
 
+// Helper function to convert numbers to roman numerals
+function toRomanNumeral(num: number): string {
+  const romanNumerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV'];
+  return romanNumerals[num - 1] || num.toString();
+}
+
 function normalizeGeneratedItem(item: GeneratedItem): BuilderQuestion {
   const uniqueId = `q-${item.id}-${Date.now()}-${Math.random().toString(36).slice(2,6)}`;
   return {
@@ -1985,7 +1991,10 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       return (
                         <div key={subsectionIdx} className="mb-3 sm:mb-6">
                           <div className="flex flex-row items-center justify-between gap-2 mb-2 sm:mb-3">
-                            <h4 className="text-xs sm:text-base font-semibold break-words">{subsection.title}</h4>
+                            <h4 className="text-xs sm:text-base font-semibold break-words">
+                              <span className="text-purple-700 mr-2">{toRomanNumeral(subsectionIdx + 1)}.</span>
+                              {subsection.title}
+                            </h4>
                             {subsectionMarksDisplay && (
                               <span className="text-[10px] sm:text-xs font-semibold text-primary border border-primary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
                                 {subsectionMarksDisplay}
@@ -2298,6 +2307,9 @@ const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData
               <div key={subsection.id} className="border border-purple-200 rounded-lg p-3 bg-purple-50/30">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2 flex-1">
+                    <Badge variant="secondary" className="text-xs font-bold bg-purple-100">
+                      {toRomanNumeral(subsectionIdx + 1)}
+                    </Badge>
                     <Input 
                       value={subsection.name}
                       onChange={(e) => renameSubsection(subsectionIdx, e.target.value)}
