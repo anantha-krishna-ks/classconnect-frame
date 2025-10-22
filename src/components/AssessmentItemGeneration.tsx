@@ -2125,17 +2125,6 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                                 </div>
                               </div>
                             )}
-                                {/* Answering Space */}
-                                {builderData.showAnsweringSpace && (
-                                  <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-blue-50/30 border border-dashed border-blue-300 rounded">
-                                    <div className="text-xs sm:text-sm text-gray-500 italic mb-2">Answer Space:</div>
-                                    <div className="space-y-2">
-                                      {Array.from({ length: Math.max(5, Math.floor((question.marks || 1) * 1.5)) }).map((_, idx) => (
-                                        <div key={idx} className="border-b border-gray-300 h-5"></div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
                               </div>
                             );
                           })}
@@ -2230,6 +2219,18 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                                 )}
                               </div>
                             ))}
+                            
+                            {/* Answering Space */}
+                            {builderData.showAnsweringSpace && (
+                              <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-blue-50/30 border border-dashed border-blue-300 rounded">
+                                <div className="text-xs sm:text-sm text-gray-500 italic mb-2">Answer Space:</div>
+                                <div className="space-y-2">
+                                  {Array.from({ length: Math.max(5, Math.floor((question.marks || 1) * 1.5)) }).map((_, idx) => (
+                                    <div key={idx} className="border-b border-gray-300 h-5"></div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         );
                       })}
