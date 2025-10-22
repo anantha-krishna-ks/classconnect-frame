@@ -1941,7 +1941,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                 <div key={sectionIdx} className="border rounded-lg p-2 sm:p-4">
                   <div className="mb-2 sm:mb-4">
                     <div className="flex flex-row items-center justify-between gap-2">
-                      <h3 className="text-sm sm:text-lg font-bold break-words">{section.title}</h3>
+                      <h3 className="text-sm sm:text-lg font-bold break-words text-center flex-1">{section.title}</h3>
                       {!hasSubsections && marksDisplayMode === 'perSubsection' && section.questions && section.questions.length > 0 && (() => {
                         const itemCount = section.questions.length;
                         const marksPerItem = section.questions[0]?.marks || 0;
@@ -1962,7 +1962,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                       })()}
                     </div>
                     {section.instruction && (
-                      <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words">{section.instruction}</p>
+                      <p className="text-xs sm:text-sm text-gray-600 mt-1 break-words text-center">{section.instruction}</p>
                     )}
                   </div>
                   
