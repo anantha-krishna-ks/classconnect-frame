@@ -1939,8 +1939,8 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
               
               return (
                 <div key={sectionIdx} className="border rounded-lg p-2 sm:p-4">
-                  <div className="mb-2 sm:mb-4 text-center">
-                    <div className="flex flex-row items-center justify-center gap-2">
+                  <div className="mb-2 sm:mb-4">
+                    <div className="flex flex-row items-center justify-between gap-2">
                       <h3 className="text-sm sm:text-lg font-bold break-words">{section.title}</h3>
                       {!hasSubsections && marksDisplayMode === 'perSubsection' && section.questions && section.questions.length > 0 && (() => {
                         const itemCount = section.questions.length;
