@@ -1992,7 +1992,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                         <div key={subsectionIdx} className="mb-3 sm:mb-6">
                           <div className="flex flex-row items-center justify-between gap-2 mb-2 sm:mb-3">
                             <h4 className="text-xs sm:text-base font-semibold break-words">
-                              <span className="text-purple-700 mr-2">{toRomanNumeral(subsectionIdx + 1)}.</span>
+                              <span className="text-purple-700 mr-2 font-serif">{toRomanNumeral(subsectionIdx + 1)}.</span>
                               {subsection.name}
                             </h4>
                             {subsectionMarksDisplay && (
@@ -2307,7 +2307,7 @@ const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData
               <div key={subsection.id} className="border border-purple-200 rounded-lg p-3 bg-purple-50/30">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2 flex-1">
-                    <Badge variant="secondary" className="text-xs font-bold bg-purple-100">
+                    <Badge variant="secondary" className="text-xs font-bold bg-purple-100 font-serif">
                       {toRomanNumeral(subsectionIdx + 1)}
                     </Badge>
                     <Input 
