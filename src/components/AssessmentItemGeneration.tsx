@@ -2359,20 +2359,6 @@ const DroppableSectionCard = ({ section, sectionIdx, builderData, setBuilderData
                   </div>
                 </div>
                 
-                {/* Subsection Description/Instruction */}
-                <div className="mb-3">
-                  <Textarea
-                    value={subsection.instruction || ''}
-                    onChange={(e) => {
-                      const updatedSections = [...builderData.sections];
-                      updatedSections[sectionIdx].subsections[subsectionIdx].instruction = e.target.value;
-                      setBuilderData((prev: any) => ({ ...prev, sections: updatedSections }));
-                    }}
-                    placeholder="Enter subsection description/instruction (optional)..."
-                    className="text-xs bg-white resize-none min-h-[60px]"
-                  />
-                </div>
-                
                 {/* Subsection Questions */}
                 <div className="space-y-2">
                   {subsection.questions?.map((question: any, questionIdx: number) => (
