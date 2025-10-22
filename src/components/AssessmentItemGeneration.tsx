@@ -1993,7 +1993,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                           <div className="flex flex-row items-center justify-between gap-2 mb-2 sm:mb-3">
                             <h4 className="text-xs sm:text-base font-semibold break-words">
                               <span className="text-purple-700 mr-2">{toRomanNumeral(subsectionIdx + 1)}.</span>
-                              {subsection.title}
+                              {subsection.name}
                             </h4>
                             {subsectionMarksDisplay && (
                               <span className="text-[10px] sm:text-xs font-semibold text-primary border border-primary px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
