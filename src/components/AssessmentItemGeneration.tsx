@@ -167,7 +167,8 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
     timeMinutes: '',
     examDate: '',
     schoolName: '',
-    schoolLogo: ''
+    schoolLogo: '',
+    showAnsweringSpace: false
   });
   const [historicalQuestions] = useState<GeneratedItem[]>([
     {
@@ -1288,6 +1289,28 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                      />
                    </div>
                  </div>
+                 
+                 {/* Answer Booklet Mode */}
+                 <div className="p-4 bg-white rounded-lg border">
+                   <div className="flex items-center justify-between">
+                     <div className="space-y-1">
+                       <label className="text-sm font-semibold">Answer Booklet Format</label>
+                       <p className="text-xs text-gray-500">Toggle to show answering space for each question</p>
+                     </div>
+                     <div className="flex items-center gap-3">
+                       <span className="text-sm font-medium">{builderData.showAnsweringSpace ? 'With Answering Space' : 'Pure Question Paper'}</span>
+                       <label className="relative inline-flex items-center cursor-pointer">
+                         <input 
+                           type="checkbox" 
+                           checked={builderData.showAnsweringSpace || false}
+                           onChange={(e) => setBuilderData(prev => ({ ...prev, showAnsweringSpace: e.target.checked }))}
+                           className="sr-only peer"
+                         />
+                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                       </label>
+                     </div>
+                   </div>
+                 </div>
               </CardContent>
             </Card>
 
@@ -2073,23 +2096,46 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                                   </div>
                                 )}
                                 
-                                {question.orQuestions && question.orQuestions.length > 0 && question.orQuestions.map((orQuestion: any) => (
-                                  <div key={orQuestion.id} className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-dashed border-gray-400">
-                                    <div className="flex justify-between items-start mb-1 sm:mb-2">
-                                      <h5 className="text-xs sm:text-base font-semibold text-center w-full">OR</h5>
-                                    </div>
-                                    <p className="mb-1 sm:mb-2 text-xs sm:text-base break-words">{orQuestion.text}</p>
-                                    {orQuestion.imageUrl && (
-                                      <div className="mb-1 sm:mb-2">
-                                        <img 
-                                          src={orQuestion.imageUrl} 
-                                          alt="OR Question" 
-                                          className="max-w-full sm:max-w-md rounded border"
-                                        />
-                                      </div>
-                                    )}
+                            {question.orQuestions && question.orQuestions.length > 0 && question.orQuestions.map((orQuestion: any) => (
+                              <div key={orQuestion.id} className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-dashed border-gray-400">
+                                <div className="flex justify-between items-start mb-1 sm:mb-2">
+                                  <h5 className="text-xs sm:text-base font-semibold text-center w-full">OR</h5>
+                                </div>
+                                <p className="mb-1 sm:mb-2 text-xs sm:text-base break-words">{orQuestion.text}</p>
+                                {orQuestion.imageUrl && (
+                                  <div className="mb-1 sm:mb-2">
+                                    <img 
+                                      src={orQuestion.imageUrl} 
+                                      alt="OR Question" 
+                                      className="max-w-full sm:max-w-md rounded border"
+                                    />
                                   </div>
-                                ))}
+                                )}
+                              </div>
+                            ))}
+                            
+                            {/* Answering Space */}
+                            {builderData.showAnsweringSpace && (
+                              <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-blue-50/30 border border-dashed border-blue-300 rounded">
+                                <div className="text-xs sm:text-sm text-gray-500 italic mb-2">Answer Space:</div>
+                                <div className="space-y-2">
+                                  {Array.from({ length: Math.max(5, Math.floor((question.marks || 1) * 1.5)) }).map((_, idx) => (
+                                    <div key={idx} className="border-b border-gray-300 h-5"></div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                                {/* Answering Space */}
+                                {builderData.showAnsweringSpace && (
+                                  <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-blue-50/30 border border-dashed border-blue-300 rounded">
+                                    <div className="text-xs sm:text-sm text-gray-500 italic mb-2">Answer Space:</div>
+                                    <div className="space-y-2">
+                                      {Array.from({ length: Math.max(5, Math.floor((question.marks || 1) * 1.5)) }).map((_, idx) => (
+                                        <div key={idx} className="border-b border-gray-300 h-5"></div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             );
                           })}
