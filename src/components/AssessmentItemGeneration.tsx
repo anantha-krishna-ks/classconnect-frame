@@ -2073,23 +2073,23 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                                   </div>
                                 )}
                                 
-                                {question.orQuestion && (
-                                  <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-dashed border-gray-400">
+                                {question.orQuestions && question.orQuestions.length > 0 && question.orQuestions.map((orQuestion: any) => (
+                                  <div key={orQuestion.id} className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-dashed border-gray-400">
                                     <div className="flex justify-between items-start mb-1 sm:mb-2">
                                       <h5 className="text-xs sm:text-base font-semibold text-center w-full">OR</h5>
                                     </div>
-                                    <p className="mb-1 sm:mb-2 text-xs sm:text-base break-words">{question.orQuestion}</p>
-                                    {question.orQuestionImage && (
+                                    <p className="mb-1 sm:mb-2 text-xs sm:text-base break-words">{orQuestion.text}</p>
+                                    {orQuestion.imageUrl && (
                                       <div className="mb-1 sm:mb-2">
                                         <img 
-                                          src={question.orQuestionImage} 
+                                          src={orQuestion.imageUrl} 
                                           alt="OR Question" 
                                           className="max-w-full sm:max-w-md rounded border"
                                         />
                                       </div>
                                     )}
                                   </div>
-                                )}
+                                ))}
                               </div>
                             );
                           })}
@@ -2167,23 +2167,23 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                               </div>
                             )}
                             
-                            {question.orQuestion && (
-                              <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-dashed border-gray-400">
+                            {question.orQuestions && question.orQuestions.length > 0 && question.orQuestions.map((orQuestion: any) => (
+                              <div key={orQuestion.id} className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-dashed border-gray-400">
                                 <div className="flex justify-between items-start mb-1 sm:mb-2">
                                   <h5 className="text-xs sm:text-base font-semibold text-center w-full">OR</h5>
                                 </div>
-                                <p className="mb-1 sm:mb-2 text-xs sm:text-base break-words">{question.orQuestion}</p>
-                                {question.orQuestionImage && (
+                                <p className="mb-1 sm:mb-2 text-xs sm:text-base break-words">{orQuestion.text}</p>
+                                {orQuestion.imageUrl && (
                                   <div className="mb-1 sm:mb-2">
                                     <img 
-                                      src={question.orQuestionImage} 
+                                      src={orQuestion.imageUrl} 
                                       alt="OR Question" 
                                       className="max-w-full sm:max-w-md rounded border"
                                     />
                                   </div>
                                 )}
                               </div>
-                            )}
+                            ))}
                           </div>
                         );
                       })}
@@ -2809,30 +2809,37 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
           </div>
         )}
         
-        {/* OR Option */}
-        {question.hasOROption && (
-          <div className="ml-8 mt-4 p-3 bg-orange-50 rounded border border-orange-300">
+        {/* OR Questions */}
+        {question.orQuestions && question.orQuestions.length > 0 && question.orQuestions.map((orQuestion: any, orIdx: number) => (
+          <div key={orQuestion.id} className="ml-8 mt-4 p-3 bg-orange-50 rounded border border-orange-300">
             <div className="flex items-center justify-between mb-2">
               <span className="font-bold text-center bg-orange-200 px-2 py-1 rounded text-sm">OR</span>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onUpdate({ ...question, hasOROption: false, orQuestion: '', orQuestionImage: null, hasOrQuestionImage: false })}
+                onClick={() => {
+                  const updatedOrQuestions = question.orQuestions.filter((_: any, idx: number) => idx !== orIdx);
+                  onUpdate({ ...question, orQuestions: updatedOrQuestions });
+                }}
                 className="h-6 w-6 p-0 text-red-500 hover:bg-red-100"
               >
                 <Trash2 className="h-3 w-3" />
               </Button>
             </div>
             <Textarea
-              value={question.orQuestion || ''}
-              onChange={(e) => onUpdate({ ...question, orQuestion: e.target.value })}
+              value={orQuestion.text || ''}
+              onChange={(e) => {
+                const updatedOrQuestions = [...question.orQuestions];
+                updatedOrQuestions[orIdx] = { ...orQuestion, text: e.target.value };
+                onUpdate({ ...question, orQuestions: updatedOrQuestions });
+              }}
               className="w-full min-h-[40px] resize-none bg-white"
               placeholder="Enter alternative question..."
             />
             
             {/* OR Question Image */}
             <div className="mt-2">
-              {(imagePreviews[`or-${question.id}`] || question.orQuestionImage) ? (
+              {(imagePreviews[`or-${question.id}-${orIdx}`] || orQuestion.imageUrl) ? (
                 <div className="relative bg-white p-2 rounded border">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-xs text-orange-700 flex items-center gap-1">
@@ -2842,14 +2849,21 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => removeImage(`or-${question.id}`, 'orQuestion')}
+                      onClick={() => {
+                        const updatedOrQuestions = [...question.orQuestions];
+                        updatedOrQuestions[orIdx] = { ...orQuestion, imageUrl: null };
+                        onUpdate({ ...question, orQuestions: updatedOrQuestions });
+                        const newPreviews = { ...imagePreviews };
+                        delete newPreviews[`or-${question.id}-${orIdx}`];
+                        setImagePreviews(newPreviews);
+                      }}
                       className="h-5 w-5 p-0 text-red-500 hover:bg-red-100 rounded-full"
                     >
                       <X className="h-3 w-3" />
                     </Button>
                   </div>
                   <img 
-                    src={imagePreviews[`or-${question.id}`] || question.orQuestionImage} 
+                    src={imagePreviews[`or-${question.id}-${orIdx}`] || orQuestion.imageUrl} 
                     alt="OR question image" 
                     className="max-w-full h-auto max-h-24 rounded border object-contain"
                   />
@@ -2862,13 +2876,26 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
                       accept="image/*"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if (file) handleImageUpload(`or-${question.id}`, file, 'orQuestion');
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            const imageUrl = reader.result as string;
+                            const updatedOrQuestions = [...question.orQuestions];
+                            updatedOrQuestions[orIdx] = { ...orQuestion, imageUrl };
+                            onUpdate({ ...question, orQuestions: updatedOrQuestions });
+                            setImagePreviews(prev => ({
+                              ...prev,
+                              [`or-${question.id}-${orIdx}`]: imageUrl
+                            }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
                       }}
                       className="hidden"
-                      id={`or-image-upload-${question.id}`}
+                      id={`or-image-upload-${question.id}-${orIdx}`}
                     />
                     <label 
-                      htmlFor={`or-image-upload-${question.id}`}
+                      htmlFor={`or-image-upload-${question.id}-${orIdx}`}
                       className="inline-flex items-center px-2 py-1 bg-orange-600 text-white text-xs rounded cursor-pointer hover:bg-orange-700"
                     >
                       <Image className="h-3 w-3 mr-1" />
@@ -2879,7 +2906,7 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
               )}
             </div>
           </div>
-        )}
+        ))}
         
         {/* Controls */}
         <div className="flex gap-2 mt-3 pt-2 border-t">
@@ -2907,10 +2934,25 @@ const ExamQuestionCard = ({ question, questionNumber, onUpdate, onDelete, dragHa
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onUpdate({ ...question, hasOROption: !question.hasOROption })}
-            className="text-orange-600 border-orange-300 hover:bg-orange-50"
+            onClick={() => {
+              const currentOrQuestions = question.orQuestions || [];
+              if (currentOrQuestions.length < 3) {
+                const newOrQuestion = {
+                  id: Date.now(),
+                  text: '',
+                  imageUrl: null
+                };
+                onUpdate({
+                  ...question,
+                  orQuestions: [...currentOrQuestions, newOrQuestion]
+                });
+              }
+            }}
+            disabled={(question.orQuestions || []).length >= 3}
+            className="text-orange-600 border-orange-300 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {question.hasOROption ? 'Remove OR' : 'Add OR'}
+            <Plus className="h-3 w-3 mr-1" />
+            Add OR ({(question.orQuestions || []).length}/3)
           </Button>
           <Button
             variant="outline"
