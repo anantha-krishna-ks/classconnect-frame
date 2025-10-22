@@ -2012,15 +2012,16 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                             
                             return (
                               <div key={question.id} className="mb-3 sm:mb-6 p-2 sm:p-4 border-l-2 sm:border-l-4 border-blue-500 bg-gray-50">
-                                <div className="flex justify-between items-start mb-1 sm:mb-2 gap-2">
-                                  <h4 className="text-xs sm:text-base font-semibold">{questionNumber}:</h4>
+                                <div className="flex justify-between items-start mb-2 sm:mb-3 gap-2">
+                                  <p className="text-xs sm:text-base break-words">
+                                    <span className="font-semibold">{questionNumber}.</span> {question.text || question.question}
+                                  </p>
                                   {marksDisplayMode === 'perQuestion' && (
                                     <span className="text-[10px] sm:text-sm font-medium bg-blue-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded shrink-0">
                                       [{question.marks} marks]
                                     </span>
                                   )}
                                 </div>
-                                <p className="mb-2 sm:mb-3 text-xs sm:text-base break-words">{question.text || question.question}</p>
                                 
                                 {question.imageUrl && (
                                   <div className="mb-2 sm:mb-3">
