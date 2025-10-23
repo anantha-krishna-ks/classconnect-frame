@@ -945,6 +945,15 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                           />
 
                                            <div className="flex items-center gap-2">
+                                             <Button
+                                               variant="outline"
+                                               size="sm"
+                                               onClick={handleMergeDialogOpen}
+                                               className="h-9 px-3"
+                                               title="Merge ELO from another chapter"
+                                             >
+                                               <GitMerge className="h-4 w-4" />
+                                             </Button>
                                             <Button
                                               variant="ghost"
                                               size="sm"
@@ -960,15 +969,6 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                                className="h-9 px-3"
                                              >
                                                <Plus className="h-4 w-4" />
-                                             </Button>
-                                             <Button
-                                               variant="outline"
-                                               size="sm"
-                                               onClick={handleMergeDialogOpen}
-                                               className="h-9 px-3"
-                                               title="Merge ELO from another chapter"
-                                             >
-                                               <GitMerge className="h-4 w-4" />
                                              </Button>
                                           </div>
                                         </div>
