@@ -57,6 +57,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
   const [selectedMergeChapter, setSelectedMergeChapter] = useState<string>('');
   const [selectedMergeELO, setSelectedMergeELO] = useState<string>('');
   const [loadingMergeData, setLoadingMergeData] = useState(false);
+  const [targetChapterId, setTargetChapterId] = useState<string>('');
   const { toast } = useToast();
 
   // Item configuration options
@@ -626,22 +627,29 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
     const selectedSubject = mergeSubjects.find(s => s.SubjectId.toString() === selectedMergeSubject);
     const selectedChapter = mergeChapters.find(c => c.chapterId === selectedMergeChapter);
     
-    if (selectedELO && selectedSubject && selectedChapter) {
+    if (selectedELO && selectedSubject && selectedChapter && targetChapterId) {
       const updatedChapterELOs = { ...chapterELOs };
       
-      if (!updatedChapterELOs[selectedChapter.chapterId]) {
-        updatedChapterELOs[selectedChapter.chapterId] = [];
+      // Add to the TARGET chapter (where user clicked merge), not the source chapter
+      if (!updatedChapterELOs[targetChapterId]) {
+        updatedChapterELOs[targetChapterId] = [];
       }
       
-      updatedChapterELOs[selectedChapter.chapterId].push({
+      const mergedELO = {
         ...selectedELO,
-        id: `${selectedChapter.chapterId}-merged-${Date.now()}`,
+        id: `${targetChapterId}-merged-${Date.now()}`,
         selected: true,
         mergedFrom: {
           subjectName: selectedSubject.SubjectName,
           chapterName: selectedChapter.chapterName
         }
-      });
+      };
+      
+      updatedChapterELOs[targetChapterId].push(mergedELO);
+      
+      console.log('Merged ELO:', mergedELO);
+      console.log('Target Chapter:', targetChapterId);
+      console.log('Merged From:', selectedSubject.SubjectName, '-', selectedChapter.chapterName);
       
       setChapterELOs(updatedChapterELOs);
       
@@ -654,6 +662,17 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
       setSelectedMergeSubject('');
       setSelectedMergeChapter('');
       setSelectedMergeELO('');
+      
+      // Scroll to the merged ELO after a short delay
+      setTimeout(() => {
+        const element = document.getElementById(`elo-${mergedELO.id}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Add a highlight animation
+          element.classList.add('animate-pulse');
+          setTimeout(() => element.classList.remove('animate-pulse'), 2000);
+        }
+      }, 300);
     }
   };
 
@@ -717,6 +736,20 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                         <Badge variant="secondary" className="bg-blue-100 text-blue-700">
                           {chapterELOs[chapter.chapterId]?.filter(elo => elo.selected).length || 0} selected
                         </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTargetChapterId(chapter.chapterId);
+                            handleMergeDialogOpen();
+                          }}
+                          className="h-8 px-3 gap-2"
+                          title="Merge ELO from another chapter"
+                        >
+                          <GitMerge className="h-4 w-4" />
+                          <span className="text-xs">Merge ELO</span>
+                        </Button>
                       </div>
                       <div className="flex items-center gap-6 bg-gradient-to-r from-blue-50 to-cyan-50 px-4 py-2 rounded-lg border border-blue-200/50">
                         <div className="flex items-center gap-2">
@@ -751,7 +784,12 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                           const { totalItems, totalMarks } = calculateELOTotals(elo);
                           
                           return (
-                            <AccordionItem key={elo.id} value={elo.id} className="border rounded-lg mb-4">
+                            <AccordionItem 
+                              key={elo.id} 
+                              value={elo.id} 
+                              id={`elo-${elo.id}`}
+                              className="border rounded-lg mb-4"
+                            >
                               <div className="flex items-center justify-between p-4">
                                 <div className="flex items-center gap-3 flex-1">
                                   <Checkbox
@@ -759,33 +797,47 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                     onCheckedChange={(checked) => handleELOSelection(elo, checked as boolean)}
                                   />
                                   <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <h4 className="font-medium text-foreground">{elo.title}</h4>
+                                    {/* ELO Title and Merged Badge on separate line for prominence */}
+                                    <div className="space-y-2">
                                       <div className="flex items-center gap-2">
+                                        <h4 className="font-medium text-foreground">{elo.title}</h4>
+                                      </div>
+                                      
+                                      {/* Merged badge - prominent and on its own row */}
+                                      {elo.mergedFrom && (
+                                        <div className="animate-fade-in">
+                                          <Badge 
+                                            variant="outline" 
+                                            className="text-sm bg-gradient-to-r from-purple-100 to-purple-50 text-purple-800 border-purple-300 flex items-center gap-2 w-fit shadow-sm hover:shadow-md transition-shadow"
+                                          >
+                                            <GitMerge className="h-4 w-4 animate-pulse" />
+                                            <span className="font-medium">
+                                              Merged from: {elo.mergedFrom.subjectName} - {elo.mergedFrom.chapterName}
+                                            </span>
+                                          </Badge>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Other badges in a flex row */}
+                                      <div className="flex flex-wrap items-center gap-2">
                                         <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
                                           {totalItems}/{elo.maxItems} items
                                         </Badge>
                                         <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
                                           {totalMarks}/{elo.maxMarks} marks
                                         </Badge>
+                                        {elo.previousAssessments && elo.previousAssessments.length > 0 && (
+                                          <>
+                                            {elo.previousAssessments.map(assessment => (
+                                              <Badge key={assessment} variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
+                                                {assessment}
+                                              </Badge>
+                                            ))}
+                                          </>
+                                        )}
                                       </div>
-                                      {elo.mergedFrom && (
-                                        <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200 flex items-center gap-1">
-                                          <GitMerge className="h-3 w-3" />
-                                          Merged from: {elo.mergedFrom.subjectName} - {elo.mergedFrom.chapterName}
-                                        </Badge>
-                                      )}
-                                      {elo.previousAssessments && elo.previousAssessments.length > 0 && (
-                                        <div className="flex gap-1">
-                                          {elo.previousAssessments.map(assessment => (
-                                            <Badge key={assessment} variant="outline" className="text-xs bg-orange-50 text-orange-700 border-orange-200">
-                                              {assessment}
-                                            </Badge>
-                                          ))}
-                                        </div>
-                                      )}
                                     </div>
-                                    <p className="text-sm text-muted-foreground">{elo.description}</p>
+                                    <p className="text-sm text-muted-foreground mt-2">{elo.description}</p>
                                   </div>
                                 </div>
                                 
@@ -945,15 +997,6 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                           />
 
                                            <div className="flex items-center gap-2">
-                                             <Button
-                                               variant="outline"
-                                               size="sm"
-                                               onClick={handleMergeDialogOpen}
-                                               className="h-9 px-3"
-                                               title="Merge ELO from another chapter"
-                                             >
-                                               <GitMerge className="h-4 w-4" />
-                                             </Button>
                                             <Button
                                               variant="ghost"
                                               size="sm"
