@@ -7,10 +7,11 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Plus } from 'lucide-react';
-import { generateCourseOutcomes } from '../pages/api';
+import { Trash2, Plus, GitMerge } from 'lucide-react';
+import { generateCourseOutcomes, getSubjects, getChapters, Subject, Chapter } from '../pages/api';
 import { useToast } from '@/hooks/use-toast';
 import AssessmentItemGeneration from './AssessmentItemGeneration';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 interface ItemConfigRow {
   id: string;
@@ -44,6 +45,14 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
   const [loading, setLoading] = useState(false);
   const [showItemGeneration, setShowItemGeneration] = useState(false);
   const [generationKey, setGenerationKey] = useState(0);
+  const [mergeDialogOpen, setMergeDialogOpen] = useState(false);
+  const [mergeSubjects, setMergeSubjects] = useState<Subject[]>([]);
+  const [mergeChapters, setMergeChapters] = useState<Chapter[]>([]);
+  const [mergeELOs, setMergeELOs] = useState<ELO[]>([]);
+  const [selectedMergeSubject, setSelectedMergeSubject] = useState<string>('');
+  const [selectedMergeChapter, setSelectedMergeChapter] = useState<string>('');
+  const [selectedMergeELO, setSelectedMergeELO] = useState<string>('');
+  const [loadingMergeData, setLoadingMergeData] = useState(false);
   const { toast } = useToast();
 
   // Item configuration options
@@ -344,6 +353,150 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
     });
   };
 
+  const loadMergeSubjects = async () => {
+    try {
+      setLoadingMergeData(true);
+      const orgcode = localStorage.getItem('orgcode') || 'DEMO';
+      const classId = parseInt(assessmentData.grade) || 1;
+      const subjects = await getSubjects(orgcode, classId);
+      setMergeSubjects(subjects);
+    } catch (error) {
+      console.error('Error loading subjects:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load subjects",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingMergeData(false);
+    }
+  };
+
+  const loadMergeChapters = async (planClassId: string) => {
+    try {
+      setLoadingMergeData(true);
+      const orgcode = localStorage.getItem('orgcode') || 'DEMO';
+      const chapters = await getChapters(orgcode, planClassId);
+      setMergeChapters(chapters);
+    } catch (error) {
+      console.error('Error loading chapters:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load chapters",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingMergeData(false);
+    }
+  };
+
+  const loadMergeELOs = async (chapterName: string) => {
+    try {
+      setLoadingMergeData(true);
+      const gradeName = `Grade ${assessmentData.grade}`;
+      const subjectName = mergeSubjects.find(s => s.SubjectId.toString() === selectedMergeSubject)?.SubjectName || '';
+      
+      const response = await generateCourseOutcomes(
+        assessmentData.board,
+        gradeName,
+        subjectName,
+        chapterName
+      );
+
+      if (response && response.course_outcomes) {
+        const elos: ELO[] = response.course_outcomes.map((outcome: any, index: number) => ({
+          id: `merge-${index}`,
+          title: outcome.co_title || `ELO ${index + 1}`,
+          description: outcome.co_description || 'Learning outcome description',
+          selected: false,
+          itemConfigRows: [],
+          maxItems: 10,
+          maxMarks: 20
+        }));
+        setMergeELOs(elos);
+      }
+    } catch (error) {
+      console.error('Error loading ELOs:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load ELOs",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingMergeData(false);
+    }
+  };
+
+  const handleMergeDialogOpen = () => {
+    setMergeDialogOpen(true);
+    loadMergeSubjects();
+  };
+
+  const handleSubjectChange = (value: string) => {
+    setSelectedMergeSubject(value);
+    setSelectedMergeChapter('');
+    setSelectedMergeELO('');
+    setMergeChapters([]);
+    setMergeELOs([]);
+    
+    const subject = mergeSubjects.find(s => s.SubjectId.toString() === value);
+    if (subject) {
+      loadMergeChapters(subject.PlanClassId);
+    }
+  };
+
+  const handleChapterChange = (value: string) => {
+    setSelectedMergeChapter(value);
+    setSelectedMergeELO('');
+    setMergeELOs([]);
+    
+    const chapter = mergeChapters.find(c => c.chapterId === value);
+    if (chapter) {
+      loadMergeELOs(chapter.chapterName);
+    }
+  };
+
+  const handleMerge = () => {
+    if (!selectedMergeSubject || !selectedMergeChapter || !selectedMergeELO) {
+      toast({
+        title: "Incomplete Selection",
+        description: "Please select Subject, Chapter, and ELO to merge",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const selectedELO = mergeELOs.find(elo => elo.id === selectedMergeELO);
+    if (selectedELO) {
+      const updatedChapterELOs = { ...chapterELOs };
+      const selectedChapter = mergeChapters.find(c => c.chapterId === selectedMergeChapter);
+      
+      if (selectedChapter) {
+        if (!updatedChapterELOs[selectedChapter.chapterId]) {
+          updatedChapterELOs[selectedChapter.chapterId] = [];
+        }
+        
+        updatedChapterELOs[selectedChapter.chapterId].push({
+          ...selectedELO,
+          id: `${selectedChapter.chapterId}-merged-${Date.now()}`,
+          selected: true
+        });
+        
+        setChapterELOs(updatedChapterELOs);
+        
+        toast({
+          title: "ELO Merged Successfully",
+          description: `${selectedELO.title} has been added to ${selectedChapter.chapterName}`,
+        });
+        
+        setMergeDialogOpen(false);
+        setSelectedMergeSubject('');
+        setSelectedMergeChapter('');
+        setSelectedMergeELO('');
+      }
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Progress Indicator */}
@@ -625,7 +778,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                             className="h-9"
                                           />
 
-                                          <div className="flex items-center gap-2">
+                                           <div className="flex items-center gap-2">
                                             <Button
                                               variant="ghost"
                                               size="sm"
@@ -641,6 +794,15 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                                className="h-9 px-3"
                                              >
                                                <Plus className="h-4 w-4" />
+                                             </Button>
+                                             <Button
+                                               variant="outline"
+                                               size="sm"
+                                               onClick={handleMergeDialogOpen}
+                                               className="h-9 px-3"
+                                               title="Merge ELO from another chapter"
+                                             >
+                                               <GitMerge className="h-4 w-4" />
                                              </Button>
                                           </div>
                                         </div>
@@ -681,6 +843,132 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
           updateAssessmentData={updateAssessmentData}
         />
       )}
+
+      {/* Merge ELO Dialog */}
+      <Dialog open={mergeDialogOpen} onOpenChange={setMergeDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Merge ELO from Another Chapter</DialogTitle>
+            <DialogDescription>
+              Select a subject, chapter, and ELO to merge into your current assessment
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 py-4">
+            {/* Subject Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Subject</label>
+              <Select
+                value={selectedMergeSubject}
+                onValueChange={handleSubjectChange}
+                disabled={loadingMergeData}
+              >
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Select a subject" />
+                </SelectTrigger>
+                <SelectContent className="bg-background z-[100]">
+                  {mergeSubjects.map(subject => (
+                    <SelectItem key={subject.SubjectId} value={subject.SubjectId.toString()}>
+                      {subject.SubjectName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Chapter Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Chapter</label>
+              <Select
+                value={selectedMergeChapter}
+                onValueChange={handleChapterChange}
+                disabled={!selectedMergeSubject || loadingMergeData}
+              >
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Select a chapter" />
+                </SelectTrigger>
+                <SelectContent className="bg-background z-[100]">
+                  {mergeChapters.map(chapter => (
+                    <SelectItem key={chapter.chapterId} value={chapter.chapterId}>
+                      {chapter.chapterName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* ELO Selection */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Expected Learning Outcome (ELO)</label>
+              <Select
+                value={selectedMergeELO}
+                onValueChange={setSelectedMergeELO}
+                disabled={!selectedMergeChapter || loadingMergeData}
+              >
+                <SelectTrigger className="w-full bg-background">
+                  <SelectValue placeholder="Select an ELO" />
+                </SelectTrigger>
+                <SelectContent className="bg-background z-[100]">
+                  {mergeELOs.map(elo => (
+                    <SelectItem key={elo.id} value={elo.id}>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{elo.title}</span>
+                        <span className="text-xs text-muted-foreground">{elo.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Loading Indicator */}
+            {loadingMergeData && (
+              <div className="flex items-center justify-center gap-2 py-4">
+                <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                <span className="text-sm text-muted-foreground">Loading...</span>
+              </div>
+            )}
+
+            {/* Merge Info */}
+            {selectedMergeELO && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-2">
+                  <GitMerge className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-blue-900 mb-1">Ready to Merge</h4>
+                    <p className="text-sm text-blue-700">
+                      The selected ELO will be added to your current assessment and marked as selected.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setMergeDialogOpen(false);
+                setSelectedMergeSubject('');
+                setSelectedMergeChapter('');
+                setSelectedMergeELO('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleMerge}
+              disabled={!selectedMergeELO || loadingMergeData}
+              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+            >
+              <GitMerge className="h-4 w-4 mr-2" />
+              Merge ELO
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
