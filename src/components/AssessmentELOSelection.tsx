@@ -401,9 +401,14 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
       const orgcode = localStorage.getItem('orgcode') || 'DEMO';
       const chapters = await getChapters(orgcode, planClassId);
       
-      // If API returns empty, use mock data based on subject
-      if (!chapters || chapters.length === 0) {
-        console.log('No chapters from API, using mock data');
+      // Filter out invalid/null chapter entries
+      const validChapters = (chapters || []).filter(
+        c => c && c.chapterId && c.chapterName && String(c.chapterName).trim() !== ''
+      );
+      
+      // If no valid chapters, use mock data
+      if (validChapters.length === 0) {
+        console.log('No valid chapters from API, using mock data');
         const mockChapters: Chapter[] = [
           { chapterId: `${planClassId}-ch1`, chapterName: 'Chapter 1 - Introduction' },
           { chapterId: `${planClassId}-ch2`, chapterName: 'Chapter 2 - Fundamentals' },
@@ -411,8 +416,10 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
           { chapterId: `${planClassId}-ch4`, chapterName: 'Chapter 4 - Applications' }
         ];
         setMergeChapters(mockChapters);
+        console.log('Set mock chapters:', mockChapters.length);
       } else {
-        setMergeChapters(chapters);
+        setMergeChapters(validChapters);
+        console.log('Set valid chapters from API:', validChapters.length);
       }
     } catch (error) {
       console.error('Error loading chapters:', error);
@@ -436,6 +443,44 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
   const loadMergeELOs = async (chapterName: string) => {
     try {
       setLoadingMergeData(true);
+      
+      // Guard: if chapterName is empty or blank, use mock data immediately
+      if (!chapterName || String(chapterName).trim() === '') {
+        console.log('Empty chapter name, using mock ELOs');
+        const mockELOs: ELO[] = [
+          {
+            id: 'merge-mock-1',
+            title: 'Understanding Core Concepts',
+            description: 'Students will be able to understand and explain the fundamental concepts of this chapter',
+            selected: false,
+            itemConfigRows: [],
+            maxItems: 10,
+            maxMarks: 20
+          },
+          {
+            id: 'merge-mock-2',
+            title: 'Application of Knowledge',
+            description: 'Students will be able to apply learned concepts to solve practical problems',
+            selected: false,
+            itemConfigRows: [],
+            maxItems: 10,
+            maxMarks: 20
+          },
+          {
+            id: 'merge-mock-3',
+            title: 'Analysis and Critical Thinking',
+            description: 'Students will be able to analyze situations and demonstrate critical thinking skills',
+            selected: false,
+            itemConfigRows: [],
+            maxItems: 10,
+            maxMarks: 20
+          }
+        ];
+        setMergeELOs(mockELOs);
+        setLoadingMergeData(false);
+        return;
+      }
+      
       const gradeName = `Grade ${assessmentData.grade}`;
       const subjectName = mergeSubjects.find(s => s.SubjectId.toString() === selectedMergeSubject)?.SubjectName || '';
       
@@ -457,6 +502,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
           maxMarks: 20
         }));
         setMergeELOs(elos);
+        console.log('Set ELOs from API:', elos.length);
       } else {
         // Use mock ELOs if API returns empty
         console.log('No ELOs from API, using mock data');
@@ -952,7 +998,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
 
       {/* Merge ELO Dialog */}
       <Dialog open={mergeDialogOpen} onOpenChange={setMergeDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl" onInteractOutside={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>Merge ELO from Another Chapter</DialogTitle>
             <DialogDescription>
@@ -972,12 +1018,16 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                 <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Select a subject" />
                 </SelectTrigger>
-                <SelectContent className="bg-background z-[100]">
-                  {mergeSubjects.map(subject => (
-                    <SelectItem key={subject.SubjectId} value={subject.SubjectId.toString()}>
-                      {subject.SubjectName}
-                    </SelectItem>
-                  ))}
+                <SelectContent className="bg-white dark:bg-slate-900 z-[1000]">
+                  {mergeSubjects.length === 0 ? (
+                    <SelectItem value="no-subjects" disabled>No subjects found</SelectItem>
+                  ) : (
+                    mergeSubjects.map(subject => (
+                      <SelectItem key={subject.SubjectId} value={subject.SubjectId.toString()}>
+                        {subject.SubjectName}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -993,12 +1043,16 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                 <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Select a chapter" />
                 </SelectTrigger>
-                <SelectContent className="bg-background z-[100]">
-                  {mergeChapters.map(chapter => (
-                    <SelectItem key={chapter.chapterId} value={chapter.chapterId}>
-                      {chapter.chapterName}
-                    </SelectItem>
-                  ))}
+                <SelectContent className="bg-white dark:bg-slate-900 z-[1000]">
+                  {mergeChapters.length === 0 ? (
+                    <SelectItem value="no-chapters" disabled>No chapters found</SelectItem>
+                  ) : (
+                    mergeChapters.map(chapter => (
+                      <SelectItem key={chapter.chapterId} value={chapter.chapterId}>
+                        {chapter.chapterName}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -1014,15 +1068,19 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                 <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Select an ELO" />
                 </SelectTrigger>
-                <SelectContent className="bg-background z-[100]">
-                  {mergeELOs.map(elo => (
-                    <SelectItem key={elo.id} value={elo.id}>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{elo.title}</span>
-                        <span className="text-xs text-muted-foreground">{elo.description}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
+                <SelectContent className="bg-white dark:bg-slate-900 z-[1000]">
+                  {mergeELOs.length === 0 ? (
+                    <SelectItem value="no-elos" disabled>No ELOs found</SelectItem>
+                  ) : (
+                    mergeELOs.map(elo => (
+                      <SelectItem key={elo.id} value={elo.id}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{elo.title}</span>
+                          <span className="text-xs text-muted-foreground">{elo.description}</span>
+                        </div>
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
