@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
@@ -15,7 +15,7 @@ import {
   Eye, Edit, Trash2, CheckCircle2, Clock, BookOpen, Target, 
   BarChart3, PieChart, Save, Filter, X, Sparkles, Image, Upload,
   GripVertical, Plus, FileDown, Settings, ChevronDown, FileCheck,
-  Brain, Lightbulb, Wrench, Search, Scale, Palette
+  Brain, Lightbulb, Wrench, Search, Scale, Palette, RefreshCw
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -148,6 +148,11 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
   const [filterBloomsLevel, setFilterBloomsLevel] = useState<string>('all');
   const [filterItemType, setFilterItemType] = useState<string>('all');
   const [filterELO, setFilterELO] = useState<string>('all');
+  
+  // Regenerate dialog state
+  const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
+  const [regenerateTarget, setRegenerateTarget] = useState<GeneratedItem | null>(null);
+  const [additionalInstructions, setAdditionalInstructions] = useState('');
   
   // Marks display preference: 'perQuestion' or 'perSubsection'
   const [marksDisplayMode, setMarksDisplayMode] = useState<'perQuestion' | 'perSubsection'>('perQuestion');
@@ -304,6 +309,47 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
     setGeneratedItems(prev => prev.filter(item => item.id !== itemId));
     setSelectedItems(prev => prev.filter(id => id !== itemId));
     toast.success('Item deleted successfully');
+  };
+
+  const openRegenerateDialog = (item: GeneratedItem) => {
+    setRegenerateTarget(item);
+    setAdditionalInstructions('');
+    setRegenerateDialogOpen(true);
+  };
+
+  const regenerateItem = async (item: GeneratedItem, instructions?: string) => {
+    setRegenerateDialogOpen(false);
+    
+    try {
+      // Simulate regeneration delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Generate new question content
+      let newQuestion = generateMockQuestion(item.itemType, item.bloomsLevel, item.eloTitle);
+      
+      // If additional instructions provided, append them as a note
+      if (instructions && instructions.trim()) {
+        newQuestion += ` [Modified based on: ${instructions.trim()}]`;
+      }
+      
+      // Update the item with new content
+      setGeneratedItems(prev => prev.map(i => 
+        i.id === item.id 
+          ? { 
+              ...i, 
+              question: newQuestion,
+              ...(item.itemType === 'Multiple Choice' && {
+                options: generateMockOptions(),
+                correctAnswer: generateMockOptions()[0]
+              })
+            }
+          : i
+      ));
+      
+      toast.success('Item regenerated successfully!');
+    } catch (error) {
+      toast.error('Failed to regenerate item. Please try again.');
+    }
   };
 
   const updateItem = (updatedItem: GeneratedItem) => {
@@ -561,6 +607,55 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
 
   return (
     <div className="space-y-8">
+      {/* Regenerate Item Dialog */}
+      <Dialog open={regenerateDialogOpen} onOpenChange={setRegenerateDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Regenerate Assessment Item</DialogTitle>
+            <DialogDescription>
+              Provide any specific requirements or modifications for the regenerated item (optional).
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="regenerate-instructions" className="text-sm font-medium">Additional Instructions</label>
+              <Textarea
+                id="regenerate-instructions"
+                placeholder="Enter any specific requirements or modifications you want for the regenerated item..."
+                value={additionalInstructions}
+                onChange={(e) => setAdditionalInstructions(e.target.value)}
+                className="min-h-[120px] resize-none"
+                maxLength={500}
+              />
+              <div className="text-xs text-muted-foreground text-right">
+                {additionalInstructions.length}/500 characters
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRegenerateDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (regenerateTarget) {
+                  regenerateItem(regenerateTarget, additionalInstructions);
+                }
+              }}
+              disabled={!regenerateTarget}
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Regenerate
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Generation Results Header */}
       <Card className="border border-border/50 bg-white">
         <CardContent className="p-6">
@@ -737,6 +832,7 @@ const AssessmentItemGeneration = ({ assessmentData, updateAssessmentData }: Asse
                                 onPreview={() => setPreviewItem(item)}
                                 onEdit={() => setEditingItem(item)}
                                 onDelete={() => deleteItem(item.id)}
+                                onRegenerate={() => openRegenerateDialog(item)}
                                 getTypeColor={getTypeColor}
                                 getBadgeColor={getBadgeColor}
                               />
@@ -3345,7 +3441,8 @@ const DraggableQuestionCard = ({
   onSelect, 
   onPreview, 
   onEdit, 
-  onDelete, 
+  onDelete,
+  onRegenerate, 
   getTypeColor, 
   getBadgeColor 
 }: any) => {
@@ -3411,6 +3508,9 @@ const DraggableQuestionCard = ({
                 </Button>
                 <Button variant="ghost" size="sm" onClick={onEdit}>
                   <Edit className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={onRegenerate} title="Regenerate item">
+                  <RefreshCw className="h-4 w-4 text-green-600" />
                 </Button>
                 <Button variant="ghost" size="sm" onClick={onDelete}>
                   <Trash2 className="h-4 w-4 text-red-500" />
