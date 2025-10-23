@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { GripVertical, Plus, X, Merge, ChevronDown, Brain, Loader2, AlertCircle, CheckCircle, Edit3, RefreshCw, Save, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -58,6 +59,11 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
   // Edit content state
   const [editingContent, setEditingContent] = useState<{stepKey: string; resourceName: string} | null>(null);
   const [editedContent, setEditedContent] = useState('');
+  
+  // Regenerate dialog state
+  const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
+  const [regenerateTarget, setRegenerateTarget] = useState<{stepKey: string; resourceName: string} | null>(null);
+  const [additionalInstructions, setAdditionalInstructions] = useState('');
   
   // Merge tracking state
   const [mergedELOs, setMergedELOs] = useState<{[mergedKey: string]: string[]}>({});
@@ -1731,11 +1737,18 @@ Students use the story framework to reflect on:
     });
   };
 
-  const regenerateContentForResource = async (stepKey: string, resourceName: string) => {
+  const openRegenerateDialog = (stepKey: string, resourceName: string) => {
+    setRegenerateTarget({ stepKey, resourceName });
+    setAdditionalInstructions('');
+    setRegenerateDialogOpen(true);
+  };
+
+  const regenerateContentForResource = async (stepKey: string, resourceName: string, instructions?: string) => {
     const [eloIndex, stepId] = stepKey.split('_');
     const stepName = fiveESteps.find(s => s.id === stepId)?.name || stepId;
     
-    // Set generating state for this specific resource
+    // Close dialog and set generating state
+    setRegenerateDialogOpen(false);
     setGeneratingContent(prev => ({ ...prev, [stepKey]: true }));
     
     try {
@@ -1745,7 +1758,12 @@ Students use the story framework to reflect on:
       // Map resource to type and generate content
       const mappedType = mapResourceToType(resourceName);
       if (mappedType) {
-        const content = getPredefinedContent(stepName, mappedType, eloIndex);
+        let content = getPredefinedContent(stepName, mappedType, eloIndex);
+        
+        // If additional instructions provided, append them as a note
+        if (instructions && instructions.trim()) {
+          content += `\n\n**Additional Instructions Applied:**\n${instructions.trim()}`;
+        }
         
         // Update content for this specific resource
         setGeneratedContentData(prev => ({
@@ -1764,7 +1782,7 @@ Students use the story framework to reflect on:
           description: `New content generated for ${resourceName}`,
         });
         
-        console.log(`Content regenerated for ${resourceName}`);
+        console.log(`Content regenerated for ${resourceName}`, instructions ? `with instructions: ${instructions}` : '');
       }
     } catch (error) {
       console.error('Error regenerating content:', error);
@@ -1780,6 +1798,58 @@ Students use the story framework to reflect on:
 
   return (
     <div className="space-y-8">
+      {/* Regenerate Content Dialog */}
+      <Dialog open={regenerateDialogOpen} onOpenChange={setRegenerateDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Regenerate Content</DialogTitle>
+            <DialogDescription>
+              Provide any specific requirements or modifications for the regenerated content (optional).
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="additional-instructions">Additional Instructions</Label>
+              <Textarea
+                id="additional-instructions"
+                placeholder="Enter any specific requirements or modifications you want for the regenerated content..."
+                value={additionalInstructions}
+                onChange={(e) => setAdditionalInstructions(e.target.value)}
+                className="min-h-[120px] resize-none"
+                maxLength={500}
+              />
+              <div className="text-xs text-muted-foreground text-right">
+                {additionalInstructions.length}/500 characters
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRegenerateDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (regenerateTarget) {
+                  regenerateContentForResource(
+                    regenerateTarget.stepKey,
+                    regenerateTarget.resourceName,
+                    additionalInstructions
+                  );
+                }
+              }}
+              disabled={!regenerateTarget}
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Regenerate
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* ELO Tabs with Drop Zones */}
       <Card className="p-6 bg-white border border-gray-200">
@@ -2052,15 +2122,15 @@ Students use the story framework to reflect on:
                                                        >
                                                          <Edit3 className="w-3 h-3" />
                                                        </Button>
-                                                       <Button
-                                                         variant="outline"
-                                                         size="sm"
-                                                         onClick={() => regenerateContentForResource(stepKey, resource)}
-                                                         className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 h-6 w-6 p-0"
-                                                         title="Regenerate content"
-                                                       >
-                                                         <RefreshCw className="w-3 h-3" />
-                                                       </Button>
+                                                        <Button
+                                                          variant="outline"
+                                                          size="sm"
+                                                          onClick={() => openRegenerateDialog(stepKey, resource)}
+                                                          className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 h-6 w-6 p-0"
+                                                          title="Regenerate content"
+                                                        >
+                                                          <RefreshCw className="w-3 h-3" />
+                                                        </Button>
                                                      </div>
                                                    )}
                                                   <Button
