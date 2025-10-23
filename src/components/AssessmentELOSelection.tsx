@@ -931,15 +931,6 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                           />
 
                                            <div className="flex items-center gap-2">
-                                             <Button
-                                               variant="outline"
-                                               size="sm"
-                                               onClick={handleMergeDialogOpen}
-                                               className="h-9 px-3"
-                                               title="Merge ELO from another chapter"
-                                             >
-                                               <GitMerge className="h-4 w-4" />
-                                             </Button>
                                             <Button
                                               variant="ghost"
                                               size="sm"
@@ -955,6 +946,15 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                                className="h-9 px-3"
                                              >
                                                <Plus className="h-4 w-4" />
+                                             </Button>
+                                             <Button
+                                               variant="outline"
+                                               size="sm"
+                                               onClick={handleMergeDialogOpen}
+                                               className="h-9 px-3"
+                                               title="Merge ELO from another chapter"
+                                             >
+                                               <GitMerge className="h-4 w-4" />
                                              </Button>
                                           </div>
                                         </div>
@@ -1015,7 +1015,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                 onValueChange={handleSubjectChange}
                 disabled={loadingMergeData}
               >
-                <SelectTrigger className="w-full bg-background [&>span]:truncate">
+                <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Select a subject" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 z-[1000]">
@@ -1040,7 +1040,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                 onValueChange={handleChapterChange}
                 disabled={!selectedMergeSubject || loadingMergeData}
               >
-                <SelectTrigger className="w-full bg-background [&>span]:truncate">
+                <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Select a chapter" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 z-[1000]">
@@ -1065,7 +1065,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                 onValueChange={setSelectedMergeELO}
                 disabled={!selectedMergeChapter || loadingMergeData}
               >
-                <SelectTrigger className="w-full bg-background [&>span]:truncate">
+                <SelectTrigger className="w-full bg-background">
                   <SelectValue placeholder="Select an ELO" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 z-[1000]">
