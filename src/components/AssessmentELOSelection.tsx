@@ -32,6 +32,10 @@ interface ELO {
   itemConfigRows: ItemConfigRow[];
   maxItems: number;
   maxMarks: number;
+  mergedFrom?: {
+    subjectName: string;
+    chapterName: string;
+  };
 }
 
 interface AssessmentELOSelectionProps {
@@ -619,33 +623,37 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
     }
 
     const selectedELO = mergeELOs.find(elo => elo.id === selectedMergeELO);
-    if (selectedELO) {
+    const selectedSubject = mergeSubjects.find(s => s.SubjectId.toString() === selectedMergeSubject);
+    const selectedChapter = mergeChapters.find(c => c.chapterId === selectedMergeChapter);
+    
+    if (selectedELO && selectedSubject && selectedChapter) {
       const updatedChapterELOs = { ...chapterELOs };
-      const selectedChapter = mergeChapters.find(c => c.chapterId === selectedMergeChapter);
       
-      if (selectedChapter) {
-        if (!updatedChapterELOs[selectedChapter.chapterId]) {
-          updatedChapterELOs[selectedChapter.chapterId] = [];
-        }
-        
-        updatedChapterELOs[selectedChapter.chapterId].push({
-          ...selectedELO,
-          id: `${selectedChapter.chapterId}-merged-${Date.now()}`,
-          selected: true
-        });
-        
-        setChapterELOs(updatedChapterELOs);
-        
-        toast({
-          title: "ELO Merged Successfully",
-          description: `${selectedELO.title} has been added to ${selectedChapter.chapterName}`,
-        });
-        
-        setMergeDialogOpen(false);
-        setSelectedMergeSubject('');
-        setSelectedMergeChapter('');
-        setSelectedMergeELO('');
+      if (!updatedChapterELOs[selectedChapter.chapterId]) {
+        updatedChapterELOs[selectedChapter.chapterId] = [];
       }
+      
+      updatedChapterELOs[selectedChapter.chapterId].push({
+        ...selectedELO,
+        id: `${selectedChapter.chapterId}-merged-${Date.now()}`,
+        selected: true,
+        mergedFrom: {
+          subjectName: selectedSubject.SubjectName,
+          chapterName: selectedChapter.chapterName
+        }
+      });
+      
+      setChapterELOs(updatedChapterELOs);
+      
+      toast({
+        title: "ELO Merged Successfully",
+        description: `${selectedELO.title} has been merged from ${selectedSubject.SubjectName} - ${selectedChapter.chapterName}`,
+      });
+      
+      setMergeDialogOpen(false);
+      setSelectedMergeSubject('');
+      setSelectedMergeChapter('');
+      setSelectedMergeELO('');
     }
   };
 
@@ -761,6 +769,12 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                                           {totalMarks}/{elo.maxMarks} marks
                                         </Badge>
                                       </div>
+                                      {elo.mergedFrom && (
+                                        <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200 flex items-center gap-1">
+                                          <GitMerge className="h-3 w-3" />
+                                          Merged from: {elo.mergedFrom.subjectName} - {elo.mergedFrom.chapterName}
+                                        </Badge>
+                                      )}
                                       {elo.previousAssessments && elo.previousAssessments.length > 0 && (
                                         <div className="flex gap-1">
                                           {elo.previousAssessments.map(assessment => (
