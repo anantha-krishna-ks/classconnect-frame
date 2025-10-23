@@ -1015,7 +1015,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                 onValueChange={handleSubjectChange}
                 disabled={loadingMergeData}
               >
-                <SelectTrigger className="w-full bg-background">
+                <SelectTrigger className="w-full bg-background [&>span]:truncate">
                   <SelectValue placeholder="Select a subject" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 z-[1000]">
@@ -1040,7 +1040,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                 onValueChange={handleChapterChange}
                 disabled={!selectedMergeSubject || loadingMergeData}
               >
-                <SelectTrigger className="w-full bg-background">
+                <SelectTrigger className="w-full bg-background [&>span]:truncate">
                   <SelectValue placeholder="Select a chapter" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 z-[1000]">
@@ -1065,7 +1065,7 @@ const AssessmentELOSelection = ({ assessmentData, updateAssessmentData, onComple
                 onValueChange={setSelectedMergeELO}
                 disabled={!selectedMergeChapter || loadingMergeData}
               >
-                <SelectTrigger className="w-full bg-background">
+                <SelectTrigger className="w-full bg-background [&>span]:truncate">
                   <SelectValue placeholder="Select an ELO" />
                 </SelectTrigger>
                 <SelectContent className="bg-white dark:bg-slate-900 z-[1000]">
