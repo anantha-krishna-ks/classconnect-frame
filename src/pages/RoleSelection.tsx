@@ -63,12 +63,12 @@ const RoleSelection = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <img 
-            src="/lovable-uploads/dff94d5b-83b8-4c9a-a098-85ed8d6db26b.png" 
-            alt="ExcelSchoolAi Logo" 
+            src="/lovable-uploads/saras-school-ai-logo.png" 
+            alt="SarasSchoolAi Logo" 
             className="h-32 mx-auto mb-4"
           />
           <p className="text-2xl text-gray-700 font-medium">
-            I will be using Excel School AI as:
+            I will be using Saras School AI as:
           </p>
         </div>
 

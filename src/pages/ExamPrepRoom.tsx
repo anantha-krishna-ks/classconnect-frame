@@ -20,11 +20,11 @@ const ExamPrepRoom = () => {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <img 
-              src="/lovable-uploads/c278e3c9-20de-45b8-a466-41c546111a8a.png" 
-              alt="ExcelSchoolAi" 
+              src="/lovable-uploads/saras-school-ai-logo.png" 
+              alt="SarasSchoolAi" 
               className="h-8 w-auto"
             />
-            <span className="text-white font-semibold text-lg">ExcelSchoolAi</span>
+            <span className="text-white font-semibold text-lg">SarasSchoolAi</span>
           </div>
           <Button
             variant="ghost"
