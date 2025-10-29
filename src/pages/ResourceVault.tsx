@@ -60,6 +60,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { createPortal } from 'react-dom';
+import PdfViewer from '@/components/PdfViewer';
 
 const ResourceVault = () => {
   const navigate = useNavigate();
@@ -1226,18 +1227,8 @@ const ResourceVault = () => {
           </div>
           <div className="flex-1 overflow-hidden rounded-lg border bg-muted relative mx-6 mb-6">
             {pdfViewerUrl && pdfViewerUrl !== '#' ? (
-              <object
-                data={pdfViewerUrl}
-                type="application/pdf"
-                className="w-full h-full"
-                title="PDF Viewer"
-              >
-                <embed
-                  src={pdfViewerUrl}
-                  type="application/pdf"
-                  className="w-full h-full"
-                />
-              </object>
+              // Use a PDF.js-based viewer to avoid Chrome sandbox blocking of native PDF plugins in iframes
+              <PdfViewer url={pdfViewerUrl} />
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">
                 <p>No PDF URL available</p>
