@@ -1154,87 +1154,90 @@ const ResourceVault = () => {
               <FileText className="w-5 h-5 text-purple-500" />
               Blueprint Template
             </DialogTitle>
-            <DialogDescription className="flex items-center gap-4">
-              <span>Interactive PDF viewer with note-taking and AI assistance</span>
-              <div className="flex gap-2 ml-auto">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const selection = window.getSelection()?.toString();
-                    if (selection) {
-                      navigator.clipboard.writeText(selection);
-                      toast({
-                        title: "Text copied",
-                        description: "Selected text has been copied to clipboard",
-                      });
-                    } else {
-                      toast({
-                        title: "No text selected",
-                        description: "Please select some text first",
-                        variant: "destructive"
-                      });
-                    }
-                  }}
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  Copy Selected
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const selection = window.getSelection()?.toString();
-                    if (selection) {
-                      setCurrentNote({
-                        ...currentNote,
-                        content: currentNote.content ? `${currentNote.content}\n\n${selection}` : selection,
-                        title: currentNote.title || 'Blueprint Notes'
-                      });
-                      setShowNotes(true);
-                      toast({
-                        title: "Added to notes",
-                        description: "Selected text has been added to your notes",
-                      });
-                    } else {
-                      toast({
-                        title: "No text selected",
-                        description: "Please select some text first",
-                        variant: "destructive"
-                      });
-                    }
-                  }}
-                >
-                  <StickyNote className="w-4 h-4 mr-2" />
-                  Add to Notes
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    setShowStudyPalPanel(true);
-                    toast({
-                      title: "StudyPal activated",
-                      description: "Ask me anything about the blueprint structure!",
-                    });
-                  }}
-                >
-                  <Brain className="w-4 h-4 mr-2" />
-                  Ask StudyPal
-                </Button>
-              </div>
+            <DialogDescription>
+              Interactive PDF viewer with note-taking and AI assistance
             </DialogDescription>
           </DialogHeader>
-          <div className="flex-1 overflow-hidden rounded-lg border bg-muted relative">
+          <div className="flex gap-2 mb-4 px-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const selection = window.getSelection()?.toString();
+                if (selection) {
+                  navigator.clipboard.writeText(selection);
+                  toast({
+                    title: "Text copied",
+                    description: "Selected text has been copied to clipboard",
+                  });
+                } else {
+                  toast({
+                    title: "No text selected",
+                    description: "Please select some text first",
+                    variant: "destructive"
+                  });
+                }
+              }}
+            >
+              <Copy className="w-4 h-4 mr-2" />
+              Copy Selected
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const selection = window.getSelection()?.toString();
+                if (selection) {
+                  setCurrentNote({
+                    ...currentNote,
+                    content: currentNote.content ? `${currentNote.content}\n\n${selection}` : selection,
+                    title: currentNote.title || 'Blueprint Notes'
+                  });
+                  setShowNotes(true);
+                  toast({
+                    title: "Added to notes",
+                    description: "Selected text has been added to your notes",
+                  });
+                } else {
+                  toast({
+                    title: "No text selected",
+                    description: "Please select some text first",
+                    variant: "destructive"
+                  });
+                }
+              }}
+            >
+              <StickyNote className="w-4 h-4 mr-2" />
+              Add to Notes
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                setShowStudyPalPanel(true);
+                toast({
+                  title: "StudyPal activated",
+                  description: "Ask me anything about the blueprint structure!",
+                });
+              }}
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              Ask StudyPal
+            </Button>
+          </div>
+          <div className="flex-1 overflow-hidden rounded-lg border bg-muted relative mx-6 mb-6">
             {pdfViewerUrl && pdfViewerUrl !== '#' ? (
-              <iframe
-                src={pdfViewerUrl}
+              <object
+                data={pdfViewerUrl}
+                type="application/pdf"
                 className="w-full h-full"
                 title="PDF Viewer"
-                onLoad={(e) => {
-                  // PDF loaded successfully
-                  console.log('PDF loaded');
-                }}
-              />
+              >
+                <embed
+                  src={pdfViewerUrl}
+                  type="application/pdf"
+                  className="w-full h-full"
+                />
+              </object>
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">
                 <p>No PDF URL available</p>
