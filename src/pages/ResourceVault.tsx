@@ -441,6 +441,9 @@ const ResourceVault = () => {
     const resourceWindow = window.open('', '_blank', windowFeatures);
     
     if (resourceWindow) {
+      // Get the diagram image - using relative path that works in new window
+      const diagramImage = new URL('/src/assets/diagram-visual.png', window.location.origin).href;
+      
       resourceWindow.document.write(`
         <!DOCTYPE html>
         <html lang="en">
@@ -448,120 +451,147 @@ const ResourceVault = () => {
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>${resourceType.charAt(0).toUpperCase() + resourceType.slice(1)} - ${topic}</title>
-          <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-          <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-          <script src="https://cdn.tailwindcss.com"></script>
           <style>
-            body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: system-ui, -apple-system, sans-serif; 
+              background: linear-gradient(135deg, #f5f7fa 0%, #e3f2fd 100%);
+              min-height: 100vh;
+              padding: 24px;
+            }
+            .container { 
+              max-width: 1200px; 
+              margin: 0 auto; 
+            }
+            .card {
+              background: white;
+              border-radius: 12px;
+              box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+              overflow: hidden;
+            }
+            .header {
+              background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+              color: white;
+              padding: 20px 24px;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+            }
+            .header-left {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+            }
+            .icon {
+              width: 40px;
+              height: 40px;
+              background: rgba(255,255,255,0.2);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 20px;
+            }
+            .close-btn {
+              background: #ef4444;
+              color: white;
+              border: none;
+              padding: 8px 16px;
+              border-radius: 6px;
+              cursor: pointer;
+              font-size: 14px;
+              transition: background 0.2s;
+            }
+            .close-btn:hover { background: #dc2626; }
+            .content {
+              padding: 32px;
+            }
+            .image-container {
+              text-align: center;
+              margin: 24px 0;
+              background: #f8fafc;
+              padding: 24px;
+              border-radius: 8px;
+            }
+            .diagram-image {
+              max-width: 100%;
+              height: auto;
+              border-radius: 8px;
+              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+            .text-content {
+              margin-top: 32px;
+            }
+            h2 {
+              color: #1e293b;
+              font-size: 24px;
+              margin-bottom: 8px;
+              text-align: center;
+            }
+            .subtitle {
+              color: #64748b;
+              text-align: center;
+              margin-bottom: 24px;
+            }
+            .process-steps {
+              display: flex;
+              flex-direction: column;
+              gap: 16px;
+              max-width: 500px;
+              margin: 0 auto;
+            }
+            .step {
+              padding: 16px 24px;
+              border-radius: 8px;
+              color: white;
+              font-weight: 500;
+              text-align: center;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .step.blue { background: #3b82f6; }
+            .step.green { background: #10b981; }
+            .step.orange { background: #f97316; }
+            .arrow {
+              width: 2px;
+              height: 32px;
+              background: #cbd5e1;
+              margin: 0 auto;
+            }
           </style>
         </head>
         <body>
-          <div id="root"></div>
-          <script>
-            const { useState, useEffect } = React;
-            
-            const ResourceViewer = () => {
-              const generateContent = () => {
-                const topic = "${topic}";
-                const resourceType = "${resourceType}";
+          <div class="container">
+            <div class="card">
+              <div class="header">
+                <div class="header-left">
+                  <div class="icon">🧠</div>
+                  <div>
+                    <h1 style="font-size: 20px; font-weight: 600;">${resourceType.charAt(0).toUpperCase() + resourceType.slice(1).replace('-', ' ')}</h1>
+                    <p style="font-size: 14px; opacity: 0.9;">Visual learning resource</p>
+                  </div>
+                </div>
+                <button class="close-btn" onclick="window.close()">Close</button>
+              </div>
+              <div class="content">
+                <h2>${topic} - Process Diagram</h2>
+                <p class="subtitle">Visual representation of the concept</p>
                 
-                switch (resourceType) {
-                  case 'mindmap':
-                    return React.createElement('div', { className: 'relative' },
-                      React.createElement('div', { className: 'text-center mb-8' },
-                        React.createElement('div', { className: 'inline-block bg-blue-500 text-white px-6 py-3 rounded-full text-lg font-semibold' }, topic)
-                      ),
-                      React.createElement('div', { className: 'grid grid-cols-2 gap-8' },
-                        React.createElement('div', { className: 'space-y-4' },
-                          React.createElement('div', { className: 'flex items-center' },
-                            React.createElement('div', { className: 'w-3 h-3 bg-green-500 rounded-full mr-3' }),
-                            React.createElement('div', { className: 'bg-green-100 px-4 py-2 rounded-lg' },
-                              React.createElement('span', { className: 'font-medium' }, 'Key Concepts')
-                            )
-                          ),
-                          React.createElement('div', { className: 'ml-6 space-y-2' },
-                            React.createElement('div', { className: 'bg-white p-3 rounded border-l-4 border-green-500 shadow-sm' }, 'Definition & Properties'),
-                            React.createElement('div', { className: 'bg-white p-3 rounded border-l-4 border-green-500 shadow-sm' }, 'Core Principles')
-                          )
-                        ),
-                        React.createElement('div', { className: 'space-y-4' },
-                          React.createElement('div', { className: 'flex items-center' },
-                            React.createElement('div', { className: 'w-3 h-3 bg-purple-500 rounded-full mr-3' }),
-                            React.createElement('div', { className: 'bg-purple-100 px-4 py-2 rounded-lg' },
-                              React.createElement('span', { className: 'font-medium' }, 'Applications')
-                            )
-                          ),
-                          React.createElement('div', { className: 'ml-6 space-y-2' },
-                            React.createElement('div', { className: 'bg-white p-3 rounded border-l-4 border-purple-500 shadow-sm' }, 'Real-world Examples'),
-                            React.createElement('div', { className: 'bg-white p-3 rounded border-l-4 border-purple-500 shadow-sm' }, 'Problem Solving')
-                          )
-                        )
-                      )
-                    );
-                  
-                  case 'diagram':
-                    return React.createElement('div', { className: 'space-y-6' },
-                      React.createElement('div', { className: 'text-center' },
-                        React.createElement('h2', { className: 'text-2xl font-bold text-gray-800 mb-2' }, topic + ' - Process Diagram'),
-                        React.createElement('p', { className: 'text-gray-600' }, 'Visual representation of the concept')
-                      ),
-                      React.createElement('div', { className: 'flex justify-center' },
-                        React.createElement('div', { className: 'space-y-4' },
-                          React.createElement('div', { className: 'flex items-center justify-center' },
-                            React.createElement('div', { className: 'bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md' }, 'Start: Input/Problem')
-                          ),
-                          React.createElement('div', { className: 'flex justify-center' },
-                            React.createElement('div', { className: 'w-px h-8 bg-gray-300' })
-                          ),
-                          React.createElement('div', { className: 'flex items-center justify-center' },
-                            React.createElement('div', { className: 'bg-green-500 text-white px-6 py-3 rounded-lg shadow-md' }, 'Process: Apply Concept')
-                          ),
-                          React.createElement('div', { className: 'flex justify-center' },
-                            React.createElement('div', { className: 'w-px h-8 bg-gray-300' })
-                          ),
-                          React.createElement('div', { className: 'flex items-center justify-center' },
-                            React.createElement('div', { className: 'bg-orange-500 text-white px-6 py-3 rounded-lg shadow-md' }, 'Output: Solution/Answer')
-                          )
-                        )
-                      )
-                    );
-                  
-                  default:
-                    return React.createElement('div', { className: 'text-center p-8' },
-                      React.createElement('h2', { className: 'text-2xl font-bold mb-4' }, 'Visual Resource'),
-                      React.createElement('p', { className: 'text-gray-600' }, 'Interactive visual content for: ' + topic)
-                    );
-                }
-              };
-              
-              return React.createElement('div', { className: 'min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-6' },
-                React.createElement('div', { className: 'max-w-4xl mx-auto' },
-                  React.createElement('div', { className: 'bg-white rounded-lg shadow-lg border-0' },
-                    React.createElement('div', { className: 'border-b p-6' },
-                      React.createElement('div', { className: 'flex items-center justify-between' },
-                        React.createElement('div', { className: 'flex items-center gap-3' },
-                          React.createElement('div', { className: 'w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center' },
-                            React.createElement('span', { className: 'text-white font-bold' }, '🧠')
-                          ),
-                          React.createElement('div', null,
-                            React.createElement('h1', { className: 'text-xl font-bold text-gray-800' }, "${resourceType.charAt(0).toUpperCase() + resourceType.slice(1).replace('-', ' ')}"),
-                            React.createElement('p', { className: 'text-sm text-gray-600' }, 'Visual learning resource')
-                          )
-                        ),
-                        React.createElement('button', { 
-                          className: 'px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600',
-                          onClick: () => window.close()
-                        }, 'Close')
-                      )
-                    ),
-                    React.createElement('div', { className: 'p-8' }, generateContent())
-                  )
-                )
-              );
-            };
-            
-            ReactDOM.render(React.createElement(ResourceViewer), document.getElementById('root'));
-          </script>
+                <div class="image-container">
+                  <img src="${diagramImage}" alt="Process Diagram" class="diagram-image" />
+                </div>
+                
+                <div class="text-content">
+                  <div class="process-steps">
+                    <div class="step blue">Start: Input/Problem</div>
+                    <div class="arrow"></div>
+                    <div class="step green">Process: Apply Concept</div>
+                    <div class="arrow"></div>
+                    <div class="step orange">Output: Solution/Answer</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </body>
         </html>
       `);
