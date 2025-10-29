@@ -945,7 +945,7 @@ const ResourceVault = () => {
                       key={resource.id} 
                       className="group border-2 border-slate-200/80 hover:border-purple-300/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
                       style={{ animationDelay: `${index * 100}ms` }}
-                      onClick={() => setPdfViewerUrl(resource.link || resource.url || '#')}
+                      onClick={() => setPdfViewerUrl(resource.link || resource.url || '/resources/blueprint-template.pdf')}
                     >
                       <div className="flex items-start gap-4 mb-4">
                         <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-200">
@@ -982,7 +982,7 @@ const ResourceVault = () => {
                           className="flex-1 min-w-0 group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105 text-xs" 
                           onClick={(e) => {
                             e.stopPropagation();
-                            setPdfViewerUrl(resource.link || resource.url || '#');
+                            setPdfViewerUrl(resource.link || resource.url || '/resources/blueprint-template.pdf');
                           }}
                         >
                           <Eye className="w-3.5 h-3.5 mr-1.5 shrink-0" />
