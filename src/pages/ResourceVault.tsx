@@ -60,7 +60,6 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { createPortal } from 'react-dom';
-import PdfViewer from '@/components/PdfViewer';
 
 const ResourceVault = () => {
   const navigate = useNavigate();
@@ -87,8 +86,7 @@ const ResourceVault = () => {
   const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
   const [isAddingToNotes, setIsAddingToNotes] = useState(false);
   const [showStudyPalPanel, setShowStudyPalPanel] = useState(true);
-  const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>('/resources/blueprint-template.pdf');
-  const [pdfText, setPdfText] = useState<string>('');
+  const [pdfViewerUrl, setPdfViewerUrl] = useState<string | null>(null);
   const [notesSearchQuery, setNotesSearchQuery] = useState('');
 
   const handleLogout = () => {
@@ -945,7 +943,7 @@ const ResourceVault = () => {
                       key={resource.id} 
                       className="group border-2 border-slate-200/80 hover:border-purple-300/60 rounded-xl p-5 hover:shadow-md transition-all duration-300 cursor-pointer bg-white/70 backdrop-blur-sm hover:bg-white hover:scale-[1.02] animate-fade-in"
                       style={{ animationDelay: `${index * 100}ms` }}
-                      onClick={() => setPdfViewerUrl(resource.link || resource.url || '/resources/blueprint-template.pdf')}
+                      onClick={() => setPdfViewerUrl(resource.link || resource.url || '#')}
                     >
                       <div className="flex items-start gap-4 mb-4">
                         <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors duration-200">
@@ -982,7 +980,7 @@ const ResourceVault = () => {
                           className="flex-1 min-w-0 group-hover:bg-purple-50 group-hover:border-purple-300 group-hover:text-purple-700 transition-all duration-200 hover:scale-105 text-xs" 
                           onClick={(e) => {
                             e.stopPropagation();
-                            setPdfViewerUrl(resource.link || resource.url || '/resources/blueprint-template.pdf');
+                            setPdfViewerUrl(resource.link || resource.url || '#');
                           }}
                         >
                           <Eye className="w-3.5 h-3.5 mr-1.5 shrink-0" />
@@ -1153,82 +1151,19 @@ const ResourceVault = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-purple-500" />
-              Blueprint Template
+              PDF Viewer
             </DialogTitle>
             <DialogDescription>
-              Interactive PDF viewer with note-taking and AI assistance
+              View PDF within the app
             </DialogDescription>
           </DialogHeader>
-          <div className="flex gap-2 mb-4 px-6">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const selection = window.getSelection()?.toString();
-                if (selection) {
-                  navigator.clipboard.writeText(selection);
-                  toast({
-                    title: "Text copied",
-                    description: "Selected text has been copied to clipboard",
-                  });
-                } else {
-                  toast({
-                    title: "No text selected",
-                    description: "Please select some text first",
-                    variant: "destructive"
-                  });
-                }
-              }}
-            >
-              <Copy className="w-4 h-4 mr-2" />
-              Copy Selected
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                const selection = window.getSelection()?.toString();
-                if (selection) {
-                  setCurrentNote({
-                    ...currentNote,
-                    content: currentNote.content ? `${currentNote.content}\n\n${selection}` : selection,
-                    title: currentNote.title || 'Blueprint Notes'
-                  });
-                  setShowNotes(true);
-                  toast({
-                    title: "Added to notes",
-                    description: "Selected text has been added to your notes",
-                  });
-                } else {
-                  toast({
-                    title: "No text selected",
-                    description: "Please select some text first",
-                    variant: "destructive"
-                  });
-                }
-              }}
-            >
-              <StickyNote className="w-4 h-4 mr-2" />
-              Add to Notes
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                setShowStudyPalPanel(true);
-                toast({
-                  title: "StudyPal activated",
-                  description: "Ask me anything about the blueprint structure!",
-                });
-              }}
-            >
-              <Brain className="w-4 h-4 mr-2" />
-              Ask StudyPal
-            </Button>
-          </div>
-          <div className="flex-1 overflow-hidden rounded-lg border bg-muted relative mx-6 mb-6">
+          <div className="flex-1 overflow-hidden rounded-lg border bg-muted">
             {pdfViewerUrl && pdfViewerUrl !== '#' ? (
-              // Use a PDF.js-based viewer to avoid Chrome sandbox blocking of native PDF plugins in iframes
-              <PdfViewer url={pdfViewerUrl} />
+              <iframe
+                src={pdfViewerUrl}
+                className="w-full h-full"
+                title="PDF Viewer"
+              />
             ) : (
               <div className="flex items-center justify-center h-full text-muted-foreground">
                 <p>No PDF URL available</p>
