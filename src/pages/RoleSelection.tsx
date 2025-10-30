@@ -63,7 +63,7 @@ const RoleSelection = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <img 
-            src="/lovable-uploads/saras-school-ai-logo.png" 
+            src="/lovable-uploads/saras-school-ai-main-logo.png" 
             alt="SarasSchoolAi Logo" 
             className="h-32 mx-auto mb-4"
           />
