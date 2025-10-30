@@ -94,7 +94,7 @@ const ParentDashboard = () => {
           <img 
             src="/lovable-uploads/saras-school-ai-logo.png" 
             alt="SarasSchoolAi" 
-            className="h-10 w-auto"
+            className="h-12 w-auto"
           />
           <AlertDialog>
             <AlertDialogTrigger asChild>

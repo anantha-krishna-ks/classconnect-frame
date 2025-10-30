@@ -22,7 +22,7 @@ const ExamPrepRoom = () => {
             <img 
               src="/lovable-uploads/saras-school-ai-logo.png" 
               alt="SarasSchoolAi" 
-              className="h-8 w-auto"
+              className="h-12 w-auto"
             />
             <span className="text-white font-semibold text-lg">SarasSchoolAi</span>
           </div>
