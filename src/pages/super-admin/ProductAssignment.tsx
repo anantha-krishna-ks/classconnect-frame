@@ -122,14 +122,14 @@ export default function ProductAssignment() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-primary">Product & Tool Assignment</h1>
+        <h1 className="text-2xl font-semibold">Product & Tool Assignment</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Manage product licenses and tool access for schools
         </p>
       </div>
 
       {/* School Selection */}
-      <Card className="border-none shadow-sm">
+      <Card>
         <CardHeader>
           <CardTitle>Select School</CardTitle>
           <CardDescription>Choose a school to manage its product licenses</CardDescription>
@@ -162,7 +162,7 @@ export default function ProductAssignment() {
       </Card>
 
       {/* Products Grid */}
-      <Card className="border-none shadow-sm">
+      <Card>
         <CardHeader>
           <CardTitle>Available Products & Tools</CardTitle>
           <CardDescription>
@@ -184,12 +184,12 @@ export default function ProductAssignment() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {products.map((product) => (
-              <Card key={product.id} className="border-none shadow-sm hover:shadow-md transition-all duration-300">
+              <Card key={product.id}>
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Package className="w-5 h-5 text-primary" />
+                      <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
+                        <Package className="w-5 h-5 text-muted-foreground" />
                       </div>
                       <div>
                         <h3 className="font-medium text-sm">{product.name}</h3>

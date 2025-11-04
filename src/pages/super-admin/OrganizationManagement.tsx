@@ -75,7 +75,7 @@ export default function OrganizationManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-primary">Organization Management</h1>
+          <h1 className="text-2xl font-semibold">Organization Management</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage customer organizations and their details
           </p>
@@ -143,7 +143,7 @@ export default function OrganizationManagement() {
         </Dialog>
       </div>
 
-      <Card className="border-none shadow-sm">
+      <Card>
         <CardHeader>
           <CardTitle>All Organizations</CardTitle>
           <CardDescription>View and manage all customer organizations</CardDescription>
@@ -176,11 +176,11 @@ export default function OrganizationManagement() {
               </TableHeader>
               <TableBody>
                 {organizations.map((org) => (
-                  <TableRow key={org.id} className="hover:bg-accent/30 transition-colors">
+                  <TableRow key={org.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <Building2 className="w-4 h-4 text-primary" />
+                        <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
+                          <Building2 className="w-4 h-4 text-muted-foreground" />
                         </div>
                         <div>
                           <p className="font-medium text-sm">{org.name}</p>
@@ -198,15 +198,15 @@ export default function OrganizationManagement() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className="bg-success/10 text-success">{org.status}</Badge>
+                      <Badge variant="secondary">{org.status}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" className="hover:bg-info/10 hover:text-info">
+                        <Button variant="ghost" size="icon">
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="hover:bg-destructive/10 hover:text-destructive">
-                          <Trash2 className="w-4 h-4" />
+                        <Button variant="ghost" size="icon">
+                          <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
                     </TableCell>

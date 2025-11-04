@@ -78,7 +78,7 @@ export default function ChapterManagement() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-primary">Chapter Management</h1>
+        <h1 className="text-2xl font-semibold">Chapter Management</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Manage chapter content, PDFs, and question papers for AI training
         </p>
@@ -93,7 +93,7 @@ export default function ChapterManagement() {
 
         {/* PDF Upload Tab */}
         <TabsContent value="pdfs" className="space-y-4">
-          <Card className="border-none shadow-sm">
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -249,7 +249,7 @@ export default function ChapterManagement() {
 
         {/* Chapter List Tab */}
         <TabsContent value="chapters" className="space-y-4">
-          <Card className="border-none shadow-sm">
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -288,7 +288,7 @@ export default function ChapterManagement() {
 
         {/* Question Papers Tab */}
         <TabsContent value="questions" className="space-y-4">
-          <Card className="border-none shadow-sm">
+          <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>

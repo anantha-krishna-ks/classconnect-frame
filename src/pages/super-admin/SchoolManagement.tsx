@@ -88,7 +88,7 @@ export default function SchoolManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-primary">School Management</h1>
+          <h1 className="text-2xl font-semibold">School Management</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage schools within organizations
           </p>
@@ -182,7 +182,7 @@ export default function SchoolManagement() {
         </Dialog>
       </div>
 
-      <Card className="border-none shadow-sm">
+      <Card>
         <CardHeader>
           <CardTitle>All Schools</CardTitle>
           <CardDescription>View and manage all schools across organizations</CardDescription>
@@ -216,11 +216,11 @@ export default function SchoolManagement() {
               </TableHeader>
               <TableBody>
                 {schools.map((school) => (
-                  <TableRow key={school.id} className="hover:bg-accent/30 transition-colors">
+                  <TableRow key={school.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center">
-                          <School className="w-4 h-4 text-info" />
+                        <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
+                          <School className="w-4 h-4 text-muted-foreground" />
                         </div>
                         <div>
                           <p className="font-medium text-sm">{school.name}</p>
@@ -236,20 +236,20 @@ export default function SchoolManagement() {
                       <Switch checked={school.published} />
                     </TableCell>
                     <TableCell>
-                      <Badge variant={school.published ? "secondary" : "outline"} className={school.published ? "bg-success/10 text-success" : ""}>
+                      <Badge variant={school.published ? "secondary" : "outline"}>
                         {school.status}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" title="View Details" className="hover:bg-primary/10 hover:text-primary">
+                        <Button variant="ghost" size="icon" title="View Details">
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" title="Edit" className="hover:bg-info/10 hover:text-info">
+                        <Button variant="ghost" size="icon" title="Edit">
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" title="Delete" className="hover:bg-destructive/10 hover:text-destructive">
-                          <Trash2 className="w-4 h-4" />
+                        <Button variant="ghost" size="icon" title="Delete">
+                          <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
                     </TableCell>

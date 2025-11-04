@@ -48,7 +48,7 @@ export default function Analytics() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-primary">Analytics & Reports</h1>
+        <h1 className="text-2xl font-semibold">Analytics & Reports</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Monitor system usage, performance, and user engagement
         </p>
@@ -57,18 +57,16 @@ export default function Analytics() {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((metric) => (
-          <Card key={metric.title} className="border-none shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+          <Card key={metric.title}>
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-normal text-muted-foreground">
                 {metric.title}
               </CardTitle>
-              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                <metric.icon className="w-4 h-4 text-primary" />
-              </div>
+              <metric.icon className="w-4 h-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-semibold">{metric.value}</div>
-              <p className="text-xs text-success mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {metric.change} from last month
               </p>
             </CardContent>
@@ -78,7 +76,7 @@ export default function Analytics() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Top Schools */}
-        <Card className="border-none shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle className="text-base">Top Performing Schools</CardTitle>
             <CardDescription className="text-sm">Schools ranked by user engagement</CardDescription>
@@ -106,7 +104,7 @@ export default function Analytics() {
         </Card>
 
         {/* Recent Activity */}
-        <Card className="border-none shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle className="text-base">Recent System Activity</CardTitle>
             <CardDescription className="text-sm">Latest events across all schools</CardDescription>
@@ -129,7 +127,7 @@ export default function Analytics() {
         </Card>
 
         {/* Tool Usage */}
-        <Card className="border-none shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle className="text-base">Tool Usage Statistics</CardTitle>
             <CardDescription className="text-sm">Most used features this month</CardDescription>
@@ -161,7 +159,7 @@ export default function Analytics() {
         </Card>
 
         {/* System Health */}
-        <Card className="border-none shadow-sm">
+        <Card>
           <CardHeader>
             <CardTitle className="text-base">System Health Monitoring</CardTitle>
             <CardDescription className="text-sm">Real-time system performance</CardDescription>
@@ -183,10 +181,10 @@ export default function Analytics() {
                     <div
                       className={`w-1.5 h-1.5 rounded-full ${
                         item.status === "excellent"
-                          ? "bg-success"
+                          ? "bg-green-500"
                           : item.status === "good"
-                          ? "bg-success"
-                          : "bg-warning"
+                          ? "bg-green-500"
+                          : "bg-yellow-500"
                       }`}
                     />
                   </div>
