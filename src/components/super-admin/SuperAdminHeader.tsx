@@ -39,20 +39,20 @@ export function SuperAdminHeader() {
 
       <div className="flex items-center gap-3">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative hover:bg-accent">
+        <Button variant="ghost" size="icon" className="relative hover:bg-primary/10 hover:text-primary transition-all duration-200">
           <Bell className="w-5 h-5" />
           <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full shadow-sm animate-pulse" />
         </Button>
 
         {/* Settings */}
-        <Button variant="ghost" size="icon" className="hover:bg-accent">
+        <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary transition-all duration-200">
           <Settings className="w-5 h-5" />
         </Button>
 
         {/* User menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="gap-2 hover:bg-accent">
+            <Button variant="ghost" className="gap-2 hover:bg-primary/10 hover:text-primary transition-all duration-200">
               <Avatar className="w-7 h-7 border-2 border-primary/20 shadow-sm">
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                   SA
@@ -64,16 +64,16 @@ export function SuperAdminHeader() {
           <DropdownMenuContent align="end" className="w-56 shadow-md">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="hover:bg-accent">
+            <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary cursor-pointer transition-all duration-200">
               <User className="mr-2 h-4 w-4" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="hover:bg-accent">
+            <DropdownMenuItem className="hover:bg-primary/10 hover:text-primary cursor-pointer transition-all duration-200">
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive hover:bg-destructive/10">
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive hover:bg-destructive/10 cursor-pointer transition-all duration-200">
               <LogOut className="mr-2 h-4 w-4" />
               Logout
             </DropdownMenuItem>
