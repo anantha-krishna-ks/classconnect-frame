@@ -43,10 +43,10 @@ const menuItems = [
 
 export function SuperAdminSidebar() {
   return (
-    <aside className="w-48 h-screen bg-sidebar-background text-sidebar-foreground flex flex-col border-r border-sidebar-border shadow-lg">
+    <aside className="w-48 h-screen bg-sidebar-background text-sidebar-foreground flex flex-col border-r border-sidebar-border shadow-sm">
       {/* Header */}
-      <div className="p-4 border-b border-sidebar-border/50">
-        <h2 className="text-sm font-semibold text-sidebar-foreground">
+      <div className="p-4 border-b border-sidebar-border bg-primary/5">
+        <h2 className="text-sm font-semibold text-primary">
           Super Admin
         </h2>
       </div>
@@ -59,11 +59,11 @@ export function SuperAdminSidebar() {
             to={item.path}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm group relative",
-                "hover:bg-sidebar-accent hover:translate-x-1 hover:shadow-md hover:border-l-2 hover:border-primary",
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm group relative border",
+                "hover:bg-accent hover:translate-x-1 hover:shadow-sm",
                 isActive 
-                  ? "bg-primary text-primary-foreground font-medium shadow-lg border-l-2 border-primary" 
-                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground"
+                  ? "bg-primary text-primary-foreground font-medium shadow-md border-primary" 
+                  : "text-muted-foreground hover:text-foreground border-transparent"
               )
             }
           >
@@ -76,11 +76,11 @@ export function SuperAdminSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-3 border-t border-sidebar-border/50">
-        <div className="text-xs text-sidebar-foreground/80 space-y-1 p-2 rounded-lg border border-success/30 bg-success/10">
-          <p className="font-medium text-sidebar-foreground">System Status</p>
+      <div className="p-3 border-t border-sidebar-border bg-accent/30">
+        <div className="text-xs text-muted-foreground space-y-1 p-2 rounded-lg border border-success/20 bg-success/5">
+          <p className="font-medium text-foreground">System Status</p>
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse shadow-sm shadow-success" />
+            <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse shadow-sm" />
             <span>Operational</span>
           </div>
         </div>
