@@ -54,12 +54,12 @@ export default function SuperAdminDashboard() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <SuperAdminHeader />
 
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-6 bg-background">
           {isRootPath ? (
             <div className="space-y-6">
               {/* Welcome section */}
-              <div>
-                <h1 className="text-2xl font-semibold mb-1">Dashboard</h1>
+              <div className="border-l-4 border-primary pl-4">
+                <h1 className="text-2xl font-semibold mb-1 text-primary">Dashboard</h1>
                 <p className="text-sm text-muted-foreground">
                   Overview of system performance and key metrics
                 </p>
@@ -68,16 +68,18 @@ export default function SuperAdminDashboard() {
               {/* Stats grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat) => (
-                  <Card key={stat.title}>
+                  <Card key={stat.title} className="shadow-sm hover:shadow-md transition-shadow duration-200 border-l-2 border-l-primary/20">
                     <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                      <CardTitle className="text-sm font-normal text-muted-foreground">
+                      <CardTitle className="text-sm font-medium text-muted-foreground">
                         {stat.title}
                       </CardTitle>
-                      <stat.icon className="w-4 h-4 text-muted-foreground" />
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <stat.icon className="w-4 h-4 text-primary" />
+                      </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-semibold">{stat.value}</div>
-                      <p className="text-xs text-muted-foreground mt-1">{stat.change}</p>
+                      <div className="text-2xl font-semibold text-foreground">{stat.value}</div>
+                      <p className="text-xs text-success mt-1">{stat.change}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -85,15 +87,17 @@ export default function SuperAdminDashboard() {
 
               {/* Quick actions */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <TrendingUp className="w-4 h-4" />
+                <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <CardHeader className="border-b">
+                    <CardTitle className="flex items-center gap-2 text-base text-primary">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <TrendingUp className="w-4 h-4 text-primary" />
+                      </div>
                       Recent Activity
                     </CardTitle>
                     <CardDescription className="text-sm">Latest system events</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-6">
                     <div className="space-y-4">
                       {[
                         { text: "New school 'Greenwood Academy' added", time: "2 hours ago" },
@@ -101,10 +105,10 @@ export default function SuperAdminDashboard() {
                         { text: "License activated for 'Springfield High'", time: "1 day ago" },
                         { text: "Chapter PDFs uploaded for Grade 10", time: "2 days ago" },
                       ].map((activity, idx) => (
-                        <div key={idx} className="flex items-start gap-3 text-sm">
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5" />
+                        <div key={idx} className="flex items-start gap-3 text-sm p-2 rounded-lg hover:bg-accent/50 transition-colors">
+                          <div className="w-2 h-2 bg-primary rounded-full mt-1.5 shadow-sm" />
                           <div className="flex-1">
-                            <p className="text-sm">{activity.text}</p>
+                            <p className="text-sm font-medium">{activity.text}</p>
                             <p className="text-xs text-muted-foreground">{activity.time}</p>
                           </div>
                         </div>
@@ -113,15 +117,17 @@ export default function SuperAdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Activity className="w-4 h-4" />
+                <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <CardHeader className="border-b">
+                    <CardTitle className="flex items-center gap-2 text-base text-primary">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Activity className="w-4 h-4 text-primary" />
+                      </div>
                       System Health
                     </CardTitle>
                     <CardDescription className="text-sm">System performance</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-6">
                     <div className="space-y-4">
                       {[
                         { label: "API Response Time", value: "145ms", status: "good" },
@@ -129,15 +135,15 @@ export default function SuperAdminDashboard() {
                         { label: "Storage Usage", value: "67%", status: "warning" },
                         { label: "Active Sessions", value: "1,234", status: "good" },
                       ].map((metric, idx) => (
-                        <div key={idx} className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">{metric.label}</span>
+                        <div key={idx} className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-accent/50 transition-colors">
+                          <span className="text-muted-foreground font-medium">{metric.label}</span>
                           <div className="flex items-center gap-2">
-                            <span className="font-medium">{metric.value}</span>
+                            <span className="font-semibold">{metric.value}</span>
                             <div
-                              className={`w-2 h-2 rounded-full ${
+                              className={`w-2 h-2 rounded-full shadow-sm ${
                                 metric.status === "good"
-                                  ? "bg-green-500"
-                                  : "bg-yellow-500"
+                                  ? "bg-success"
+                                  : "bg-warning"
                               }`}
                             />
                           </div>

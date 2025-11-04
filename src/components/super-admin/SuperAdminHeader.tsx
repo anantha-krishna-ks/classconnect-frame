@@ -27,33 +27,33 @@ export function SuperAdminHeader() {
   };
 
   return (
-    <header className="h-14 bg-card border-b flex items-center justify-between px-6">
+    <header className="h-14 bg-card border-b shadow-sm flex items-center justify-between px-6">
       <div className="flex items-center gap-3">
-        <h1 className="text-lg font-semibold text-foreground">
+        <h1 className="text-lg font-semibold text-primary">
           SarasSchool AI
         </h1>
-        <span className="text-xs text-muted-foreground px-2 py-0.5 bg-muted rounded">
+        <span className="text-xs text-primary-foreground px-2 py-0.5 bg-primary rounded shadow-sm">
           Super Admin
         </span>
       </div>
 
       <div className="flex items-center gap-3">
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative hover:bg-accent">
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+          <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full shadow-sm animate-pulse" />
         </Button>
 
         {/* Settings */}
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="hover:bg-accent">
           <Settings className="w-5 h-5" />
         </Button>
 
         {/* User menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="gap-2">
-              <Avatar className="w-7 h-7">
+            <Button variant="ghost" className="gap-2 hover:bg-accent">
+              <Avatar className="w-7 h-7 border-2 border-primary/20 shadow-sm">
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                   SA
                 </AvatarFallback>
@@ -61,19 +61,19 @@ export function SuperAdminHeader() {
               <span className="hidden md:inline text-sm">Super Admin</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-56 shadow-md">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-accent">
               <User className="mr-2 h-4 w-4" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem className="hover:bg-accent">
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive hover:bg-destructive/10">
               <LogOut className="mr-2 h-4 w-4" />
               Logout
             </DropdownMenuItem>
