@@ -42,6 +42,14 @@ import ParentComingSoon from "./pages/ParentComingSoon";
 import ResourceVault from "./pages/ResourceVault";
 import ExamPrepRoom from "./pages/ExamPrepRoom";
 import SubscriptionAllocation from "./pages/SubscriptionAllocation";
+import SuperAdminLogin from "./pages/SuperAdminLogin";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import OrganizationManagement from "./pages/super-admin/OrganizationManagement";
+import SchoolManagement from "./pages/super-admin/SchoolManagement";
+import UserManagement from "./pages/super-admin/UserManagement";
+import ProductAssignment from "./pages/super-admin/ProductAssignment";
+import ChapterManagement from "./pages/super-admin/ChapterManagement";
+import Analytics from "./pages/super-admin/Analytics";
 
 
 const queryClient = new QueryClient();
@@ -121,6 +129,17 @@ const App = () => (
           <Route path="/concept-checkin" element={<ParentComingSoon />} />
           <Route path="/attendance-monitor" element={<ParentComingSoon />} />
           <Route path="/resource-library" element={<ParentComingSoon />} />
+
+          {/* Super Admin Routes (Hidden - No UI Links) */}
+          <Route path="/super-admin-login" element={<SuperAdminLogin />} />
+          <Route path="/super-admin" element={<SuperAdminDashboard />}>
+            <Route path="organizations" element={<OrganizationManagement />} />
+            <Route path="schools" element={<SchoolManagement />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="products" element={<ProductAssignment />} />
+            <Route path="chapters" element={<ChapterManagement />} />
+            <Route path="analytics" element={<Analytics />} />
+          </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
