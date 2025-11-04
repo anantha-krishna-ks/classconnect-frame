@@ -88,7 +88,9 @@ export default function SchoolManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">School Management</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            School Management
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage schools within organizations
           </p>
@@ -182,9 +184,12 @@ export default function SchoolManagement() {
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>All Schools</CardTitle>
+      <Card className="border-primary/10 shadow-lg">
+        <CardHeader className="bg-gradient-to-br from-info/10 to-transparent">
+          <CardTitle className="flex items-center gap-2">
+            <School className="w-5 h-5 text-info" />
+            All Schools
+          </CardTitle>
           <CardDescription>View and manage all schools across organizations</CardDescription>
         </CardHeader>
         <CardContent>

@@ -122,15 +122,17 @@ export default function ProductAssignment() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Product & Tool Assignment</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+          Product & Tool Assignment
+        </h1>
         <p className="text-sm text-muted-foreground mt-1">
           Manage product licenses and tool access for schools
         </p>
       </div>
 
       {/* School Selection */}
-      <Card>
-        <CardHeader>
+      <Card className="border-primary/10 shadow-lg">
+        <CardHeader className="bg-gradient-to-br from-primary/5 to-transparent">
           <CardTitle>Select School</CardTitle>
           <CardDescription>Choose a school to manage its product licenses</CardDescription>
         </CardHeader>
@@ -162,9 +164,12 @@ export default function ProductAssignment() {
       </Card>
 
       {/* Products Grid */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Available Products & Tools</CardTitle>
+      <Card className="border-primary/10 shadow-lg">
+        <CardHeader className="bg-gradient-to-br from-info/10 to-transparent">
+          <CardTitle className="flex items-center gap-2">
+            <Package className="w-5 h-5 text-info" />
+            Available Products & Tools
+          </CardTitle>
           <CardDescription>
             Toggle tools on/off to activate or deactivate licenses
           </CardDescription>
@@ -184,15 +189,19 @@ export default function ProductAssignment() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {products.map((product) => (
-              <Card key={product.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
+              <Card 
+                key={product.id}
+                className="border-primary/10 hover:border-primary/30 hover:shadow-lg transition-all duration-300 group"
+              >
+                <CardContent className="p-6 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-start justify-between mb-4 relative z-10">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
-                        <Package className="w-5 h-5 text-muted-foreground" />
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Package className="w-5 h-5 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-sm">{product.name}</h3>
+                        <h3 className="font-semibold text-sm">{product.name}</h3>
                         <p className="text-xs text-muted-foreground mt-1">
                           {product.description}
                         </p>
@@ -204,9 +213,9 @@ export default function ProductAssignment() {
                       disabled={!selectedSchool}
                     />
                   </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline">{product.category}</Badge>
-                    <span className="text-sm font-medium text-muted-foreground">
+                  <div className="flex items-center justify-between relative z-10">
+                    <Badge variant="outline" className="border-primary/20">{product.category}</Badge>
+                    <span className="text-sm font-bold text-primary">
                       {product.price}
                     </span>
                   </div>

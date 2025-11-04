@@ -48,7 +48,9 @@ export default function Analytics() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Analytics & Reports</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+          Analytics & Reports
+        </h1>
         <p className="text-sm text-muted-foreground mt-1">
           Monitor system usage, performance, and user engagement
         </p>
@@ -56,17 +58,23 @@ export default function Analytics() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {metrics.map((metric) => (
-          <Card key={metric.title}>
+        {metrics.map((metric, index) => (
+          <Card 
+            key={metric.title}
+            className="border-primary/10 hover:border-primary/30 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-normal text-muted-foreground">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
                 {metric.title}
               </CardTitle>
-              <metric.icon className="w-4 h-4 text-muted-foreground" />
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <metric.icon className="w-5 h-5 text-primary" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-semibold">{metric.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-3xl font-bold mb-1">{metric.value}</div>
+              <p className="text-xs text-green-600 font-medium">
                 {metric.change} from last month
               </p>
             </CardContent>
