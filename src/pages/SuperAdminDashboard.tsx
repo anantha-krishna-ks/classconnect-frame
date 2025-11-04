@@ -27,32 +27,24 @@ export default function SuperAdminDashboard() {
       value: "24",
       change: "+3 this month",
       icon: Building2,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100 dark:bg-purple-900/30",
     },
     {
       title: "Active Schools",
       value: "156",
       change: "+12 this month",
       icon: School,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100 dark:bg-blue-900/30",
     },
     {
       title: "Total Users",
       value: "45,231",
       change: "+2,341 this month",
       icon: Users,
-      color: "text-green-600",
-      bgColor: "bg-green-100 dark:bg-green-900/30",
     },
     {
       title: "Active Licenses",
       value: "892",
       change: "+45 this month",
       icon: Package,
-      color: "text-orange-600",
-      bgColor: "bg-orange-100 dark:bg-orange-900/30",
     },
   ];
 
@@ -71,26 +63,24 @@ export default function SuperAdminDashboard() {
             <div className="space-y-6">
               {/* Welcome section */}
               <div>
-                <h1 className="text-3xl font-bold mb-2">Welcome back, Super Admin</h1>
-                <p className="text-muted-foreground">
-                  Here's an overview of your system performance and key metrics
+                <h1 className="text-2xl font-semibold mb-1">Dashboard</h1>
+                <p className="text-sm text-muted-foreground">
+                  Overview of system performance and key metrics
                 </p>
               </div>
 
               {/* Stats grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat) => (
                   <Card key={stat.title}>
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                      <CardTitle className="text-sm font-normal text-muted-foreground">
                         {stat.title}
                       </CardTitle>
-                      <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                        <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                      </div>
+                      <stat.icon className="w-4 h-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold">{stat.value}</div>
+                      <div className="text-2xl font-semibold">{stat.value}</div>
                       <p className="text-xs text-muted-foreground mt-1">{stat.change}</p>
                     </CardContent>
                   </Card>
@@ -98,14 +88,14 @@ export default function SuperAdminDashboard() {
               </div>
 
               {/* Quick actions */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-purple-600" />
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <TrendingUp className="w-4 h-4" />
                       Recent Activity
                     </CardTitle>
-                    <CardDescription>Latest system events and updates</CardDescription>
+                    <CardDescription className="text-sm">Latest system events</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -116,9 +106,9 @@ export default function SuperAdminDashboard() {
                         { text: "Chapter PDFs uploaded for Grade 10", time: "2 days ago" },
                       ].map((activity, idx) => (
                         <div key={idx} className="flex items-start gap-3 text-sm">
-                          <div className="w-2 h-2 bg-purple-600 rounded-full mt-2" />
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5" />
                           <div className="flex-1">
-                            <p className="font-medium">{activity.text}</p>
+                            <p className="text-sm">{activity.text}</p>
                             <p className="text-xs text-muted-foreground">{activity.time}</p>
                           </div>
                         </div>
@@ -129,11 +119,11 @@ export default function SuperAdminDashboard() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Activity className="w-5 h-5 text-blue-600" />
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <Activity className="w-4 h-4" />
                       System Health
                     </CardTitle>
-                    <CardDescription>Monitor system performance</CardDescription>
+                    <CardDescription className="text-sm">System performance</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">

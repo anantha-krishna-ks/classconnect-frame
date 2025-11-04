@@ -27,13 +27,13 @@ export function SuperAdminHeader() {
   };
 
   return (
-    <header className="h-16 bg-card border-b flex items-center justify-between px-6 shadow-sm">
-      <div className="flex items-center gap-4">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+    <header className="h-14 bg-card border-b flex items-center justify-between px-6">
+      <div className="flex items-center gap-3">
+        <h1 className="text-lg font-semibold text-foreground">
           SarasSchool AI
         </h1>
-        <span className="text-xs text-muted-foreground px-2 py-1 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-          Super Admin Console
+        <span className="text-xs text-muted-foreground px-2 py-0.5 bg-muted rounded">
+          Super Admin
         </span>
       </div>
 
@@ -53,12 +53,12 @@ export function SuperAdminHeader() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="gap-2">
-              <Avatar className="w-8 h-8">
-                <AvatarFallback className="bg-gradient-to-br from-purple-600 to-blue-600 text-white">
+              <Avatar className="w-7 h-7">
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                   SA
                 </AvatarFallback>
               </Avatar>
-              <span className="hidden md:inline text-sm font-medium">Super Admin</span>
+              <span className="hidden md:inline text-sm">Super Admin</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">

@@ -44,26 +44,21 @@ export default function SuperAdminLogin() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-500" />
-      </div>
-
+    <div className="min-h-screen w-full flex items-center justify-center bg-muted/30">
       {/* Login card */}
-      <Card className="w-full max-w-md mx-4 backdrop-blur-xl bg-card/90 border-2 shadow-2xl relative z-10">
-        <CardHeader className="space-y-3 text-center">
-          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-            <Shield className="w-10 h-10 text-white" />
+      <Card className="w-full max-w-md mx-4 border shadow-sm">
+        <CardHeader className="space-y-4 text-center pb-6">
+          <div className="mx-auto w-16 h-16 bg-primary rounded-lg flex items-center justify-center">
+            <Shield className="w-8 h-8 text-primary-foreground" />
           </div>
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Super Admin Portal
-          </CardTitle>
-          <CardDescription className="text-base">
-            Secure access to system administration
-          </CardDescription>
+          <div className="space-y-1">
+            <CardTitle className="text-2xl font-semibold text-foreground">
+              Super Admin Portal
+            </CardTitle>
+            <CardDescription className="text-sm">
+              System Administration Access
+            </CardDescription>
+          </div>
         </CardHeader>
 
         <CardContent>
@@ -120,7 +115,7 @@ export default function SuperAdminLogin() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold shadow-lg"
+              className="w-full h-11"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -133,9 +128,9 @@ export default function SuperAdminLogin() {
               )}
             </Button>
 
-            <div className="text-center pt-4">
+            <div className="text-center pt-2">
               <p className="text-xs text-muted-foreground">
-                Protected by enterprise-grade security
+                Secure enterprise access
               </p>
             </div>
           </form>

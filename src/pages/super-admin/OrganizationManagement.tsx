@@ -75,8 +75,8 @@ export default function OrganizationManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Organization Management</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl font-semibold">Organization Management</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Manage customer organizations and their details
           </p>
         </div>
@@ -179,12 +179,12 @@ export default function OrganizationManagement() {
                   <TableRow key={org.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                          <Building2 className="w-5 h-5 text-purple-600" />
+                        <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
+                          <Building2 className="w-4 h-4 text-muted-foreground" />
                         </div>
                         <div>
-                          <p className="font-medium">{org.name}</p>
-                          <p className="text-sm text-muted-foreground">{org.email}</p>
+                          <p className="font-medium text-sm">{org.name}</p>
+                          <p className="text-xs text-muted-foreground">{org.email}</p>
                         </div>
                       </div>
                     </TableCell>

@@ -122,8 +122,8 @@ export default function ProductAssignment() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Product & Tool Assignment</h1>
-        <p className="text-muted-foreground mt-1">
+        <h1 className="text-2xl font-semibold">Product & Tool Assignment</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Manage product licenses and tool access for schools
         </p>
       </div>
@@ -188,12 +188,12 @@ export default function ProductAssignment() {
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                        <Package className="w-6 h-6 text-purple-600" />
+                      <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
+                        <Package className="w-5 h-5 text-muted-foreground" />
                       </div>
                       <div>
-                        <h3 className="font-semibold">{product.name}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
+                        <h3 className="font-medium text-sm">{product.name}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">
                           {product.description}
                         </p>
                       </div>
@@ -236,7 +236,7 @@ export default function ProductAssignment() {
                 <ul className="space-y-1">
                   {activatedToolsList.map((tool) => (
                     <li key={tool.id} className="text-sm flex items-center gap-2">
-                      <Check className="w-4 h-4 text-green-600" />
+                      <Check className="w-3 h-3" />
                       {tool.name}
                     </li>
                   ))}
