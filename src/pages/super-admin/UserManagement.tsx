@@ -91,7 +91,7 @@ export default function UserManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">User Management</h1>
+          <h1 className="text-2xl font-semibold text-primary">User Management</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage students and teachers across all schools
           </p>
@@ -112,7 +112,7 @@ export default function UserManagement() {
 
         {/* Students Tab */}
         <TabsContent value="students" className="space-y-4">
-          <Card>
+          <Card className="border-none shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -214,7 +214,7 @@ export default function UserManagement() {
                   </TableHeader>
                   <TableBody>
                     {students.map((student) => (
-                      <TableRow key={student.id}>
+                      <TableRow key={student.id} className="hover:bg-accent/30 transition-colors">
                         <TableCell className="font-medium">{student.name}</TableCell>
                         <TableCell>{student.grade}</TableCell>
                         <TableCell>{student.section}</TableCell>
@@ -222,7 +222,7 @@ export default function UserManagement() {
                         <TableCell>{student.parentPhone}</TableCell>
                         <TableCell>{student.school}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary">{student.status}</Badge>
+                          <Badge variant="secondary" className="bg-success/10 text-success">{student.status}</Badge>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -235,7 +235,7 @@ export default function UserManagement() {
 
         {/* Teachers Tab */}
         <TabsContent value="teachers" className="space-y-4">
-          <Card>
+          <Card className="border-none shadow-sm">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
@@ -338,7 +338,7 @@ export default function UserManagement() {
                   </TableHeader>
                   <TableBody>
                     {teachers.map((teacher) => (
-                      <TableRow key={teacher.id}>
+                      <TableRow key={teacher.id} className="hover:bg-accent/30 transition-colors">
                         <TableCell className="font-medium">{teacher.name}</TableCell>
                         <TableCell>{teacher.email}</TableCell>
                         <TableCell>
@@ -348,7 +348,7 @@ export default function UserManagement() {
                         <TableCell>{teacher.sections}</TableCell>
                         <TableCell>{teacher.school}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary">{teacher.status}</Badge>
+                          <Badge variant="secondary" className="bg-success/10 text-success">{teacher.status}</Badge>
                         </TableCell>
                       </TableRow>
                     ))}
