@@ -1,12 +1,6 @@
-import { Building2, School, Users, Package, BookOpen, BarChart3, ChevronLeft, ChevronRight } from "lucide-react";
+import { Building2, School, Users, Package, BookOpen, BarChart3 } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-interface SuperAdminSidebarProps {
-  collapsed: boolean;
-  onToggle: () => void;
-}
 
 const menuItems = [
   {
@@ -47,29 +41,14 @@ const menuItems = [
   },
 ];
 
-export function SuperAdminSidebar({ collapsed, onToggle }: SuperAdminSidebarProps) {
+export function SuperAdminSidebar() {
   return (
-    <aside
-      className={cn(
-        "h-screen bg-sidebar-background text-sidebar-foreground transition-all duration-300 flex flex-col border-r border-sidebar-border",
-        collapsed ? "w-20" : "w-64"
-      )}
-    >
+    <aside className="w-48 h-screen bg-sidebar-background text-sidebar-foreground flex flex-col border-r border-sidebar-border">
       {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-sidebar-border">
-        {!collapsed && (
-          <h2 className="text-sm font-semibold text-sidebar-primary">
-            Super Admin
-          </h2>
-        )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onToggle}
-          className="text-sidebar-foreground hover:bg-sidebar-accent"
-        >
-          {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-        </Button>
+      <div className="p-4 border-b border-sidebar-border">
+        <h2 className="text-sm font-semibold text-sidebar-primary">
+          Super Admin
+        </h2>
       </div>
 
       {/* Navigation */}
@@ -80,33 +59,31 @@ export function SuperAdminSidebar({ collapsed, onToggle }: SuperAdminSidebarProp
             to={item.path}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 px-3 py-2 rounded-md transition-colors text-sm",
-                "hover:bg-sidebar-accent",
-                isActive && "bg-sidebar-accent font-medium"
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm group relative",
+                "hover:bg-primary/5 hover:translate-x-0.5",
+                isActive 
+                  ? "bg-primary/10 text-primary font-medium shadow-sm border-l-2 border-primary" 
+                  : "text-muted-foreground hover:text-foreground"
               )
             }
           >
-            <item.icon className="w-4 h-4 flex-shrink-0" />
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <p className="truncate">{item.title}</p>
-              </div>
-            )}
+            <item.icon className="w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110" />
+            <div className="flex-1 min-w-0">
+              <p className="truncate">{item.title}</p>
+            </div>
           </NavLink>
         ))}
       </nav>
 
       {/* Footer */}
       <div className="p-3 border-t border-sidebar-border">
-        {!collapsed && (
-          <div className="text-xs text-muted-foreground space-y-1">
-            <p className="font-medium">System Status</p>
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-              <span>Operational</span>
-            </div>
+        <div className="text-xs text-muted-foreground space-y-1">
+          <p className="font-medium">System Status</p>
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+            <span>Operational</span>
           </div>
-        )}
+        </div>
       </div>
     </aside>
   );

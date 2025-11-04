@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { SuperAdminSidebar } from "@/components/super-admin/SuperAdminSidebar";
 import { SuperAdminHeader } from "@/components/super-admin/SuperAdminHeader";
@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Building2, School, Users, Package, TrendingUp, Activity } from "lucide-react";
 
 export default function SuperAdminDashboard() {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -50,10 +49,7 @@ export default function SuperAdminDashboard() {
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background">
-      <SuperAdminSidebar
-        collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
+      <SuperAdminSidebar />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <SuperAdminHeader />
