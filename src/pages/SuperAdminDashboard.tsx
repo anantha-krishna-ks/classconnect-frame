@@ -68,13 +68,13 @@ export default function SuperAdminDashboard() {
               {/* Stats grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat) => (
-                  <Card key={stat.title} className="shadow-sm hover:shadow-md transition-shadow duration-200 border-l-2 border-l-primary/20">
+                  <Card key={stat.title} className="group shadow-sm hover:shadow-lg transition-all duration-300 border-l-2 border-l-primary/20 hover:border-l-primary cursor-pointer hover:-translate-y-1">
                     <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                      <CardTitle className="text-sm font-medium text-muted-foreground">
+                      <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors duration-300">
                         {stat.title}
                       </CardTitle>
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <stat.icon className="w-4 h-4 text-primary" />
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300">
+                        <stat.icon className="w-4 h-4 text-primary group-hover:scale-110 transition-transform duration-300" />
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -87,7 +87,7 @@ export default function SuperAdminDashboard() {
 
               {/* Quick actions */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+                <Card className="shadow-sm hover:shadow-lg transition-all duration-300">
                   <CardHeader className="border-b">
                     <CardTitle className="flex items-center gap-2 text-base text-primary">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -105,7 +105,7 @@ export default function SuperAdminDashboard() {
                         { text: "License activated for 'Springfield High'", time: "1 day ago" },
                         { text: "Chapter PDFs uploaded for Grade 10", time: "2 days ago" },
                       ].map((activity, idx) => (
-                        <div key={idx} className="flex items-start gap-3 text-sm p-2 rounded-lg hover:bg-accent/50 transition-colors">
+                        <div key={idx} className="flex items-start gap-3 text-sm p-2 rounded-lg hover:bg-primary/5 hover:border-l-2 hover:border-primary cursor-pointer transition-all duration-200">
                           <div className="w-2 h-2 bg-primary rounded-full mt-1.5 shadow-sm" />
                           <div className="flex-1">
                             <p className="text-sm font-medium">{activity.text}</p>
@@ -117,7 +117,7 @@ export default function SuperAdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
+                <Card className="shadow-sm hover:shadow-lg transition-all duration-300">
                   <CardHeader className="border-b">
                     <CardTitle className="flex items-center gap-2 text-base text-primary">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -135,8 +135,8 @@ export default function SuperAdminDashboard() {
                         { label: "Storage Usage", value: "67%", status: "warning" },
                         { label: "Active Sessions", value: "1,234", status: "good" },
                       ].map((metric, idx) => (
-                        <div key={idx} className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-accent/50 transition-colors">
-                          <span className="text-muted-foreground font-medium">{metric.label}</span>
+                        <div key={idx} className="flex items-center justify-between text-sm p-2 rounded-lg hover:bg-primary/5 hover:border-l-2 hover:border-primary cursor-pointer transition-all duration-200">
+                          <span className="text-muted-foreground font-medium hover:text-foreground transition-colors">{metric.label}</span>
                           <div className="flex items-center gap-2">
                             <span className="font-semibold">{metric.value}</span>
                             <div

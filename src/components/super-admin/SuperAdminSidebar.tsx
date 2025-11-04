@@ -59,15 +59,15 @@ export function SuperAdminSidebar() {
             to={item.path}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm group relative border",
-                "hover:bg-accent hover:translate-x-1 hover:shadow-sm",
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 text-sm group relative border",
+                "hover:bg-primary/10 hover:translate-x-1 hover:shadow-md hover:border-primary/30",
                 isActive 
                   ? "bg-primary text-primary-foreground font-medium shadow-md border-primary" 
-                  : "text-muted-foreground hover:text-foreground border-transparent"
+                  : "text-muted-foreground hover:text-primary border-transparent"
               )
             }
           >
-            <item.icon className="w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110" />
+            <item.icon className="w-4 h-4 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
             <div className="flex-1 min-w-0">
               <p className="truncate">{item.title}</p>
             </div>
