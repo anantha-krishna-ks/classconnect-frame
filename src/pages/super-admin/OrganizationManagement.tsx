@@ -75,9 +75,7 @@ export default function OrganizationManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-            Organization Management
-          </h1>
+          <h1 className="text-2xl font-semibold">Organization Management</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Manage customer organizations and their details
           </p>
@@ -145,12 +143,9 @@ export default function OrganizationManagement() {
         </Dialog>
       </div>
 
-      <Card className="border-primary/10 shadow-lg">
-        <CardHeader className="bg-gradient-to-br from-primary/5 to-transparent">
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-primary" />
-            All Organizations
-          </CardTitle>
+      <Card>
+        <CardHeader>
+          <CardTitle>All Organizations</CardTitle>
           <CardDescription>View and manage all customer organizations</CardDescription>
         </CardHeader>
         <CardContent>
@@ -181,27 +176,21 @@ export default function OrganizationManagement() {
               </TableHeader>
               <TableBody>
                 {organizations.map((org) => (
-                  <TableRow key={org.id} className="hover:bg-accent/50 transition-colors">
+                  <TableRow key={org.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                          <Building2 className="w-5 h-5 text-primary" />
+                        <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
+                          <Building2 className="w-4 h-4 text-muted-foreground" />
                         </div>
                         <div>
-                          <p className="font-semibold text-sm">{org.name}</p>
+                          <p className="font-medium text-sm">{org.name}</p>
                           <p className="text-xs text-muted-foreground">{org.email}</p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="border-primary/20">{org.type}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-semibold">{org.schools}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="font-semibold">{org.users.toLocaleString()}</span>
-                    </TableCell>
+                    <TableCell>{org.type}</TableCell>
+                    <TableCell>{org.schools}</TableCell>
+                    <TableCell>{org.users.toLocaleString()}</TableCell>
                     <TableCell>
                       <div>
                         <p className="font-medium text-sm">{org.contact}</p>
@@ -209,15 +198,15 @@ export default function OrganizationManagement() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 border-0">{org.status}</Badge>
+                      <Badge variant="secondary">{org.status}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary">
+                        <Button variant="ghost" size="icon">
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" className="hover:bg-destructive/10 hover:text-destructive">
-                          <Trash2 className="w-4 h-4" />
+                        <Button variant="ghost" size="icon">
+                          <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
                     </TableCell>
