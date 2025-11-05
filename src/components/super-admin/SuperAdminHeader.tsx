@@ -27,25 +27,12 @@ export function SuperAdminHeader() {
   };
 
   return (
-    <header 
-      className="h-14 border-b flex items-center justify-between px-6"
-      style={{ 
-        backgroundColor: 'hsl(var(--super-admin-card))',
-        borderColor: 'hsl(var(--super-admin-border))',
-        boxShadow: '0 2px 4px hsl(var(--super-admin-shadow))'
-      }}
-    >
+    <header className="h-14 border-b flex items-center justify-between px-6 bg-super-admin-card border-super-admin-border shadow-[0_2px_4px_hsl(var(--super-admin-shadow))]">
       <div className="flex items-center gap-3">
         <h1 className="text-lg font-semibold text-foreground">
           SarasSchool AI
         </h1>
-        <span 
-          className="text-xs px-2 py-0.5 rounded font-medium"
-          style={{ 
-            backgroundColor: 'hsl(var(--super-admin-accent))',
-            color: 'hsl(var(--super-admin-primary))'
-          }}
-        >
+        <span className="text-xs px-2 py-0.5 rounded font-medium bg-super-admin-accent text-super-admin-primary">
           Super Admin
         </span>
       </div>
@@ -67,13 +54,7 @@ export function SuperAdminHeader() {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="gap-2">
               <Avatar className="w-7 h-7">
-                <AvatarFallback 
-                  className="text-xs"
-                  style={{ 
-                    backgroundColor: 'hsl(var(--super-admin-primary))',
-                    color: 'hsl(var(--super-admin-primary-foreground))'
-                  }}
-                >
+                <AvatarFallback className="text-xs bg-super-admin-primary text-super-admin-primary-foreground">
                   SA
                 </AvatarFallback>
               </Avatar>

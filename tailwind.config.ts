@@ -65,6 +65,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				'super-admin': {
+					primary: 'hsl(var(--super-admin-primary))',
+					'primary-foreground': 'hsl(var(--super-admin-primary-foreground))',
+					accent: 'hsl(var(--super-admin-accent))',
+					'accent-hover': 'hsl(var(--super-admin-accent-hover))',
+					border: 'hsl(var(--super-admin-border))',
+					sidebar: 'hsl(var(--super-admin-sidebar))',
+					card: 'hsl(var(--super-admin-card))',
+					shadow: 'hsl(var(--super-admin-shadow))',
+					'shadow-md': 'hsl(var(--super-admin-shadow-md))'
 				}
 			},
 			borderRadius: {

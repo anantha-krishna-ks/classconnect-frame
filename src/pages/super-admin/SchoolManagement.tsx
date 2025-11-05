@@ -182,14 +182,7 @@ export default function SchoolManagement() {
         </Dialog>
       </div>
 
-      <Card 
-        className="transition-all"
-        style={{ 
-          backgroundColor: 'hsl(var(--super-admin-card))',
-          borderColor: 'hsl(var(--super-admin-border))',
-          boxShadow: '0 1px 3px hsl(var(--super-admin-shadow))'
-        }}
-      >
+      <Card className="transition-all bg-super-admin-card border-super-admin-border shadow-[0_1px_3px_hsl(var(--super-admin-shadow))]">
         <CardHeader>
           <CardTitle>All Schools</CardTitle>
           <CardDescription>View and manage all schools across organizations</CardDescription>
