@@ -361,7 +361,7 @@ export default function ChapterManagement() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Import a CSV or Excel file with chapter titles organized by grade
                 </p>
-                <Button className="gap-2">
+                <Button className="gap-2" onClick={() => setIsChapterListImportOpen(true)}>
                   <Upload className="w-4 h-4" />
                   Import Your First List
                 </Button>
