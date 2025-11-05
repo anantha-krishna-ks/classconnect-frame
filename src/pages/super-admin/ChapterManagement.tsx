@@ -35,6 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 export default function ChapterManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isChapterListImportOpen, setIsChapterListImportOpen] = useState(false);
+  const [isQuestionPaperUploadOpen, setIsQuestionPaperUploadOpen] = useState(false);
 
   // Mock PDF data
   const pdfs = [
@@ -381,7 +382,7 @@ export default function ChapterManagement() {
                     Upload previous years' question papers for future extraction
                   </CardDescription>
                 </div>
-                <Dialog>
+                <Dialog open={isQuestionPaperUploadOpen} onOpenChange={setIsQuestionPaperUploadOpen}>
                   <DialogTrigger asChild>
                     <Button className="gap-2">
                       <Upload className="w-4 h-4" />
@@ -449,10 +450,10 @@ export default function ChapterManagement() {
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button variant="outline">
+                      <Button variant="outline" onClick={() => setIsQuestionPaperUploadOpen(false)}>
                         Cancel
                       </Button>
-                      <Button>
+                      <Button onClick={() => setIsQuestionPaperUploadOpen(false)}>
                         Upload Question Papers
                       </Button>
                     </DialogFooter>
