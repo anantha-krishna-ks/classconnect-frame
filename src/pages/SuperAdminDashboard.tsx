@@ -26,24 +26,28 @@ export default function SuperAdminDashboard() {
       value: "24",
       change: "+3 this month",
       icon: Building2,
+      path: "/super-admin/organizations",
     },
     {
       title: "Active Schools",
       value: "156",
       change: "+12 this month",
       icon: School,
+      path: "/super-admin/schools",
     },
     {
       title: "Total Users",
       value: "45,231",
       change: "+2,341 this month",
       icon: Users,
+      path: "/super-admin/users",
     },
     {
       title: "Active Licenses",
       value: "892",
       change: "+45 this month",
       icon: Package,
+      path: "/super-admin/products",
     },
   ];
 
@@ -70,7 +74,8 @@ export default function SuperAdminDashboard() {
                 {stats.map((stat) => (
                   <Card 
                     key={stat.title}
-                    className="transition-all hover:shadow-md bg-super-admin-card border-super-admin-border shadow-[0_1px_3px_hsl(var(--super-admin-shadow))]"
+                    className="transition-all hover:shadow-md bg-super-admin-card border-super-admin-border shadow-[0_1px_3px_hsl(var(--super-admin-shadow))] cursor-pointer hover:scale-105"
+                    onClick={() => navigate(stat.path)}
                   >
                     <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                       <CardTitle className="text-sm font-normal text-muted-foreground">
