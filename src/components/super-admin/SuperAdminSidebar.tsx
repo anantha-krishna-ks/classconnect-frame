@@ -1,8 +1,14 @@
-import { Building2, School, Users, Package, BookOpen, BarChart3 } from "lucide-react";
+import { Building2, School, Users, Package, BookOpen, BarChart3, LayoutDashboard } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const menuItems = [
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    path: "/super-admin",
+    description: "Overview & insights",
+  },
   {
     title: "Organizations",
     icon: Building2,
