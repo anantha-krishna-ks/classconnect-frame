@@ -1994,7 +1994,7 @@ Students use the story framework to reflect on:
                               {step.name}
                             </Badge>
                             <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-2 flex-col items-start">
+                                <div className="flex flex-col gap-1">
                                   <div className="flex items-center gap-2">
                                     <label className="text-sm font-medium text-gray-700">Time:</label>
                                     <div className="relative inline-flex items-center">
