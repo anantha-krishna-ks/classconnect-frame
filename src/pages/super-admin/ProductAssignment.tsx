@@ -29,6 +29,7 @@ export default function ProductAssignment() {
   const [selectedSchool, setSelectedSchool] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [selectedTools, setSelectedTools] = useState<Record<string, boolean>>({});
+  const [activatedTools, setActivatedTools] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
   // Mock products/tools data
@@ -146,13 +147,21 @@ export default function ProductAssignment() {
   };
 
   const confirmActivation = () => {
-    const activatedTools = products.filter((p) => selectedTools[p.id]);
+    const activatedToolsList = products.filter((p) => selectedTools[p.id]);
     toast({
       title: "Tools activated successfully",
-      description: `${activatedTools.length} tools have been activated for the selected school`,
+      description: `${activatedToolsList.length} tools have been activated for the selected school`,
     });
     setShowConfirmDialog(false);
-    setSelectedTools({});
+    setActivatedTools({ ...selectedTools });
+  };
+
+  const handleCancel = () => {
+    setSelectedTools({ ...activatedTools });
+    toast({
+      title: "Changes cancelled",
+      description: "Toggle switches have been reset to their last saved state",
+    });
   };
 
   const activatedToolsList = products.filter((p) => selectedTools[p.id]);
@@ -253,7 +262,16 @@ export default function ProductAssignment() {
             })}
           </div>
           
-          <div className="mt-6 flex justify-end">
+          <div className="mt-6 flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              disabled={!selectedSchool || JSON.stringify(selectedTools) === JSON.stringify(activatedTools)}
+              className="gap-2"
+            >
+              <X className="w-4 h-4" />
+              Cancel Changes
+            </Button>
             <Button
               onClick={handleActivate}
               disabled={!selectedSchool}
