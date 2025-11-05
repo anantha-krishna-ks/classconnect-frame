@@ -43,10 +43,10 @@ const menuItems = [
 
 export function SuperAdminSidebar() {
   return (
-    <aside className="w-48 h-screen bg-sidebar-background text-sidebar-foreground flex flex-col border-r border-sidebar-border shadow-sm">
+    <aside className="w-48 h-screen bg-sidebar-background text-sidebar-foreground flex flex-col border-r border-sidebar-border">
       {/* Header */}
-      <div className="p-4 border-b border-sidebar-border bg-primary/5">
-        <h2 className="text-sm font-semibold text-primary">
+      <div className="p-4 border-b border-sidebar-border">
+        <h2 className="text-sm font-semibold text-sidebar-primary">
           Super Admin
         </h2>
       </div>
@@ -59,15 +59,15 @@ export function SuperAdminSidebar() {
             to={item.path}
             className={({ isActive }) =>
               cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 text-sm group relative border",
-                "hover:bg-primary/10 hover:translate-x-1 hover:shadow-md hover:border-primary/30",
+                "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm group relative",
+                "hover:bg-primary/5 hover:translate-x-0.5",
                 isActive 
-                  ? "bg-primary text-primary-foreground font-medium shadow-md border-primary" 
-                  : "text-muted-foreground hover:text-primary border-transparent"
+                  ? "bg-primary/10 text-primary font-medium shadow-sm border-l-2 border-primary" 
+                  : "text-muted-foreground hover:text-foreground"
               )
             }
           >
-            <item.icon className="w-4 h-4 flex-shrink-0 transition-transform duration-300 group-hover:scale-110" />
+            <item.icon className="w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110" />
             <div className="flex-1 min-w-0">
               <p className="truncate">{item.title}</p>
             </div>
@@ -76,11 +76,11 @@ export function SuperAdminSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-3 border-t border-sidebar-border bg-accent/30">
-        <div className="text-xs text-muted-foreground space-y-1 p-2 rounded-lg border border-success/20 bg-success/5">
-          <p className="font-medium text-foreground">System Status</p>
+      <div className="p-3 border-t border-sidebar-border">
+        <div className="text-xs text-muted-foreground space-y-1">
+          <p className="font-medium">System Status</p>
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse shadow-sm" />
+            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
             <span>Operational</span>
           </div>
         </div>
