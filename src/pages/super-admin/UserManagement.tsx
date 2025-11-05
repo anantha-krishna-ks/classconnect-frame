@@ -98,28 +98,32 @@ export default function UserManagement() {
         </div>
       </div>
 
-      <Tabs defaultValue="students" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="students" className="gap-2">
-            <GraduationCap className="w-4 h-4" />
-            Students
-          </TabsTrigger>
-          <TabsTrigger value="teachers" className="gap-2">
-            <Users className="w-4 h-4" />
-            Teachers
-          </TabsTrigger>
-        </TabsList>
+      <Card>
+        <Tabs defaultValue="students" className="w-full">
+          <CardHeader className="pb-0">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <CardTitle>Student & Teacher Records</CardTitle>
+                <CardDescription>Import and manage user records across schools</CardDescription>
+              </div>
+            </div>
+            <TabsList className="w-full justify-start -mb-px">
+              <TabsTrigger value="students" className="gap-2">
+                <GraduationCap className="w-4 h-4" />
+                Students
+              </TabsTrigger>
+              <TabsTrigger value="teachers" className="gap-2">
+                <Users className="w-4 h-4" />
+                Teachers
+              </TabsTrigger>
+            </TabsList>
+          </CardHeader>
 
         {/* Students Tab */}
-        <TabsContent value="students" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Student Management</CardTitle>
-                  <CardDescription>Import and manage student records</CardDescription>
-                </div>
-                <div className="flex gap-2">
+        <TabsContent value="students" className="m-0">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex gap-2">
                   <Dialog open={isStudentImportOpen} onOpenChange={setIsStudentImportOpen}>
                     <DialogTrigger asChild>
                       <Button className="gap-2">
@@ -181,9 +185,8 @@ export default function UserManagement() {
                   </Button>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4 flex gap-2">
+            
+            <div className="mb-4 flex gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
@@ -229,20 +232,14 @@ export default function UserManagement() {
                   </TableBody>
                 </Table>
               </div>
-            </CardContent>
-          </Card>
+          </CardContent>
         </TabsContent>
 
         {/* Teachers Tab */}
-        <TabsContent value="teachers" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Teacher Management</CardTitle>
-                  <CardDescription>Import and manage teacher records</CardDescription>
-                </div>
-                <div className="flex gap-2">
+        <TabsContent value="teachers" className="m-0">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex gap-2">
                   <Dialog open={isTeacherImportOpen} onOpenChange={setIsTeacherImportOpen}>
                     <DialogTrigger asChild>
                       <Button className="gap-2">
@@ -305,9 +302,8 @@ export default function UserManagement() {
                   </Button>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4 flex gap-2">
+            
+            <div className="mb-4 flex gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
@@ -355,10 +351,10 @@ export default function UserManagement() {
                   </TableBody>
                 </Table>
               </div>
-            </CardContent>
-          </Card>
+          </CardContent>
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      </Card>
     </div>
   );
 }
