@@ -101,6 +101,7 @@ All colors MUST be HSL.
 
   /* Scoped Super Admin theme */
   .super-admin-theme {
+    /* Super Admin semantic tokens */
     --super-admin-primary: 216 85% 39%;
     --super-admin-primary-foreground: 0 0% 100%;
     --super-admin-accent: 216 95% 97%;
@@ -110,9 +111,18 @@ All colors MUST be HSL.
     --super-admin-card: 0 0% 100%;
     --super-admin-shadow: 216 85% 39% / 0.15;
     --super-admin-shadow-md: 216 85% 39% / 0.25;
+
+    /* Map global design tokens within Super Admin scope */
+    --primary: var(--super-admin-primary);
+    --primary-foreground: var(--super-admin-primary-foreground);
+    --accent: var(--super-admin-accent);
+    --border: var(--super-admin-border);
+    --card: var(--super-admin-card);
+    --ring: var(--super-admin-primary);
   }
 
   .dark .super-admin-theme {
+    /* Super Admin semantic tokens (dark) */
     --super-admin-primary: 216 85% 55%;
     --super-admin-primary-foreground: 0 0% 100%;
     --super-admin-accent: 216 25% 16%;
@@ -122,6 +132,14 @@ All colors MUST be HSL.
     --super-admin-card: 216 30% 12%;
     --super-admin-shadow: 216 85% 20% / 0.5;
     --super-admin-shadow-md: 216 85% 20% / 0.6;
+
+    /* Map global design tokens within Super Admin scope (dark) */
+    --primary: var(--super-admin-primary);
+    --primary-foreground: var(--super-admin-primary-foreground);
+    --accent: var(--super-admin-accent);
+    --border: var(--super-admin-border);
+    --card: var(--super-admin-card);
+    --ring: var(--super-admin-primary);
   }
 }
 
