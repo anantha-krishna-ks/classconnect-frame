@@ -252,6 +252,17 @@ export default function ProductAssignment() {
               );
             })}
           </div>
+          
+          <div className="mt-6 flex justify-end">
+            <Button
+              onClick={handleActivate}
+              disabled={!selectedSchool}
+              className="gap-2"
+            >
+              <Check className="w-4 h-4" />
+              Activate Selected Tools
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
