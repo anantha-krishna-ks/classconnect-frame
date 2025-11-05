@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Package, Check, X } from "lucide-react";
+import { Search, Check, X, BookOpen, BarChart3, Presentation, GraduationCap, Video, FolderOpen, FileText, Brain, Sparkles, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,46 +34,84 @@ export default function ProductAssignment() {
   // Mock products/tools data
   const products = [
     {
-      id: "lesson-planner",
+      id: "lesson-plan",
       name: "Lesson Plan Assistant",
       description: "AI-powered lesson planning tool",
       category: "Planning",
-      price: "$49/month",
+      icon: BookOpen,
+      iconBg: "bg-blue-500",
     },
     {
-      id: "assessment-creator",
+      id: "assessment",
       name: "Assessment Creator",
       description: "Create and manage assessments",
       category: "Assessment",
-      price: "$39/month",
-    },
-    {
-      id: "exam-prep",
-      name: "Exam Prep Room",
-      description: "Student exam preparation tools",
-      category: "Student Tools",
-      price: "$29/month",
+      icon: BarChart3,
+      iconBg: "bg-green-500",
     },
     {
       id: "slide-generator",
       name: "Slide Generator",
       description: "AI presentation creator",
       category: "Content",
-      price: "$35/month",
+      icon: Presentation,
+      iconBg: "bg-rose-500",
     },
     {
-      id: "resource-vault",
-      name: "Resource Vault",
-      description: "Centralized resource library",
-      category: "Resources",
-      price: "$25/month",
+      id: "exam-prep",
+      name: "Exam Prep Assistant",
+      description: "Student exam preparation tools",
+      category: "Student Tools",
+      icon: GraduationCap,
+      iconBg: "bg-indigo-500",
     },
     {
       id: "video-editor",
       name: "Video Clip Editor",
       description: "Educational video editing",
       category: "Content",
-      price: "$45/month",
+      icon: Video,
+      iconBg: "bg-cyan-500",
+    },
+    {
+      id: "resource-vault",
+      name: "Resource Vault",
+      description: "Centralized resource library",
+      category: "Resources",
+      icon: FolderOpen,
+      iconBg: "bg-amber-500",
+    },
+    {
+      id: "quiz-creator",
+      name: "Quiz Creator",
+      description: "Interactive quiz generation",
+      category: "Assessment",
+      icon: FileText,
+      iconBg: "bg-purple-500",
+    },
+    {
+      id: "ai-tutor",
+      name: "AI Tutor Assistant",
+      description: "Personalized student tutoring",
+      category: "Student Tools",
+      icon: Brain,
+      iconBg: "bg-pink-500",
+    },
+    {
+      id: "content-enhancer",
+      name: "Content Enhancer",
+      description: "AI-powered content improvement",
+      category: "Content",
+      icon: Sparkles,
+      iconBg: "bg-yellow-500",
+    },
+    {
+      id: "discussion-board",
+      name: "Discussion Board",
+      description: "Collaborative learning platform",
+      category: "Communication",
+      icon: MessageSquare,
+      iconBg: "bg-teal-500",
     },
   ];
 
@@ -183,36 +221,36 @@ export default function ProductAssignment() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {products.map((product) => (
-              <Card key={product.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded bg-muted flex items-center justify-center">
-                        <Package className="w-5 h-5 text-muted-foreground" />
+            {products.map((product) => {
+              const Icon = product.icon;
+              return (
+                <Card key={product.id}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-start gap-3">
+                        <div className={`w-10 h-10 rounded ${product.iconBg} flex items-center justify-center`}>
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-sm">{product.name}</h3>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {product.description}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-medium text-sm">{product.name}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {product.description}
-                        </p>
-                      </div>
+                      <Switch
+                        checked={selectedTools[product.id] || false}
+                        onCheckedChange={(checked) => handleToolToggle(product.id, checked)}
+                        disabled={!selectedSchool}
+                      />
                     </div>
-                    <Switch
-                      checked={selectedTools[product.id] || false}
-                      onCheckedChange={(checked) => handleToolToggle(product.id, checked)}
-                      disabled={!selectedSchool}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline">{product.category}</Badge>
-                    <span className="text-sm font-medium text-muted-foreground">
-                      {product.price}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline">{product.category}</Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
