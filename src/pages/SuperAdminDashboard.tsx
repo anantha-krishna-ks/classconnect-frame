@@ -17,6 +17,14 @@ export default function SuperAdminDashboard() {
     }
   }, [navigate]);
 
+  // Apply Super Admin theme to body so portaled dialogs inherit it
+  useEffect(() => {
+    document.body.classList.add("super-admin-theme");
+    return () => {
+      document.body.classList.remove("super-admin-theme");
+    };
+  }, []);
+
   // Check if we're on the root dashboard path
   const isRootPath = location.pathname === "/super-admin" || location.pathname === "/super-admin/";
 

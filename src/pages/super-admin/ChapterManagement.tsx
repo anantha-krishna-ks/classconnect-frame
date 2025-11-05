@@ -209,7 +209,7 @@ export default function ChapterManagement() {
                       <TableRow key={pdf.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-red-600" />
+                            <FileText className="w-4 h-4 text-destructive" />
                             <span className="font-medium">{pdf.filename}</span>
                           </div>
                         </TableCell>
@@ -399,7 +399,7 @@ export default function ChapterManagement() {
                       <TableRow key={paper.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-blue-600" />
+                            <FileText className="w-4 h-4 text-primary" />
                             <span className="font-medium">{paper.filename}</span>
                           </div>
                         </TableCell>
