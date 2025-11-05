@@ -428,11 +428,41 @@ export default function ChapterManagement() {
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="qp-year">Year *</Label>
-                          <Input id="qp-year" type="number" placeholder="2023" />
+                          <Select>
+                            <SelectTrigger id="qp-year">
+                              <SelectValue placeholder="Select year" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[...Array(15)].map((_, i) => {
+                                const year = new Date().getFullYear() - 10 + i;
+                                return (
+                                  <SelectItem key={year} value={String(year)}>
+                                    {year}
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor="qp-subject">Subject</Label>
-                          <Input id="qp-subject" placeholder="Math" />
+                          <Select>
+                            <SelectTrigger id="qp-subject">
+                              <SelectValue placeholder="Select subject" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="mathematics">Mathematics</SelectItem>
+                              <SelectItem value="science">Science</SelectItem>
+                              <SelectItem value="english">English</SelectItem>
+                              <SelectItem value="social-studies">Social Studies</SelectItem>
+                              <SelectItem value="physics">Physics</SelectItem>
+                              <SelectItem value="chemistry">Chemistry</SelectItem>
+                              <SelectItem value="biology">Biology</SelectItem>
+                              <SelectItem value="history">History</SelectItem>
+                              <SelectItem value="geography">Geography</SelectItem>
+                              <SelectItem value="computer-science">Computer Science</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
                       <div className="grid gap-2">
