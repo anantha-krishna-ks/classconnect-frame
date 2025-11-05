@@ -104,7 +104,7 @@ export default function UserManagement() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <CardTitle>Student & Teacher Records</CardTitle>
-                <CardDescription>Import and manage user records across schools</CardDescription>
+                <CardDescription className="mt-2">Import and manage user records across schools</CardDescription>
               </div>
             </div>
             <TabsList className="w-full justify-start -mb-px">
