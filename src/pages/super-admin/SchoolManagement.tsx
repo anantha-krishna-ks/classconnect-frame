@@ -22,6 +22,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -30,10 +40,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SchoolManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isToggleConfirmOpen, setIsToggleConfirmOpen] = useState(false);
+  const [pendingToggle, setPendingToggle] = useState<{ id: number; newState: boolean } | null>(null);
+  const { toast } = useToast();
+
+  const handleToggleClick = (schoolId: number, currentState: boolean) => {
+    setPendingToggle({ id: schoolId, newState: !currentState });
+    setIsToggleConfirmOpen(true);
+  };
+
+  const confirmToggle = () => {
+    if (pendingToggle) {
+      // Here you would update the actual state/backend
+      toast({
+        title: pendingToggle.newState ? "School Published" : "School Unpublished",
+        description: `School has been ${pendingToggle.newState ? "published" : "unpublished"} successfully.`,
+      });
+      setIsToggleConfirmOpen(false);
+      setPendingToggle(null);
+    }
+  };
+
+  const cancelToggle = () => {
+    setIsToggleConfirmOpen(false);
+    setPendingToggle(null);
+  };
 
   // Mock data
   const schools = [
@@ -233,7 +269,10 @@ export default function SchoolManagement() {
                     <TableCell>{school.students.toLocaleString()}</TableCell>
                     <TableCell>{school.teachers}</TableCell>
                     <TableCell>
-                      <Switch checked={school.published} />
+                      <Switch 
+                        checked={school.published} 
+                        onCheckedChange={() => handleToggleClick(school.id, school.published)}
+                      />
                     </TableCell>
                     <TableCell>
                       <Badge variant={school.published ? "secondary" : "outline"}>
@@ -260,6 +299,28 @@ export default function SchoolManagement() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Toggle Confirmation Dialog */}
+      <AlertDialog open={isToggleConfirmOpen} onOpenChange={setIsToggleConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingToggle?.newState ? "Publish School?" : "Unpublish School?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingToggle?.newState
+                ? "Publishing this school will enable it for all users and make it active in the system."
+                : "Unpublishing this school will disable it and make it inactive. Users won't be able to access it."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelToggle}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmToggle}>
+              {pendingToggle?.newState ? "Publish" : "Unpublish"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
