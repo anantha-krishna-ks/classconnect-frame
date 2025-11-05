@@ -83,7 +83,7 @@ export default function OrganizationManagement() {
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2">
+            <Button className="gap-2 bg-super-admin-primary hover:bg-super-admin-primary/90 text-super-admin-primary-foreground">
               <Plus className="w-4 h-4" />
               Add Organization
             </Button>
