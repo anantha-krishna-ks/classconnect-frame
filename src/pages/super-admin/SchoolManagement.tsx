@@ -49,30 +49,8 @@ export default function SchoolManagement() {
   const [pendingToggle, setPendingToggle] = useState<{ id: number; newState: boolean } | null>(null);
   const { toast } = useToast();
 
-  const handleToggleClick = (schoolId: number, currentState: boolean) => {
-    setPendingToggle({ id: schoolId, newState: !currentState });
-    setIsToggleConfirmOpen(true);
-  };
-
-  const confirmToggle = () => {
-    if (pendingToggle) {
-      // Here you would update the actual state/backend
-      toast({
-        title: pendingToggle.newState ? "School Published" : "School Unpublished",
-        description: `School has been ${pendingToggle.newState ? "published" : "unpublished"} successfully.`,
-      });
-      setIsToggleConfirmOpen(false);
-      setPendingToggle(null);
-    }
-  };
-
-  const cancelToggle = () => {
-    setIsToggleConfirmOpen(false);
-    setPendingToggle(null);
-  };
-
-  // Mock data
-  const schools = [
+  // Mock data - converted to state
+  const [schools, setSchools] = useState([
     {
       id: 1,
       name: "Lincoln High School",
@@ -118,7 +96,41 @@ export default function SchoolManagement() {
       published: false,
       status: "Setup",
     },
-  ];
+  ]);
+
+  const handleToggleClick = (schoolId: number, currentState: boolean) => {
+    setPendingToggle({ id: schoolId, newState: !currentState });
+    setIsToggleConfirmOpen(true);
+  };
+
+  const confirmToggle = () => {
+    if (pendingToggle) {
+      // Update the schools state
+      setSchools((prevSchools) =>
+        prevSchools.map((school) =>
+          school.id === pendingToggle.id
+            ? { 
+                ...school, 
+                published: pendingToggle.newState,
+                status: pendingToggle.newState ? "Active" : "Setup"
+              }
+            : school
+        )
+      );
+      
+      toast({
+        title: pendingToggle.newState ? "School Published" : "School Unpublished",
+        description: `School has been ${pendingToggle.newState ? "published" : "unpublished"} successfully.`,
+      });
+      setIsToggleConfirmOpen(false);
+      setPendingToggle(null);
+    }
+  };
+
+  const cancelToggle = () => {
+    setIsToggleConfirmOpen(false);
+    setPendingToggle(null);
+  };
 
   return (
     <div className="space-y-6">
