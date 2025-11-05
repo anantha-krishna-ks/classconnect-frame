@@ -63,6 +63,7 @@ export function SuperAdminSidebar() {
           <NavLink
             key={item.path}
             to={item.path}
+            end
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm group relative",
