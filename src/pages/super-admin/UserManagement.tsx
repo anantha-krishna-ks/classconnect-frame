@@ -98,35 +98,28 @@ export default function UserManagement() {
         </div>
       </div>
 
-      <Card>
-        <Tabs defaultValue="students" className="w-full">
-          <CardHeader className="border-b">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription className="mt-2">Import and manage student and teacher records</CardDescription>
-              </div>
-            </div>
-            
-            <TabsList className="w-full justify-start">
-              <TabsTrigger value="students" className="gap-2 flex-1 md:flex-initial">
-                <GraduationCap className="w-4 h-4" />
-                Students
-              </TabsTrigger>
-              <TabsTrigger value="teachers" className="gap-2 flex-1 md:flex-initial">
-                <Users className="w-4 h-4" />
-                Teachers
-              </TabsTrigger>
-            </TabsList>
-          </CardHeader>
-        
-          <CardContent className="p-0">
-            {/* Students Tab */}
-            <TabsContent value="students" className="m-0">
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Student Records</h3>
-                  <div className="flex gap-2">
+      <Tabs defaultValue="students" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="students" className="gap-2">
+            <GraduationCap className="w-4 h-4" />
+            Students
+          </TabsTrigger>
+          <TabsTrigger value="teachers" className="gap-2">
+            <Users className="w-4 h-4" />
+            Teachers
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Students Tab */}
+        <TabsContent value="students" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Student Management</CardTitle>
+                  <CardDescription>Import and manage student records</CardDescription>
+                </div>
+                <div className="flex gap-2">
                   <Dialog open={isStudentImportOpen} onOpenChange={setIsStudentImportOpen}>
                     <DialogTrigger asChild>
                       <Button className="gap-2">
@@ -186,10 +179,11 @@ export default function UserManagement() {
                     <Download className="w-4 h-4" />
                     Download Template
                   </Button>
-                  </div>
                 </div>
-
-                <div className="mb-4 flex gap-2">
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4 flex gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
@@ -233,17 +227,22 @@ export default function UserManagement() {
                       </TableRow>
                     ))}
                   </TableBody>
-                  </Table>
-                </div>
+                </Table>
               </div>
-            </TabsContent>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-            {/* Teachers Tab */}
-            <TabsContent value="teachers" className="m-0">
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Teacher Records</h3>
-                  <div className="flex gap-2">
+        {/* Teachers Tab */}
+        <TabsContent value="teachers" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Teacher Management</CardTitle>
+                  <CardDescription>Import and manage teacher records</CardDescription>
+                </div>
+                <div className="flex gap-2">
                   <Dialog open={isTeacherImportOpen} onOpenChange={setIsTeacherImportOpen}>
                     <DialogTrigger asChild>
                       <Button className="gap-2">
@@ -304,10 +303,11 @@ export default function UserManagement() {
                     <Download className="w-4 h-4" />
                     Download Template
                   </Button>
-                  </div>
                 </div>
-
-                <div className="mb-4 flex gap-2">
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-4 flex gap-2">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
@@ -353,13 +353,12 @@ export default function UserManagement() {
                       </TableRow>
                     ))}
                   </TableBody>
-                  </Table>
-                </div>
+                </Table>
               </div>
-            </TabsContent>
-          </CardContent>
-        </Tabs>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
