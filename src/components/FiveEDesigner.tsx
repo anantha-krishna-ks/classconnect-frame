@@ -81,6 +81,9 @@ const FiveEDesigner: React.FC<FiveEDesignerProps> = ({ elos = [], onFiveEChange,
     contentGenerated: {}
   });
   
+  // Time validation errors
+  const [timeErrors, setTimeErrors] = useState<{[key: string]: {[stepId: string]: boolean}}>({});
+  
   // All available resources across all 5E steps
   const getAllResources = (): string[] => {
     const resourceMap: {[key: string]: string[]} = {
@@ -1991,36 +1994,69 @@ Students use the story framework to reflect on:
                               {step.name}
                             </Badge>
                             <div className="flex items-center gap-2">
-                              <div className="flex items-center gap-2">
-                                <label className="text-sm font-medium text-gray-700">Time:</label>
-                                <div className="relative inline-flex items-center">
-                                  <input
-                                    type="number"
-                                    min="0"
-                                    placeholder="30"
-                                    value={stepTimes[eloKey]?.[step.id] || ''}
-                                    onChange={(e) => {
-                                      const value = e.target.value.replace(/\D/g, '');
-                                      updateStepTime(eloKey, step.id, value);
-                                    }}
-                                    onKeyDown={(e) => {
-                                      if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E' || e.key === '.') {
-                                        e.preventDefault();
-                                      }
-                                    }}
-                                    onBlur={() => {
-                                      const time = stepTimes[eloKey]?.[step.id];
-                                      if (time && selectedResources[eloKey]?.[step.id]?.length > 0) {
-                                        distributeTimeAmongResources(eloKey, step.id, time);
-                                      }
-                                    }}
-                                    className="w-20 px-2 py-1 text-sm border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-blue-500 border-r-0"
-                                  />
-                                  <span className="px-2 py-1 text-sm bg-muted text-muted-foreground border border-gray-300 border-l-0 rounded-r">
-                                    mins
-                                  </span>
+                                <div className="flex items-center gap-2 flex-col items-start">
+                                  <div className="flex items-center gap-2">
+                                    <label className="text-sm font-medium text-gray-700">Time:</label>
+                                    <div className="relative inline-flex items-center">
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        placeholder="30"
+                                        value={stepTimes[eloKey]?.[step.id] || ''}
+                                        onChange={(e) => {
+                                          const value = e.target.value.replace(/\D/g, '');
+                                          updateStepTime(eloKey, step.id, value);
+                                          
+                                          // Validate time value
+                                          if (value === '0' || value === '00') {
+                                            setTimeErrors(prev => ({
+                                              ...prev,
+                                              [eloKey]: {
+                                                ...prev[eloKey],
+                                                [step.id]: true
+                                              }
+                                            }));
+                                          } else {
+                                            setTimeErrors(prev => ({
+                                              ...prev,
+                                              [eloKey]: {
+                                                ...prev[eloKey],
+                                                [step.id]: false
+                                              }
+                                            }));
+                                          }
+                                        }}
+                                        onKeyDown={(e) => {
+                                          if (e.key === '-' || e.key === '+' || e.key === 'e' || e.key === 'E' || e.key === '.') {
+                                            e.preventDefault();
+                                          }
+                                        }}
+                                        onBlur={() => {
+                                          const time = stepTimes[eloKey]?.[step.id];
+                                          if (time && selectedResources[eloKey]?.[step.id]?.length > 0) {
+                                            distributeTimeAmongResources(eloKey, step.id, time);
+                                          }
+                                        }}
+                                        className={`w-20 px-2 py-1 text-sm border rounded-l focus:outline-none focus:ring-1 border-r-0 ${
+                                          timeErrors[eloKey]?.[step.id] 
+                                            ? 'border-destructive focus:ring-destructive' 
+                                            : 'border-gray-300 focus:ring-blue-500'
+                                        }`}
+                                      />
+                                      <span className="px-2 py-1 text-sm bg-muted text-muted-foreground border border-gray-300 border-l-0 rounded-r">
+                                        mins
+                                      </span>
+                                    </div>
+                                  </div>
+                                  {timeErrors[eloKey]?.[step.id] && (
+                                    <p className="text-xs text-destructive flex items-center gap-1 mt-1 ml-12">
+                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                      </svg>
+                                      Please add a value greater than 0
+                                    </p>
+                                  )}
                                 </div>
-                              </div>
                               <Popover>
                                     <PopoverTrigger asChild>
                                       <Button variant="outline" size="sm" className="text-xs">
