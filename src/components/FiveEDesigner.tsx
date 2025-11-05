@@ -1994,7 +1994,7 @@ Students use the story framework to reflect on:
                               {step.name}
                             </Badge>
                             <div className="flex items-center gap-2">
-                                <div className="flex flex-col gap-1">
+                                <div className={`relative flex flex-col ${timeErrors[eloKey]?.[step.id] ? 'pb-5' : ''}`}>
                                   <div className="flex items-center gap-2">
                                     <label className="text-sm font-medium text-gray-700">Time:</label>
                                     <div className="relative inline-flex items-center">
@@ -2046,16 +2046,16 @@ Students use the story framework to reflect on:
                                       <span className="px-2 py-1 text-sm bg-muted text-muted-foreground border border-gray-300 border-l-0 rounded-r">
                                         mins
                                       </span>
+                                      {timeErrors[eloKey]?.[step.id] && (
+                                        <span className="absolute left-0 top-full mt-1 text-xs text-destructive flex items-center gap-1 whitespace-nowrap pointer-events-none">
+                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                          </svg>
+                                          Please add a value greater than 0
+                                        </span>
+                                      )}
                                     </div>
                                   </div>
-                                  {timeErrors[eloKey]?.[step.id] && (
-                                    <p className="text-xs text-destructive flex items-center gap-1 mt-1 ml-12">
-                                      <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                                      </svg>
-                                      Please add a value greater than 0
-                                    </p>
-                                  )}
                                 </div>
                               <Popover>
                                     <PopoverTrigger asChild>
