@@ -17,6 +17,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -177,6 +178,14 @@ export default function UserManagement() {
                           </ul>
                         </div>
                       </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsStudentImportOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={() => setIsStudentImportOpen(false)}>
+                          Import Students
+                        </Button>
+                      </DialogFooter>
                     </DialogContent>
                   </Dialog>
                   <Button variant="outline" className="gap-2">
@@ -294,6 +303,14 @@ export default function UserManagement() {
                           </ul>
                         </div>
                       </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsTeacherImportOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={() => setIsTeacherImportOpen(false)}>
+                          Import Teachers
+                        </Button>
+                      </DialogFooter>
                     </DialogContent>
                   </Dialog>
                   <Button variant="outline" className="gap-2">

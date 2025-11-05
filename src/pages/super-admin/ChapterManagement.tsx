@@ -17,6 +17,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -189,6 +190,14 @@ export default function ChapterManagement() {
                         />
                       </div>
                     </div>
+                    <DialogFooter>
+                      <Button variant="outline">
+                        Cancel
+                      </Button>
+                      <Button>
+                        Upload PDFs
+                      </Button>
+                    </DialogFooter>
                   </DialogContent>
                 </Dialog>
               </div>
@@ -380,6 +389,14 @@ export default function ChapterManagement() {
                         </div>
                       </div>
                     </div>
+                    <DialogFooter>
+                      <Button variant="outline">
+                        Cancel
+                      </Button>
+                      <Button>
+                        Upload Question Papers
+                      </Button>
+                    </DialogFooter>
                   </DialogContent>
                 </Dialog>
               </div>
