@@ -96,20 +96,20 @@ export default function Analytics() {
     { type: "Charter", engagement: 78, schools: 22 },
   ];
 
-  // Monthly content generation
-  const contentGenerationData = [
-    { month: "Jan", lessonPlans: 620, assessments: 340, slides: 280 },
-    { month: "Feb", lessonPlans: 680, assessments: 380, slides: 310 },
-    { month: "Mar", lessonPlans: 740, assessments: 420, slides: 350 },
-    { month: "Apr", lessonPlans: 810, assessments: 460, slides: 390 },
-    { month: "May", lessonPlans: 890, assessments: 510, slides: 430 },
-    { month: "Jun", lessonPlans: 920, assessments: 540, slides: 460 },
-    { month: "Jul", lessonPlans: 850, assessments: 490, slides: 420 },
-    { month: "Aug", lessonPlans: 980, assessments: 580, slides: 510 },
-    { month: "Sep", lessonPlans: 1050, assessments: 620, slides: 550 },
-    { month: "Oct", lessonPlans: 1120, assessments: 660, slides: 590 },
-    { month: "Nov", lessonPlans: 1180, assessments: 710, slides: 630 },
-    { month: "Dec", lessonPlans: 1240, assessments: 750, slides: 670 },
+  // License utilization and engagement data
+  const licenseUtilizationData = [
+    { month: "Jan", totalLicenses: 3200, activeUsers: 2400, utilizationRate: 75, revenue: 48000 },
+    { month: "Feb", totalLicenses: 3350, activeUsers: 2650, utilizationRate: 79, revenue: 50250 },
+    { month: "Mar", totalLicenses: 3600, activeUsers: 2880, utilizationRate: 80, revenue: 54000 },
+    { month: "Apr", totalLicenses: 3750, activeUsers: 3000, utilizationRate: 80, revenue: 56250 },
+    { month: "May", totalLicenses: 3900, activeUsers: 3276, utilizationRate: 84, revenue: 58500 },
+    { month: "Jun", totalLicenses: 3980, activeUsers: 3383, utilizationRate: 85, revenue: 59700 },
+    { month: "Jul", totalLicenses: 4050, activeUsers: 3442, utilizationRate: 85, revenue: 60750 },
+    { month: "Aug", totalLicenses: 4150, activeUsers: 3569, utilizationRate: 86, revenue: 62250 },
+    { month: "Sep", totalLicenses: 4240, activeUsers: 3657, utilizationRate: 86, revenue: 63600 },
+    { month: "Oct", totalLicenses: 4280, activeUsers: 3767, utilizationRate: 88, revenue: 64200 },
+    { month: "Nov", totalLicenses: 4350, activeUsers: 3915, utilizationRate: 90, revenue: 65250 },
+    { month: "Dec", totalLicenses: 4420, activeUsers: 4199, utilizationRate: 95, revenue: 66300 },
   ];
 
   // Feature usage comparison
@@ -286,45 +286,59 @@ export default function Analytics() {
           </CardContent>
         </Card>
 
-        {/* Content Generation Trends */}
+        {/* License Utilization & Revenue */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Content Generation Trends</CardTitle>
-            <CardDescription>Monthly content created by users across all tools</CardDescription>
+            <CardTitle>License Utilization & Revenue</CardTitle>
+            <CardDescription>Track license allocation vs active usage and revenue growth</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={contentGenerationData}>
+              <AreaChart data={licenseUtilizationData}>
+                <defs>
+                  <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#94a3b8" stopOpacity={0.05}/>
+                  </linearGradient>
+                  <linearGradient id="colorActive" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="month" className="text-xs" />
-                <YAxis className="text-xs" />
+                <YAxis yAxisId="left" className="text-xs" />
+                <YAxis yAxisId="right" orientation="right" className="text-xs" domain={[0, 100]} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Line 
+                <Area 
+                  yAxisId="left"
                   type="monotone" 
-                  dataKey="lessonPlans" 
+                  dataKey="totalLicenses" 
+                  stroke="#94a3b8" 
+                  fillOpacity={1} 
+                  fill="url(#colorTotal)" 
+                  name="Total Licenses"
+                />
+                <Area 
+                  yAxisId="left"
+                  type="monotone" 
+                  dataKey="activeUsers" 
                   stroke="#3b82f6" 
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  name="Lesson Plans"
+                  fillOpacity={1} 
+                  fill="url(#colorActive)" 
+                  name="Active Users"
                 />
                 <Line 
+                  yAxisId="right"
                   type="monotone" 
-                  dataKey="assessments" 
-                  stroke="#8b5cf6" 
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  name="Assessments"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="slides" 
+                  dataKey="utilizationRate" 
                   stroke="#10b981" 
-                  strokeWidth={2}
-                  dot={{ r: 4 }}
-                  name="Slides"
+                  strokeWidth={3}
+                  dot={{ r: 5, fill: "#10b981" }}
+                  name="Utilization %"
                 />
-              </LineChart>
+              </AreaChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
