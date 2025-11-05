@@ -34,6 +34,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export default function ChapterManagement() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isChapterListImportOpen, setIsChapterListImportOpen] = useState(false);
 
   // Mock PDF data
   const pdfs = [
@@ -284,10 +285,68 @@ export default function ChapterManagement() {
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  <Button className="gap-2">
-                    <Upload className="w-4 h-4" />
-                    Import Chapter List
-                  </Button>
+                  <Dialog open={isChapterListImportOpen} onOpenChange={setIsChapterListImportOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="gap-2">
+                        <Upload className="w-4 h-4" />
+                        Import Chapter List
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Import Chapter List</DialogTitle>
+                        <DialogDescription>
+                          Upload a CSV or Excel file with consolidated chapter lists from all grades
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="chapter-school">Select School *</Label>
+                          <Select>
+                            <SelectTrigger id="chapter-school">
+                              <SelectValue placeholder="Choose school" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">Lincoln High School</SelectItem>
+                              <SelectItem value="2">Roosevelt Middle School</SelectItem>
+                              <SelectItem value="3">Jefferson Elementary</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid gap-2">
+                          <Label>Upload File</Label>
+                          <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                            <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                            <p className="text-sm font-medium mb-1">
+                              Click to upload or drag and drop
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              CSV or Excel file with chapter lists (max 10MB)
+                            </p>
+                            <input type="file" accept=".csv,.xlsx,.xls" className="hidden" />
+                          </div>
+                        </div>
+                        <div className="bg-muted p-4 rounded-lg">
+                          <p className="text-sm font-medium mb-2">Required File Format:</p>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            <li>• <strong>Grade</strong> - Numeric or text (e.g., "10" or "Grade 10")</li>
+                            <li>• <strong>Chapter Title</strong> - Full chapter name</li>
+                          </ul>
+                          <p className="text-xs text-muted-foreground mt-3">
+                            Example: Grade | Chapter Title
+                          </p>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsChapterListImportOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={() => setIsChapterListImportOpen(false)}>
+                          Import Chapter List
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                   <Button variant="outline" className="gap-2">
                     <Download className="w-4 h-4" />
                     Download Template
