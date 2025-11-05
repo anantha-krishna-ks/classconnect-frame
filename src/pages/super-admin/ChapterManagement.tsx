@@ -98,7 +98,7 @@ export default function ChapterManagement() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Chapter PDF Management</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="mt-2">
                     Upload chapter PDFs for AI training and content generation
                   </CardDescription>
                 </div>
@@ -270,7 +270,7 @@ export default function ChapterManagement() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Chapter List Import</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="mt-2">
                     Import consolidated chapter lists from CSV/Excel
                   </CardDescription>
                 </div>
@@ -309,7 +309,7 @@ export default function ChapterManagement() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Question Paper Management</CardTitle>
-                  <CardDescription>
+                  <CardDescription className="mt-2">
                     Upload previous years' question papers for future extraction
                   </CardDescription>
                 </div>
