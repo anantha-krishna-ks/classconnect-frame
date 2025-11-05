@@ -44,12 +44,12 @@ export default function SuperAdminLogin() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-muted/30">
+    <div className="super-admin-theme min-h-screen w-full flex items-center justify-center bg-super-admin-accent">
       {/* Login card */}
-      <Card className="w-full max-w-md mx-4 border shadow-sm">
+      <Card className="w-full max-w-md mx-4 border-super-admin-border shadow-[0_2px_8px_hsl(var(--super-admin-shadow))] bg-super-admin-card">
         <CardHeader className="space-y-4 text-center pb-6">
-          <div className="mx-auto w-16 h-16 bg-primary rounded-lg flex items-center justify-center">
-            <Shield className="w-8 h-8 text-primary-foreground" />
+          <div className="mx-auto w-16 h-16 bg-super-admin-primary rounded-lg flex items-center justify-center">
+            <Shield className="w-8 h-8 text-super-admin-primary-foreground" />
           </div>
           <div className="space-y-1">
             <CardTitle className="text-2xl font-semibold text-foreground">
@@ -115,7 +115,7 @@ export default function SuperAdminLogin() {
 
             <Button
               type="submit"
-              className="w-full h-11"
+              className="w-full h-11 bg-super-admin-primary hover:bg-super-admin-primary/90 text-super-admin-primary-foreground"
               disabled={isLoading}
             >
               {isLoading ? (

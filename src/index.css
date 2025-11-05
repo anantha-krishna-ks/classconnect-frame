@@ -101,27 +101,27 @@ All colors MUST be HSL.
 
   /* Scoped Super Admin theme */
   .super-admin-theme {
-    --super-admin-primary: 234 56% 42%;
+    --super-admin-primary: 216 85% 39%;
     --super-admin-primary-foreground: 0 0% 100%;
-    --super-admin-accent: 220 16% 96%;
-    --super-admin-accent-hover: 220 16% 92%;
-    --super-admin-border: 220 14% 90%;
-    --super-admin-sidebar: 220 18% 97%;
+    --super-admin-accent: 216 95% 97%;
+    --super-admin-accent-hover: 216 95% 93%;
+    --super-admin-border: 216 80% 90%;
+    --super-admin-sidebar: 216 90% 98%;
     --super-admin-card: 0 0% 100%;
-    --super-admin-shadow: 220 10% 46% / 0.28;
-    --super-admin-shadow-md: 220 10% 40% / 0.38;
+    --super-admin-shadow: 216 85% 39% / 0.15;
+    --super-admin-shadow-md: 216 85% 39% / 0.25;
   }
 
   .dark .super-admin-theme {
-    --super-admin-primary: 234 65% 60%;
+    --super-admin-primary: 216 85% 55%;
     --super-admin-primary-foreground: 0 0% 100%;
-    --super-admin-accent: 225 12% 16%;
-    --super-admin-accent-hover: 225 12% 20%;
-    --super-admin-border: 225 10% 26%;
-    --super-admin-sidebar: 225 14% 14%;
-    --super-admin-card: 225 14% 12%;
-    --super-admin-shadow: 220 10% 20% / 0.5;
-    --super-admin-shadow-md: 220 10% 20% / 0.6;
+    --super-admin-accent: 216 25% 16%;
+    --super-admin-accent-hover: 216 25% 20%;
+    --super-admin-border: 216 20% 26%;
+    --super-admin-sidebar: 216 30% 14%;
+    --super-admin-card: 216 30% 12%;
+    --super-admin-shadow: 216 85% 20% / 0.5;
+    --super-admin-shadow-md: 216 85% 20% / 0.6;
   }
 }
 
