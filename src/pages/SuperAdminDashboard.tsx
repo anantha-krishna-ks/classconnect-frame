@@ -48,7 +48,7 @@ export default function SuperAdminDashboard() {
   ];
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-super-admin-accent">
+    <div className="super-admin-theme flex h-screen w-full overflow-hidden bg-super-admin-accent">
       <SuperAdminSidebar />
 
       <div className="flex-1 flex flex-col overflow-hidden">

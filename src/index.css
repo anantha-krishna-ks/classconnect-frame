@@ -98,6 +98,31 @@ All colors MUST be HSL.
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* Scoped Super Admin theme */
+  .super-admin-theme {
+    --super-admin-primary: 234 56% 42%;
+    --super-admin-primary-foreground: 0 0% 100%;
+    --super-admin-accent: 220 16% 96%;
+    --super-admin-accent-hover: 220 16% 92%;
+    --super-admin-border: 220 14% 90%;
+    --super-admin-sidebar: 220 18% 97%;
+    --super-admin-card: 0 0% 100%;
+    --super-admin-shadow: 220 10% 46% / 0.28;
+    --super-admin-shadow-md: 220 10% 40% / 0.38;
+  }
+
+  .dark .super-admin-theme {
+    --super-admin-primary: 234 65% 60%;
+    --super-admin-primary-foreground: 0 0% 100%;
+    --super-admin-accent: 225 12% 16%;
+    --super-admin-accent-hover: 225 12% 20%;
+    --super-admin-border: 225 10% 26%;
+    --super-admin-sidebar: 225 14% 14%;
+    --super-admin-card: 225 14% 12%;
+    --super-admin-shadow: 220 10% 20% / 0.5;
+    --super-admin-shadow-md: 220 10% 20% / 0.6;
+  }
 }
 
 @layer base {
