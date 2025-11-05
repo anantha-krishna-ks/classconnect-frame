@@ -43,10 +43,23 @@ const menuItems = [
 
 export function SuperAdminSidebar() {
   return (
-    <aside className="w-48 h-screen bg-sidebar-background text-sidebar-foreground flex flex-col border-r border-sidebar-border">
+    <aside 
+      className="w-48 h-screen flex flex-col border-r"
+      style={{ 
+        backgroundColor: 'hsl(var(--super-admin-sidebar))',
+        borderColor: 'hsl(var(--super-admin-border))',
+        boxShadow: '2px 0 8px hsl(var(--super-admin-shadow))'
+      }}
+    >
       {/* Header */}
-      <div className="p-4 border-b border-sidebar-border">
-        <h2 className="text-sm font-semibold text-sidebar-primary">
+      <div 
+        className="p-4 border-b"
+        style={{ borderColor: 'hsl(var(--super-admin-border))' }}
+      >
+        <h2 
+          className="text-sm font-semibold"
+          style={{ color: 'hsl(var(--super-admin-primary))' }}
+        >
           Super Admin
         </h2>
       </div>
@@ -60,12 +73,33 @@ export function SuperAdminSidebar() {
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all text-sm group relative",
-                "hover:bg-primary/5 hover:translate-x-0.5",
                 isActive 
-                  ? "bg-primary/10 text-primary font-medium shadow-sm border-l-2 border-primary" 
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "font-medium shadow-sm border-l-2" 
+                  : "text-muted-foreground"
               )
             }
+            style={({ isActive }) => 
+              isActive
+                ? {
+                    backgroundColor: 'hsl(var(--super-admin-accent-hover))',
+                    color: 'hsl(var(--super-admin-primary))',
+                    borderColor: 'hsl(var(--super-admin-primary))',
+                    boxShadow: '0 1px 3px hsl(var(--super-admin-shadow))'
+                  }
+                : {}
+            }
+            onMouseEnter={(e) => {
+              if (!e.currentTarget.classList.contains('font-medium')) {
+                e.currentTarget.style.backgroundColor = 'hsl(var(--super-admin-accent))';
+                e.currentTarget.style.color = 'hsl(var(--super-admin-primary))';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!e.currentTarget.classList.contains('font-medium')) {
+                e.currentTarget.style.backgroundColor = '';
+                e.currentTarget.style.color = '';
+              }
+            }}
           >
             <item.icon className="w-4 h-4 flex-shrink-0 transition-transform group-hover:scale-110" />
             <div className="flex-1 min-w-0">
@@ -76,7 +110,10 @@ export function SuperAdminSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-3 border-t border-sidebar-border">
+      <div 
+        className="p-3 border-t"
+        style={{ borderColor: 'hsl(var(--super-admin-border))' }}
+      >
         <div className="text-xs text-muted-foreground space-y-1">
           <p className="font-medium">System Status</p>
           <div className="flex items-center gap-2">

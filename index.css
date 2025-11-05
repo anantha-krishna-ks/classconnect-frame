@@ -53,6 +53,17 @@ All colors MUST be HSL.
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Super Admin specific colors - Professional indigo theme */
+    --super-admin-primary: 231 48% 48%;
+    --super-admin-primary-foreground: 0 0% 100%;
+    --super-admin-accent: 231 48% 95%;
+    --super-admin-accent-hover: 231 48% 90%;
+    --super-admin-border: 231 20% 88%;
+    --super-admin-sidebar: 231 25% 97%;
+    --super-admin-card: 0 0% 100%;
+    --super-admin-shadow: 231 48% 48% / 0.08;
+    --super-admin-shadow-md: 231 48% 48% / 0.12;
   }
 
   .dark {
@@ -91,6 +102,17 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Super Admin dark mode colors */
+    --super-admin-primary: 231 48% 58%;
+    --super-admin-primary-foreground: 0 0% 100%;
+    --super-admin-accent: 231 25% 20%;
+    --super-admin-accent-hover: 231 25% 25%;
+    --super-admin-border: 231 20% 25%;
+    --super-admin-sidebar: 231 25% 12%;
+    --super-admin-card: 231 25% 15%;
+    --super-admin-shadow: 231 48% 58% / 0.15;
+    --super-admin-shadow-md: 231 48% 58% / 0.2;
   }
 }
 

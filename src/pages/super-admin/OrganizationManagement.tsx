@@ -143,7 +143,14 @@ export default function OrganizationManagement() {
         </Dialog>
       </div>
 
-      <Card>
+      <Card 
+        className="transition-all"
+        style={{ 
+          backgroundColor: 'hsl(var(--super-admin-card))',
+          borderColor: 'hsl(var(--super-admin-border))',
+          boxShadow: '0 1px 3px hsl(var(--super-admin-shadow))'
+        }}
+      >
         <CardHeader>
           <CardTitle>All Organizations</CardTitle>
           <CardDescription>View and manage all customer organizations</CardDescription>

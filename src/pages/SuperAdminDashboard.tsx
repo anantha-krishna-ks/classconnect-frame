@@ -48,7 +48,7 @@ export default function SuperAdminDashboard() {
   ];
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
+    <div className="flex h-screen w-full overflow-hidden" style={{ backgroundColor: 'hsl(var(--super-admin-accent))' }}>
       <SuperAdminSidebar />
 
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -68,12 +68,25 @@ export default function SuperAdminDashboard() {
               {/* Stats grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat) => (
-                  <Card key={stat.title}>
+                  <Card 
+                    key={stat.title}
+                    className="transition-all hover:shadow-md"
+                    style={{ 
+                      backgroundColor: 'hsl(var(--super-admin-card))',
+                      borderColor: 'hsl(var(--super-admin-border))',
+                      boxShadow: '0 1px 3px hsl(var(--super-admin-shadow))'
+                    }}
+                  >
                     <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                       <CardTitle className="text-sm font-normal text-muted-foreground">
                         {stat.title}
                       </CardTitle>
-                      <stat.icon className="w-4 h-4 text-muted-foreground" />
+                      <div 
+                        className="w-9 h-9 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: 'hsl(var(--super-admin-accent))' }}
+                      >
+                        <stat.icon className="w-4 h-4" style={{ color: 'hsl(var(--super-admin-primary))' }} />
+                      </div>
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-semibold">{stat.value}</div>
@@ -85,10 +98,22 @@ export default function SuperAdminDashboard() {
 
               {/* Quick actions */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <Card>
+                <Card 
+                  className="transition-all hover:shadow-md"
+                  style={{ 
+                    backgroundColor: 'hsl(var(--super-admin-card))',
+                    borderColor: 'hsl(var(--super-admin-border))',
+                    boxShadow: '0 1px 3px hsl(var(--super-admin-shadow))'
+                  }}
+                >
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
-                      <TrendingUp className="w-4 h-4" />
+                      <div 
+                        className="w-7 h-7 rounded-md flex items-center justify-center"
+                        style={{ backgroundColor: 'hsl(var(--super-admin-accent))' }}
+                      >
+                        <TrendingUp className="w-4 h-4" style={{ color: 'hsl(var(--super-admin-primary))' }} />
+                      </div>
                       Recent Activity
                     </CardTitle>
                     <CardDescription className="text-sm">Latest system events</CardDescription>
@@ -102,7 +127,10 @@ export default function SuperAdminDashboard() {
                         { text: "Chapter PDFs uploaded for Grade 10", time: "2 days ago" },
                       ].map((activity, idx) => (
                         <div key={idx} className="flex items-start gap-3 text-sm">
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full mt-1.5" />
+                          <div 
+                            className="w-1.5 h-1.5 rounded-full mt-1.5" 
+                            style={{ backgroundColor: 'hsl(var(--super-admin-primary))' }}
+                          />
                           <div className="flex-1">
                             <p className="text-sm">{activity.text}</p>
                             <p className="text-xs text-muted-foreground">{activity.time}</p>
@@ -113,10 +141,22 @@ export default function SuperAdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card 
+                  className="transition-all hover:shadow-md"
+                  style={{ 
+                    backgroundColor: 'hsl(var(--super-admin-card))',
+                    borderColor: 'hsl(var(--super-admin-border))',
+                    boxShadow: '0 1px 3px hsl(var(--super-admin-shadow))'
+                  }}
+                >
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-base">
-                      <Activity className="w-4 h-4" />
+                      <div 
+                        className="w-7 h-7 rounded-md flex items-center justify-center"
+                        style={{ backgroundColor: 'hsl(var(--super-admin-accent))' }}
+                      >
+                        <Activity className="w-4 h-4" style={{ color: 'hsl(var(--super-admin-primary))' }} />
+                      </div>
                       System Health
                     </CardTitle>
                     <CardDescription className="text-sm">System performance</CardDescription>
