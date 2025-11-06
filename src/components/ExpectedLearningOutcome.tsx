@@ -655,30 +655,36 @@ const ExpectedLearningOutcome = ({
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full">
-                          <span className="text-xs font-bold text-gray-700">ELO {index + 1}</span>
+                      {/* Header with ELO number and Bloom's Taxonomy */}
+                      <div className="flex items-start justify-between gap-3 mb-4 pb-3 border-b border-gray-200">
+                        <div className="flex items-center gap-2 bg-green-100 px-3 py-1.5 rounded-lg border border-green-200">
+                          <span className="text-xs font-bold text-green-800">ELO {index + 1}</span>
                         </div>
+                        
                         {outcome.bloomsLevel && (
-                          <Badge 
-                            variant="secondary"
-                            className={`
-                              text-xs font-semibold px-3 py-1.5 shadow-sm
-                              ${outcome.bloomsLevel.toLowerCase() === 'remember' ? 'bg-blue-100 text-blue-700 border border-blue-200' : ''}
-                              ${outcome.bloomsLevel.toLowerCase() === 'understand' ? 'bg-purple-100 text-purple-700 border border-purple-200' : ''}
-                              ${outcome.bloomsLevel.toLowerCase() === 'apply' ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' : ''}
-                              ${outcome.bloomsLevel.toLowerCase() === 'analyze' || outcome.bloomsLevel.toLowerCase() === 'analyse' ? 'bg-pink-100 text-pink-700 border border-pink-200' : ''}
-                              ${outcome.bloomsLevel.toLowerCase() === 'evaluate' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : ''}
-                              ${outcome.bloomsLevel.toLowerCase() === 'create' ? 'bg-green-100 text-green-700 border border-green-200' : ''}
-                            `}
-                          >
-                            <Brain className="w-3 h-3 inline mr-1" />
-                            {outcome.bloomsLevel}
-                          </Badge>
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">Bloom's Taxonomy</span>
+                            <Badge 
+                              variant="secondary"
+                              className={`
+                                text-sm font-bold px-4 py-2 shadow-md border-2
+                                ${outcome.bloomsLevel.toLowerCase() === 'remember' ? 'bg-blue-100 text-blue-800 border-blue-300' : ''}
+                                ${outcome.bloomsLevel.toLowerCase() === 'understand' ? 'bg-purple-100 text-purple-800 border-purple-300' : ''}
+                                ${outcome.bloomsLevel.toLowerCase() === 'apply' ? 'bg-indigo-100 text-indigo-800 border-indigo-300' : ''}
+                                ${outcome.bloomsLevel.toLowerCase() === 'analyze' || outcome.bloomsLevel.toLowerCase() === 'analyse' ? 'bg-pink-100 text-pink-800 border-pink-300' : ''}
+                                ${outcome.bloomsLevel.toLowerCase() === 'evaluate' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : ''}
+                                ${outcome.bloomsLevel.toLowerCase() === 'create' ? 'bg-green-100 text-green-800 border-green-300' : ''}
+                              `}
+                            >
+                              <Brain className="w-4 h-4 inline mr-2" />
+                              {outcome.bloomsLevel}
+                            </Badge>
+                          </div>
                         )}
                       </div>
                       
-                      <p className="text-[15px] text-gray-800 font-medium leading-[1.75] mb-4 tracking-wide">
+                      {/* Learning Outcome Text */}
+                      <p className="text-base text-gray-900 font-medium leading-[1.8] mb-4 tracking-normal">
                         {outcome.text}
                       </p>
                       
