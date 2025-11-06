@@ -285,13 +285,25 @@ const ExpectedLearningOutcome = ({
       
       const courseOutcomes = response.data;
       if (Array.isArray(courseOutcomes)) {
+        // Create an array of Bloom's levels based on the counts selected by the user
+        const bloomLevelsArray: string[] = [];
+        for (const [level, count] of Object.entries(blooms_elo_counts)) {
+          for (let i = 0; i < count; i++) {
+            bloomLevelsArray.push(level);
+          }
+        }
+
+        let eloIndex = 0;
         const allELOs = courseOutcomes.flatMap((co: any) =>
-          (co.elos || []).map((elo: any) => ({
-            text: elo.elo,
-            bloomsLevel: elo.blooms_level || elo.bloomsLevel,
-            skills: elo.skills || [],
-            competencies: elo.competencies || []
-          }))
+          (co.elos || []).map((elo: any) => {
+            const currentIndex = eloIndex++;
+            return {
+              text: elo.elo,
+              bloomsLevel: bloomLevelsArray[currentIndex] || elo.blooms_level || elo.bloomsLevel || 'Apply',
+              skills: elo.skills || [],
+              competencies: elo.competencies || []
+            };
+          })
         );
         setGeneratedOutcomes(allELOs);
         if (onEloGenerated) {
