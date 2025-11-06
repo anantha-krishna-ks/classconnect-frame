@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { Card } from '@/components/ui/card';
+import { Card, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Lightbulb, Bot, CheckCircle, Brain, Heart, Target, Plus, X } from 'lucide-react';
+import { Lightbulb, Bot, CheckCircle, Brain, Heart, Target, Plus, X, Edit2, RefreshCw, Trash2 } from 'lucide-react';
 import axios from 'axios';
 import { set } from 'date-fns';
 import { PageLoader, Loader } from "@/components/ui/loader"
@@ -62,7 +63,7 @@ const ExpectedLearningOutcome = ({
 
   const [activeTab, setActiveTab] = useState<'recommended' | 'aiAssist'>('recommended');
   const [customPrompt, setCustomPrompt] = useState('');
-  const [generatedOutcomes, setGeneratedOutcomes] = useState<string[]>([]);
+  const [generatedOutcomes, setGeneratedOutcomes] = useState<any[]>([]);
   const [EloPayload, setEloPayload] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [bloomCounts, setBloomCounts] = useState<{ [key: string]: number }>({
@@ -285,7 +286,12 @@ const ExpectedLearningOutcome = ({
       const courseOutcomes = response.data;
       if (Array.isArray(courseOutcomes)) {
         const allELOs = courseOutcomes.flatMap((co: any) =>
-          (co.elos || []).map((elo: any) => elo.elo)
+          (co.elos || []).map((elo: any) => ({
+            text: elo.elo,
+            bloomsLevel: elo.blooms_level || elo.bloomsLevel,
+            skills: elo.skills || [],
+            competencies: elo.competencies || []
+          }))
         );
         setGeneratedOutcomes(allELOs);
         if (onEloGenerated) {
@@ -642,16 +648,101 @@ const ExpectedLearningOutcome = ({
           </div>
           <h4 className="font-medium text-gray-900">Generated Learning Outcomes</h4>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-4">
           {generatedOutcomes.length > 0 ? (
             generatedOutcomes.map((outcome, index) => (
-              <div key={index} className="bg-white p-3 rounded border border-gray-200">
-                <p className="text-sm text-gray-700">{outcome}</p>
-              </div>
+              <Card key={index} className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xs font-semibold text-gray-500">ELO {index + 1}</span>
+                        {outcome.bloomsLevel && (
+                          <Badge 
+                            variant="secondary"
+                            className={`
+                              ${outcome.bloomsLevel.toLowerCase() === 'remember' ? 'bg-blue-100 text-blue-700' : ''}
+                              ${outcome.bloomsLevel.toLowerCase() === 'understand' ? 'bg-purple-100 text-purple-700' : ''}
+                              ${outcome.bloomsLevel.toLowerCase() === 'apply' ? 'bg-indigo-100 text-indigo-700' : ''}
+                              ${outcome.bloomsLevel.toLowerCase() === 'analyze' || outcome.bloomsLevel.toLowerCase() === 'analyse' ? 'bg-pink-100 text-pink-700' : ''}
+                              ${outcome.bloomsLevel.toLowerCase() === 'evaluate' ? 'bg-yellow-100 text-yellow-700' : ''}
+                              ${outcome.bloomsLevel.toLowerCase() === 'create' ? 'bg-green-100 text-green-700' : ''}
+                            `}
+                          >
+                            <span className="text-xs">{outcome.bloomsLevel}</span>
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <p className="text-base text-gray-900 font-medium leading-relaxed mb-3">
+                        {outcome.text}
+                      </p>
+                      
+                      {(outcome.skills?.length > 0 || outcome.competencies?.length > 0) && (
+                        <div className="space-y-2">
+                          {outcome.skills?.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5">
+                              <span className="text-xs font-medium text-gray-600 mr-1">Skills:</span>
+                              {outcome.skills.map((skill: string, idx: number) => (
+                                <Badge 
+                                  key={idx} 
+                                  variant="outline"
+                                  className="bg-blue-50 text-blue-700 border-blue-200 text-xs"
+                                >
+                                  {skill}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {outcome.competencies?.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5">
+                              <span className="text-xs font-medium text-gray-600 mr-1">Competencies:</span>
+                              {outcome.competencies.map((comp: string, idx: number) => (
+                                <Badge 
+                                  key={idx} 
+                                  variant="outline"
+                                  className="bg-green-50 text-green-700 border-green-200 text-xs"
+                                >
+                                  {comp}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
             ))
           ) : (
-            <div className="bg-white p-3 rounded border border-gray-200">
-              <p className="text-xs text-gray-500 italic">Your expected learning outcomes will be generated here...</p>
+            <div className="bg-white p-6 rounded-lg border-2 border-dashed border-gray-300">
+              <p className="text-sm text-gray-500 text-center italic">Your expected learning outcomes will be generated here...</p>
             </div>
           )}
         </div>
