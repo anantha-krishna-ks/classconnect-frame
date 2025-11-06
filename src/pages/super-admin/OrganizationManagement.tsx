@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -29,13 +40,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 export default function OrganizationManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isToggleConfirmOpen, setIsToggleConfirmOpen] = useState(false);
+  const [pendingToggle, setPendingToggle] = useState<{ id: number; newState: boolean } | null>(null);
+  const { toast } = useToast();
 
-  // Mock data
-  const organizations = [
+  // Mock data - converted to state
+  const [organizations, setOrganizations] = useState([
     {
       id: 1,
       name: "Springfield School District",
@@ -45,6 +60,7 @@ export default function OrganizationManagement() {
       contact: "John Doe",
       email: "john@springfield.edu",
       phone: "+1 234 567 8900",
+      published: true,
       status: "Active",
     },
     {
@@ -56,6 +72,7 @@ export default function OrganizationManagement() {
       contact: "Jane Smith",
       email: "jane@greenwood.edu",
       phone: "+1 234 567 8901",
+      published: true,
       status: "Active",
     },
     {
@@ -67,9 +84,43 @@ export default function OrganizationManagement() {
       contact: "Mike Johnson",
       email: "mike@riverside.edu",
       phone: "+1 234 567 8902",
-      status: "Active",
+      published: false,
+      status: "Setup",
     },
-  ];
+  ]);
+
+  const handleToggleClick = (orgId: number, currentState: boolean) => {
+    setPendingToggle({ id: orgId, newState: !currentState });
+    setIsToggleConfirmOpen(true);
+  };
+
+  const confirmToggle = () => {
+    if (pendingToggle) {
+      setOrganizations((prevOrgs) =>
+        prevOrgs.map((org) =>
+          org.id === pendingToggle.id
+            ? { 
+                ...org, 
+                published: pendingToggle.newState,
+                status: pendingToggle.newState ? "Active" : "Setup"
+              }
+            : org
+        )
+      );
+      
+      toast({
+        title: pendingToggle.newState ? "Organization Published" : "Organization Unpublished",
+        description: `Organization has been ${pendingToggle.newState ? "published" : "unpublished"} successfully.`,
+      });
+      setIsToggleConfirmOpen(false);
+      setPendingToggle(null);
+    }
+  };
+
+  const cancelToggle = () => {
+    setIsToggleConfirmOpen(false);
+    setPendingToggle(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -170,6 +221,7 @@ export default function OrganizationManagement() {
                   <TableHead>Schools</TableHead>
                   <TableHead>Users</TableHead>
                   <TableHead>Contact</TableHead>
+                  <TableHead>Published</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -198,7 +250,15 @@ export default function OrganizationManagement() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="secondary">{org.status}</Badge>
+                      <Switch 
+                        checked={org.published} 
+                        onCheckedChange={() => handleToggleClick(org.id, org.published)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={org.published ? "secondary" : "outline"}>
+                        {org.status}
+                      </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -217,6 +277,28 @@ export default function OrganizationManagement() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Toggle Confirmation Dialog */}
+      <AlertDialog open={isToggleConfirmOpen} onOpenChange={setIsToggleConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingToggle?.newState ? "Publish Organization?" : "Unpublish Organization?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingToggle?.newState
+                ? "Publishing this organization will enable it for all users and make it active in the system."
+                : "Unpublishing this organization will disable it and make it inactive. Users won't be able to access it."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelToggle}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmToggle}>
+              {pendingToggle?.newState ? "Publish" : "Unpublish"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
