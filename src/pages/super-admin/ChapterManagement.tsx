@@ -331,10 +331,12 @@ export default function ChapterManagement() {
                           <p className="text-sm font-medium mb-2">Required File Format:</p>
                           <ul className="text-sm text-muted-foreground space-y-1">
                             <li>• <strong>Grade</strong> - Numeric or text (e.g., "10" or "Grade 10")</li>
+                            <li>• <strong>Section</strong> - Section identifier (e.g., "A", "B", "Science")</li>
+                            <li>• <strong>Subject</strong> - Subject name (e.g., "Mathematics", "Physics")</li>
                             <li>• <strong>Chapter Title</strong> - Full chapter name</li>
                           </ul>
                           <p className="text-xs text-muted-foreground mt-3">
-                            Example: Grade | Chapter Title
+                            Example: Grade | Section | Subject | Chapter Title
                           </p>
                         </div>
                       </div>
