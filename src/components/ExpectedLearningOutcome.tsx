@@ -651,30 +651,34 @@ const ExpectedLearningOutcome = ({
         <div className="space-y-4">
           {generatedOutcomes.length > 0 ? (
             generatedOutcomes.map((outcome, index) => (
-              <Card key={index} className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between gap-3">
+              <Card key={index} className="border-l-4 border-l-green-500 hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-white to-green-50/30">
+                <CardHeader className="pb-4">
+                  <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-xs font-semibold text-gray-500">ELO {index + 1}</span>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full">
+                          <span className="text-xs font-bold text-gray-700">ELO {index + 1}</span>
+                        </div>
                         {outcome.bloomsLevel && (
                           <Badge 
                             variant="secondary"
                             className={`
-                              ${outcome.bloomsLevel.toLowerCase() === 'remember' ? 'bg-blue-100 text-blue-700' : ''}
-                              ${outcome.bloomsLevel.toLowerCase() === 'understand' ? 'bg-purple-100 text-purple-700' : ''}
-                              ${outcome.bloomsLevel.toLowerCase() === 'apply' ? 'bg-indigo-100 text-indigo-700' : ''}
-                              ${outcome.bloomsLevel.toLowerCase() === 'analyze' || outcome.bloomsLevel.toLowerCase() === 'analyse' ? 'bg-pink-100 text-pink-700' : ''}
-                              ${outcome.bloomsLevel.toLowerCase() === 'evaluate' ? 'bg-yellow-100 text-yellow-700' : ''}
-                              ${outcome.bloomsLevel.toLowerCase() === 'create' ? 'bg-green-100 text-green-700' : ''}
+                              text-xs font-semibold px-3 py-1.5 shadow-sm
+                              ${outcome.bloomsLevel.toLowerCase() === 'remember' ? 'bg-blue-100 text-blue-700 border border-blue-200' : ''}
+                              ${outcome.bloomsLevel.toLowerCase() === 'understand' ? 'bg-purple-100 text-purple-700 border border-purple-200' : ''}
+                              ${outcome.bloomsLevel.toLowerCase() === 'apply' ? 'bg-indigo-100 text-indigo-700 border border-indigo-200' : ''}
+                              ${outcome.bloomsLevel.toLowerCase() === 'analyze' || outcome.bloomsLevel.toLowerCase() === 'analyse' ? 'bg-pink-100 text-pink-700 border border-pink-200' : ''}
+                              ${outcome.bloomsLevel.toLowerCase() === 'evaluate' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' : ''}
+                              ${outcome.bloomsLevel.toLowerCase() === 'create' ? 'bg-green-100 text-green-700 border border-green-200' : ''}
                             `}
                           >
-                            <span className="text-xs">{outcome.bloomsLevel}</span>
+                            <Brain className="w-3 h-3 inline mr-1" />
+                            {outcome.bloomsLevel}
                           </Badge>
                         )}
                       </div>
                       
-                      <p className="text-base text-gray-900 font-medium leading-relaxed mb-3">
+                      <p className="text-[15px] text-gray-800 font-medium leading-[1.75] mb-4 tracking-wide">
                         {outcome.text}
                       </p>
                       
