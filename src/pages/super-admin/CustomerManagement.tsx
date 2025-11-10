@@ -159,9 +159,8 @@ export default function CustomerManagement() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="school">School</SelectItem>
-                    <SelectItem value="district">School District</SelectItem>
-                    <SelectItem value="private">Private School</SelectItem>
-                    <SelectItem value="corporate">Corporate Customer</SelectItem>
+                    <SelectItem value="corporate">Corporate Organization</SelectItem>
+                    <SelectItem value="college">College</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
