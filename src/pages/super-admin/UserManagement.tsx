@@ -35,6 +35,19 @@ export default function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isStudentImportOpen, setIsStudentImportOpen] = useState(false);
   const [isTeacherImportOpen, setIsTeacherImportOpen] = useState(false);
+  
+  // Student filters
+  const [studentFilterSchool, setStudentFilterSchool] = useState<string>("all");
+  const [studentFilterGrade, setStudentFilterGrade] = useState<string>("all");
+  const [studentFilterSection, setStudentFilterSection] = useState<string>("all");
+  const [studentFilterSex, setStudentFilterSex] = useState<string>("all");
+  const [studentFilterStatus, setStudentFilterStatus] = useState<string>("all");
+  
+  // Teacher filters
+  const [teacherFilterSchool, setTeacherFilterSchool] = useState<string>("all");
+  const [teacherFilterDesignation, setTeacherFilterDesignation] = useState<string>("all");
+  const [teacherFilterGrade, setTeacherFilterGrade] = useState<string>("all");
+  const [teacherFilterStatus, setTeacherFilterStatus] = useState<string>("all");
 
   // Mock student data
   const students = [
@@ -87,6 +100,37 @@ export default function UserManagement() {
       status: "Active",
     },
   ];
+
+  // Filter students
+  const filteredStudents = students.filter((student) => {
+    const matchesSearch = student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         student.parentPhone.includes(searchQuery);
+    const matchesSchool = studentFilterSchool === "all" || student.school === studentFilterSchool;
+    const matchesGrade = studentFilterGrade === "all" || student.grade === studentFilterGrade;
+    const matchesSection = studentFilterSection === "all" || student.section === studentFilterSection;
+    const matchesSex = studentFilterSex === "all" || student.sex === studentFilterSex;
+    const matchesStatus = studentFilterStatus === "all" || student.status === studentFilterStatus;
+    
+    return matchesSearch && matchesSchool && matchesGrade && matchesSection && matchesSex && matchesStatus;
+  });
+
+  // Filter teachers
+  const filteredTeachers = teachers.filter((teacher) => {
+    const matchesSearch = teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         teacher.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSchool = teacherFilterSchool === "all" || teacher.school === teacherFilterSchool;
+    const matchesDesignation = teacherFilterDesignation === "all" || teacher.designation === teacherFilterDesignation;
+    const matchesGrade = teacherFilterGrade === "all" || teacher.grades.includes(teacherFilterGrade);
+    const matchesStatus = teacherFilterStatus === "all" || teacher.status === teacherFilterStatus;
+    
+    return matchesSearch && matchesSchool && matchesDesignation && matchesGrade && matchesStatus;
+  });
+
+  // Get unique values for filters
+  const uniqueSchools = Array.from(new Set([...students.map(s => s.school), ...teachers.map(t => t.school)]));
+  const uniqueGrades = Array.from(new Set(students.map(s => s.grade))).sort();
+  const uniqueSections = Array.from(new Set(students.map(s => s.section))).sort();
+  const uniqueDesignations = Array.from(new Set(teachers.map(t => t.designation)));
 
   return (
     <div className="space-y-6">
@@ -195,21 +239,86 @@ export default function UserManagement() {
                 </div>
               </div>
             
-            <div className="mb-4 flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search students..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Button variant="outline" className="gap-2">
-                  <Filter className="w-4 h-4" />
-                  Filters
-                </Button>
+            <div className="space-y-4 mb-4">
+              {/* Filter Dropdowns */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <Select value={studentFilterSchool} onValueChange={setStudentFilterSchool}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Schools" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Schools</SelectItem>
+                    {uniqueSchools.map((school) => (
+                      <SelectItem key={school} value={school}>
+                        {school}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={studentFilterGrade} onValueChange={setStudentFilterGrade}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Grades" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Grades</SelectItem>
+                    {uniqueGrades.map((grade) => (
+                      <SelectItem key={grade} value={grade}>
+                        Grade {grade}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={studentFilterSection} onValueChange={setStudentFilterSection}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Sections" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Sections</SelectItem>
+                    {uniqueSections.map((section) => (
+                      <SelectItem key={section} value={section}>
+                        Section {section}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={studentFilterSex} onValueChange={setStudentFilterSex}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Sex" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={studentFilterStatus} onValueChange={setStudentFilterStatus}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search students..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
 
               <div className="border rounded-lg">
                 <Table>
@@ -225,7 +334,14 @@ export default function UserManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {students.map((student) => (
+                    {filteredStudents.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                          No students found matching your filters
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredStudents.map((student) => (
                       <TableRow key={student.id}>
                         <TableCell className="font-medium">{student.name}</TableCell>
                         <TableCell>{student.grade}</TableCell>
@@ -237,7 +353,8 @@ export default function UserManagement() {
                           <Badge variant="secondary">{student.status}</Badge>
                         </TableCell>
                       </TableRow>
-                    ))}
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </div>
@@ -320,21 +437,74 @@ export default function UserManagement() {
                 </div>
               </div>
             
-            <div className="mb-4 flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search teachers..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Button variant="outline" className="gap-2">
-                  <Filter className="w-4 h-4" />
-                  Filters
-                </Button>
+            <div className="space-y-4 mb-4">
+              {/* Filter Dropdowns */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <Select value={teacherFilterSchool} onValueChange={setTeacherFilterSchool}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Schools" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Schools</SelectItem>
+                    {uniqueSchools.map((school) => (
+                      <SelectItem key={school} value={school}>
+                        {school}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={teacherFilterDesignation} onValueChange={setTeacherFilterDesignation}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Designations" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Designations</SelectItem>
+                    {uniqueDesignations.map((designation) => (
+                      <SelectItem key={designation} value={designation}>
+                        {designation}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={teacherFilterGrade} onValueChange={setTeacherFilterGrade}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Grades" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Grades</SelectItem>
+                    {uniqueGrades.map((grade) => (
+                      <SelectItem key={grade} value={grade}>
+                        Grade {grade}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={teacherFilterStatus} onValueChange={setTeacherFilterStatus}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="Active">Active</SelectItem>
+                    <SelectItem value="Inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search teachers..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
 
               <div className="border rounded-lg">
                 <Table>
@@ -350,7 +520,14 @@ export default function UserManagement() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {teachers.map((teacher) => (
+                    {filteredTeachers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                          No teachers found matching your filters
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredTeachers.map((teacher) => (
                       <TableRow key={teacher.id}>
                         <TableCell className="font-medium">{teacher.name}</TableCell>
                         <TableCell>{teacher.email}</TableCell>
@@ -364,7 +541,8 @@ export default function UserManagement() {
                           <Badge variant="secondary">{teacher.status}</Badge>
                         </TableCell>
                       </TableRow>
-                    ))}
+                      ))
+                    )}
                   </TableBody>
                 </Table>
               </div>
