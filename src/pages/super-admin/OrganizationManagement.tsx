@@ -47,6 +47,7 @@ export default function OrganizationManagement() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isToggleConfirmOpen, setIsToggleConfirmOpen] = useState(false);
   const [pendingToggle, setPendingToggle] = useState<{ id: number; newState: boolean } | null>(null);
+  const [selectedCustomerType, setSelectedCustomerType] = useState<string>("");
   const { toast } = useToast();
 
   // Mock data - converted to state
@@ -159,14 +160,14 @@ export default function OrganizationManagement() {
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="org-customer">Customer *</Label>
-                <Select>
+                <Select onValueChange={setSelectedCustomerType} value={selectedCustomerType}>
                   <SelectTrigger id="org-customer">
-                    <SelectValue placeholder="Select customer" />
+                    <SelectValue placeholder="Select customer type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">Springfield School District</SelectItem>
-                    <SelectItem value="2">Greenwood Academy Network</SelectItem>
-                    <SelectItem value="3">Riverside Education Group</SelectItem>
+                    <SelectItem value="school">School</SelectItem>
+                    <SelectItem value="college">College</SelectItem>
+                    <SelectItem value="corporate">Corporate Organization</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -175,19 +176,21 @@ export default function OrganizationManagement() {
                 <Input id="org-name" placeholder="Enter organization name" />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="org-type">Organization Type *</Label>
-                  <Select>
-                    <SelectTrigger id="org-type">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="elementary">Elementary</SelectItem>
-                      <SelectItem value="middle">Middle School</SelectItem>
-                      <SelectItem value="high">High School</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {selectedCustomerType !== "corporate" && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="org-type">Organization Type *</Label>
+                    <Select>
+                      <SelectTrigger id="org-type">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="elementary">Elementary</SelectItem>
+                        <SelectItem value="middle">Middle School</SelectItem>
+                        <SelectItem value="high">High School</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 <div className="grid gap-2">
                   <Label htmlFor="org-size">Organization Size *</Label>
                   <Input id="org-size" type="number" placeholder="Number of students" />
