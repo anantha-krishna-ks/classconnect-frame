@@ -52,6 +52,10 @@ export default function OrganizationManagement() {
   const [selectedOrg, setSelectedOrg] = useState<typeof organizations[0] | null>(null);
   const [editingOrg, setEditingOrg] = useState<typeof organizations[0] | null>(null);
   const [selectedCustomerType, setSelectedCustomerType] = useState<string>("");
+  const [filterCustomer, setFilterCustomer] = useState<string>("all");
+  const [filterType, setFilterType] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterPublished, setFilterPublished] = useState<string>("all");
   const { toast } = useToast();
 
   // Mock data - converted to state
@@ -173,6 +177,24 @@ export default function OrganizationManagement() {
     setSelectedCustomerType("");
   };
 
+  // Filter organizations based on all filters
+  const filteredOrganizations = organizations.filter((org) => {
+    const matchesSearch = org.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         org.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         org.principal.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCustomer = filterCustomer === "all" || org.customer === filterCustomer;
+    const matchesType = filterType === "all" || org.type === filterType;
+    const matchesStatus = filterStatus === "all" || org.status === filterStatus;
+    const matchesPublished = filterPublished === "all" || 
+                            (filterPublished === "published" && org.published) ||
+                            (filterPublished === "unpublished" && !org.published);
+    
+    return matchesSearch && matchesCustomer && matchesType && matchesStatus && matchesPublished;
+  });
+
+  // Get unique customers for filter dropdown
+  const uniqueCustomers = Array.from(new Set(organizations.map(org => org.customer)));
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -284,7 +306,59 @@ export default function OrganizationManagement() {
           <CardDescription>View and manage all organizations across customers</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-4">
+          <div className="space-y-4 mb-4">
+            {/* Filters Row */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <Select value={filterCustomer} onValueChange={setFilterCustomer}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="All Customers" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Customers</SelectItem>
+                  {uniqueCustomers.map((customer) => (
+                    <SelectItem key={customer} value={customer}>
+                      {customer}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="Elementary School">Elementary School</SelectItem>
+                  <SelectItem value="Middle School">Middle School</SelectItem>
+                  <SelectItem value="High School">High School</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="Active">Active</SelectItem>
+                  <SelectItem value="Setup">Setup</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={filterPublished} onValueChange={setFilterPublished}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="All Published" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                  <SelectItem value="unpublished">Unpublished</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -311,7 +385,14 @@ export default function OrganizationManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {organizations.map((organization) => (
+                {filteredOrganizations.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                      No organizations found matching your filters
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredOrganizations.map((organization) => (
                   <TableRow key={organization.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -353,7 +434,8 @@ export default function OrganizationManagement() {
                       </div>
                     </TableCell>
                   </TableRow>
-                ))}
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>
