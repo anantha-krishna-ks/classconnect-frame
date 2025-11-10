@@ -50,6 +50,10 @@ export default function UserManagement() {
   const [teacherFilterSchool, setTeacherFilterSchool] = useState<string>("all");
   const [teacherFilterDesignation, setTeacherFilterDesignation] = useState<string>("all");
   const [teacherFilterGrade, setTeacherFilterGrade] = useState<string>("all");
+  
+  // Others filters
+  const [othersFilterSchool, setOthersFilterSchool] = useState<string>("all");
+  const [othersFilterDesignation, setOthersFilterDesignation] = useState<string>("all");
 
   // Mock student data
   const students = [
@@ -115,6 +119,34 @@ export default function UserManagement() {
     },
   ];
 
+  // Mock others data (headmaster, principal, micro-admin, etc.)
+  const others = [
+    {
+      id: 1,
+      name: "Mr. David Anderson",
+      email: "david.anderson@lincoln.edu",
+      designation: "Headmaster",
+      phone: "+1 234 567 8940",
+      school: "Lincoln High School",
+      customer: "ABC Education",
+      organization: "Lincoln High School",
+      city: "New York",
+      status: "Active",
+    },
+    {
+      id: 2,
+      name: "Ms. Sarah Williams",
+      email: "sarah.williams@lincoln.edu",
+      designation: "Micro-Admin",
+      phone: "+1 234 567 8941",
+      school: "Lincoln High School",
+      customer: "ABC Education",
+      organization: "Lincoln High School",
+      city: "New York",
+      status: "Active",
+    },
+  ];
+
   // Filter students
   const filteredStudents = students.filter((student) => {
     const matchesSearch = student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -143,14 +175,28 @@ export default function UserManagement() {
     return matchesSearch && matchesCustomer && matchesOrganization && matchesCity && matchesSchool && matchesDesignation && matchesGrade;
   });
 
+  // Filter others
+  const filteredOthers = others.filter((other) => {
+    const matchesSearch = other.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         other.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCustomer = filterCustomer === "all" || other.customer === filterCustomer;
+    const matchesOrganization = filterOrganization === "all" || other.organization === filterOrganization;
+    const matchesCity = filterCity === "all" || other.city === filterCity;
+    const matchesSchool = othersFilterSchool === "all" || other.school === othersFilterSchool;
+    const matchesDesignation = othersFilterDesignation === "all" || other.designation === othersFilterDesignation;
+    
+    return matchesSearch && matchesCustomer && matchesOrganization && matchesCity && matchesSchool && matchesDesignation;
+  });
+
   // Get unique values for filters
-  const uniqueCustomers = Array.from(new Set([...students.map(s => s.customer), ...teachers.map(t => t.customer)]));
-  const uniqueOrganizations = Array.from(new Set([...students.map(s => s.organization), ...teachers.map(t => t.organization)]));
-  const uniqueCities = Array.from(new Set([...students.map(s => s.city), ...teachers.map(t => t.city)]));
-  const uniqueSchools = Array.from(new Set([...students.map(s => s.school), ...teachers.map(t => t.school)]));
+  const uniqueCustomers = Array.from(new Set([...students.map(s => s.customer), ...teachers.map(t => t.customer), ...others.map(o => o.customer)]));
+  const uniqueOrganizations = Array.from(new Set([...students.map(s => s.organization), ...teachers.map(t => t.organization), ...others.map(o => o.organization)]));
+  const uniqueCities = Array.from(new Set([...students.map(s => s.city), ...teachers.map(t => t.city), ...others.map(o => o.city)]));
+  const uniqueSchools = Array.from(new Set([...students.map(s => s.school), ...teachers.map(t => t.school), ...others.map(o => o.school)]));
   const uniqueGrades = Array.from(new Set(students.map(s => s.grade))).sort();
   const uniqueSections = Array.from(new Set(students.map(s => s.section))).sort();
-  const uniqueDesignations = Array.from(new Set(teachers.map(t => t.designation)));
+  const uniqueTeacherDesignations = Array.from(new Set(teachers.map(t => t.designation)));
+  const uniqueOthersDesignations = Array.from(new Set(others.map(o => o.designation)));
 
   return (
     <div className="space-y-6">
@@ -228,6 +274,10 @@ export default function UserManagement() {
               <TabsTrigger value="teachers" className="gap-2">
                 <Users className="w-4 h-4" />
                 Teachers
+              </TabsTrigger>
+              <TabsTrigger value="others" className="gap-2">
+                <Users className="w-4 h-4" />
+                Others
               </TabsTrigger>
             </TabsList>
           </CardHeader>
@@ -505,7 +555,7 @@ export default function UserManagement() {
                   </SelectTrigger>
                   <SelectContent className="bg-popover z-50">
                     <SelectItem value="all">All Designations</SelectItem>
-                    {uniqueDesignations.map((designation) => (
+                    {uniqueTeacherDesignations.map((designation) => (
                       <SelectItem key={designation} value={designation}>
                         {designation}
                       </SelectItem>
@@ -573,6 +623,103 @@ export default function UserManagement() {
                         <TableCell>{teacher.school}</TableCell>
                         <TableCell>
                           <Badge variant="secondary">{teacher.status}</Badge>
+                        </TableCell>
+                      </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+          </CardContent>
+        </TabsContent>
+
+        {/* Others Tab */}
+        <TabsContent value="others" className="m-0">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex gap-2">
+                  <Button variant="outline" className="gap-2">
+                    <Download className="w-4 h-4" />
+                    Download Template
+                  </Button>
+                </div>
+              </div>
+            
+            <div className="space-y-4 mb-4">
+              {/* Filter Dropdowns */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Select value={othersFilterSchool} onValueChange={setOthersFilterSchool}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Schools" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Schools</SelectItem>
+                    {uniqueSchools.map((school) => (
+                      <SelectItem key={school} value={school}>
+                        {school}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={othersFilterDesignation} onValueChange={setOthersFilterDesignation}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Designations" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Designations</SelectItem>
+                    {uniqueOthersDesignations.map((designation) => (
+                      <SelectItem key={designation} value={designation}>
+                        {designation}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search others..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+              <div className="border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Designation</TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead>School</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredOthers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                          No users found matching your filters
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredOthers.map((other) => (
+                      <TableRow key={other.id}>
+                        <TableCell className="font-medium">{other.name}</TableCell>
+                        <TableCell>{other.email}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{other.designation}</Badge>
+                        </TableCell>
+                        <TableCell>{other.phone}</TableCell>
+                        <TableCell>{other.school}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">{other.status}</Badge>
                         </TableCell>
                       </TableRow>
                       ))
