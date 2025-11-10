@@ -298,6 +298,38 @@ export default function ProductAssignment() {
     return productsByRole[role].length;
   };
 
+  const areAllSelected = (role: keyof typeof productsByRole) => {
+    return productsByRole[role].every((product) => selectedTools[product.id]);
+  };
+
+  const handleSelectAll = (role: keyof typeof productsByRole) => {
+    if (!selectedSchool) {
+      toast({
+        title: "No school selected",
+        description: "Please select a school first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const allSelected = areAllSelected(role);
+    const updates: Record<string, boolean> = {};
+    
+    productsByRole[role].forEach((product) => {
+      updates[product.id] = !allSelected;
+    });
+
+    setSelectedTools((prev) => ({
+      ...prev,
+      ...updates,
+    }));
+
+    toast({
+      title: allSelected ? "All tools unselected" : "All tools selected",
+      description: `${allSelected ? "Unselected" : "Selected"} all ${role} tools`,
+    });
+  };
+
   const handleToolToggle = (toolId: string, enabled: boolean) => {
     setSelectedTools((prev) => ({
       ...prev,
@@ -431,8 +463,8 @@ export default function ProductAssignment() {
 
             {(Object.keys(productsByRole) as Array<keyof typeof productsByRole>).map((role) => (
               <TabsContent key={role} value={role} className="space-y-4">
-                <div className="mb-4">
-                  <div className="relative">
+                <div className="flex gap-3 items-center">
+                  <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
                       placeholder={`Search ${role} tools...`}
@@ -441,6 +473,24 @@ export default function ProductAssignment() {
                       className="pl-10"
                     />
                   </div>
+                  <Button
+                    variant={areAllSelected(role) ? "secondary" : "outline"}
+                    onClick={() => handleSelectAll(role)}
+                    disabled={!selectedSchool}
+                    className="gap-2 whitespace-nowrap"
+                  >
+                    {areAllSelected(role) ? (
+                      <>
+                        <X className="w-4 h-4" />
+                        Unselect All
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Select All
+                      </>
+                    )}
+                  </Button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
