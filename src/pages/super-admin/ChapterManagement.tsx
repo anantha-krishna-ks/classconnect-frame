@@ -184,12 +184,28 @@ export default function ChapterManagement() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="chapters" className="space-y-6">
+      <Tabs defaultValue="class-data" className="space-y-6">
         <TabsList>
+          <TabsTrigger value="class-data">Class Data</TabsTrigger>
           <TabsTrigger value="chapters">Chapter List</TabsTrigger>
           <TabsTrigger value="pdfs">Chapter PDFs</TabsTrigger>
           <TabsTrigger value="questions">Question Papers</TabsTrigger>
         </TabsList>
+
+        {/* Class Data Tab */}
+        <TabsContent value="class-data" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Class Data Management</CardTitle>
+              <CardDescription>
+                Manage class data and information
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">Class data content will be displayed here.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Chapter List Tab */}
         <TabsContent value="chapters" className="space-y-4">
