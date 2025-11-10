@@ -220,7 +220,6 @@ export default function CustomerManagement() {
                   <TableHead>Organizations</TableHead>
                   <TableHead>Users</TableHead>
                   <TableHead>Contact</TableHead>
-                  <TableHead>Published</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -247,12 +246,6 @@ export default function CustomerManagement() {
                         <p className="font-medium text-sm">{customer.contact}</p>
                         <p className="text-xs text-muted-foreground">{customer.phone}</p>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Switch 
-                        checked={customer.published} 
-                        onCheckedChange={() => handleToggleClick(customer.id, customer.published)}
-                      />
                     </TableCell>
                     <TableCell>
                       <Badge variant={customer.published ? "secondary" : "outline"}>
