@@ -210,11 +210,15 @@ export default function OrganizationManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="principal-name">Principal Name *</Label>
+                  <Label htmlFor="principal-name">
+                    {selectedCustomerType === "corporate" ? "Contact Person Name *" : "Principal Name *"}
+                  </Label>
                   <Input id="principal-name" placeholder="Full name" />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="principal-email">Principal Email *</Label>
+                  <Label htmlFor="principal-email">
+                    {selectedCustomerType === "corporate" ? "Contact Person Email *" : "Principal Email *"}
+                  </Label>
                   <Input id="principal-email" type="email" placeholder="email@example.com" />
                 </div>
               </div>
