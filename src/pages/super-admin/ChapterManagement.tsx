@@ -213,6 +213,136 @@ export default function ChapterManagement() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
+                  <CardTitle>Chapter List Import</CardTitle>
+                  <CardDescription className="mt-2">
+                    Import consolidated chapter lists from CSV/Excel
+                  </CardDescription>
+                </div>
+                <div className="flex gap-2">
+                  <Dialog open={isChapterListImportOpen} onOpenChange={setIsChapterListImportOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="gap-2">
+                        <Upload className="w-4 h-4" />
+                        Import Chapter List
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Import Chapter List</DialogTitle>
+                        <DialogDescription>
+                          Upload a CSV or Excel file with consolidated chapter lists from all grades
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="chapter-school">Select School *</Label>
+                          <Select>
+                            <SelectTrigger id="chapter-school">
+                              <SelectValue placeholder="Choose school" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="1">Lincoln High School</SelectItem>
+                              <SelectItem value="2">Roosevelt Middle School</SelectItem>
+                              <SelectItem value="3">Jefferson Elementary</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid gap-2">
+                          <Label>Upload File</Label>
+                          <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                            <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                            <p className="text-sm font-medium mb-1">
+                              Click to upload or drag and drop
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              CSV or Excel file with chapter lists (max 10MB)
+                            </p>
+                            <input type="file" accept=".csv,.xlsx,.xls" className="hidden" />
+                          </div>
+                        </div>
+                        <div className="bg-muted p-4 rounded-lg">
+                          <p className="text-sm font-medium mb-2">Required File Format:</p>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            <li>• <strong>Grade</strong> - Numeric or text (e.g., "10" or "Grade 10")</li>
+                            <li>• <strong>Section</strong> - Section identifier (e.g., "A", "B", "Science")</li>
+                            <li>• <strong>Subject</strong> - Subject name (e.g., "Mathematics", "Physics")</li>
+                            <li>• <strong>Chapter Title</strong> - Full chapter name</li>
+                          </ul>
+                          <p className="text-xs text-muted-foreground mt-3">
+                            Example: Grade | Section | Subject | Chapter Title
+                          </p>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsChapterListImportOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={() => setIsChapterListImportOpen(false)}>
+                          Import Chapter List
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                  <Button variant="outline" className="gap-2">
+                    <Download className="w-4 h-4" />
+                    Download Template
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {/* Grade and Subject Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <Select value={chapterListGrade} onValueChange={setChapterListGrade}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Grades" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Grades</SelectItem>
+                    {grades.map((grade) => (
+                      <SelectItem key={grade} value={grade}>
+                        Grade {grade}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={chapterListSubject} onValueChange={setChapterListSubject}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Subjects" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Subjects</SelectItem>
+                    {subjects.map((subject) => (
+                      <SelectItem key={subject} value={subject}>
+                        {subject}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="bg-muted p-6 rounded-lg text-center">
+                <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="font-medium mb-2">No chapter lists imported yet</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Import a CSV or Excel file with chapter titles organized by grade
+                </p>
+                <Button className="gap-2" onClick={() => setIsChapterListImportOpen(true)}>
+                  <Upload className="w-4 h-4" />
+                  Import Your First List
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Chapter PDFs Tab */}
+        <TabsContent value="pdfs" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
                   <CardTitle>Chapter PDF Management</CardTitle>
                   <CardDescription className="mt-2">
                     Upload chapter PDFs for AI training and content generation
@@ -427,105 +557,6 @@ export default function ChapterManagement() {
                     ))}
                   </TableBody>
                 </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Chapter PDFs Tab */}
-        <TabsContent value="pdfs" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Chapter List Import</CardTitle>
-                  <CardDescription className="mt-2">
-                    Import consolidated chapter lists from CSV/Excel
-                  </CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  <Dialog open={isChapterListImportOpen} onOpenChange={setIsChapterListImportOpen}>
-                    <DialogTrigger asChild>
-                      <Button className="gap-2">
-                        <Upload className="w-4 h-4" />
-                        Import Chapter List
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                      <DialogHeader>
-                        <DialogTitle>Import Chapter List</DialogTitle>
-                        <DialogDescription>
-                          Upload a CSV or Excel file with consolidated chapter lists from all grades
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <div className="grid gap-2">
-                          <Label htmlFor="chapter-school">Select School *</Label>
-                          <Select>
-                            <SelectTrigger id="chapter-school">
-                              <SelectValue placeholder="Choose school" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="1">Lincoln High School</SelectItem>
-                              <SelectItem value="2">Roosevelt Middle School</SelectItem>
-                              <SelectItem value="3">Jefferson Elementary</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="grid gap-2">
-                          <Label>Upload File</Label>
-                          <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
-                            <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                            <p className="text-sm font-medium mb-1">
-                              Click to upload or drag and drop
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              CSV or Excel file with chapter lists (max 10MB)
-                            </p>
-                            <input type="file" accept=".csv,.xlsx,.xls" className="hidden" />
-                          </div>
-                        </div>
-                        <div className="bg-muted p-4 rounded-lg">
-                          <p className="text-sm font-medium mb-2">Required File Format:</p>
-                          <ul className="text-sm text-muted-foreground space-y-1">
-                            <li>• <strong>Grade</strong> - Numeric or text (e.g., "10" or "Grade 10")</li>
-                            <li>• <strong>Section</strong> - Section identifier (e.g., "A", "B", "Science")</li>
-                            <li>• <strong>Subject</strong> - Subject name (e.g., "Mathematics", "Physics")</li>
-                            <li>• <strong>Chapter Title</strong> - Full chapter name</li>
-                          </ul>
-                          <p className="text-xs text-muted-foreground mt-3">
-                            Example: Grade | Section | Subject | Chapter Title
-                          </p>
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button variant="outline" onClick={() => setIsChapterListImportOpen(false)}>
-                          Cancel
-                        </Button>
-                        <Button onClick={() => setIsChapterListImportOpen(false)}>
-                          Import Chapter List
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                  <Button variant="outline" className="gap-2">
-                    <Download className="w-4 h-4" />
-                    Download Template
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="bg-muted p-6 rounded-lg text-center">
-                <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="font-medium mb-2">No chapter lists imported yet</p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Import a CSV or Excel file with chapter titles organized by grade
-                </p>
-                <Button className="gap-2" onClick={() => setIsChapterListImportOpen(true)}>
-                  <Upload className="w-4 h-4" />
-                  Import Your First List
-                </Button>
               </div>
             </CardContent>
           </Card>
