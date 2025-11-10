@@ -27,11 +27,32 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function ProductAssignment() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState("");
   const [selectedOrganization, setSelectedOrganization] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [selectedTools, setSelectedTools] = useState<Record<string, boolean>>({});
   const [activatedTools, setActivatedTools] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
+
+  // Mock customers data
+  const customers = [
+    { id: "1", name: "ABC Education" },
+    { id: "2", name: "XYZ Schools Network" },
+    { id: "3", name: "Global Learning Group" },
+  ];
+
+  // Mock organizations data with customer association
+  const organizations = [
+    { id: "1", name: "Lincoln High School", customerId: "1" },
+    { id: "2", name: "Roosevelt Middle School", customerId: "1" },
+    { id: "3", name: "Jefferson Elementary", customerId: "2" },
+    { id: "4", name: "Washington Academy", customerId: "3" },
+  ];
+
+  // Filter organizations based on selected customer
+  const filteredOrganizations = selectedCustomer
+    ? organizations.filter((org) => org.customerId === selectedCustomer)
+    : organizations;
 
   // Mock products/tools data organized by role
   const productsByRole = {
@@ -391,24 +412,49 @@ export default function ProductAssignment() {
         </p>
       </div>
 
-      {/* Organization Selection */}
+      {/* Customer & Organization Selection */}
       <Card>
         <CardHeader>
-          <CardTitle>Select Organization</CardTitle>
-          <CardDescription>Choose an organization to manage its product licenses</CardDescription>
+          <CardTitle>Select Customer & Organization</CardTitle>
+          <CardDescription>Choose a customer and organization to manage product licenses</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
             <div className="flex-1">
-              <Select value={selectedOrganization} onValueChange={setSelectedOrganization}>
+              <Select 
+                value={selectedCustomer} 
+                onValueChange={(value) => {
+                  setSelectedCustomer(value);
+                  setSelectedOrganization(""); // Reset organization when customer changes
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a customer" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  {customers.map((customer) => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex-1">
+              <Select 
+                value={selectedOrganization} 
+                onValueChange={setSelectedOrganization}
+                disabled={!selectedCustomer}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Choose an organization" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Lincoln High School</SelectItem>
-                  <SelectItem value="2">Roosevelt Middle School</SelectItem>
-                  <SelectItem value="3">Jefferson Elementary</SelectItem>
-                  <SelectItem value="4">Washington Academy</SelectItem>
+                <SelectContent className="bg-popover z-50">
+                  {filteredOrganizations.map((org) => (
+                    <SelectItem key={org.id} value={org.id}>
+                      {org.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
