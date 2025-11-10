@@ -219,10 +219,6 @@ export default function OrganizationManagement() {
                 <Label htmlFor="principal-phone">Phone</Label>
                 <Input id="principal-phone" type="tel" placeholder="+1 234 567 8900" />
               </div>
-              <div className="flex items-center space-x-2">
-                <Switch id="publish" />
-                <Label htmlFor="publish">Publish organization immediately</Label>
-              </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
