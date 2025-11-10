@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Check, X, BookOpen, BarChart3, Presentation, GraduationCap, Video, FolderOpen, FileText, Brain, Sparkles, MessageSquare, Users, TrendingUp, Settings, FileSpreadsheet, Eye, Bell, Calendar, Award, Timer, CalendarClock, Shuffle, Zap, Megaphone, Heart, Target, ClipboardList, UserCheck, MessageCircle, GraduationCapIcon, UserPlus, AlertTriangle, CreditCard } from "lucide-react";
+import { Search, Check, X, BookOpen, BarChart3, Presentation, GraduationCap, Video, FolderOpen, FileText, Brain, Sparkles, MessageSquare, Users, TrendingUp, Settings, FileSpreadsheet, Eye, Bell, Calendar, Award, Timer, CalendarClock, Shuffle, Zap, Megaphone, Heart, Target, ClipboardList, UserCheck, MessageCircle, GraduationCapIcon, UserPlus, AlertTriangle, CreditCard, LineChart, Compass, MessageCircleQuestion, Library } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -239,32 +239,53 @@ export default function ProductAssignment() {
     ],
     parent: [
       {
-        id: "progress-tracker",
-        name: "Student Progress Tracker",
-        description: "Monitor student achievements",
-        icon: Award,
-        iconBg: "bg-fuchsia-500",
+        id: "progress-pulse",
+        name: "Progress Pulse",
+        description: "Weekly insights into your child's learning progress — strengths, struggles, and effort",
+        icon: LineChart,
+        iconBg: "bg-blue-500",
       },
       {
-        id: "grade-viewer",
-        name: "Grade Viewer",
-        description: "View student grades and scores",
-        icon: Eye,
-        iconBg: "bg-sky-500",
+        id: "career-spark",
+        name: "Career Spark",
+        description: "Uncover your child's interests and talents through school activities and performance patterns",
+        icon: Compass,
+        iconBg: "bg-purple-500",
       },
       {
-        id: "communication-center",
-        name: "Communication Center",
-        description: "Connect with teachers",
-        icon: Bell,
-        iconBg: "bg-red-500",
+        id: "focus-wellbeing-meter",
+        name: "Focus & Wellbeing Meter",
+        description: "Track subtle signs of stress or distraction, with tips to support your child's focus",
+        icon: Heart,
+        iconBg: "bg-pink-500",
       },
       {
-        id: "attendance-monitor",
-        name: "Attendance Monitor",
-        description: "Track attendance records",
+        id: "smart-study-recommender",
+        name: "Smart Study Recommender",
+        description: "Personalized videos, articles, and activities based on your child's current topics and needs",
+        icon: BookOpen,
+        iconBg: "bg-green-500",
+      },
+      {
+        id: "concept-check-in",
+        name: "Concept Check-In",
+        description: "A simple way to reflect on and share how confident your child feels about each topic",
+        icon: MessageCircleQuestion,
+        iconBg: "bg-orange-500",
+      },
+      {
+        id: "attendance-schedule-monitor",
+        name: "Attendance & Schedule Monitor",
+        description: "Stay updated on your child's attendance, timetable, and upcoming school events",
         icon: Calendar,
-        iconBg: "bg-lime-500",
+        iconBg: "bg-indigo-500",
+      },
+      {
+        id: "learning-resource-library",
+        name: "Learning Resource Library",
+        description: "Access curated learning materials that support your child's classwork and revision",
+        icon: Library,
+        iconBg: "bg-cyan-500",
       },
     ],
   };
