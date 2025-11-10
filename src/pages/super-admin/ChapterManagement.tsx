@@ -41,15 +41,29 @@ export default function ChapterManagement() {
   const [editingPdf, setEditingPdf] = useState<any>(null);
   const { toast } = useToast();
   
-  // Filter states
+  // Global filter states
   const [filterCustomer, setFilterCustomer] = useState<string>("all");
   const [filterOrganization, setFilterOrganization] = useState<string>("all");
   const [filterCity, setFilterCity] = useState<string>("all");
+  
+  // Tab-specific filters - Chapter List
+  const [chapterListGrade, setChapterListGrade] = useState<string>("all");
+  const [chapterListSubject, setChapterListSubject] = useState<string>("all");
+  
+  // Tab-specific filters - Chapter PDFs
+  const [pdfGrade, setPdfGrade] = useState<string>("all");
+  const [pdfSubject, setPdfSubject] = useState<string>("all");
+  
+  // Tab-specific filters - Question Papers
+  const [questionGrade, setQuestionGrade] = useState<string>("all");
+  const [questionSubject, setQuestionSubject] = useState<string>("all");
 
   // Mock filter data
   const customers = ["ABC Education", "XYZ Schools Network", "Global Learning Group"];
   const organizations = ["Lincoln High School", "Roosevelt Middle School", "Jefferson Elementary"];
   const cities = ["New York", "Los Angeles", "Chicago", "Boston"];
+  const grades = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
+  const subjects = ["Mathematics", "Science", "English", "Social Studies", "Physics", "Chemistry", "Biology", "History", "Geography", "Computer Science"];
 
   // Mock PDF data
   const pdfs = [
@@ -288,6 +302,37 @@ export default function ChapterManagement() {
               </div>
             </CardHeader>
             <CardContent>
+              {/* Grade and Subject Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <Select value={pdfGrade} onValueChange={setPdfGrade}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Grades" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Grades</SelectItem>
+                    {grades.map((grade) => (
+                      <SelectItem key={grade} value={grade}>
+                        Grade {grade}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={pdfSubject} onValueChange={setPdfSubject}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Subjects" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Subjects</SelectItem>
+                    {subjects.map((subject) => (
+                      <SelectItem key={subject} value={subject}>
+                        {subject}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="mb-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -584,6 +629,37 @@ export default function ChapterManagement() {
               </div>
             </CardHeader>
             <CardContent>
+              {/* Grade and Subject Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                <Select value={questionGrade} onValueChange={setQuestionGrade}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Grades" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Grades</SelectItem>
+                    {grades.map((grade) => (
+                      <SelectItem key={grade} value={grade}>
+                        Grade {grade}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={questionSubject} onValueChange={setQuestionSubject}>
+                  <SelectTrigger className="bg-background">
+                    <SelectValue placeholder="All Subjects" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="all">All Subjects</SelectItem>
+                    {subjects.map((subject) => (
+                      <SelectItem key={subject} value={subject}>
+                        {subject}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="mb-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
