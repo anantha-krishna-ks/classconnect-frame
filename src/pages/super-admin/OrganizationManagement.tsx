@@ -183,13 +183,12 @@ export default function OrganizationManagement() {
           </p>
         </div>
 
+        <Button className="gap-2" onClick={() => setIsDialogOpen(true)}>
+          <Plus className="w-4 h-4" />
+          Add Organization
+        </Button>
+
         <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
-          <DialogTrigger asChild>
-            <Button className="gap-2">
-              <Plus className="w-4 h-4" />
-              Add Organization
-            </Button>
-          </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>{editingOrg ? "Edit Organization" : "Create New Organization"}</DialogTitle>
