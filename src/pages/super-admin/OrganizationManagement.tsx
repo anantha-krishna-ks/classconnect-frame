@@ -198,6 +198,10 @@ export default function OrganizationManagement() {
                 <Input id="org-address" placeholder="Enter address" />
               </div>
               <div className="grid gap-2">
+                <Label htmlFor="org-city">City</Label>
+                <Input id="org-city" placeholder="Enter city" />
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="org-district">District</Label>
                 <Input id="org-district" placeholder="District name" />
               </div>
