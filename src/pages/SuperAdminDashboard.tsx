@@ -30,18 +30,18 @@ export default function SuperAdminDashboard() {
 
   const stats = [
     {
-      title: "Total Organizations",
+      title: "Total Customers",
       value: "24",
       change: "+3 this month",
       icon: Building2,
-      path: "/super-admin/organizations",
+      path: "/super-admin/customers",
     },
     {
-      title: "Active Schools",
+      title: "Active Organizations",
       value: "156",
       change: "+12 this month",
       icon: School,
-      path: "/super-admin/schools",
+      path: "/super-admin/organizations",
     },
     {
       title: "Total Users",
@@ -116,7 +116,7 @@ export default function SuperAdminDashboard() {
                   <CardContent>
                     <div className="space-y-4">
                       {[
-                        { text: "New school 'Greenwood Academy' added", time: "2 hours ago" },
+                        { text: "New organization 'Greenwood Academy' added", time: "2 hours ago" },
                         { text: "Bulk import completed: 245 students", time: "5 hours ago" },
                         { text: "License activated for 'Springfield High'", time: "1 day ago" },
                         { text: "Chapter PDFs uploaded for Grade 10", time: "2 days ago" },

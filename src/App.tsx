@@ -44,8 +44,8 @@ import ExamPrepRoom from "./pages/ExamPrepRoom";
 import SubscriptionAllocation from "./pages/SubscriptionAllocation";
 import SuperAdminLogin from "./pages/SuperAdminLogin";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import CustomerManagement from "./pages/super-admin/CustomerManagement";
 import OrganizationManagement from "./pages/super-admin/OrganizationManagement";
-import SchoolManagement from "./pages/super-admin/SchoolManagement";
 import UserManagement from "./pages/super-admin/UserManagement";
 import ProductAssignment from "./pages/super-admin/ProductAssignment";
 import ChapterManagement from "./pages/super-admin/ChapterManagement";
@@ -133,8 +133,8 @@ const App = () => (
           {/* Super Admin Routes (Hidden - No UI Links) */}
           <Route path="/super-admin-login" element={<SuperAdminLogin />} />
           <Route path="/super-admin" element={<SuperAdminDashboard />}>
+            <Route path="customers" element={<CustomerManagement />} />
             <Route path="organizations" element={<OrganizationManagement />} />
-            <Route path="schools" element={<SchoolManagement />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="products" element={<ProductAssignment />} />
             <Route path="chapters" element={<ChapterManagement />} />

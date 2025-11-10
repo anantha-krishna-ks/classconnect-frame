@@ -27,7 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function ProductAssignment() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedSchool, setSelectedSchool] = useState("");
+  const [selectedOrganization, setSelectedOrganization] = useState("");
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [selectedTools, setSelectedTools] = useState<Record<string, boolean>>({});
   const [activatedTools, setActivatedTools] = useState<Record<string, boolean>>({});
@@ -303,10 +303,10 @@ export default function ProductAssignment() {
   };
 
   const handleSelectAll = (role: keyof typeof productsByRole) => {
-    if (!selectedSchool) {
+    if (!selectedOrganization) {
       toast({
-        title: "No school selected",
-        description: "Please select a school first",
+        title: "No organization selected",
+        description: "Please select an organization first",
         variant: "destructive",
       });
       return;
@@ -338,10 +338,10 @@ export default function ProductAssignment() {
   };
 
   const handleActivate = () => {
-    if (!selectedSchool) {
+    if (!selectedOrganization) {
       toast({
-        title: "No school selected",
-        description: "Please select a school first",
+        title: "No organization selected",
+        description: "Please select an organization first",
         variant: "destructive",
       });
       return;
@@ -365,7 +365,7 @@ export default function ProductAssignment() {
     const activatedToolsList = allProducts.filter((p) => selectedTools[p.id]);
     toast({
       title: "Tools activated successfully",
-      description: `${activatedToolsList.length} tools have been activated for the selected school`,
+      description: `${activatedToolsList.length} tools have been activated for the selected organization`,
     });
     setShowConfirmDialog(false);
     setActivatedTools({ ...selectedTools });
@@ -387,22 +387,22 @@ export default function ProductAssignment() {
       <div>
         <h1 className="text-2xl font-semibold">Product & Tool Assignment</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Manage product licenses and tool access for schools
+          Manage product licenses and tool access for organizations
         </p>
       </div>
 
-      {/* School Selection */}
+      {/* Organization Selection */}
       <Card>
         <CardHeader>
-          <CardTitle>Select School</CardTitle>
-          <CardDescription>Choose a school to manage its product licenses</CardDescription>
+          <CardTitle>Select Organization</CardTitle>
+          <CardDescription>Choose an organization to manage its product licenses</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
             <div className="flex-1">
-              <Select value={selectedSchool} onValueChange={setSelectedSchool}>
+              <Select value={selectedOrganization} onValueChange={setSelectedOrganization}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Choose a school" />
+                  <SelectValue placeholder="Choose an organization" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="1">Lincoln High School</SelectItem>
@@ -414,7 +414,7 @@ export default function ProductAssignment() {
             </div>
             <Button
               onClick={handleActivate}
-              disabled={!selectedSchool}
+              disabled={!selectedOrganization}
               className="gap-2"
             >
               <Check className="w-4 h-4" />
@@ -476,7 +476,7 @@ export default function ProductAssignment() {
                   <Button
                     variant={areAllSelected(role) ? "secondary" : "outline"}
                     onClick={() => handleSelectAll(role)}
-                    disabled={!selectedSchool}
+                    disabled={!selectedOrganization}
                     className="gap-2 whitespace-nowrap"
                   >
                     {areAllSelected(role) ? (
@@ -519,7 +519,7 @@ export default function ProductAssignment() {
                               <Switch
                                 checked={selectedTools[product.id] || false}
                                 onCheckedChange={(checked) => handleToolToggle(product.id, checked)}
-                                disabled={!selectedSchool}
+                                disabled={!selectedOrganization}
                                 className="ml-3"
                               />
                             </div>
@@ -536,7 +536,7 @@ export default function ProductAssignment() {
             <Button
               variant="outline"
               onClick={handleCancel}
-              disabled={!selectedSchool || JSON.stringify(selectedTools) === JSON.stringify(activatedTools)}
+              disabled={!selectedOrganization || JSON.stringify(selectedTools) === JSON.stringify(activatedTools)}
               className="gap-2"
             >
               <X className="w-4 h-4" />
@@ -544,7 +544,7 @@ export default function ProductAssignment() {
             </Button>
             <Button
               onClick={handleActivate}
-              disabled={!selectedSchool}
+              disabled={!selectedOrganization}
               className="gap-2"
             >
               <Check className="w-4 h-4" />
@@ -560,13 +560,13 @@ export default function ProductAssignment() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Tool Activation</AlertDialogTitle>
             <AlertDialogDescription>
-              You are about to activate the following tools for the selected school:
+              You are about to activate the following tools for the selected organization:
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
             <div className="bg-muted p-4 rounded-lg space-y-2">
               <p className="font-medium text-sm">
-                School: {selectedSchool === "1" ? "Lincoln High School" : "Selected School"}
+                Organization: {selectedOrganization === "1" ? "Lincoln High School" : "Selected Organization"}
               </p>
               <div className="mt-3">
                 <p className="font-medium text-sm mb-2">Activated Tools:</p>

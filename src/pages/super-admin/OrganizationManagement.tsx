@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Edit, Trash2, Building2 } from "lucide-react";
+import { Plus, Search, Edit, Trash2, School, Eye, Power } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -53,37 +53,46 @@ export default function OrganizationManagement() {
   const [organizations, setOrganizations] = useState([
     {
       id: 1,
-      name: "Springfield School District",
-      type: "School District",
-      schools: 12,
-      users: 8542,
-      contact: "John Doe",
-      email: "john@springfield.edu",
-      phone: "+1 234 567 8900",
+      name: "Lincoln High School",
+      customer: "Springfield School District",
+      type: "High School",
+      students: 1245,
+      teachers: 78,
+      principal: "Dr. Sarah Williams",
+      email: "principal@lincoln.edu",
+      phone: "+1 234 567 8910",
+      district: "District A",
+      size: "Large",
       published: true,
       status: "Active",
     },
     {
       id: 2,
-      name: "Greenwood Academy Network",
-      type: "Private School",
-      schools: 5,
-      users: 3200,
-      contact: "Jane Smith",
-      email: "jane@greenwood.edu",
-      phone: "+1 234 567 8901",
+      name: "Roosevelt Middle School",
+      customer: "Springfield School District",
+      type: "Middle School",
+      students: 856,
+      teachers: 52,
+      principal: "Mr. David Brown",
+      email: "principal@roosevelt.edu",
+      phone: "+1 234 567 8911",
+      district: "District A",
+      size: "Medium",
       published: true,
       status: "Active",
     },
     {
       id: 3,
-      name: "Riverside Education Group",
-      type: "Corporate",
-      schools: 8,
-      users: 5100,
-      contact: "Mike Johnson",
-      email: "mike@riverside.edu",
-      phone: "+1 234 567 8902",
+      name: "Jefferson Elementary",
+      customer: "Springfield School District",
+      type: "Elementary School",
+      students: 542,
+      teachers: 34,
+      principal: "Ms. Emily Clark",
+      email: "principal@jefferson.edu",
+      phone: "+1 234 567 8912",
+      district: "District B",
+      size: "Small",
       published: false,
       status: "Setup",
     },
@@ -96,15 +105,16 @@ export default function OrganizationManagement() {
 
   const confirmToggle = () => {
     if (pendingToggle) {
-      setOrganizations((prevOrgs) =>
-        prevOrgs.map((org) =>
-          org.id === pendingToggle.id
+      // Update the organizations state
+      setOrganizations((prevOrganizations) =>
+        prevOrganizations.map((organization) =>
+          organization.id === pendingToggle.id
             ? { 
-                ...org, 
+                ...organization, 
                 published: pendingToggle.newState,
                 status: pendingToggle.newState ? "Active" : "Setup"
               }
-            : org
+            : organization
         )
       );
       
@@ -128,13 +138,13 @@ export default function OrganizationManagement() {
         <div>
           <h1 className="text-2xl font-semibold">Organization Management</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage customer organizations and their details
+            Manage organizations within customers
           </p>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="gap-2 bg-super-admin-primary hover:bg-super-admin-primary/90 text-super-admin-primary-foreground">
+            <Button className="gap-2">
               <Plus className="w-4 h-4" />
               Add Organization
             </Button>
@@ -143,45 +153,71 @@ export default function OrganizationManagement() {
             <DialogHeader>
               <DialogTitle>Create New Organization</DialogTitle>
               <DialogDescription>
-                Add a new customer organization to the system
+                Add a new organization to a customer
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="org-name">Organization Name *</Label>
-                <Input id="org-name" placeholder="Enter organization name" />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="org-type">Organization Type *</Label>
+                <Label htmlFor="org-customer">Customer *</Label>
                 <Select>
-                  <SelectTrigger id="org-type">
-                    <SelectValue placeholder="Select type" />
+                  <SelectTrigger id="org-customer">
+                    <SelectValue placeholder="Select customer" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="school">School</SelectItem>
-                    <SelectItem value="district">School District</SelectItem>
-                    <SelectItem value="private">Private School</SelectItem>
-                    <SelectItem value="corporate">Corporate Organization</SelectItem>
+                    <SelectItem value="1">Springfield School District</SelectItem>
+                    <SelectItem value="2">Greenwood Academy Network</SelectItem>
+                    <SelectItem value="3">Riverside Education Group</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="address">Address</Label>
-                <Input id="address" placeholder="Enter address" />
+                <Label htmlFor="org-name">Organization Name *</Label>
+                <Input id="org-name" placeholder="Enter organization name" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="contact-name">Contact Person *</Label>
-                  <Input id="contact-name" placeholder="Full name" />
+                  <Label htmlFor="org-type">Organization Type *</Label>
+                  <Select>
+                    <SelectTrigger id="org-type">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="elementary">Elementary</SelectItem>
+                      <SelectItem value="middle">Middle School</SelectItem>
+                      <SelectItem value="high">High School</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="contact-email">Email *</Label>
-                  <Input id="contact-email" type="email" placeholder="email@example.com" />
+                  <Label htmlFor="org-size">Organization Size *</Label>
+                  <Input id="org-size" type="number" placeholder="Number of students" />
                 </div>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="contact-phone">Phone</Label>
-                <Input id="contact-phone" type="tel" placeholder="+1 234 567 8900" />
+                <Label htmlFor="org-address">Address</Label>
+                <Input id="org-address" placeholder="Enter address" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="org-district">District</Label>
+                <Input id="org-district" placeholder="District name" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="principal-name">Principal Name *</Label>
+                  <Input id="principal-name" placeholder="Full name" />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="principal-email">Principal Email *</Label>
+                  <Input id="principal-email" type="email" placeholder="email@example.com" />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="principal-phone">Phone</Label>
+                <Input id="principal-phone" type="tel" placeholder="+1 234 567 8900" />
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch id="publish" />
+                <Label htmlFor="publish">Publish organization immediately</Label>
               </div>
             </div>
             <DialogFooter>
@@ -197,7 +233,7 @@ export default function OrganizationManagement() {
       <Card className="transition-all bg-super-admin-card border-super-admin-border shadow-[0_1px_3px_hsl(var(--super-admin-shadow))]">
         <CardHeader>
           <CardTitle>All Organizations</CardTitle>
-          <CardDescription>View and manage all customer organizations</CardDescription>
+          <CardDescription>View and manage all organizations across customers</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-4">
@@ -217,55 +253,53 @@ export default function OrganizationManagement() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Organization</TableHead>
+                  <TableHead>Customer</TableHead>
                   <TableHead>Type</TableHead>
-                  <TableHead>Schools</TableHead>
-                  <TableHead>Users</TableHead>
-                  <TableHead>Contact</TableHead>
+                  <TableHead>Students</TableHead>
+                  <TableHead>Teachers</TableHead>
                   <TableHead>Published</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {organizations.map((org) => (
-                  <TableRow key={org.id}>
+                {organizations.map((organization) => (
+                  <TableRow key={organization.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
-                          <Building2 className="w-4 h-4 text-muted-foreground" />
+                          <School className="w-4 h-4 text-muted-foreground" />
                         </div>
                         <div>
-                          <p className="font-medium text-sm">{org.name}</p>
-                          <p className="text-xs text-muted-foreground">{org.email}</p>
+                          <p className="font-medium text-sm">{organization.name}</p>
+                          <p className="text-xs text-muted-foreground">{organization.principal}</p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{org.type}</TableCell>
-                    <TableCell>{org.schools}</TableCell>
-                    <TableCell>{org.users.toLocaleString()}</TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium text-sm">{org.contact}</p>
-                        <p className="text-xs text-muted-foreground">{org.phone}</p>
-                      </div>
-                    </TableCell>
+                    <TableCell>{organization.customer}</TableCell>
+                    <TableCell>{organization.type}</TableCell>
+                    <TableCell>{organization.students.toLocaleString()}</TableCell>
+                    <TableCell>{organization.teachers}</TableCell>
                     <TableCell>
                       <Switch 
-                        checked={org.published} 
-                        onCheckedChange={() => handleToggleClick(org.id, org.published)}
+                        checked={organization.published} 
+                        onCheckedChange={() => handleToggleClick(organization.id, organization.published)}
                       />
                     </TableCell>
                     <TableCell>
-                      <Badge variant={org.published ? "secondary" : "outline"}>
-                        {org.status}
+                      <Badge variant={organization.published ? "secondary" : "outline"}>
+                        {organization.status}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" title="View Details">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" title="Edit">
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" title="Delete">
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>

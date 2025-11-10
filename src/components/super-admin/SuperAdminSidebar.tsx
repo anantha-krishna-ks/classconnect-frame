@@ -10,16 +10,16 @@ const menuItems = [
     description: "Overview & insights",
   },
   {
-    title: "Organizations",
+    title: "Customers",
     icon: Building2,
-    path: "/super-admin/organizations",
-    description: "Manage customer organizations",
+    path: "/super-admin/customers",
+    description: "Manage customer accounts",
   },
   {
-    title: "Schools",
+    title: "Organizations",
     icon: School,
-    path: "/super-admin/schools",
-    description: "School management",
+    path: "/super-admin/organizations",
+    description: "Organization management",
   },
   {
     title: "Users",
