@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Check, X, BookOpen, BarChart3, Presentation, GraduationCap, Video, FolderOpen, FileText, Brain, Sparkles, MessageSquare } from "lucide-react";
+import { Search, Check, X, BookOpen, BarChart3, Presentation, GraduationCap, Video, FolderOpen, FileText, Brain, Sparkles, MessageSquare, Users, TrendingUp, Settings, FileSpreadsheet, Eye, Bell, Calendar, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -109,6 +109,73 @@ export default function ProductAssignment() {
         iconBg: "bg-teal-500",
       },
     ],
+    admin: [
+      {
+        id: "school-management",
+        name: "School Management",
+        description: "Manage school operations",
+        icon: Users,
+        iconBg: "bg-violet-500",
+      },
+      {
+        id: "user-management",
+        name: "User Management",
+        description: "Manage users and permissions",
+        icon: Users,
+        iconBg: "bg-blue-600",
+      },
+      {
+        id: "analytics-dashboard",
+        name: "Analytics Dashboard",
+        description: "Comprehensive usage analytics",
+        icon: TrendingUp,
+        iconBg: "bg-emerald-500",
+      },
+      {
+        id: "product-assignment",
+        name: "Product Assignment",
+        description: "Manage product licenses",
+        icon: Settings,
+        iconBg: "bg-slate-500",
+      },
+      {
+        id: "report-generator",
+        name: "Report Generator",
+        description: "Generate detailed reports",
+        icon: FileSpreadsheet,
+        iconBg: "bg-orange-500",
+      },
+    ],
+    parent: [
+      {
+        id: "progress-tracker",
+        name: "Student Progress Tracker",
+        description: "Monitor student achievements",
+        icon: Award,
+        iconBg: "bg-fuchsia-500",
+      },
+      {
+        id: "grade-viewer",
+        name: "Grade Viewer",
+        description: "View student grades and scores",
+        icon: Eye,
+        iconBg: "bg-sky-500",
+      },
+      {
+        id: "communication-center",
+        name: "Communication Center",
+        description: "Connect with teachers",
+        icon: Bell,
+        iconBg: "bg-red-500",
+      },
+      {
+        id: "attendance-monitor",
+        name: "Attendance Monitor",
+        description: "Track attendance records",
+        icon: Calendar,
+        iconBg: "bg-lime-500",
+      },
+    ],
   };
 
   const getActiveCount = (role: keyof typeof productsByRole) => {
@@ -168,7 +235,7 @@ export default function ProductAssignment() {
     });
   };
 
-  const allProducts = [...productsByRole.teacher, ...productsByRole.student];
+  const allProducts = [...productsByRole.teacher, ...productsByRole.student, ...productsByRole.admin, ...productsByRole.parent];
   const activatedToolsList = allProducts.filter((p) => selectedTools[p.id]);
 
   return (
@@ -223,7 +290,7 @@ export default function ProductAssignment() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="teacher" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="teacher" className="gap-2">
                 Teacher Tools
                 <Badge variant="secondary" className="ml-auto">
@@ -234,6 +301,18 @@ export default function ProductAssignment() {
                 Student Tools
                 <Badge variant="secondary" className="ml-auto">
                   {getActiveCount("student")}/{getTotalCount("student")}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="admin" className="gap-2">
+                Admin Tools
+                <Badge variant="secondary" className="ml-auto">
+                  {getActiveCount("admin")}/{getTotalCount("admin")}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="parent" className="gap-2">
+                Parent Tools
+                <Badge variant="secondary" className="ml-auto">
+                  {getActiveCount("parent")}/{getTotalCount("parent")}
                 </Badge>
               </TabsTrigger>
             </TabsList>
