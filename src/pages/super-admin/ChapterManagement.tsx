@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Upload, FileText, Search, Download, Trash2, Eye } from "lucide-react";
+import { Upload, FileText, Search, Download, Trash2, Eye, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -36,6 +37,9 @@ export default function ChapterManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isChapterListImportOpen, setIsChapterListImportOpen] = useState(false);
   const [isQuestionPaperUploadOpen, setIsQuestionPaperUploadOpen] = useState(false);
+  const [isEditPdfOpen, setIsEditPdfOpen] = useState(false);
+  const [editingPdf, setEditingPdf] = useState<any>(null);
+  const { toast } = useToast();
   
   // Filter states
   const [filterCustomer, setFilterCustomer] = useState<string>("all");
@@ -87,6 +91,22 @@ export default function ChapterManagement() {
       size: "1.8 MB",
     },
   ];
+
+  // Edit handlers
+  const handleEditPdf = (pdf: any) => {
+    setEditingPdf(pdf);
+    setIsEditPdfOpen(true);
+  };
+
+  const handleSavePdf = () => {
+    // TODO: Implement save logic
+    toast({
+      title: "PDF updated",
+      description: "Chapter PDF information has been updated successfully.",
+    });
+    setIsEditPdfOpen(false);
+    setEditingPdf(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -319,6 +339,13 @@ export default function ChapterManagement() {
                           <div className="flex items-center justify-end gap-2">
                             <Button variant="ghost" size="icon">
                               <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              onClick={() => handleEditPdf(pdf)}
+                            >
+                              <Edit className="w-4 h-4" />
                             </Button>
                             <Button variant="ghost" size="icon">
                               <Download className="w-4 h-4" />
@@ -620,6 +647,98 @@ export default function ChapterManagement() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Edit PDF Dialog */}
+      <Dialog open={isEditPdfOpen} onOpenChange={setIsEditPdfOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Chapter PDF</DialogTitle>
+            <DialogDescription>Update PDF metadata and information</DialogDescription>
+          </DialogHeader>
+          {editingPdf && (
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="edit-filename">Filename *</Label>
+                <Input
+                  id="edit-filename"
+                  defaultValue={editingPdf.filename}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-grade">Grade *</Label>
+                  <Select defaultValue={editingPdf.grade}>
+                    <SelectTrigger id="edit-grade">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      {[...Array(12)].map((_, i) => (
+                        <SelectItem key={i + 1} value={String(i + 1)}>
+                          Grade {i + 1}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-subject">Subject *</Label>
+                  <Select defaultValue={editingPdf.subject.toLowerCase()}>
+                    <SelectTrigger id="edit-subject">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      <SelectItem value="mathematics">Mathematics</SelectItem>
+                      <SelectItem value="science">Science</SelectItem>
+                      <SelectItem value="english">English</SelectItem>
+                      <SelectItem value="social-studies">Social Studies</SelectItem>
+                      <SelectItem value="physics">Physics</SelectItem>
+                      <SelectItem value="chemistry">Chemistry</SelectItem>
+                      <SelectItem value="biology">Biology</SelectItem>
+                      <SelectItem value="history">History</SelectItem>
+                      <SelectItem value="geography">Geography</SelectItem>
+                      <SelectItem value="computer-science">Computer Science</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-chapter">Chapter Title *</Label>
+                <Input
+                  id="edit-chapter"
+                  defaultValue={editingPdf.chapter}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-school">School *</Label>
+                <Select>
+                  <SelectTrigger id="edit-school">
+                    <SelectValue placeholder="Choose school" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-popover z-50">
+                    <SelectItem value="1">Lincoln High School</SelectItem>
+                    <SelectItem value="2">Roosevelt Middle School</SelectItem>
+                    <SelectItem value="3">Jefferson Elementary</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-notes">Notes (Optional)</Label>
+                <Textarea
+                  id="edit-notes"
+                  placeholder="Add any notes or descriptions..."
+                  rows={3}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditPdfOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSavePdf}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
