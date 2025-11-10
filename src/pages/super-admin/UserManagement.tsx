@@ -40,20 +40,6 @@ export default function UserManagement() {
   const [filterCustomer, setFilterCustomer] = useState<string>("all");
   const [filterOrganization, setFilterOrganization] = useState<string>("all");
   const [filterCity, setFilterCity] = useState<string>("all");
-  
-  // Student filters
-  const [studentFilterSchool, setStudentFilterSchool] = useState<string>("all");
-  const [studentFilterGrade, setStudentFilterGrade] = useState<string>("all");
-  const [studentFilterSection, setStudentFilterSection] = useState<string>("all");
-  
-  // Teacher filters
-  const [teacherFilterSchool, setTeacherFilterSchool] = useState<string>("all");
-  const [teacherFilterDesignation, setTeacherFilterDesignation] = useState<string>("all");
-  const [teacherFilterGrade, setTeacherFilterGrade] = useState<string>("all");
-  
-  // Others filters
-  const [othersFilterSchool, setOthersFilterSchool] = useState<string>("all");
-  const [othersFilterDesignation, setOthersFilterDesignation] = useState<string>("all");
 
   // Mock student data
   const students = [
@@ -154,11 +140,8 @@ export default function UserManagement() {
     const matchesCustomer = filterCustomer === "all" || student.customer === filterCustomer;
     const matchesOrganization = filterOrganization === "all" || student.organization === filterOrganization;
     const matchesCity = filterCity === "all" || student.city === filterCity;
-    const matchesSchool = studentFilterSchool === "all" || student.school === studentFilterSchool;
-    const matchesGrade = studentFilterGrade === "all" || student.grade === studentFilterGrade;
-    const matchesSection = studentFilterSection === "all" || student.section === studentFilterSection;
     
-    return matchesSearch && matchesCustomer && matchesOrganization && matchesCity && matchesSchool && matchesGrade && matchesSection;
+    return matchesSearch && matchesCustomer && matchesOrganization && matchesCity;
   });
 
   // Filter teachers
@@ -168,11 +151,8 @@ export default function UserManagement() {
     const matchesCustomer = filterCustomer === "all" || teacher.customer === filterCustomer;
     const matchesOrganization = filterOrganization === "all" || teacher.organization === filterOrganization;
     const matchesCity = filterCity === "all" || teacher.city === filterCity;
-    const matchesSchool = teacherFilterSchool === "all" || teacher.school === teacherFilterSchool;
-    const matchesDesignation = teacherFilterDesignation === "all" || teacher.designation === teacherFilterDesignation;
-    const matchesGrade = teacherFilterGrade === "all" || teacher.grades.includes(teacherFilterGrade);
     
-    return matchesSearch && matchesCustomer && matchesOrganization && matchesCity && matchesSchool && matchesDesignation && matchesGrade;
+    return matchesSearch && matchesCustomer && matchesOrganization && matchesCity;
   });
 
   // Filter others
@@ -182,21 +162,14 @@ export default function UserManagement() {
     const matchesCustomer = filterCustomer === "all" || other.customer === filterCustomer;
     const matchesOrganization = filterOrganization === "all" || other.organization === filterOrganization;
     const matchesCity = filterCity === "all" || other.city === filterCity;
-    const matchesSchool = othersFilterSchool === "all" || other.school === othersFilterSchool;
-    const matchesDesignation = othersFilterDesignation === "all" || other.designation === othersFilterDesignation;
     
-    return matchesSearch && matchesCustomer && matchesOrganization && matchesCity && matchesSchool && matchesDesignation;
+    return matchesSearch && matchesCustomer && matchesOrganization && matchesCity;
   });
 
   // Get unique values for filters
   const uniqueCustomers = Array.from(new Set([...students.map(s => s.customer), ...teachers.map(t => t.customer), ...others.map(o => o.customer)]));
   const uniqueOrganizations = Array.from(new Set([...students.map(s => s.organization), ...teachers.map(t => t.organization), ...others.map(o => o.organization)]));
   const uniqueCities = Array.from(new Set([...students.map(s => s.city), ...teachers.map(t => t.city), ...others.map(o => o.city)]));
-  const uniqueSchools = Array.from(new Set([...students.map(s => s.school), ...teachers.map(t => t.school), ...others.map(o => o.school)]));
-  const uniqueGrades = Array.from(new Set(students.map(s => s.grade))).sort();
-  const uniqueSections = Array.from(new Set(students.map(s => s.section))).sort();
-  const uniqueTeacherDesignations = Array.from(new Set(teachers.map(t => t.designation)));
-  const uniqueOthersDesignations = Array.from(new Set(others.map(o => o.designation)));
 
   return (
     <div className="space-y-6">
@@ -358,51 +331,6 @@ export default function UserManagement() {
               </div>
             
             <div className="space-y-4 mb-4">
-              {/* Filter Dropdowns */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <Select value={studentFilterSchool} onValueChange={setStudentFilterSchool}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Schools" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Schools</SelectItem>
-                    {uniqueSchools.map((school) => (
-                      <SelectItem key={school} value={school}>
-                        {school}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={studentFilterGrade} onValueChange={setStudentFilterGrade}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Grades" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Grades</SelectItem>
-                    {uniqueGrades.map((grade) => (
-                      <SelectItem key={grade} value={grade}>
-                        Grade {grade}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={studentFilterSection} onValueChange={setStudentFilterSection}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Sections" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Sections</SelectItem>
-                    {uniqueSections.map((section) => (
-                      <SelectItem key={section} value={section}>
-                        Section {section}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
               {/* Search Bar */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -533,51 +461,6 @@ export default function UserManagement() {
               </div>
             
             <div className="space-y-4 mb-4">
-              {/* Filter Dropdowns */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <Select value={teacherFilterSchool} onValueChange={setTeacherFilterSchool}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Schools" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Schools</SelectItem>
-                    {uniqueSchools.map((school) => (
-                      <SelectItem key={school} value={school}>
-                        {school}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={teacherFilterDesignation} onValueChange={setTeacherFilterDesignation}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Designations" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Designations</SelectItem>
-                    {uniqueTeacherDesignations.map((designation) => (
-                      <SelectItem key={designation} value={designation}>
-                        {designation}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={teacherFilterGrade} onValueChange={setTeacherFilterGrade}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Grades" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Grades</SelectItem>
-                    {uniqueGrades.map((grade) => (
-                      <SelectItem key={grade} value={grade}>
-                        Grade {grade}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
               {/* Search Bar */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -646,37 +529,6 @@ export default function UserManagement() {
               </div>
             
             <div className="space-y-4 mb-4">
-              {/* Filter Dropdowns */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Select value={othersFilterSchool} onValueChange={setOthersFilterSchool}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Schools" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Schools</SelectItem>
-                    {uniqueSchools.map((school) => (
-                      <SelectItem key={school} value={school}>
-                        {school}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={othersFilterDesignation} onValueChange={setOthersFilterDesignation}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Designations" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Designations</SelectItem>
-                    {uniqueOthersDesignations.map((designation) => (
-                      <SelectItem key={designation} value={designation}>
-                        {designation}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
               {/* Search Bar */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
