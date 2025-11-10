@@ -45,8 +45,12 @@ import { useToast } from "@/hooks/use-toast";
 export default function OrganizationManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isToggleConfirmOpen, setIsToggleConfirmOpen] = useState(false);
   const [pendingToggle, setPendingToggle] = useState<{ id: number; newState: boolean } | null>(null);
+  const [selectedOrg, setSelectedOrg] = useState<typeof organizations[0] | null>(null);
+  const [editingOrg, setEditingOrg] = useState<typeof organizations[0] | null>(null);
   const [selectedCustomerType, setSelectedCustomerType] = useState<string>("");
   const { toast } = useToast();
 
@@ -133,6 +137,42 @@ export default function OrganizationManagement() {
     setPendingToggle(null);
   };
 
+  const handleView = (org: typeof organizations[0]) => {
+    setSelectedOrg(org);
+    setIsViewDialogOpen(true);
+  };
+
+  const handleEdit = (org: typeof organizations[0]) => {
+    setEditingOrg(org);
+    setSelectedCustomerType(org.type === "High School" || org.type === "Middle School" || org.type === "Elementary School" ? "school" : "corporate");
+    setIsDialogOpen(true);
+  };
+
+  const handleDelete = (org: typeof organizations[0]) => {
+    setSelectedOrg(org);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (selectedOrg) {
+      setOrganizations((prevOrganizations) =>
+        prevOrganizations.filter((org) => org.id !== selectedOrg.id)
+      );
+      toast({
+        title: "Organization Deleted",
+        description: `${selectedOrg.name} has been deleted successfully.`,
+      });
+      setIsDeleteDialogOpen(false);
+      setSelectedOrg(null);
+    }
+  };
+
+  const handleDialogClose = () => {
+    setIsDialogOpen(false);
+    setEditingOrg(null);
+    setSelectedCustomerType("");
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -143,7 +183,7 @@ export default function OrganizationManagement() {
           </p>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
             <Button className="gap-2">
               <Plus className="w-4 h-4" />
@@ -152,9 +192,9 @@ export default function OrganizationManagement() {
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Create New Organization</DialogTitle>
+              <DialogTitle>{editingOrg ? "Edit Organization" : "Create New Organization"}</DialogTitle>
               <DialogDescription>
-                Add a new organization to a customer
+                {editingOrg ? "Update organization details" : "Add a new organization to a customer"}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -173,7 +213,7 @@ export default function OrganizationManagement() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="org-name">Organization Name *</Label>
-                <Input id="org-name" placeholder="Enter organization name" />
+                <Input id="org-name" placeholder="Enter organization name" defaultValue={editingOrg?.name} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {selectedCustomerType !== "corporate" && (
@@ -228,10 +268,12 @@ export default function OrganizationManagement() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <Button variant="outline" onClick={handleDialogClose}>
                 Cancel
               </Button>
-              <Button onClick={() => setIsDialogOpen(false)}>Create Organization</Button>
+              <Button onClick={handleDialogClose}>
+                {editingOrg ? "Update Organization" : "Create Organization"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -300,13 +342,13 @@ export default function OrganizationManagement() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon" title="View Details">
+                        <Button variant="ghost" size="icon" title="View Details" onClick={() => handleView(organization)}>
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" title="Edit">
+                        <Button variant="ghost" size="icon" title="Edit" onClick={() => handleEdit(organization)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" title="Delete">
+                        <Button variant="ghost" size="icon" title="Delete" onClick={() => handleDelete(organization)}>
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
@@ -336,6 +378,105 @@ export default function OrganizationManagement() {
             <AlertDialogCancel onClick={cancelToggle}>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmToggle}>
               {pendingToggle?.newState ? "Publish" : "Unpublish"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* View Organization Dialog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Organization Details</DialogTitle>
+            <DialogDescription>
+              View complete information about this organization
+            </DialogDescription>
+          </DialogHeader>
+          {selectedOrg && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Organization Name</Label>
+                  <p className="font-medium mt-1">{selectedOrg.name}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Customer</Label>
+                  <p className="font-medium mt-1">{selectedOrg.customer}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Type</Label>
+                  <p className="font-medium mt-1">{selectedOrg.type}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Size</Label>
+                  <p className="font-medium mt-1">{selectedOrg.size}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Students</Label>
+                  <p className="font-medium mt-1">{selectedOrg.students.toLocaleString()}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Teachers</Label>
+                  <p className="font-medium mt-1">{selectedOrg.teachers}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Principal</Label>
+                  <p className="font-medium mt-1">{selectedOrg.principal}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Email</Label>
+                  <p className="font-medium mt-1">{selectedOrg.email}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Phone</Label>
+                  <p className="font-medium mt-1">{selectedOrg.phone}</p>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">District</Label>
+                  <p className="font-medium mt-1">{selectedOrg.district}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Status</Label>
+                  <Badge variant={selectedOrg.published ? "secondary" : "outline"} className="mt-1 w-fit">
+                    {selectedOrg.status}
+                  </Badge>
+                </div>
+                <div>
+                  <Label className="text-muted-foreground">Published</Label>
+                  <p className="font-medium mt-1">{selectedOrg.published ? "Yes" : "No"}</p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button onClick={() => setIsViewDialogOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Organization?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{selectedOrg?.name}"? This action cannot be undone and will remove all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
