@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,89 +33,91 @@ export default function ProductAssignment() {
   const [activatedTools, setActivatedTools] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
-  // Mock products/tools data
-  const products = [
-    {
-      id: "lesson-plan",
-      name: "Lesson Plan Assistant",
-      description: "AI-powered lesson planning tool",
-      category: "Planning",
-      icon: BookOpen,
-      iconBg: "bg-blue-500",
-    },
-    {
-      id: "assessment",
-      name: "Assessment Creator",
-      description: "Create and manage assessments",
-      category: "Assessment",
-      icon: BarChart3,
-      iconBg: "bg-green-500",
-    },
-    {
-      id: "slide-generator",
-      name: "Slide Generator",
-      description: "AI presentation creator",
-      category: "Content",
-      icon: Presentation,
-      iconBg: "bg-rose-500",
-    },
-    {
-      id: "exam-prep",
-      name: "Exam Prep Assistant",
-      description: "Student exam preparation tools",
-      category: "Student Tools",
-      icon: GraduationCap,
-      iconBg: "bg-indigo-500",
-    },
-    {
-      id: "video-editor",
-      name: "Video Clip Editor",
-      description: "Educational video editing",
-      category: "Content",
-      icon: Video,
-      iconBg: "bg-cyan-500",
-    },
-    {
-      id: "resource-vault",
-      name: "Resource Vault",
-      description: "Centralized resource library",
-      category: "Resources",
-      icon: FolderOpen,
-      iconBg: "bg-amber-500",
-    },
-    {
-      id: "quiz-creator",
-      name: "Quiz Creator",
-      description: "Interactive quiz generation",
-      category: "Assessment",
-      icon: FileText,
-      iconBg: "bg-purple-500",
-    },
-    {
-      id: "ai-tutor",
-      name: "AI Tutor Assistant",
-      description: "Personalized student tutoring",
-      category: "Student Tools",
-      icon: Brain,
-      iconBg: "bg-pink-500",
-    },
-    {
-      id: "content-enhancer",
-      name: "Content Enhancer",
-      description: "AI-powered content improvement",
-      category: "Content",
-      icon: Sparkles,
-      iconBg: "bg-yellow-500",
-    },
-    {
-      id: "discussion-board",
-      name: "Discussion Board",
-      description: "Collaborative learning platform",
-      category: "Communication",
-      icon: MessageSquare,
-      iconBg: "bg-teal-500",
-    },
-  ];
+  // Mock products/tools data organized by role
+  const productsByRole = {
+    teacher: [
+      {
+        id: "lesson-plan",
+        name: "Lesson Plan Assistant",
+        description: "AI-powered lesson planning tool",
+        icon: BookOpen,
+        iconBg: "bg-blue-500",
+      },
+      {
+        id: "assessment",
+        name: "Assessment Creator",
+        description: "Create and manage assessments",
+        icon: BarChart3,
+        iconBg: "bg-green-500",
+      },
+      {
+        id: "slide-generator",
+        name: "Slide Generator",
+        description: "AI presentation creator",
+        icon: Presentation,
+        iconBg: "bg-rose-500",
+      },
+      {
+        id: "video-editor",
+        name: "Video Clip Editor",
+        description: "Educational video editing",
+        icon: Video,
+        iconBg: "bg-cyan-500",
+      },
+      {
+        id: "resource-vault",
+        name: "Resource Vault",
+        description: "Centralized resource library",
+        icon: FolderOpen,
+        iconBg: "bg-amber-500",
+      },
+      {
+        id: "quiz-creator",
+        name: "Quiz Creator",
+        description: "Interactive quiz generation",
+        icon: FileText,
+        iconBg: "bg-purple-500",
+      },
+      {
+        id: "content-enhancer",
+        name: "Content Enhancer",
+        description: "AI-powered content improvement",
+        icon: Sparkles,
+        iconBg: "bg-yellow-500",
+      },
+    ],
+    student: [
+      {
+        id: "exam-prep",
+        name: "Exam Prep Assistant",
+        description: "Student exam preparation tools",
+        icon: GraduationCap,
+        iconBg: "bg-indigo-500",
+      },
+      {
+        id: "ai-tutor",
+        name: "AI Tutor Assistant",
+        description: "Personalized student tutoring",
+        icon: Brain,
+        iconBg: "bg-pink-500",
+      },
+      {
+        id: "discussion-board",
+        name: "Discussion Board",
+        description: "Collaborative learning platform",
+        icon: MessageSquare,
+        iconBg: "bg-teal-500",
+      },
+    ],
+  };
+
+  const getActiveCount = (role: keyof typeof productsByRole) => {
+    return productsByRole[role].filter((p) => selectedTools[p.id]).length;
+  };
+
+  const getTotalCount = (role: keyof typeof productsByRole) => {
+    return productsByRole[role].length;
+  };
 
   const handleToolToggle = (toolId: string, enabled: boolean) => {
     setSelectedTools((prev) => ({
@@ -147,7 +150,8 @@ export default function ProductAssignment() {
   };
 
   const confirmActivation = () => {
-    const activatedToolsList = products.filter((p) => selectedTools[p.id]);
+    const allProducts = [...productsByRole.teacher, ...productsByRole.student];
+    const activatedToolsList = allProducts.filter((p) => selectedTools[p.id]);
     toast({
       title: "Tools activated successfully",
       description: `${activatedToolsList.length} tools have been activated for the selected school`,
@@ -164,7 +168,8 @@ export default function ProductAssignment() {
     });
   };
 
-  const activatedToolsList = products.filter((p) => selectedTools[p.id]);
+  const allProducts = [...productsByRole.teacher, ...productsByRole.student];
+  const activatedToolsList = allProducts.filter((p) => selectedTools[p.id]);
 
   return (
     <div className="space-y-6">
@@ -213,54 +218,78 @@ export default function ProductAssignment() {
         <CardHeader>
           <CardTitle>Available Products & Tools</CardTitle>
           <CardDescription>
-            Toggle tools on/off to activate or deactivate licenses
+            Toggle tools on/off to activate or deactivate licenses by role
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
+          <Tabs defaultValue="teacher" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="teacher" className="gap-2">
+                Teacher Tools
+                <Badge variant="secondary" className="ml-auto">
+                  {getActiveCount("teacher")}/{getTotalCount("teacher")}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="student" className="gap-2">
+                Student Tools
+                <Badge variant="secondary" className="ml-auto">
+                  {getActiveCount("student")}/{getTotalCount("student")}
+                </Badge>
+              </TabsTrigger>
+            </TabsList>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {products.map((product) => {
-              const Icon = product.icon;
-              return (
-                <Card key={product.id}>
-                  <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-start gap-3">
-                        <div className={`w-10 h-10 rounded ${product.iconBg} flex items-center justify-center`}>
-                          <Icon className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-sm">{product.name}</h3>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {product.description}
-                          </p>
-                        </div>
-                      </div>
-                      <Switch
-                        checked={selectedTools[product.id] || false}
-                        onCheckedChange={(checked) => handleToolToggle(product.id, checked)}
-                        disabled={!selectedSchool}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline">{product.category}</Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+            {(Object.keys(productsByRole) as Array<keyof typeof productsByRole>).map((role) => (
+              <TabsContent key={role} value={role} className="space-y-4">
+                <div className="mb-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder={`Search ${role} tools...`}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {productsByRole[role]
+                    .filter((product) =>
+                      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      product.description.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((product) => {
+                      const Icon = product.icon;
+                      return (
+                        <Card key={product.id}>
+                          <CardContent className="p-6">
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-start gap-3 flex-1">
+                                <div className={`w-10 h-10 rounded ${product.iconBg} flex items-center justify-center shrink-0`}>
+                                  <Icon className="w-5 h-5 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-medium text-sm">{product.name}</h3>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {product.description}
+                                  </p>
+                                </div>
+                              </div>
+                              <Switch
+                                checked={selectedTools[product.id] || false}
+                                onCheckedChange={(checked) => handleToolToggle(product.id, checked)}
+                                disabled={!selectedSchool}
+                                className="ml-3"
+                              />
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
           
           <div className="mt-6 flex justify-end gap-3">
             <Button
