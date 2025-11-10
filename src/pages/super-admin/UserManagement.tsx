@@ -1,7 +1,18 @@
 import { useState } from "react";
-import { Upload, Search, Download, Users, GraduationCap, Filter } from "lucide-react";
+import { Upload, Search, Download, Users, GraduationCap, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -35,11 +46,24 @@ export default function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isStudentImportOpen, setIsStudentImportOpen] = useState(false);
   const [isTeacherImportOpen, setIsTeacherImportOpen] = useState(false);
+  const { toast } = useToast();
   
   // Global filters
   const [filterCustomer, setFilterCustomer] = useState<string>("all");
   const [filterOrganization, setFilterOrganization] = useState<string>("all");
   const [filterCity, setFilterCity] = useState<string>("all");
+  
+  // Edit states
+  const [editingStudent, setEditingStudent] = useState<any>(null);
+  const [editingTeacher, setEditingTeacher] = useState<any>(null);
+  const [editingOther, setEditingOther] = useState<any>(null);
+  const [isEditStudentOpen, setIsEditStudentOpen] = useState(false);
+  const [isEditTeacherOpen, setIsEditTeacherOpen] = useState(false);
+  const [isEditOtherOpen, setIsEditOtherOpen] = useState(false);
+  
+  // Delete states
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<{ id: number; type: string; name: string } | null>(null);
 
   // Mock student data
   const students = [
@@ -170,6 +194,70 @@ export default function UserManagement() {
   const uniqueCustomers = Array.from(new Set([...students.map(s => s.customer), ...teachers.map(t => t.customer), ...others.map(o => o.customer)]));
   const uniqueOrganizations = Array.from(new Set([...students.map(s => s.organization), ...teachers.map(t => t.organization), ...others.map(o => o.organization)]));
   const uniqueCities = Array.from(new Set([...students.map(s => s.city), ...teachers.map(t => t.city), ...others.map(o => o.city)]));
+
+  // Edit handlers
+  const handleEditStudent = (student: any) => {
+    setEditingStudent(student);
+    setIsEditStudentOpen(true);
+  };
+
+  const handleEditTeacher = (teacher: any) => {
+    setEditingTeacher(teacher);
+    setIsEditTeacherOpen(true);
+  };
+
+  const handleEditOther = (other: any) => {
+    setEditingOther(other);
+    setIsEditOtherOpen(true);
+  };
+
+  const handleSaveStudent = () => {
+    // TODO: Implement save logic
+    toast({
+      title: "Student updated",
+      description: "Student information has been updated successfully.",
+    });
+    setIsEditStudentOpen(false);
+    setEditingStudent(null);
+  };
+
+  const handleSaveTeacher = () => {
+    // TODO: Implement save logic
+    toast({
+      title: "Teacher updated",
+      description: "Teacher information has been updated successfully.",
+    });
+    setIsEditTeacherOpen(false);
+    setEditingTeacher(null);
+  };
+
+  const handleSaveOther = () => {
+    // TODO: Implement save logic
+    toast({
+      title: "User updated",
+      description: "User information has been updated successfully.",
+    });
+    setIsEditOtherOpen(false);
+    setEditingOther(null);
+  };
+
+  // Delete handlers
+  const handleDeleteClick = (id: number, type: string, name: string) => {
+    setUserToDelete({ id, type, name });
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (userToDelete) {
+      // TODO: Implement delete logic
+      toast({
+        title: "User deleted",
+        description: `${userToDelete.name} has been deleted successfully.`,
+      });
+      setDeleteConfirmOpen(false);
+      setUserToDelete(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -354,12 +442,13 @@ export default function UserManagement() {
                       <TableHead>Parent Phone</TableHead>
                       <TableHead>School</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredStudents.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                        <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                           No students found matching your filters
                         </TableCell>
                       </TableRow>
@@ -374,6 +463,24 @@ export default function UserManagement() {
                         <TableCell>{student.school}</TableCell>
                         <TableCell>
                           <Badge variant="secondary">{student.status}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditStudent(student)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteClick(student.id, "student", student.name)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                       ))
@@ -484,12 +591,13 @@ export default function UserManagement() {
                       <TableHead>Sections</TableHead>
                       <TableHead>School</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredTeachers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                        <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                           No teachers found matching your filters
                         </TableCell>
                       </TableRow>
@@ -506,6 +614,24 @@ export default function UserManagement() {
                         <TableCell>{teacher.school}</TableCell>
                         <TableCell>
                           <Badge variant="secondary">{teacher.status}</Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditTeacher(teacher)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteClick(teacher.id, "teacher", teacher.name)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                       ))
@@ -551,12 +677,13 @@ export default function UserManagement() {
                       <TableHead>Phone</TableHead>
                       <TableHead>School</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredOthers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                        <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                           No users found matching your filters
                         </TableCell>
                       </TableRow>
@@ -573,6 +700,24 @@ export default function UserManagement() {
                         <TableCell>
                           <Badge variant="secondary">{other.status}</Badge>
                         </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditOther(other)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteClick(other.id, "other", other.name)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                       ))
                     )}
@@ -583,6 +728,234 @@ export default function UserManagement() {
         </TabsContent>
         </Tabs>
       </Card>
+
+      {/* Edit Student Dialog */}
+      <Dialog open={isEditStudentOpen} onOpenChange={setIsEditStudentOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Student</DialogTitle>
+            <DialogDescription>Update student information</DialogDescription>
+          </DialogHeader>
+          {editingStudent && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-student-name">Full Name *</Label>
+                  <Input
+                    id="edit-student-name"
+                    defaultValue={editingStudent.name}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-student-sex">Sex *</Label>
+                  <Select defaultValue={editingStudent.sex}>
+                    <SelectTrigger id="edit-student-sex">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-student-grade">Grade *</Label>
+                  <Input
+                    id="edit-student-grade"
+                    defaultValue={editingStudent.grade}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-student-section">Section *</Label>
+                  <Input
+                    id="edit-student-section"
+                    defaultValue={editingStudent.section}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-student-parent-phone">Parent's Phone *</Label>
+                <Input
+                  id="edit-student-parent-phone"
+                  defaultValue={editingStudent.parentPhone}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-student-school">School *</Label>
+                <Input
+                  id="edit-student-school"
+                  defaultValue={editingStudent.school}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditStudentOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveStudent}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Teacher Dialog */}
+      <Dialog open={isEditTeacherOpen} onOpenChange={setIsEditTeacherOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Teacher</DialogTitle>
+            <DialogDescription>Update teacher information</DialogDescription>
+          </DialogHeader>
+          {editingTeacher && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-teacher-name">Full Name *</Label>
+                  <Input
+                    id="edit-teacher-name"
+                    defaultValue={editingTeacher.name}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-teacher-email">Email *</Label>
+                  <Input
+                    id="edit-teacher-email"
+                    type="email"
+                    defaultValue={editingTeacher.email}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-teacher-designation">Designation *</Label>
+                  <Input
+                    id="edit-teacher-designation"
+                    defaultValue={editingTeacher.designation}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-teacher-phone">Phone</Label>
+                  <Input
+                    id="edit-teacher-phone"
+                    defaultValue={editingTeacher.phone}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-teacher-grades">Grades *</Label>
+                  <Input
+                    id="edit-teacher-grades"
+                    defaultValue={editingTeacher.grades}
+                    placeholder="e.g., 9, 10, 11"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-teacher-sections">Sections *</Label>
+                  <Input
+                    id="edit-teacher-sections"
+                    defaultValue={editingTeacher.sections}
+                    placeholder="e.g., A, B, C"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-teacher-school">School *</Label>
+                <Input
+                  id="edit-teacher-school"
+                  defaultValue={editingTeacher.school}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditTeacherOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveTeacher}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Other Dialog */}
+      <Dialog open={isEditOtherOpen} onOpenChange={setIsEditOtherOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogDescription>Update user information</DialogDescription>
+          </DialogHeader>
+          {editingOther && (
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-other-name">Full Name *</Label>
+                  <Input
+                    id="edit-other-name"
+                    defaultValue={editingOther.name}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-other-email">Email *</Label>
+                  <Input
+                    id="edit-other-email"
+                    type="email"
+                    defaultValue={editingOther.email}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-other-designation">Designation *</Label>
+                  <Input
+                    id="edit-other-designation"
+                    defaultValue={editingOther.designation}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-other-phone">Phone</Label>
+                  <Input
+                    id="edit-other-phone"
+                    defaultValue={editingOther.phone}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-other-school">School *</Label>
+                <Input
+                  id="edit-other-school"
+                  defaultValue={editingOther.school}
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditOtherOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveOther}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete {userToDelete?.name}. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
