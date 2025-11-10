@@ -36,18 +36,20 @@ export default function UserManagement() {
   const [isStudentImportOpen, setIsStudentImportOpen] = useState(false);
   const [isTeacherImportOpen, setIsTeacherImportOpen] = useState(false);
   
+  // Global filters
+  const [filterCustomer, setFilterCustomer] = useState<string>("all");
+  const [filterOrganization, setFilterOrganization] = useState<string>("all");
+  const [filterCity, setFilterCity] = useState<string>("all");
+  
   // Student filters
   const [studentFilterSchool, setStudentFilterSchool] = useState<string>("all");
   const [studentFilterGrade, setStudentFilterGrade] = useState<string>("all");
   const [studentFilterSection, setStudentFilterSection] = useState<string>("all");
-  const [studentFilterSex, setStudentFilterSex] = useState<string>("all");
-  const [studentFilterStatus, setStudentFilterStatus] = useState<string>("all");
   
   // Teacher filters
   const [teacherFilterSchool, setTeacherFilterSchool] = useState<string>("all");
   const [teacherFilterDesignation, setTeacherFilterDesignation] = useState<string>("all");
   const [teacherFilterGrade, setTeacherFilterGrade] = useState<string>("all");
-  const [teacherFilterStatus, setTeacherFilterStatus] = useState<string>("all");
 
   // Mock student data
   const students = [
@@ -60,6 +62,9 @@ export default function UserManagement() {
       dob: "2008-05-15",
       parentPhone: "+1 234 567 8920",
       school: "Lincoln High School",
+      customer: "ABC Education",
+      organization: "Lincoln High School",
+      city: "New York",
       status: "Active",
     },
     {
@@ -71,6 +76,9 @@ export default function UserManagement() {
       dob: "2008-08-22",
       parentPhone: "+1 234 567 8921",
       school: "Lincoln High School",
+      customer: "ABC Education",
+      organization: "Lincoln High School",
+      city: "New York",
       status: "Active",
     },
   ];
@@ -86,6 +94,9 @@ export default function UserManagement() {
       sections: "All",
       phone: "+1 234 567 8930",
       school: "Lincoln High School",
+      customer: "ABC Education",
+      organization: "Lincoln High School",
+      city: "New York",
       status: "Active",
     },
     {
@@ -97,6 +108,9 @@ export default function UserManagement() {
       sections: "A, B",
       phone: "+1 234 567 8931",
       school: "Lincoln High School",
+      customer: "ABC Education",
+      organization: "Lincoln High School",
+      city: "New York",
       status: "Active",
     },
   ];
@@ -105,28 +119,34 @@ export default function UserManagement() {
   const filteredStudents = students.filter((student) => {
     const matchesSearch = student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          student.parentPhone.includes(searchQuery);
+    const matchesCustomer = filterCustomer === "all" || student.customer === filterCustomer;
+    const matchesOrganization = filterOrganization === "all" || student.organization === filterOrganization;
+    const matchesCity = filterCity === "all" || student.city === filterCity;
     const matchesSchool = studentFilterSchool === "all" || student.school === studentFilterSchool;
     const matchesGrade = studentFilterGrade === "all" || student.grade === studentFilterGrade;
     const matchesSection = studentFilterSection === "all" || student.section === studentFilterSection;
-    const matchesSex = studentFilterSex === "all" || student.sex === studentFilterSex;
-    const matchesStatus = studentFilterStatus === "all" || student.status === studentFilterStatus;
     
-    return matchesSearch && matchesSchool && matchesGrade && matchesSection && matchesSex && matchesStatus;
+    return matchesSearch && matchesCustomer && matchesOrganization && matchesCity && matchesSchool && matchesGrade && matchesSection;
   });
 
   // Filter teachers
   const filteredTeachers = teachers.filter((teacher) => {
     const matchesSearch = teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          teacher.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCustomer = filterCustomer === "all" || teacher.customer === filterCustomer;
+    const matchesOrganization = filterOrganization === "all" || teacher.organization === filterOrganization;
+    const matchesCity = filterCity === "all" || teacher.city === filterCity;
     const matchesSchool = teacherFilterSchool === "all" || teacher.school === teacherFilterSchool;
     const matchesDesignation = teacherFilterDesignation === "all" || teacher.designation === teacherFilterDesignation;
     const matchesGrade = teacherFilterGrade === "all" || teacher.grades.includes(teacherFilterGrade);
-    const matchesStatus = teacherFilterStatus === "all" || teacher.status === teacherFilterStatus;
     
-    return matchesSearch && matchesSchool && matchesDesignation && matchesGrade && matchesStatus;
+    return matchesSearch && matchesCustomer && matchesOrganization && matchesCity && matchesSchool && matchesDesignation && matchesGrade;
   });
 
   // Get unique values for filters
+  const uniqueCustomers = Array.from(new Set([...students.map(s => s.customer), ...teachers.map(t => t.customer)]));
+  const uniqueOrganizations = Array.from(new Set([...students.map(s => s.organization), ...teachers.map(t => t.organization)]));
+  const uniqueCities = Array.from(new Set([...students.map(s => s.city), ...teachers.map(t => t.city)]));
   const uniqueSchools = Array.from(new Set([...students.map(s => s.school), ...teachers.map(t => t.school)]));
   const uniqueGrades = Array.from(new Set(students.map(s => s.grade))).sort();
   const uniqueSections = Array.from(new Set(students.map(s => s.section))).sort();
@@ -144,14 +164,62 @@ export default function UserManagement() {
       </div>
 
       <Card>
-        <Tabs defaultValue="students" className="w-full">
-          <CardHeader className="pb-0">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <CardTitle>Student & Teacher Records</CardTitle>
-                <CardDescription className="mt-2">Import and manage user records across schools</CardDescription>
-              </div>
+        <CardHeader className="pb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <CardTitle>Student & Teacher Records</CardTitle>
+              <CardDescription className="mt-2">Import and manage user records across schools</CardDescription>
             </div>
+          </div>
+
+          {/* Global Filters Above Tabs */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <Select value={filterCustomer} onValueChange={setFilterCustomer}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="All Customers" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="all">All Customers</SelectItem>
+                {uniqueCustomers.map((customer) => (
+                  <SelectItem key={customer} value={customer}>
+                    {customer}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={filterOrganization} onValueChange={setFilterOrganization}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="All Organizations" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="all">All Organizations</SelectItem>
+                {uniqueOrganizations.map((org) => (
+                  <SelectItem key={org} value={org}>
+                    {org}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={filterCity} onValueChange={setFilterCity}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="All Cities" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="all">All Cities</SelectItem>
+                {uniqueCities.map((city) => (
+                  <SelectItem key={city} value={city}>
+                    {city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardHeader>
+
+        <Tabs defaultValue="students" className="w-full">
+          <CardHeader className="pt-0 pb-0">
             <TabsList className="w-full justify-start -mb-px">
               <TabsTrigger value="students" className="gap-2">
                 <GraduationCap className="w-4 h-4" />
@@ -241,7 +309,7 @@ export default function UserManagement() {
             
             <div className="space-y-4 mb-4">
               {/* Filter Dropdowns */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <Select value={studentFilterSchool} onValueChange={setStudentFilterSchool}>
                   <SelectTrigger className="bg-background">
                     <SelectValue placeholder="All Schools" />
@@ -281,29 +349,6 @@ export default function UserManagement() {
                         Section {section}
                       </SelectItem>
                     ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={studentFilterSex} onValueChange={setStudentFilterSex}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Sex" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="Male">Male</SelectItem>
-                    <SelectItem value="Female">Female</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={studentFilterStatus} onValueChange={setStudentFilterStatus}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Status" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -439,7 +484,7 @@ export default function UserManagement() {
             
             <div className="space-y-4 mb-4">
               {/* Filter Dropdowns */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <Select value={teacherFilterSchool} onValueChange={setTeacherFilterSchool}>
                   <SelectTrigger className="bg-background">
                     <SelectValue placeholder="All Schools" />
@@ -479,17 +524,6 @@ export default function UserManagement() {
                         Grade {grade}
                       </SelectItem>
                     ))}
-                  </SelectContent>
-                </Select>
-
-                <Select value={teacherFilterStatus} onValueChange={setTeacherFilterStatus}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="All Status" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
