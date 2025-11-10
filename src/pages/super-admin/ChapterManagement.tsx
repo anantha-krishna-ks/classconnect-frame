@@ -230,6 +230,21 @@ export default function ChapterManagement() {
                           </SelectContent>
                         </Select>
                       </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="pdf-resource-vault">Resource Vault *</Label>
+                        <Select>
+                          <SelectTrigger id="pdf-resource-vault">
+                            <SelectValue placeholder="Select resource vault" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover z-50">
+                            <SelectItem value="teacher-resources">Teacher Resources</SelectItem>
+                            <SelectItem value="student-materials">Student Materials</SelectItem>
+                            <SelectItem value="exam-papers">Exam Papers</SelectItem>
+                            <SelectItem value="reference-books">Reference Books</SelectItem>
+                            <SelectItem value="supplementary">Supplementary Materials</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="grid gap-2">
                           <Label htmlFor="pdf-grade">Grade *</Label>
