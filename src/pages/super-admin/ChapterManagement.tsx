@@ -36,6 +36,16 @@ export default function ChapterManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isChapterListImportOpen, setIsChapterListImportOpen] = useState(false);
   const [isQuestionPaperUploadOpen, setIsQuestionPaperUploadOpen] = useState(false);
+  
+  // Filter states
+  const [filterCustomer, setFilterCustomer] = useState<string>("all");
+  const [filterOrganization, setFilterOrganization] = useState<string>("all");
+  const [filterCity, setFilterCity] = useState<string>("all");
+
+  // Mock filter data
+  const customers = ["ABC Education", "XYZ Schools Network", "Global Learning Group"];
+  const organizations = ["Lincoln High School", "Roosevelt Middle School", "Jefferson Elementary"];
+  const cities = ["New York", "Los Angeles", "Chicago", "Boston"];
 
   // Mock PDF data
   const pdfs = [
@@ -87,15 +97,68 @@ export default function ChapterManagement() {
         </p>
       </div>
 
-      <Tabs defaultValue="pdfs" className="space-y-6">
+      {/* Global Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Filters</CardTitle>
+          <CardDescription>Filter content by customer, organization, and city</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Select value={filterCustomer} onValueChange={setFilterCustomer}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="All Customers" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="all">All Customers</SelectItem>
+                {customers.map((customer) => (
+                  <SelectItem key={customer} value={customer}>
+                    {customer}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={filterOrganization} onValueChange={setFilterOrganization}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="All Organizations" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="all">All Organizations</SelectItem>
+                {organizations.map((org) => (
+                  <SelectItem key={org} value={org}>
+                    {org}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={filterCity} onValueChange={setFilterCity}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="All Cities" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="all">All Cities</SelectItem>
+                {cities.map((city) => (
+                  <SelectItem key={city} value={city}>
+                    {city}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Tabs defaultValue="chapters" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="pdfs">Chapter PDFs</TabsTrigger>
           <TabsTrigger value="chapters">Chapter List</TabsTrigger>
+          <TabsTrigger value="pdfs">Chapter PDFs</TabsTrigger>
           <TabsTrigger value="questions">Question Papers</TabsTrigger>
         </TabsList>
 
-        {/* PDF Upload Tab */}
-        <TabsContent value="pdfs" className="space-y-4">
+        {/* Chapter List Tab */}
+        <TabsContent value="chapters" className="space-y-4">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -274,8 +337,8 @@ export default function ChapterManagement() {
           </Card>
         </TabsContent>
 
-        {/* Chapter List Tab */}
-        <TabsContent value="chapters" className="space-y-4">
+        {/* Chapter PDFs Tab */}
+        <TabsContent value="pdfs" className="space-y-4">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
