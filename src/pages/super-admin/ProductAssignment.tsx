@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Check, X, BookOpen, BarChart3, Presentation, GraduationCap, Video, FolderOpen, FileText, Brain, Sparkles, MessageSquare, Users, TrendingUp, Settings, FileSpreadsheet, Eye, Bell, Calendar, Award, Timer, CalendarClock, Shuffle, Zap, Megaphone, Heart, Target, ClipboardList } from "lucide-react";
+import { Search, Check, X, BookOpen, BarChart3, Presentation, GraduationCap, Video, FolderOpen, FileText, Brain, Sparkles, MessageSquare, Users, TrendingUp, Settings, FileSpreadsheet, Eye, Bell, Calendar, Award, Timer, CalendarClock, Shuffle, Zap, Megaphone, Heart, Target, ClipboardList, UserCheck, MessageCircle, GraduationCapIcon, UserPlus, AlertTriangle, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -181,39 +181,60 @@ export default function ProductAssignment() {
     ],
     admin: [
       {
-        id: "school-management",
-        name: "School Management",
-        description: "Manage school operations",
-        icon: Users,
-        iconBg: "bg-violet-500",
+        id: "teacher-insight-ai",
+        name: "Teacher Insight AI",
+        description: "Evaluates recorded classes to assess teaching clarity, pedagogy, and engagement",
+        icon: Brain,
+        iconBg: "bg-blue-500",
       },
       {
-        id: "user-management",
-        name: "User Management",
-        description: "Manage users and permissions",
-        icon: Users,
-        iconBg: "bg-blue-600",
+        id: "student-profiling-ai",
+        name: "Student Profiling AI",
+        description: "Builds a longitudinal view of each student's academic, behavioral, and engagement trends",
+        icon: UserCheck,
+        iconBg: "bg-green-500",
       },
       {
-        id: "analytics-dashboard",
-        name: "Analytics Dashboard",
-        description: "Comprehensive usage analytics",
-        icon: TrendingUp,
-        iconBg: "bg-emerald-500",
+        id: "parent-interview-analyzer",
+        name: "Parent Interview Analyzer",
+        description: "Assesses recorded parent interviews to evaluate alignment with school culture",
+        icon: MessageCircle,
+        iconBg: "bg-purple-500",
       },
       {
-        id: "product-assignment",
-        name: "Product Assignment",
-        description: "Manage product licenses",
-        icon: Settings,
-        iconBg: "bg-slate-500",
-      },
-      {
-        id: "report-generator",
-        name: "Report Generator",
-        description: "Generate detailed reports",
-        icon: FileSpreadsheet,
+        id: "alumni-feedback-miner",
+        name: "Alumni Feedback Miner",
+        description: "Extracts insights from alumni stories to inform school improvement, branding, and outcome tracking",
+        icon: GraduationCap,
         iconBg: "bg-orange-500",
+      },
+      {
+        id: "teacher-hiring-evaluator",
+        name: "Teacher Hiring Evaluator",
+        description: "Reviews demo class recordings with AI to support bias-free, evidence-based teacher recruitment",
+        icon: FileText,
+        iconBg: "bg-indigo-500",
+      },
+      {
+        id: "admission-fit-evaluator",
+        name: "Admission Fit Evaluator",
+        description: "Analyzes student and parent interviews to assess cultural fit, preparedness, and potential for success",
+        icon: UserPlus,
+        iconBg: "bg-teal-500",
+      },
+      {
+        id: "student-risk-radar",
+        name: "Student Risk Radar",
+        description: "Flags students at risk of disengagement or exit using academic, behavioral, and parental signals",
+        icon: AlertTriangle,
+        iconBg: "bg-red-500",
+      },
+      {
+        id: "subscription-portal",
+        name: "Subscription Portal",
+        description: "Customize and assign learning tools to individual teachers, manage subscriptions, and activate SarasSchool AI",
+        icon: CreditCard,
+        iconBg: "bg-cyan-500",
       },
     ],
     parent: [
