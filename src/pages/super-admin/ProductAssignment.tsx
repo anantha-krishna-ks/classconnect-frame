@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Check, X, BookOpen, BarChart3, Presentation, GraduationCap, Video, FolderOpen, FileText, Brain, Sparkles, MessageSquare, Users, TrendingUp, Settings, FileSpreadsheet, Eye, Bell, Calendar, Award } from "lucide-react";
+import { Search, Check, X, BookOpen, BarChart3, Presentation, GraduationCap, Video, FolderOpen, FileText, Brain, Sparkles, MessageSquare, Users, TrendingUp, Settings, FileSpreadsheet, Eye, Bell, Calendar, Award, Timer, CalendarClock, Shuffle, Zap, Megaphone, Heart, Target, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -88,25 +88,95 @@ export default function ProductAssignment() {
     ],
     student: [
       {
-        id: "exam-prep",
-        name: "Exam Prep Assistant",
-        description: "Student exam preparation tools",
+        id: "focus-buddy",
+        name: "Focus Buddy",
+        description: "Timed study sessions with breaks using Pomodoro technique",
+        icon: Timer,
+        iconBg: "bg-blue-500",
+      },
+      {
+        id: "smart-revision-planner",
+        name: "Smart Revision Planner",
+        description: "Schedules revisions using spaced repetition for long-term retention",
+        icon: CalendarClock,
+        iconBg: "bg-green-500",
+      },
+      {
+        id: "mix-master",
+        name: "Mix & Master",
+        description: "Mixes questions from different chapters to strengthen retention",
+        icon: Shuffle,
+        iconBg: "bg-purple-500",
+      },
+      {
+        id: "quick-recall-ai",
+        name: "Quick Recall AI",
+        description: "Daily quizzes to practice active recall and strengthen memory",
+        icon: Zap,
+        iconBg: "bg-amber-500",
+      },
+      {
+        id: "confidence-tracker",
+        name: "Confidence Tracker",
+        description: "Rate confidence after each topic to build self-awareness",
+        icon: TrendingUp,
+        iconBg: "bg-orange-500",
+      },
+      {
+        id: "exam-prep-room",
+        name: "Exam Prep Room",
+        description: "Practice tests, past papers, and chapter-wise mock tests",
         icon: GraduationCap,
         iconBg: "bg-indigo-500",
       },
       {
-        id: "ai-tutor",
-        name: "AI Tutor Assistant",
-        description: "Personalized student tutoring",
-        icon: Brain,
+        id: "mock-test-generator",
+        name: "Mock Test Generator",
+        description: "Generate full-length mock tests with scoring and feedback",
+        icon: ClipboardList,
+        iconBg: "bg-teal-500",
+      },
+      {
+        id: "resource-vault-student",
+        name: "Resource Vault",
+        description: "Access school-approved study materials, notes, and video lessons",
+        icon: FolderOpen,
+        iconBg: "bg-purple-600",
+      },
+      {
+        id: "school-announcements",
+        name: "School Announcements Hub",
+        description: "Stay informed about exams, events, holidays, and circulars",
+        icon: Megaphone,
+        iconBg: "bg-red-500",
+      },
+      {
+        id: "calendar-deadlines",
+        name: "Calendar & Deadlines Tracker",
+        description: "Track assignments, tests, holidays, and revision milestones",
+        icon: Calendar,
+        iconBg: "bg-emerald-500",
+      },
+      {
+        id: "mood-mirror",
+        name: "Mood Mirror",
+        description: "Daily check-ins to manage stress, anxiety, and focus",
+        icon: Heart,
         iconBg: "bg-pink-500",
       },
       {
-        id: "discussion-board",
-        name: "Discussion Board",
-        description: "Collaborative learning platform",
-        icon: MessageSquare,
-        iconBg: "bg-teal-500",
+        id: "study-buddy-connect",
+        name: "Study Buddy Connect",
+        description: "Find classmates with similar topics or goals to study together",
+        icon: Users,
+        iconBg: "bg-cyan-500",
+      },
+      {
+        id: "goal-setter",
+        name: "Goal Setter",
+        description: "Set personal academic goals and track progress",
+        icon: Target,
+        iconBg: "bg-violet-500",
       },
     ],
     admin: [
