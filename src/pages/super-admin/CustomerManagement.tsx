@@ -131,7 +131,7 @@ export default function CustomerManagement() {
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-semibold">Customer Management</h1>
-            <Badge variant="default" className="text-sm bg-super-admin-primary text-super-admin-primary-foreground">
+            <Badge variant="secondary" className="text-sm">
               {activeCustomersCount} Active
             </Badge>
           </div>
