@@ -116,6 +116,24 @@ export default function ChapterManagement() {
     { id: 3, name: "Mathematics - Grade 10", type: "Subject" },
   ];
 
+  // Mock chapter data
+  const chapters = [
+    {
+      id: 1,
+      name: "Real Numbers",
+      grade: "10",
+      subject: "Mathematics",
+      school: "Lincoln High School",
+    },
+    {
+      id: 2,
+      name: "Periodic Classification",
+      grade: "10",
+      subject: "Science",
+      school: "Lincoln High School",
+    },
+  ];
+
   // Edit handlers
   const handleEditPdf = (pdf: any) => {
     setEditingPdf(pdf);
@@ -369,19 +387,58 @@ export default function ChapterManagement() {
                         </DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="chapter-school">Select School *</Label>
+                        <Select>
+                          <SelectTrigger id="chapter-school">
+                            <SelectValue placeholder="Choose school" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover z-50">
+                            <SelectItem value="1">Lincoln High School</SelectItem>
+                            <SelectItem value="2">Roosevelt Middle School</SelectItem>
+                            <SelectItem value="3">Jefferson Elementary</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="chapter-name">Chapter Name *</Label>
+                        <Input
+                          id="chapter-name"
+                          placeholder="Enter chapter name"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
                         <div className="grid gap-2">
-                          <Label htmlFor="chapter-school">Select School *</Label>
+                          <Label htmlFor="chapter-grade">Grade *</Label>
                           <Select>
-                            <SelectTrigger id="chapter-school">
-                              <SelectValue placeholder="Choose school" />
+                            <SelectTrigger id="chapter-grade">
+                              <SelectValue placeholder="Select grade" />
                             </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="1">Lincoln High School</SelectItem>
-                              <SelectItem value="2">Roosevelt Middle School</SelectItem>
-                              <SelectItem value="3">Jefferson Elementary</SelectItem>
+                            <SelectContent className="bg-popover z-50">
+                              {grades.map((grade) => (
+                                <SelectItem key={grade} value={grade}>
+                                  Grade {grade}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="chapter-subject">Subject *</Label>
+                          <Select>
+                            <SelectTrigger id="chapter-subject">
+                              <SelectValue placeholder="Select subject" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-popover z-50">
+                              {subjects.map((subject) => (
+                                <SelectItem key={subject} value={subject}>
+                                  {subject}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
                         <div className="grid gap-2">
                           <Label>Upload File</Label>
                           <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
@@ -457,16 +514,38 @@ export default function ChapterManagement() {
                 </Select>
               </div>
 
-              <div className="bg-muted p-6 rounded-lg text-center">
-                <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="font-medium mb-2">No chapter lists imported yet</p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Import a CSV or Excel file with chapter titles organized by grade
-                </p>
-                <Button className="gap-2" onClick={() => setIsChapterListImportOpen(true)}>
-                  <Upload className="w-4 h-4" />
-                  Import Your First List
-                </Button>
+              <div className="border rounded-lg">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Chapter Name</TableHead>
+                      <TableHead>Grade</TableHead>
+                      <TableHead>Subject</TableHead>
+                      <TableHead>School</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {chapters.map((chapter) => (
+                      <TableRow key={chapter.id}>
+                        <TableCell className="font-medium">{chapter.name}</TableCell>
+                        <TableCell>{chapter.grade}</TableCell>
+                        <TableCell>{chapter.subject}</TableCell>
+                        <TableCell>{chapter.school}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button variant="ghost" size="icon">
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon">
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
