@@ -46,6 +46,7 @@ export default function UserManagement() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isStudentImportOpen, setIsStudentImportOpen] = useState(false);
   const [isTeacherImportOpen, setIsTeacherImportOpen] = useState(false);
+  const [isOtherImportOpen, setIsOtherImportOpen] = useState(false);
   const { toast } = useToast();
   
   // Global filters
@@ -647,6 +648,69 @@ export default function UserManagement() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex gap-2">
+                  <Dialog open={isOtherImportOpen} onOpenChange={setIsOtherImportOpen}>
+                    <DialogTrigger asChild>
+                      <Button className="gap-2">
+                        <Upload className="w-4 h-4" />
+                        Bulk Import Others
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Import Others from CSV/Excel</DialogTitle>
+                        <DialogDescription>
+                          Upload a CSV or Excel file with user data (Headmaster, Principal, Micro-Admin, etc.)
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="other-school-select">Select School *</Label>
+                          <Select>
+                            <SelectTrigger id="other-school-select">
+                              <SelectValue placeholder="Choose school" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-popover z-50">
+                              <SelectItem value="1">Lincoln High School</SelectItem>
+                              <SelectItem value="2">Roosevelt Middle School</SelectItem>
+                              <SelectItem value="3">Jefferson Elementary</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid gap-2">
+                          <Label>Upload File</Label>
+                          <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                            <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                            <p className="text-sm font-medium mb-1">
+                              Click to upload or drag and drop
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              CSV or Excel file (max 10MB)
+                            </p>
+                            <input type="file" accept=".csv,.xlsx,.xls" className="hidden" />
+                          </div>
+                        </div>
+                        <div className="bg-muted p-4 rounded-lg">
+                          <p className="text-sm font-medium mb-2">Required Fields:</p>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            <li>• First Name, Last Name</li>
+                            <li>• Email ID (unique)</li>
+                            <li>• Designation (Headmaster/Principal/Micro-Admin/etc.)</li>
+                            <li>• Phone Number</li>
+                            <li>• Date of Birth (optional)</li>
+                            <li>• Address (optional)</li>
+                          </ul>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsOtherImportOpen(false)}>
+                          Cancel
+                        </Button>
+                        <Button onClick={() => setIsOtherImportOpen(false)}>
+                          Import Users
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                   <Button variant="outline" className="gap-2">
                     <Download className="w-4 h-4" />
                     Download Template
