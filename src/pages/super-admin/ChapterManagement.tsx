@@ -94,24 +94,6 @@ export default function ChapterManagement() {
     },
   ];
 
-  // Mock chapters
-  const chapters = [
-    {
-      id: 1,
-      name: "Real Numbers",
-      grade: "10",
-      subject: "Mathematics",
-      school: "Lincoln High School",
-    },
-    {
-      id: 2,
-      name: "Periodic Classification",
-      grade: "10",
-      subject: "Science",
-      school: "Lincoln High School",
-    },
-  ];
-
   // Mock question papers
   const questionPapers = [
     {
@@ -475,36 +457,16 @@ export default function ChapterManagement() {
                 </Select>
               </div>
 
-              <div className="border rounded-lg">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Chapter Name</TableHead>
-                      <TableHead>Grade</TableHead>
-                      <TableHead>Subject</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {chapters.map((chapter) => (
-                      <TableRow key={chapter.id}>
-                        <TableCell className="font-medium">{chapter.name}</TableCell>
-                        <TableCell>{chapter.grade}</TableCell>
-                        <TableCell>{chapter.subject}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button variant="ghost" size="icon">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="w-4 h-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <div className="bg-muted p-6 rounded-lg text-center">
+                <FileText className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="font-medium mb-2">No chapter lists imported yet</p>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Import a CSV or Excel file with chapter titles organized by grade
+                </p>
+                <Button className="gap-2" onClick={() => setIsChapterListImportOpen(true)}>
+                  <Upload className="w-4 h-4" />
+                  Import Your First List
+                </Button>
               </div>
             </CardContent>
           </Card>
