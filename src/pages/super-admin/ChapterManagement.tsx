@@ -111,9 +111,9 @@ export default function ChapterManagement() {
 
   // Mock class data
   const classData = [
-    { id: 1, name: "Grade 10 - Section A", type: "Class" },
-    { id: 2, name: "Grade 10 - Section B", type: "Class" },
-    { id: 3, name: "Mathematics - Grade 10", type: "Subject" },
+    { id: 1, name: "Grade 10 - Section A", section: "A" },
+    { id: 2, name: "Grade 10 - Section B", section: "B" },
+    { id: 3, name: "Mathematics - Grade 10", section: "-" },
   ];
 
   // Mock chapter data
@@ -330,7 +330,7 @@ export default function ChapterManagement() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Class Name</TableHead>
-                      <TableHead>Type</TableHead>
+                      <TableHead>Section</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -338,9 +338,7 @@ export default function ChapterManagement() {
                     {classData.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell className="font-medium">{item.name}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{item.type}</Badge>
-                        </TableCell>
+                        <TableCell>{item.section}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
                             <Button variant="ghost" size="icon">
