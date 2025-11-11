@@ -216,7 +216,7 @@ export default function ChapterManagement() {
         <TabsList>
           <TabsTrigger value="class-data">Class Data</TabsTrigger>
           <TabsTrigger value="chapters">Chapter List</TabsTrigger>
-          <TabsTrigger value="pdfs">Chapter PDFs</TabsTrigger>
+          <TabsTrigger value="pdfs">Chapter Resources</TabsTrigger>
           <TabsTrigger value="questions">Question Papers</TabsTrigger>
         </TabsList>
 
@@ -551,29 +551,29 @@ export default function ChapterManagement() {
           </Card>
         </TabsContent>
 
-        {/* Chapter PDFs Tab */}
+        {/* Chapter Resources Tab */}
         <TabsContent value="pdfs" className="space-y-4">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <CardTitle>Chapter PDF Management</CardTitle>
+                  <CardTitle>Chapter Resources Management</CardTitle>
                   <CardDescription className="mt-2">
-                    Upload chapter PDFs for AI training and content generation
+                    Upload chapter resources for AI training and content generation
                   </CardDescription>
                 </div>
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button className="gap-2">
                       <Upload className="w-4 h-4" />
-                      Upload PDFs
+                      Upload Resources
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                      <DialogTitle>Upload Chapter PDFs</DialogTitle>
+                      <DialogTitle>Upload Chapter Resources</DialogTitle>
                       <DialogDescription>
-                        Upload one or more PDF files for AI training
+                        Upload one or more resource files for AI training
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
@@ -661,7 +661,7 @@ export default function ChapterManagement() {
                         Cancel
                       </Button>
                       <Button>
-                        Upload PDFs
+                        Upload Resources
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -704,7 +704,7 @@ export default function ChapterManagement() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search PDFs..."
+                    placeholder="Search resources..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -992,12 +992,12 @@ export default function ChapterManagement() {
         </TabsContent>
       </Tabs>
 
-      {/* Edit PDF Dialog */}
+      {/* Edit Resource Dialog */}
       <Dialog open={isEditPdfOpen} onOpenChange={setIsEditPdfOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Edit Chapter PDF</DialogTitle>
-            <DialogDescription>Update PDF metadata and information</DialogDescription>
+            <DialogTitle>Edit Chapter Resource</DialogTitle>
+            <DialogDescription>Update resource metadata and information</DialogDescription>
           </DialogHeader>
           {editingPdf && (
             <div className="grid gap-4 py-4">
