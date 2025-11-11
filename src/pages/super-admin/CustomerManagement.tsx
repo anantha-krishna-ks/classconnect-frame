@@ -220,7 +220,14 @@ export default function CustomerManagement() {
                   <TableHead>Organizations</TableHead>
                   <TableHead>Users</TableHead>
                   <TableHead>Contact</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>
+                    <div className="flex items-center gap-2">
+                      Status
+                      <Badge variant="secondary" className="text-xs">
+                        {customers.filter(c => c.status === "Active").length}
+                      </Badge>
+                    </div>
+                  </TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
