@@ -591,10 +591,10 @@ export default function ChapterManagement() {
                         </Select>
                       </div>
                       <div className="grid gap-2">
-                        <Label htmlFor="pdf-resource-vault">Resource Vault *</Label>
+                        <Label htmlFor="pdf-resource-name">Resource Name *</Label>
                         <Input
-                          id="pdf-resource-vault"
-                          placeholder="Enter resource vault name"
+                          id="pdf-resource-name"
+                          placeholder="Enter resource name"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
