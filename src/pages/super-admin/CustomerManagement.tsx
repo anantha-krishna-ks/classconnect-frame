@@ -122,11 +122,19 @@ export default function CustomerManagement() {
     setPendingToggle(null);
   };
 
+  // Calculate active customers
+  const activeCustomersCount = customers.filter(c => c.status === "Active").length;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Customer Management</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-semibold">Customer Management</h1>
+            <Badge variant="secondary" className="text-sm">
+              {activeCustomersCount} Active
+            </Badge>
+          </div>
           <p className="text-sm text-muted-foreground mt-1">
             Manage customer accounts and their details
           </p>
