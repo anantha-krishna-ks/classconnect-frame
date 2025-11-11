@@ -281,10 +281,10 @@ export default function ChapterManagement() {
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <div className="grid gap-2">
-                        <Label htmlFor="class-school">Select School *</Label>
+                        <Label htmlFor="class-school">Select Organization *</Label>
                         <Select>
                           <SelectTrigger id="class-school">
-                            <SelectValue placeholder="Choose school" />
+                            <SelectValue placeholder="Choose organization" />
                           </SelectTrigger>
                           <SelectContent className="bg-popover z-50">
                             <SelectItem value="1">Lincoln High School</SelectItem>
