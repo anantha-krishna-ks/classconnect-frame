@@ -220,14 +220,7 @@ export default function CustomerManagement() {
                   <TableHead>Organizations</TableHead>
                   <TableHead>Users</TableHead>
                   <TableHead>Contact</TableHead>
-                  <TableHead>
-                    <div className="flex items-center gap-2">
-                      Status
-                      <Badge variant="secondary" className="text-xs">
-                        {customers.filter(c => c.status === "Active").length}
-                      </Badge>
-                    </div>
-                  </TableHead>
+                  <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -255,9 +248,16 @@ export default function CustomerManagement() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={customer.published ? "secondary" : "outline"}>
-                        {customer.status}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={customer.published ? "secondary" : "outline"}>
+                          {customer.status}
+                        </Badge>
+                        {customer.status === "Active" && (
+                          <Badge variant="default" className="text-xs bg-super-admin-primary text-super-admin-primary-foreground">
+                            {customers.filter(c => c.status === "Active").length}
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
