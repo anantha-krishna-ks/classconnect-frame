@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, Search, Download, Users, GraduationCap, Edit, Trash2 } from "lucide-react";
+import { Upload, Search, Download, Users, GraduationCap, Edit, Trash2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -435,6 +435,7 @@ export default function UserManagement() {
                   <Dialog open={isCreateStudentOpen} onOpenChange={setIsCreateStudentOpen}>
                     <DialogTrigger asChild>
                       <Button variant="default" className="gap-2">
+                        <UserPlus className="w-4 h-4" />
                         Create Student
                       </Button>
                     </DialogTrigger>
@@ -590,6 +591,7 @@ export default function UserManagement() {
                   <Dialog open={isCreateTeacherOpen} onOpenChange={setIsCreateTeacherOpen}>
                     <DialogTrigger asChild>
                       <Button variant="default" className="gap-2">
+                        <UserPlus className="w-4 h-4" />
                         Create Teacher
                       </Button>
                     </DialogTrigger>
@@ -748,6 +750,7 @@ export default function UserManagement() {
                   <Dialog open={isCreateOtherOpen} onOpenChange={setIsCreateOtherOpen}>
                     <DialogTrigger asChild>
                       <Button variant="default" className="gap-2">
+                        <UserPlus className="w-4 h-4" />
                         Create Other
                       </Button>
                     </DialogTrigger>
