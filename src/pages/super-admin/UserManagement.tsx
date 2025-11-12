@@ -432,6 +432,13 @@ export default function UserManagement() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex gap-2">
+                  <Dialog open={isCreateStudentOpen} onOpenChange={setIsCreateStudentOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="default" className="gap-2">
+                        Create Student
+                      </Button>
+                    </DialogTrigger>
+                  </Dialog>
                   <Dialog open={isStudentImportOpen} onOpenChange={setIsStudentImportOpen}>
                     <DialogTrigger asChild>
                       <Button className="gap-2">
@@ -499,13 +506,6 @@ export default function UserManagement() {
                     <Download className="w-4 h-4" />
                     Download Template
                   </Button>
-                  <Dialog open={isCreateStudentOpen} onOpenChange={setIsCreateStudentOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="default" className="gap-2">
-                        Create Student
-                      </Button>
-                    </DialogTrigger>
-                  </Dialog>
                 </div>
               </div>
             
@@ -587,6 +587,13 @@ export default function UserManagement() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex gap-2">
+                  <Dialog open={isCreateTeacherOpen} onOpenChange={setIsCreateTeacherOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="default" className="gap-2">
+                        Create Teacher
+                      </Button>
+                    </DialogTrigger>
+                  </Dialog>
                   <Dialog open={isTeacherImportOpen} onOpenChange={setIsTeacherImportOpen}>
                     <DialogTrigger asChild>
                       <Button className="gap-2">
@@ -655,13 +662,6 @@ export default function UserManagement() {
                     <Download className="w-4 h-4" />
                     Download Template
                   </Button>
-                  <Dialog open={isCreateTeacherOpen} onOpenChange={setIsCreateTeacherOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="default" className="gap-2">
-                        Create Teacher
-                      </Button>
-                    </DialogTrigger>
-                  </Dialog>
                 </div>
               </div>
             
@@ -745,6 +745,13 @@ export default function UserManagement() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex gap-2">
+                  <Dialog open={isCreateOtherOpen} onOpenChange={setIsCreateOtherOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="default" className="gap-2">
+                        Create Other
+                      </Button>
+                    </DialogTrigger>
+                  </Dialog>
                   <Dialog open={isOtherImportOpen} onOpenChange={setIsOtherImportOpen}>
                     <DialogTrigger asChild>
                       <Button className="gap-2">
@@ -812,13 +819,6 @@ export default function UserManagement() {
                     <Download className="w-4 h-4" />
                     Download Template
                   </Button>
-                  <Dialog open={isCreateOtherOpen} onOpenChange={setIsCreateOtherOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="default" className="gap-2">
-                        Create Other
-                      </Button>
-                    </DialogTrigger>
-                  </Dialog>
                 </div>
               </div>
             
