@@ -47,6 +47,9 @@ export default function UserManagement() {
   const [isStudentImportOpen, setIsStudentImportOpen] = useState(false);
   const [isTeacherImportOpen, setIsTeacherImportOpen] = useState(false);
   const [isOtherImportOpen, setIsOtherImportOpen] = useState(false);
+  const [isCreateStudentOpen, setIsCreateStudentOpen] = useState(false);
+  const [isCreateTeacherOpen, setIsCreateTeacherOpen] = useState(false);
+  const [isCreateOtherOpen, setIsCreateOtherOpen] = useState(false);
   const { toast } = useToast();
   
   // Global filters
@@ -67,7 +70,7 @@ export default function UserManagement() {
   const [userToDelete, setUserToDelete] = useState<{ id: number; type: string; name: string } | null>(null);
 
   // Mock student data
-  const students = [
+  const [students, setStudents] = useState([
     {
       id: 1,
       name: "Emma Johnson",
@@ -96,10 +99,10 @@ export default function UserManagement() {
       city: "New York",
       status: "Active",
     },
-  ];
+  ]);
 
   // Mock teacher data
-  const teachers = [
+  const [teachers, setTeachers] = useState([
     {
       id: 1,
       name: "Dr. Robert Smith",
@@ -128,10 +131,10 @@ export default function UserManagement() {
       city: "New York",
       status: "Active",
     },
-  ];
+  ]);
 
   // Mock others data (headmaster, principal, micro-admin, etc.)
-  const others = [
+  const [others, setOthers] = useState([
     {
       id: 1,
       name: "Mr. David Anderson",
@@ -156,7 +159,7 @@ export default function UserManagement() {
       city: "New York",
       status: "Active",
     },
-  ];
+  ]);
 
   // Filter students
   const filteredStudents = students.filter((student) => {
@@ -242,6 +245,80 @@ export default function UserManagement() {
     setEditingOther(null);
   };
 
+  // Create handlers
+  const handleCreateStudent = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const newStudent = {
+      id: students.length + 1,
+      name: formData.get("name") as string,
+      grade: formData.get("grade") as string,
+      section: formData.get("section") as string,
+      sex: formData.get("sex") as string,
+      dob: formData.get("dob") as string,
+      parentPhone: formData.get("parentPhone") as string,
+      school: formData.get("school") as string,
+      customer: "ABC Education",
+      organization: formData.get("school") as string,
+      city: "New York",
+      status: "Active",
+    };
+    setStudents([...students, newStudent]);
+    toast({
+      title: "Student created",
+      description: "New student has been added successfully.",
+    });
+    setIsCreateStudentOpen(false);
+  };
+
+  const handleCreateTeacher = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const newTeacher = {
+      id: teachers.length + 1,
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      designation: formData.get("designation") as string,
+      grades: formData.get("grades") as string,
+      sections: formData.get("sections") as string,
+      phone: formData.get("phone") as string,
+      school: formData.get("school") as string,
+      customer: "ABC Education",
+      organization: formData.get("school") as string,
+      city: "New York",
+      status: "Active",
+    };
+    setTeachers([...teachers, newTeacher]);
+    toast({
+      title: "Teacher created",
+      description: "New teacher has been added successfully.",
+    });
+    setIsCreateTeacherOpen(false);
+  };
+
+  const handleCreateOther = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const newOther = {
+      id: others.length + 1,
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      designation: formData.get("designation") as string,
+      phone: formData.get("phone") as string,
+      school: formData.get("school") as string,
+      customer: "ABC Education",
+      organization: formData.get("school") as string,
+      city: "New York",
+      status: "Active",
+    };
+    setOthers([...others, newOther]);
+    toast({
+      title: "User created",
+      description: "New user has been added successfully.",
+    });
+    setIsCreateOtherOpen(false);
+  };
+
   // Delete handlers
   const handleDeleteClick = (id: number, type: string, name: string) => {
     setUserToDelete({ id, type, name });
@@ -250,7 +327,13 @@ export default function UserManagement() {
 
   const handleDeleteConfirm = () => {
     if (userToDelete) {
-      // TODO: Implement delete logic
+      if (userToDelete.type === "student") {
+        setStudents(students.filter(s => s.id !== userToDelete.id));
+      } else if (userToDelete.type === "teacher") {
+        setTeachers(teachers.filter(t => t.id !== userToDelete.id));
+      } else {
+        setOthers(others.filter(o => o.id !== userToDelete.id));
+      }
       toast({
         title: "User deleted",
         description: `${userToDelete.name} has been deleted successfully.`,
@@ -349,6 +432,13 @@ export default function UserManagement() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex gap-2">
+                  <Dialog open={isCreateStudentOpen} onOpenChange={setIsCreateStudentOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="default" className="gap-2">
+                        Create Student
+                      </Button>
+                    </DialogTrigger>
+                  </Dialog>
                   <Dialog open={isStudentImportOpen} onOpenChange={setIsStudentImportOpen}>
                     <DialogTrigger asChild>
                       <Button className="gap-2">
@@ -497,6 +587,13 @@ export default function UserManagement() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex gap-2">
+                  <Dialog open={isCreateTeacherOpen} onOpenChange={setIsCreateTeacherOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="default" className="gap-2">
+                        Create Teacher
+                      </Button>
+                    </DialogTrigger>
+                  </Dialog>
                   <Dialog open={isTeacherImportOpen} onOpenChange={setIsTeacherImportOpen}>
                     <DialogTrigger asChild>
                       <Button className="gap-2">
@@ -648,6 +745,13 @@ export default function UserManagement() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex gap-2">
+                  <Dialog open={isCreateOtherOpen} onOpenChange={setIsCreateOtherOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="default" className="gap-2">
+                        Create Other
+                      </Button>
+                    </DialogTrigger>
+                  </Dialog>
                   <Dialog open={isOtherImportOpen} onOpenChange={setIsOtherImportOpen}>
                     <DialogTrigger asChild>
                       <Button className="gap-2">
@@ -793,6 +897,67 @@ export default function UserManagement() {
         </Tabs>
       </Card>
 
+      {/* Create Student Dialog */}
+      <Dialog open={isCreateStudentOpen} onOpenChange={setIsCreateStudentOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Create Student</DialogTitle>
+            <DialogDescription>Add a new student</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateStudent}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="create-student-name">Full Name *</Label>
+                  <Input id="create-student-name" name="name" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="create-student-sex">Sex *</Label>
+                  <Select name="sex" required>
+                    <SelectTrigger id="create-student-sex">
+                      <SelectValue placeholder="Select sex" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Male">Male</SelectItem>
+                      <SelectItem value="Female">Female</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="create-student-grade">Grade *</Label>
+                  <Input id="create-student-grade" name="grade" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="create-student-section">Section *</Label>
+                  <Input id="create-student-section" name="section" required />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-student-parent-phone">Parent's Phone *</Label>
+                <Input id="create-student-parent-phone" name="parentPhone" required />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-student-dob">Date of Birth</Label>
+                <Input id="create-student-dob" name="dob" type="date" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-student-school">School *</Label>
+                <Input id="create-student-school" name="school" defaultValue="Lincoln High School" required />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsCreateStudentOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Create Student</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
       {/* Edit Student Dialog */}
       <Dialog open={isEditStudentOpen} onOpenChange={setIsEditStudentOpen}>
         <DialogContent className="max-w-2xl">
@@ -862,6 +1027,60 @@ export default function UserManagement() {
             </Button>
             <Button onClick={handleSaveStudent}>Save Changes</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Teacher Dialog */}
+      <Dialog open={isCreateTeacherOpen} onOpenChange={setIsCreateTeacherOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Create Teacher</DialogTitle>
+            <DialogDescription>Add a new teacher</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateTeacher}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="create-teacher-name">Full Name *</Label>
+                  <Input id="create-teacher-name" name="name" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="create-teacher-email">Email *</Label>
+                  <Input id="create-teacher-email" name="email" type="email" required />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="create-teacher-designation">Designation *</Label>
+                  <Input id="create-teacher-designation" name="designation" placeholder="e.g., Teacher, HOD" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="create-teacher-phone">Phone</Label>
+                  <Input id="create-teacher-phone" name="phone" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="create-teacher-grades">Grades *</Label>
+                  <Input id="create-teacher-grades" name="grades" placeholder="e.g., 9, 10, 11" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="create-teacher-sections">Sections *</Label>
+                  <Input id="create-teacher-sections" name="sections" placeholder="e.g., A, B, C" required />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-teacher-school">School *</Label>
+                <Input id="create-teacher-school" name="school" defaultValue="Lincoln High School" required />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsCreateTeacherOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Create Teacher</Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
@@ -940,6 +1159,50 @@ export default function UserManagement() {
             </Button>
             <Button onClick={handleSaveTeacher}>Save Changes</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Other Dialog */}
+      <Dialog open={isCreateOtherOpen} onOpenChange={setIsCreateOtherOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Create User</DialogTitle>
+            <DialogDescription>Add a new user (Headmaster, Principal, Micro-Admin, etc.)</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateOther}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="create-other-name">Full Name *</Label>
+                  <Input id="create-other-name" name="name" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="create-other-email">Email *</Label>
+                  <Input id="create-other-email" name="email" type="email" required />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="create-other-designation">Designation *</Label>
+                  <Input id="create-other-designation" name="designation" placeholder="e.g., Headmaster, Principal" required />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="create-other-phone">Phone *</Label>
+                  <Input id="create-other-phone" name="phone" required />
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-other-school">School *</Label>
+                <Input id="create-other-school" name="school" defaultValue="Lincoln High School" required />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsCreateOtherOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Create User</Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
 
