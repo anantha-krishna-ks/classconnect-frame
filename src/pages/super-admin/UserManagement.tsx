@@ -1194,10 +1194,6 @@ export default function UserManagement() {
                 </div>
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="create-teacher-parent-name">Parent's Name</Label>
-                <Input id="create-teacher-parent-name" name="parentName" />
-              </div>
-              <div className="grid gap-2">
                 <Label htmlFor="create-teacher-address">Address</Label>
                 <Input id="create-teacher-address" name="address" />
               </div>
@@ -1322,10 +1318,6 @@ export default function UserManagement() {
                   <Label htmlFor="create-other-phone">Phone *</Label>
                   <Input id="create-other-phone" name="phone" required />
                 </div>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="create-other-parent-name">Parent's Name</Label>
-                <Input id="create-other-parent-name" name="parentName" />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="create-other-address">Address</Label>
