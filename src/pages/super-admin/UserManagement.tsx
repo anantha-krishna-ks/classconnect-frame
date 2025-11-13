@@ -931,12 +931,43 @@ export default function UserManagement() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="create-student-grade">Grade *</Label>
-                  <Input id="create-student-grade" name="grade" required />
+                  <Select name="grade" required>
+                    <SelectTrigger id="create-student-grade">
+                      <SelectValue placeholder="Select grade" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="I">I</SelectItem>
+                      <SelectItem value="II">II</SelectItem>
+                      <SelectItem value="III">III</SelectItem>
+                      <SelectItem value="IV">IV</SelectItem>
+                      <SelectItem value="V">V</SelectItem>
+                      <SelectItem value="VI">VI</SelectItem>
+                      <SelectItem value="VII">VII</SelectItem>
+                      <SelectItem value="VIII">VIII</SelectItem>
+                      <SelectItem value="IX">IX</SelectItem>
+                      <SelectItem value="X">X</SelectItem>
+                      <SelectItem value="XI">XI</SelectItem>
+                      <SelectItem value="XII">XII</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="create-student-section">Section *</Label>
-                  <Input id="create-student-section" name="section" required />
+                  <Select name="section" required>
+                    <SelectTrigger id="create-student-section">
+                      <SelectValue placeholder="Select section" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map(letter => (
+                        <SelectItem key={letter} value={letter}>{letter}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-student-parent-name">Parent's Name *</Label>
+                <Input id="create-student-parent-name" name="parentName" required />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="create-student-parent-phone">Parent's Phone *</Label>
@@ -945,6 +976,10 @@ export default function UserManagement() {
               <div className="grid gap-2">
                 <Label htmlFor="create-student-dob">Date of Birth</Label>
                 <Input id="create-student-dob" name="dob" type="date" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-student-address">Address</Label>
+                <Input id="create-student-address" name="address" />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="create-student-school">School *</Label>
@@ -1065,12 +1100,47 @@ export default function UserManagement() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="create-teacher-grades">Grades *</Label>
-                  <Input id="create-teacher-grades" name="grades" placeholder="e.g., 9, 10, 11" required />
+                  <Select name="grades" required>
+                    <SelectTrigger id="create-teacher-grades">
+                      <SelectValue placeholder="Select grades" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="I">I</SelectItem>
+                      <SelectItem value="II">II</SelectItem>
+                      <SelectItem value="III">III</SelectItem>
+                      <SelectItem value="IV">IV</SelectItem>
+                      <SelectItem value="V">V</SelectItem>
+                      <SelectItem value="VI">VI</SelectItem>
+                      <SelectItem value="VII">VII</SelectItem>
+                      <SelectItem value="VIII">VIII</SelectItem>
+                      <SelectItem value="IX">IX</SelectItem>
+                      <SelectItem value="X">X</SelectItem>
+                      <SelectItem value="XI">XI</SelectItem>
+                      <SelectItem value="XII">XII</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="create-teacher-sections">Sections *</Label>
-                  <Input id="create-teacher-sections" name="sections" placeholder="e.g., A, B, C" required />
+                  <Select name="sections" required>
+                    <SelectTrigger id="create-teacher-sections">
+                      <SelectValue placeholder="Select sections" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map(letter => (
+                        <SelectItem key={letter} value={letter}>{letter}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-teacher-parent-name">Parent's Name</Label>
+                <Input id="create-teacher-parent-name" name="parentName" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-teacher-address">Address</Label>
+                <Input id="create-teacher-address" name="address" />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="create-teacher-school">School *</Label>
@@ -1193,6 +1263,14 @@ export default function UserManagement() {
                   <Label htmlFor="create-other-phone">Phone *</Label>
                   <Input id="create-other-phone" name="phone" required />
                 </div>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-other-parent-name">Parent's Name</Label>
+                <Input id="create-other-parent-name" name="parentName" />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="create-other-address">Address</Label>
+                <Input id="create-other-address" name="address" />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="create-other-school">School *</Label>
