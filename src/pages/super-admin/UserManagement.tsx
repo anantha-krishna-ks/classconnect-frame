@@ -274,13 +274,18 @@ export default function UserManagement() {
   const handleCreateTeacher = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    
+    // Get all selected grades and sections
+    const selectedGrades = formData.getAll("grades") as string[];
+    const selectedSections = formData.getAll("sections") as string[];
+    
     const newTeacher = {
       id: teachers.length + 1,
       name: formData.get("name") as string,
       email: formData.get("email") as string,
       designation: formData.get("designation") as string,
-      grades: formData.get("grades") as string,
-      sections: formData.get("sections") as string,
+      grades: selectedGrades.join(", "),
+      sections: selectedSections.join(", "),
       phone: formData.get("phone") as string,
       school: formData.get("school") as string,
       customer: "ABC Education",
@@ -1099,39 +1104,46 @@ export default function UserManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="create-teacher-grades">Grades *</Label>
-                  <Select name="grades" required>
-                    <SelectTrigger id="create-teacher-grades">
-                      <SelectValue placeholder="Select grades" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="I">I</SelectItem>
-                      <SelectItem value="II">II</SelectItem>
-                      <SelectItem value="III">III</SelectItem>
-                      <SelectItem value="IV">IV</SelectItem>
-                      <SelectItem value="V">V</SelectItem>
-                      <SelectItem value="VI">VI</SelectItem>
-                      <SelectItem value="VII">VII</SelectItem>
-                      <SelectItem value="VIII">VIII</SelectItem>
-                      <SelectItem value="IX">IX</SelectItem>
-                      <SelectItem value="X">X</SelectItem>
-                      <SelectItem value="XI">XI</SelectItem>
-                      <SelectItem value="XII">XII</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label>Grades * (Select multiple)</Label>
+                  <div className="border rounded-md p-3 max-h-[200px] overflow-y-auto bg-background">
+                    <div className="grid grid-cols-3 gap-2">
+                      {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'].map((grade) => (
+                        <div key={grade} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`grade-${grade}`}
+                            name="grades"
+                            value={grade}
+                            className="rounded border-border"
+                          />
+                          <Label htmlFor={`grade-${grade}`} className="text-sm font-normal cursor-pointer">
+                            {grade}
+                          </Label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="create-teacher-sections">Sections *</Label>
-                  <Select name="sections" required>
-                    <SelectTrigger id="create-teacher-sections">
-                      <SelectValue placeholder="Select sections" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map(letter => (
-                        <SelectItem key={letter} value={letter}>{letter}</SelectItem>
+                  <Label>Sections * (Select multiple)</Label>
+                  <div className="border rounded-md p-3 max-h-[200px] overflow-y-auto bg-background">
+                    <div className="grid grid-cols-4 gap-2">
+                      {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map((letter) => (
+                        <div key={letter} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`section-${letter}`}
+                            name="sections"
+                            value={letter}
+                            className="rounded border-border"
+                          />
+                          <Label htmlFor={`section-${letter}`} className="text-sm font-normal cursor-pointer">
+                            {letter}
+                          </Label>
+                        </div>
                       ))}
-                    </SelectContent>
-                  </Select>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="grid gap-2">
