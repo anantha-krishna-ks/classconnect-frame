@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, Search, Download, Users, GraduationCap, Edit, Trash2, UserPlus } from "lucide-react";
+import { Upload, Search, Download, Users, GraduationCap, Edit, Trash2, UserPlus, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -50,6 +50,12 @@ export default function UserManagement() {
   const [isCreateStudentOpen, setIsCreateStudentOpen] = useState(false);
   const [isCreateTeacherOpen, setIsCreateTeacherOpen] = useState(false);
   const [isCreateOtherOpen, setIsCreateOtherOpen] = useState(false);
+  
+  // Multi-select state for teacher creation
+  const [selectedGrades, setSelectedGrades] = useState<string[]>([]);
+  const [selectedSections, setSelectedSections] = useState<string[]>([]);
+  const [gradesDropdownOpen, setGradesDropdownOpen] = useState(false);
+  const [sectionsDropdownOpen, setSectionsDropdownOpen] = useState(false);
   const { toast } = useToast();
   
   // Global filters
@@ -275,10 +281,6 @@ export default function UserManagement() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    // Get all selected grades and sections
-    const selectedGrades = formData.getAll("grades") as string[];
-    const selectedSections = formData.getAll("sections") as string[];
-    
     const newTeacher = {
       id: teachers.length + 1,
       name: formData.get("name") as string,
@@ -299,6 +301,9 @@ export default function UserManagement() {
       description: "New teacher has been added successfully.",
     });
     setIsCreateTeacherOpen(false);
+    // Reset selections
+    setSelectedGrades([]);
+    setSelectedSections([]);
   };
 
   const handleCreateOther = (e: React.FormEvent<HTMLFormElement>) => {
@@ -1104,58 +1109,88 @@ export default function UserManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="create-teacher-grades">Grades *</Label>
-                  <Select>
-                    <SelectTrigger id="create-teacher-grades">
-                      <SelectValue placeholder="Select grades (multiple)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <div className="p-2 space-y-2">
-                        {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'].map((grade) => (
-                          <div key={grade} className="flex items-center space-x-2 px-2 py-1 hover:bg-accent rounded">
-                            <input
-                              type="checkbox"
-                              id={`grade-${grade}`}
-                              name="grades"
-                              value={grade}
-                              className="rounded border-border"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <Label htmlFor={`grade-${grade}`} className="text-sm font-normal cursor-pointer flex-1">
-                              {grade}
-                            </Label>
-                          </div>
-                        ))}
+                  <Label>Grades *</Label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setGradesDropdownOpen(!gradesDropdownOpen)}
+                      className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <span className={selectedGrades.length === 0 ? "text-muted-foreground" : ""}>
+                        {selectedGrades.length === 0 ? "Select grades" : `${selectedGrades.length} selected: ${selectedGrades.join(", ")}`}
+                      </span>
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </button>
+                    {gradesDropdownOpen && (
+                      <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md">
+                        <div className="p-2 space-y-1 max-h-[300px] overflow-y-auto">
+                          {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'].map((grade) => (
+                            <div
+                              key={grade}
+                              className="flex items-center space-x-2 px-2 py-1.5 hover:bg-accent rounded cursor-pointer"
+                              onClick={() => {
+                                setSelectedGrades(prev =>
+                                  prev.includes(grade)
+                                    ? prev.filter(g => g !== grade)
+                                    : [...prev, grade]
+                                );
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedGrades.includes(grade)}
+                                onChange={() => {}}
+                                className="rounded border-border"
+                              />
+                              <span className="text-sm flex-1">{grade}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </SelectContent>
-                  </Select>
+                    )}
+                  </div>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="create-teacher-sections">Sections *</Label>
-                  <Select>
-                    <SelectTrigger id="create-teacher-sections">
-                      <SelectValue placeholder="Select sections (multiple)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <div className="p-2 space-y-1 max-h-[300px] overflow-y-auto">
-                        {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map((letter) => (
-                          <div key={letter} className="flex items-center space-x-2 px-2 py-1 hover:bg-accent rounded">
-                            <input
-                              type="checkbox"
-                              id={`section-${letter}`}
-                              name="sections"
-                              value={letter}
-                              className="rounded border-border"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            <Label htmlFor={`section-${letter}`} className="text-sm font-normal cursor-pointer flex-1">
-                              {letter}
-                            </Label>
-                          </div>
-                        ))}
+                  <Label>Sections *</Label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setSectionsDropdownOpen(!sectionsDropdownOpen)}
+                      className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <span className={selectedSections.length === 0 ? "text-muted-foreground" : ""}>
+                        {selectedSections.length === 0 ? "Select sections" : `${selectedSections.length} selected: ${selectedSections.join(", ")}`}
+                      </span>
+                      <ChevronDown className="h-4 w-4 opacity-50" />
+                    </button>
+                    {sectionsDropdownOpen && (
+                      <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover shadow-md">
+                        <div className="p-2 space-y-1 max-h-[300px] overflow-y-auto">
+                          {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map((letter) => (
+                            <div
+                              key={letter}
+                              className="flex items-center space-x-2 px-2 py-1.5 hover:bg-accent rounded cursor-pointer"
+                              onClick={() => {
+                                setSelectedSections(prev =>
+                                  prev.includes(letter)
+                                    ? prev.filter(s => s !== letter)
+                                    : [...prev, letter]
+                                );
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedSections.includes(letter)}
+                                onChange={() => {}}
+                                className="rounded border-border"
+                              />
+                              <span className="text-sm flex-1">{letter}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </SelectContent>
-                  </Select>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="grid gap-2">
