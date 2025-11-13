@@ -1104,46 +1104,58 @@ export default function UserManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label>Grades * (Select multiple)</Label>
-                  <div className="border rounded-md p-3 max-h-[200px] overflow-y-auto bg-background">
-                    <div className="grid grid-cols-3 gap-2">
-                      {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'].map((grade) => (
-                        <div key={grade} className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id={`grade-${grade}`}
-                            name="grades"
-                            value={grade}
-                            className="rounded border-border"
-                          />
-                          <Label htmlFor={`grade-${grade}`} className="text-sm font-normal cursor-pointer">
-                            {grade}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <Label htmlFor="create-teacher-grades">Grades *</Label>
+                  <Select>
+                    <SelectTrigger id="create-teacher-grades">
+                      <SelectValue placeholder="Select grades (multiple)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <div className="p-2 space-y-2">
+                        {['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'].map((grade) => (
+                          <div key={grade} className="flex items-center space-x-2 px-2 py-1 hover:bg-accent rounded">
+                            <input
+                              type="checkbox"
+                              id={`grade-${grade}`}
+                              name="grades"
+                              value={grade}
+                              className="rounded border-border"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <Label htmlFor={`grade-${grade}`} className="text-sm font-normal cursor-pointer flex-1">
+                              {grade}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
-                  <Label>Sections * (Select multiple)</Label>
-                  <div className="border rounded-md p-3 max-h-[200px] overflow-y-auto bg-background">
-                    <div className="grid grid-cols-4 gap-2">
-                      {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map((letter) => (
-                        <div key={letter} className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id={`section-${letter}`}
-                            name="sections"
-                            value={letter}
-                            className="rounded border-border"
-                          />
-                          <Label htmlFor={`section-${letter}`} className="text-sm font-normal cursor-pointer">
-                            {letter}
-                          </Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <Label htmlFor="create-teacher-sections">Sections *</Label>
+                  <Select>
+                    <SelectTrigger id="create-teacher-sections">
+                      <SelectValue placeholder="Select sections (multiple)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <div className="p-2 space-y-1 max-h-[300px] overflow-y-auto">
+                        {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map((letter) => (
+                          <div key={letter} className="flex items-center space-x-2 px-2 py-1 hover:bg-accent rounded">
+                            <input
+                              type="checkbox"
+                              id={`section-${letter}`}
+                              name="sections"
+                              value={letter}
+                              className="rounded border-border"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                            <Label htmlFor={`section-${letter}`} className="text-sm font-normal cursor-pointer flex-1">
+                              {letter}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="grid gap-2">
