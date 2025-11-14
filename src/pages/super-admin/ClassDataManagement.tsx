@@ -42,6 +42,7 @@ export default function ClassDataManagement() {
   const [filterOrganization, setFilterOrganization] = useState<string>("all");
   const [filterCity, setFilterCity] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
+  const [filterClass, setFilterClass] = useState<string>("");
 
   // Mock filter data
   const customers = ["ABC Education", "XYZ Schools Network", "Global Learning Group"];
@@ -216,7 +217,12 @@ export default function ClassDataManagement() {
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="w-64">
-              <Select value={filterType} onValueChange={setFilterType}>
+              <Select value={filterType} onValueChange={(value) => {
+                setFilterType(value);
+                if (value !== "subject") {
+                  setFilterClass("");
+                }
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -227,6 +233,22 @@ export default function ClassDataManagement() {
                 </SelectContent>
               </Select>
             </div>
+            {filterType === "subject" && (
+              <div className="w-64">
+                <Select value={filterClass} onValueChange={setFilterClass}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select class" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {classData.filter(item => item.name.startsWith("Grade")).map((item) => (
+                      <SelectItem key={item.id} value={item.name}>
+                        {item.name} - {item.section}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
