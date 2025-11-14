@@ -41,15 +41,11 @@ export default function ClassDataManagement() {
   const [filterCustomer, setFilterCustomer] = useState<string>("all");
   const [filterOrganization, setFilterOrganization] = useState<string>("all");
   const [filterCity, setFilterCity] = useState<string>("all");
-  const [filterGrade, setFilterGrade] = useState<string>("all");
-  const [filterSubject, setFilterSubject] = useState<string>("all");
 
   // Mock filter data
   const customers = ["ABC Education", "XYZ Schools Network", "Global Learning Group"];
   const organizations = ["Lincoln High School", "Roosevelt Middle School", "Jefferson Elementary"];
   const cities = ["New York", "Los Angeles", "Chicago", "Boston"];
-  const grades = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
-  const subjects = ["Mathematics", "Science", "English", "Social Studies", "Physics", "Chemistry", "Biology", "History", "Geography", "Computer Science"];
 
   // Mock class data
   const classData = [
@@ -75,14 +71,14 @@ export default function ClassDataManagement() {
           <CardDescription>Apply filters to view specific data</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid gap-2">
               <Label>Customer</Label>
               <Select value={filterCustomer} onValueChange={setFilterCustomer}>
-                <SelectTrigger className="bg-background">
+                <SelectTrigger>
                   <SelectValue placeholder="Select customer" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
+                <SelectContent>
                   <SelectItem value="all">All Customers</SelectItem>
                   {customers.map((customer) => (
                     <SelectItem key={customer} value={customer}>
@@ -95,10 +91,10 @@ export default function ClassDataManagement() {
             <div className="grid gap-2">
               <Label>Organization</Label>
               <Select value={filterOrganization} onValueChange={setFilterOrganization}>
-                <SelectTrigger className="bg-background">
+                <SelectTrigger>
                   <SelectValue placeholder="Select organization" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
+                <SelectContent>
                   <SelectItem value="all">All Organizations</SelectItem>
                   {organizations.map((org) => (
                     <SelectItem key={org} value={org}>
@@ -111,46 +107,14 @@ export default function ClassDataManagement() {
             <div className="grid gap-2">
               <Label>City</Label>
               <Select value={filterCity} onValueChange={setFilterCity}>
-                <SelectTrigger className="bg-background">
+                <SelectTrigger>
                   <SelectValue placeholder="Select city" />
                 </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
+                <SelectContent>
                   <SelectItem value="all">All Cities</SelectItem>
                   {cities.map((city) => (
                     <SelectItem key={city} value={city}>
                       {city}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label>Grade</Label>
-              <Select value={filterGrade} onValueChange={setFilterGrade}>
-                <SelectTrigger className="bg-background">
-                  <SelectValue placeholder="Select grade" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Grades</SelectItem>
-                  {grades.map((grade) => (
-                    <SelectItem key={grade} value={grade}>
-                      Grade {grade}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label>Subject</Label>
-              <Select value={filterSubject} onValueChange={setFilterSubject}>
-                <SelectTrigger className="bg-background">
-                  <SelectValue placeholder="Select subject" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Subjects</SelectItem>
-                  {subjects.map((subject) => (
-                    <SelectItem key={subject} value={subject}>
-                      {subject}
                     </SelectItem>
                   ))}
                 </SelectContent>
