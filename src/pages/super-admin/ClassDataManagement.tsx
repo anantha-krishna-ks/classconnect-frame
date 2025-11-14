@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, Search, Edit, Trash2 } from "lucide-react";
+import { Upload, Search, Edit, Trash2, BookOpen, Calculator, Atom, BookA, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -56,15 +56,15 @@ export default function ClassDataManagement() {
 
   // Mock class data
   const classData = [
-    { id: 1, name: "Grade 10", section: "A", icon: "📘", color: "bg-blue-500" },
-    { id: 2, name: "Grade 10", section: "B", icon: "📙", color: "bg-green-500" },
+    { id: 1, name: "Grade 10", section: "A", icon: BookOpen, color: "bg-blue-500" },
+    { id: 2, name: "Grade 10", section: "B", icon: BookOpen, color: "bg-green-500" },
   ];
 
   const subjectData = [
-    { id: 3, name: "Mathematics", section: "Grade 10", icon: "➗", color: "bg-purple-500" },
-    { id: 4, name: "Science", section: "Grade 10", icon: "⚗️", color: "bg-cyan-500" },
-    { id: 5, name: "English", section: "Grade 10", icon: "✍️", color: "bg-orange-500" },
-    { id: 6, name: "History", section: "Grade 10", icon: "📖", color: "bg-amber-500" },
+    { id: 3, name: "Mathematics", section: "Grade 10", icon: Calculator, color: "bg-purple-500" },
+    { id: 4, name: "Science", section: "Grade 10", icon: Atom, color: "bg-cyan-500" },
+    { id: 5, name: "English", section: "Grade 10", icon: BookA, color: "bg-orange-500" },
+    { id: 6, name: "History", section: "Grade 10", icon: Clock, color: "bg-amber-500" },
   ];
 
   const handleToggleClass = (id: number) => {
@@ -313,27 +313,30 @@ export default function ClassDataManagement() {
           {filterType === "class" && (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {classData.map((item) => (
-                  <Card key={item.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className={`${item.color} w-12 h-12 rounded-lg flex items-center justify-center text-2xl`}>
-                            {item.icon}
+                {classData.map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <Card key={item.id} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className={`${item.color} w-12 h-12 rounded-lg flex items-center justify-center`}>
+                              <IconComponent className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-lg">{item.name} - Section {item.section}</h3>
+                              <p className="text-sm text-muted-foreground">Class section</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="font-semibold text-lg">{item.name} - Section {item.section}</h3>
-                            <p className="text-sm text-muted-foreground">Class section</p>
-                          </div>
+                          <Switch
+                            checked={enabledClasses.has(item.id)}
+                            onCheckedChange={() => handleToggleClass(item.id)}
+                          />
                         </div>
-                        <Switch
-                          checked={enabledClasses.has(item.id)}
-                          onCheckedChange={() => handleToggleClass(item.id)}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
               <div className="flex justify-end gap-3 pt-4">
                 <Button variant="outline" onClick={handleCancelChanges}>Cancel</Button>
@@ -347,27 +350,30 @@ export default function ClassDataManagement() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {subjectData
                   .filter(item => !filterClass || item.section === filterClass)
-                  .map((item) => (
-                    <Card key={item.id} className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className={`${item.color} w-12 h-12 rounded-lg flex items-center justify-center text-2xl`}>
-                              {item.icon}
+                  .map((item) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <Card key={item.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className={`${item.color} w-12 h-12 rounded-lg flex items-center justify-center`}>
+                                <IconComponent className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-lg">{item.name}</h3>
+                                <p className="text-sm text-muted-foreground">{item.section}</p>
+                              </div>
                             </div>
-                            <div>
-                              <h3 className="font-semibold text-lg">{item.name}</h3>
-                              <p className="text-sm text-muted-foreground">{item.section}</p>
-                            </div>
+                            <Switch
+                              checked={enabledSubjects.has(item.id)}
+                              onCheckedChange={() => handleToggleSubject(item.id)}
+                            />
                           </div>
-                          <Switch
-                            checked={enabledSubjects.has(item.id)}
-                            onCheckedChange={() => handleToggleSubject(item.id)}
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
               </div>
               <div className="flex justify-end gap-3 pt-4">
                 <Button variant="outline" onClick={handleCancelChanges}>Cancel</Button>
