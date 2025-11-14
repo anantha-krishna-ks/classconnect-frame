@@ -41,6 +41,7 @@ export default function ClassDataManagement() {
   const [filterCustomer, setFilterCustomer] = useState<string>("all");
   const [filterOrganization, setFilterOrganization] = useState<string>("all");
   const [filterCity, setFilterCity] = useState<string>("all");
+  const [filterType, setFilterType] = useState<string>("all");
 
   // Mock filter data
   const customers = ["ABC Education", "XYZ Schools Network", "Global Learning Group"];
@@ -71,7 +72,7 @@ export default function ClassDataManagement() {
           <CardDescription>Apply filters to view specific data</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="grid gap-2">
               <Label>Customer</Label>
               <Select value={filterCustomer} onValueChange={setFilterCustomer}>
@@ -117,6 +118,19 @@ export default function ClassDataManagement() {
                       {city}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label>Type</Label>
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="class">Class</SelectItem>
+                  <SelectItem value="subject">Subject</SelectItem>
                 </SelectContent>
               </Select>
             </div>
