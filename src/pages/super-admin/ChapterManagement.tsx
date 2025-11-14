@@ -39,9 +39,6 @@ export default function ChapterManagement() {
   const [isQuestionPaperUploadOpen, setIsQuestionPaperUploadOpen] = useState(false);
   const [isEditPdfOpen, setIsEditPdfOpen] = useState(false);
   const [editingPdf, setEditingPdf] = useState<any>(null);
-  const [classDataType, setClassDataType] = useState<string>("");
-  const [selectedClassForSubject, setSelectedClassForSubject] = useState<string>("");
-  const [isClassUploadOpen, setIsClassUploadOpen] = useState(false);
   const { toast } = useToast();
   
   // Global filter states
@@ -107,13 +104,6 @@ export default function ChapterManagement() {
       uploadedDate: "2024-01-10",
       size: "1.8 MB",
     },
-  ];
-
-  // Mock class data
-  const classData = [
-    { id: 1, name: "Grade 10 - Section A", section: "A" },
-    { id: 2, name: "Grade 10 - Section B", section: "B" },
-    { id: 3, name: "Mathematics - Grade 10", section: "-" },
   ];
 
   // Mock chapter data
@@ -212,151 +202,12 @@ export default function ChapterManagement() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="class-data" className="space-y-6">
+      <Tabs defaultValue="chapters" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="class-data">Class Data</TabsTrigger>
           <TabsTrigger value="chapters">Chapter List</TabsTrigger>
           <TabsTrigger value="pdfs">Chapter Resources</TabsTrigger>
           <TabsTrigger value="questions">Question Papers</TabsTrigger>
         </TabsList>
-
-        {/* Class Data Tab */}
-        <TabsContent value="class-data" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Class Data Management</CardTitle>
-                  <CardDescription className="mt-2">
-                    Upload and manage class and subject data
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Select value={classDataType} onValueChange={(value) => {
-                  setClassDataType(value);
-                  setSelectedClassForSubject("");
-                }}>
-                  <SelectTrigger className="bg-background">
-                    <SelectValue placeholder="Select Type" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover z-50">
-                    <SelectItem value="class">Class</SelectItem>
-                    <SelectItem value="subject">Subject</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {classDataType === "subject" && (
-                  <Select value={selectedClassForSubject} onValueChange={setSelectedClassForSubject}>
-                    <SelectTrigger className="bg-background">
-                      <SelectValue placeholder="Select Class" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover z-50">
-                      {grades.map((grade) => (
-                        <SelectItem key={grade} value={grade}>
-                          Grade {grade}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-
-              {((classDataType === "class") || (classDataType === "subject" && selectedClassForSubject)) && (
-                <Dialog open={isClassUploadOpen} onOpenChange={setIsClassUploadOpen}>
-                  <DialogTrigger asChild>
-                    <Button className="gap-2">
-                      <Upload className="w-4 h-4" />
-                      Upload {classDataType === "class" ? "Class" : "Subject"} Data
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                      <DialogTitle>Upload {classDataType === "class" ? "Class" : "Subject"} Data</DialogTitle>
-                      <DialogDescription>
-                        Upload CSV or Excel file with {classDataType} information
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="class-school">Select Organization *</Label>
-                        <Select>
-                          <SelectTrigger id="class-school">
-                            <SelectValue placeholder="Choose organization" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-popover z-50">
-                            <SelectItem value="1">Lincoln High School</SelectItem>
-                            <SelectItem value="2">Roosevelt Middle School</SelectItem>
-                            <SelectItem value="3">Jefferson Elementary</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="grid gap-2">
-                        <Label>Upload File</Label>
-                        <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
-                          <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                          <p className="text-sm font-medium mb-1">
-                            Click to upload or drag and drop
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            CSV or Excel file (max 10MB)
-                          </p>
-                          <input type="file" accept=".csv,.xlsx,.xls" className="hidden" />
-                        </div>
-                      </div>
-                    </div>
-                    <DialogFooter>
-                      <Button variant="outline" onClick={() => setIsClassUploadOpen(false)}>
-                        Cancel
-                      </Button>
-                      <Button onClick={() => {
-                        setIsClassUploadOpen(false);
-                        toast({
-                          title: "Data uploaded",
-                          description: `${classDataType === "class" ? "Class" : "Subject"} data has been uploaded successfully.`,
-                        });
-                      }}>
-                        Upload Data
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
-
-              <div className="border rounded-lg">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Class Name</TableHead>
-                      <TableHead>Section</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {classData.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.name}</TableCell>
-                        <TableCell>{item.section}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button variant="ghost" size="icon">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="w-4 h-4 text-destructive" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         {/* Chapter List Tab */}
         <TabsContent value="chapters" className="space-y-4">
