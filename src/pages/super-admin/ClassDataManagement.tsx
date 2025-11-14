@@ -42,7 +42,7 @@ export default function ClassDataManagement() {
   const [filterCustomer, setFilterCustomer] = useState<string>("all");
   const [filterOrganization, setFilterOrganization] = useState<string>("all");
   const [filterCity, setFilterCity] = useState<string>("all");
-  const [filterType, setFilterType] = useState<string>("all");
+  const [filterType, setFilterType] = useState<string>("class");
   const [filterClass, setFilterClass] = useState<string>("");
   
   // Track enabled items
@@ -56,15 +56,15 @@ export default function ClassDataManagement() {
 
   // Mock class data
   const classData = [
-    { id: 1, name: "Grade 10", section: "A", icon: "🎓", color: "bg-blue-500" },
-    { id: 2, name: "Grade 10", section: "B", icon: "🎓", color: "bg-green-500" },
+    { id: 1, name: "Grade 10", section: "A", icon: "📘", color: "bg-blue-500" },
+    { id: 2, name: "Grade 10", section: "B", icon: "📙", color: "bg-green-500" },
   ];
 
   const subjectData = [
-    { id: 3, name: "Mathematics", section: "Grade 10", icon: "📐", color: "bg-purple-500" },
-    { id: 4, name: "Science", section: "Grade 10", icon: "🔬", color: "bg-cyan-500" },
-    { id: 5, name: "English", section: "Grade 10", icon: "📚", color: "bg-orange-500" },
-    { id: 6, name: "History", section: "Grade 10", icon: "📜", color: "bg-amber-500" },
+    { id: 3, name: "Mathematics", section: "Grade 10", icon: "➗", color: "bg-purple-500" },
+    { id: 4, name: "Science", section: "Grade 10", icon: "⚗️", color: "bg-cyan-500" },
+    { id: 5, name: "English", section: "Grade 10", icon: "✍️", color: "bg-orange-500" },
+    { id: 6, name: "History", section: "Grade 10", icon: "📖", color: "bg-amber-500" },
   ];
 
   const handleToggleClass = (id: number) => {
@@ -278,7 +278,6 @@ export default function ClassDataManagement() {
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="class">Class</SelectItem>
                   <SelectItem value="subject">Subject</SelectItem>
                 </SelectContent>
@@ -375,54 +374,6 @@ export default function ClassDataManagement() {
                 <Button onClick={handleSaveChanges}>Save Changes</Button>
               </div>
             </>
-          )}
-
-          {filterType === "all" && (
-            <div className="border rounded-lg">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Class Name</TableHead>
-                    <TableHead>Section</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {classData.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell>{item.section}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button variant="ghost" size="icon">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {subjectData.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell>{item.section}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button variant="ghost" size="icon">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="w-4 h-4 text-destructive" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
           )}
         </CardContent>
       </Card>
