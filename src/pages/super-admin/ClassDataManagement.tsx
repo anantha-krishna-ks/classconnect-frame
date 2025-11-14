@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableBody,
@@ -43,6 +44,10 @@ export default function ClassDataManagement() {
   const [filterCity, setFilterCity] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterClass, setFilterClass] = useState<string>("");
+  
+  // Track enabled items
+  const [enabledClasses, setEnabledClasses] = useState<Set<number>>(new Set([1, 2]));
+  const [enabledSubjects, setEnabledSubjects] = useState<Set<number>>(new Set([3]));
 
   // Mock filter data
   const customers = ["ABC Education", "XYZ Schools Network", "Global Learning Group"];
@@ -51,10 +56,56 @@ export default function ClassDataManagement() {
 
   // Mock class data
   const classData = [
-    { id: 1, name: "Grade 10", section: "A" },
-    { id: 2, name: "Grade 10", section: "B" },
-    { id: 3, name: "Mathematics", section: "Grade 10" },
+    { id: 1, name: "Grade 10", section: "A", icon: "🎓", color: "bg-blue-500" },
+    { id: 2, name: "Grade 10", section: "B", icon: "🎓", color: "bg-green-500" },
   ];
+
+  const subjectData = [
+    { id: 3, name: "Mathematics", section: "Grade 10", icon: "📐", color: "bg-purple-500" },
+    { id: 4, name: "Science", section: "Grade 10", icon: "🔬", color: "bg-cyan-500" },
+    { id: 5, name: "English", section: "Grade 10", icon: "📚", color: "bg-orange-500" },
+    { id: 6, name: "History", section: "Grade 10", icon: "📜", color: "bg-amber-500" },
+  ];
+
+  const handleToggleClass = (id: number) => {
+    setEnabledClasses(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleToggleSubject = (id: number) => {
+    setEnabledSubjects(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSaveChanges = () => {
+    toast({
+      title: "Changes saved",
+      description: "Class and subject data has been updated successfully.",
+    });
+  };
+
+  const handleCancelChanges = () => {
+    setEnabledClasses(new Set([1, 2]));
+    setEnabledSubjects(new Set([3]));
+    toast({
+      title: "Changes cancelled",
+      description: "All changes have been reverted.",
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -260,35 +311,119 @@ export default function ClassDataManagement() {
             </div>
           </div>
 
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Class Name</TableHead>
-                  <TableHead>Section</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+          {filterType === "class" && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {classData.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.section}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="icon">
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
+                  <Card key={item.id} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className={`${item.color} w-12 h-12 rounded-lg flex items-center justify-center text-2xl`}>
+                            {item.icon}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg">{item.name} - Section {item.section}</h3>
+                            <p className="text-sm text-muted-foreground">Class section</p>
+                          </div>
+                        </div>
+                        <Switch
+                          checked={enabledClasses.has(item.id)}
+                          onCheckedChange={() => handleToggleClass(item.id)}
+                        />
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </CardContent>
+                  </Card>
                 ))}
-              </TableBody>
-            </Table>
-          </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-4">
+                <Button variant="outline" onClick={handleCancelChanges}>Cancel</Button>
+                <Button onClick={handleSaveChanges}>Save Changes</Button>
+              </div>
+            </>
+          )}
+
+          {filterType === "subject" && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {subjectData
+                  .filter(item => !filterClass || item.section === filterClass)
+                  .map((item) => (
+                    <Card key={item.id} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className={`${item.color} w-12 h-12 rounded-lg flex items-center justify-center text-2xl`}>
+                              {item.icon}
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-lg">{item.name}</h3>
+                              <p className="text-sm text-muted-foreground">{item.section}</p>
+                            </div>
+                          </div>
+                          <Switch
+                            checked={enabledSubjects.has(item.id)}
+                            onCheckedChange={() => handleToggleSubject(item.id)}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+              </div>
+              <div className="flex justify-end gap-3 pt-4">
+                <Button variant="outline" onClick={handleCancelChanges}>Cancel</Button>
+                <Button onClick={handleSaveChanges}>Save Changes</Button>
+              </div>
+            </>
+          )}
+
+          {filterType === "all" && (
+            <div className="border rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Class Name</TableHead>
+                    <TableHead>Section</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {classData.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell>{item.section}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="ghost" size="icon">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon">
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {subjectData.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell>{item.section}</TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="ghost" size="icon">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon">
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
