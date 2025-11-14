@@ -33,9 +33,6 @@ import {
 
 export default function ClassDataManagement() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [classDataType, setClassDataType] = useState<string>("");
-  const [selectedClassForSubject, setSelectedClassForSubject] = useState<string>("");
-  const [isClassUploadOpen, setIsClassUploadOpen] = useState(false);
   const { toast } = useToast();
   
   // Global filter states
@@ -169,82 +166,6 @@ export default function ClassDataManagement() {
                 Upload and manage class and subject data
               </CardDescription>
             </div>
-            <Dialog open={isClassUploadOpen} onOpenChange={setIsClassUploadOpen}>
-              <DialogTrigger asChild>
-                <Button className="gap-2">
-                  <Upload className="w-4 h-4" />
-                  Upload Class/Subject Data
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Upload Class/Subject Data</DialogTitle>
-                  <DialogDescription>
-                    Upload class or subject information
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label>Select Type *</Label>
-                    <Select value={classDataType} onValueChange={setClassDataType}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Choose data type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="class">Class</SelectItem>
-                        <SelectItem value="subject">Subject</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {classDataType === "subject" && (
-                    <div className="grid gap-2">
-                      <Label>Class Name *</Label>
-                      <Select value={selectedClassForSubject} onValueChange={setSelectedClassForSubject}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select class" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {classData.filter(item => item.name.startsWith("Grade")).map((item) => (
-                            <SelectItem key={item.id} value={item.name}>
-                              {item.name} - {item.section}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                  <div className="grid gap-2">
-                    <Label>Upload File</Label>
-                    <div className="border-2 border-dashed rounded-lg p-6 hover:border-primary/50 cursor-pointer transition-colors">
-                      <div className="flex flex-col items-center justify-center text-center">
-                        <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                        <p className="text-sm font-medium mb-1">
-                          Click to upload or drag and drop
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          CSV or Excel file (max 10MB)
-                        </p>
-                        <input type="file" accept=".csv,.xlsx,.xls" className="hidden" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button variant="outline" onClick={() => setIsClassUploadOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={() => {
-                    setIsClassUploadOpen(false);
-                    toast({
-                      title: "Data uploaded",
-                      description: `${classDataType === "class" ? "Class" : "Subject"} data has been uploaded successfully.`,
-                    });
-                  }}>
-                    Upload Data
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
