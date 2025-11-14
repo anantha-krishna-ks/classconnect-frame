@@ -72,7 +72,7 @@ export default function ClassDataManagement() {
           <CardDescription>Apply filters to view specific data</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="grid gap-2">
               <Label>Customer</Label>
               <Select value={filterCustomer} onValueChange={setFilterCustomer}>
@@ -118,19 +118,6 @@ export default function ClassDataManagement() {
                       {city}
                     </SelectItem>
                   ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label>Type</Label>
-              <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="class">Class</SelectItem>
-                  <SelectItem value="subject">Subject</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -228,6 +215,18 @@ export default function ClassDataManagement() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
+            <div className="w-64">
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="class">Class</SelectItem>
+                  <SelectItem value="subject">Subject</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
