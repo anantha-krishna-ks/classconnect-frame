@@ -46,6 +46,7 @@ import SuperAdminLogin from "./pages/SuperAdminLogin";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import CustomerManagement from "./pages/super-admin/CustomerManagement";
 import OrganizationManagement from "./pages/super-admin/OrganizationManagement";
+import ClassDataManagement from "./pages/super-admin/ClassDataManagement";
 import UserManagement from "./pages/super-admin/UserManagement";
 import ProductAssignment from "./pages/super-admin/ProductAssignment";
 import ChapterManagement from "./pages/super-admin/ChapterManagement";
@@ -135,6 +136,7 @@ const App = () => (
           <Route path="/super-admin" element={<SuperAdminDashboard />}>
             <Route path="customers" element={<CustomerManagement />} />
             <Route path="organizations" element={<OrganizationManagement />} />
+            <Route path="class-data" element={<ClassDataManagement />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="products" element={<ProductAssignment />} />
             <Route path="chapters" element={<ChapterManagement />} />

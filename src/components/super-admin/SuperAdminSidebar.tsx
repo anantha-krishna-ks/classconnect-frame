@@ -1,4 +1,4 @@
-import { Building2, School, Users, Package, BookOpen, BarChart3, LayoutDashboard } from "lucide-react";
+import { Building2, School, Users, Package, BookOpen, BarChart3, LayoutDashboard, GraduationCap } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,12 @@ const menuItems = [
     icon: School,
     path: "/super-admin/organizations",
     description: "Organization management",
+  },
+  {
+    title: "Class Data",
+    icon: GraduationCap,
+    path: "/super-admin/class-data",
+    description: "Class & subject management",
   },
   {
     title: "Users",
