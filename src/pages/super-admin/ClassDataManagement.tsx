@@ -228,7 +228,6 @@ export default function ClassDataManagement() {
                             </div>
                             <div>
                               <h3 className="font-semibold text-lg">{item.name}</h3>
-                              <p className="text-sm text-muted-foreground">Class section</p>
                             </div>
                           </div>
                           <Switch
