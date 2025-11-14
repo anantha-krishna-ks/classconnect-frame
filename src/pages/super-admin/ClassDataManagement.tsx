@@ -41,7 +41,6 @@ export default function ClassDataManagement() {
   // Global filter states
   const [filterCustomer, setFilterCustomer] = useState<string>("all");
   const [filterOrganization, setFilterOrganization] = useState<string>("all");
-  const [filterCity, setFilterCity] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("class");
   const [filterClass, setFilterClass] = useState<string>("");
   
@@ -52,7 +51,6 @@ export default function ClassDataManagement() {
   // Mock filter data
   const customers = ["ABC Education", "XYZ Schools Network", "Global Learning Group"];
   const organizations = ["Lincoln High School", "Roosevelt Middle School", "Jefferson Elementary"];
-  const cities = ["New York", "Los Angeles", "Chicago", "Boston"];
 
   // Mock class data
   const classData = [
@@ -124,7 +122,7 @@ export default function ClassDataManagement() {
           <CardDescription>Apply filters to view specific data</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label>Customer</Label>
               <Select value={filterCustomer} onValueChange={setFilterCustomer}>
@@ -152,22 +150,6 @@ export default function ClassDataManagement() {
                   {organizations.map((org) => (
                     <SelectItem key={org} value={org}>
                       {org}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label>City</Label>
-              <Select value={filterCity} onValueChange={setFilterCity}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select city" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Cities</SelectItem>
-                  {cities.map((city) => (
-                    <SelectItem key={city} value={city}>
-                      {city}
                     </SelectItem>
                   ))}
                 </SelectContent>
