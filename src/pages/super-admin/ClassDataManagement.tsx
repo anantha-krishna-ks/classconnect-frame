@@ -46,7 +46,21 @@ export default function ClassDataManagement() {
   const [enabledSubjects, setEnabledSubjects] = useState<Set<number>>(new Set([3]));
 
   // Mock filter data
-  const customers = ["ABC Education", "XYZ Schools Network", "Global Learning Group"];
+  const customers = [
+    "ABC Education", 
+    "XYZ Schools Network", 
+    "Global Learning Group",
+    "Bright Future Academy",
+    "Excellence Learning Center",
+    "Pioneer Schools",
+    "Sunrise International",
+    "Golden Valley Schools",
+    "Metro Education Hub",
+    "Harmony Learning Institute",
+    "Apex School Group",
+    "Green Valley Academy",
+    "Summit Education Network"
+  ];
   const organizations = ["Lincoln High School", "Roosevelt Middle School", "Jefferson Elementary"];
 
   // Mock class data
