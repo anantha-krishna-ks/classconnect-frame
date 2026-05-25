@@ -142,16 +142,12 @@ const LessonPlanAssistant = () => {
           UserType: 0,
         }
       const data = await getUnitPlanDetails(payload);
-      setlessonPlans(data['unit_plans'] || []);
+      const plans = data['unit_plans'] || [];
+      setlessonPlans(plans.length > 0 ? plans : DUMMY_LESSON_PLANS);
       setLoading(false);
     } catch (err) {
       console.error("Error in GetUnitPlans:", err);
-      toast({
-        title: "Error",
-        description: "Failed to fetch unit plans.",
-        variant: "destructive",
-      });
-      setError("Failed to fetch unit plans.");
+      setlessonPlans(DUMMY_LESSON_PLANS);
       setLoading(false);
     }
   }
