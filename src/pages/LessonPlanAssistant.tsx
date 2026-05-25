@@ -378,7 +378,20 @@ const LessonPlanAssistant = () => {
     {/* Edit Button with Tooltip */}
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-purple-50" disabled>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 hover:bg-purple-50"
+          onClick={() => {
+            setEditingPlan(lesson);
+            setEditForm({
+              unitplantitle: lesson.unitplantitle || "",
+              classname: lesson.classname || "",
+              subjectname: lesson.subjectname || "",
+            });
+            setEditDialogOpen(true);
+          }}
+        >
           <Edit className="h-4 w-4 text-purple-600" />
         </Button>
       </TooltipTrigger>
