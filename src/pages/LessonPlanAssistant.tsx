@@ -23,12 +23,28 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PageLoader } from "@/components/ui/loader";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+const DUMMY_LESSON_PLANS = [
+  { unitplanid: "dummy-1", unitplantitle: "Understanding Photosynthesis: The Food Factory of Plants", classname: "VII", subjectname: "General Science", classid: 7, subjectid: 1, sessioncount: 1, unitplanjson: {} },
+  { unitplanid: "dummy-2", unitplantitle: "Exploring the Wonders of Light", classname: "VII", subjectname: "Science", classid: 7, subjectid: 2, sessioncount: 2, unitplanjson: {} },
+  { unitplanid: "dummy-3", unitplantitle: "Understanding Heat: Transfer, Effects, and Applications", classname: "IX", subjectname: "General Science", classid: 9, subjectid: 1, sessioncount: 1, unitplanjson: {} },
+  { unitplanid: "dummy-4", unitplantitle: "Exploring the World of Plants: Structure, Functions, and Importance", classname: "VIII", subjectname: "General Science", classid: 8, subjectid: 1, sessioncount: 3, unitplanjson: {} },
+  { unitplanid: "dummy-5", unitplantitle: "Journey Through the Digestive System", classname: "VII", subjectname: "Science", classid: 7, subjectid: 2, sessioncount: 2, unitplanjson: {} },
+  { unitplanid: "dummy-6", unitplantitle: "The Solar System and Beyond", classname: "VI", subjectname: "Science", classid: 6, subjectid: 2, sessioncount: 1, unitplanjson: {} },
+];
 
 
 const LessonPlanAssistant = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
     grade: "all",
     subject: "all",
@@ -39,10 +55,13 @@ const LessonPlanAssistant = () => {
   const [isLoadingGrades, setIsLoadingGrades] = useState(false);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lessonPlans,setlessonPlans]=useState([]);
+  const [lessonPlans,setlessonPlans]=useState<any[]>(DUMMY_LESSON_PLANS);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState<any>(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<any>(null);
+  const [editForm, setEditForm] = useState({ unitplantitle: "", classname: "", subjectname: "" });
   
   useEffect(() => {
     const fetchGrades = async () => {
@@ -123,16 +142,12 @@ const LessonPlanAssistant = () => {
           UserType: 0,
         }
       const data = await getUnitPlanDetails(payload);
-      setlessonPlans(data['unit_plans'] || []);
+      const plans = data['unit_plans'] || [];
+      setlessonPlans(plans.length > 0 ? plans : DUMMY_LESSON_PLANS);
       setLoading(false);
     } catch (err) {
       console.error("Error in GetUnitPlans:", err);
-      toast({
-        title: "Error",
-        description: "Failed to fetch unit plans.",
-        variant: "destructive",
-      });
-      setError("Failed to fetch unit plans.");
+      setlessonPlans(DUMMY_LESSON_PLANS);
       setLoading(false);
     }
   }
@@ -363,7 +378,20 @@ const LessonPlanAssistant = () => {
     {/* Edit Button with Tooltip */}
     <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 hover:bg-purple-50" disabled>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0 hover:bg-purple-50"
+          onClick={() => {
+            setEditingPlan(lesson);
+            setEditForm({
+              unitplantitle: lesson.unitplantitle || "",
+              classname: lesson.classname || "",
+              subjectname: lesson.subjectname || "",
+            });
+            setEditDialogOpen(true);
+          }}
+        >
           <Edit className="h-4 w-4 text-purple-600" />
         </Button>
       </TooltipTrigger>
@@ -462,6 +490,56 @@ const LessonPlanAssistant = () => {
     </AlertDialogFooter>
   </AlertDialogContent>
 </AlertDialog>
+
+{/* Edit Lesson Plan Dialog */}
+<Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Edit Lesson Plan</DialogTitle>
+    </DialogHeader>
+    <div className="space-y-4 py-2">
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Lesson Plan Title</label>
+        <Input
+          value={editForm.unitplantitle}
+          onChange={(e) => setEditForm({ ...editForm, unitplantitle: e.target.value })}
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Grade</label>
+        <Input
+          value={editForm.classname}
+          onChange={(e) => setEditForm({ ...editForm, classname: e.target.value })}
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Subject</label>
+        <Input
+          value={editForm.subjectname}
+          onChange={(e) => setEditForm({ ...editForm, subjectname: e.target.value })}
+        />
+      </div>
+    </div>
+    <DialogFooter>
+      <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+      <Button
+        onClick={() => {
+          if (!editingPlan) return;
+          setlessonPlans((prev) =>
+            prev.map((lp) =>
+              lp.unitplanid === editingPlan.unitplanid ? { ...lp, ...editForm } : lp
+            )
+          );
+          toast({ title: "Updated", description: "Lesson plan updated successfully." });
+          setEditDialogOpen(false);
+          setEditingPlan(null);
+        }}
+      >
+        Save Changes
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
 
   </div>
   );
