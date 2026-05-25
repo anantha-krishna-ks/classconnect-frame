@@ -44,7 +44,7 @@ const DUMMY_LESSON_PLANS = [
 const LessonPlanAssistant = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
     grade: "all",
     subject: "all",
