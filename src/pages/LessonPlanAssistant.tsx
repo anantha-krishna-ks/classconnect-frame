@@ -23,6 +23,22 @@ import {
 } from "@/components/ui/alert-dialog";
 import { PageLoader } from "@/components/ui/loader";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
+const DUMMY_LESSON_PLANS = [
+  { unitplanid: "dummy-1", unitplantitle: "Understanding Photosynthesis: The Food Factory of Plants", classname: "VII", subjectname: "General Science", classid: 7, subjectid: 1, sessioncount: 1, unitplanjson: {} },
+  { unitplanid: "dummy-2", unitplantitle: "Exploring the Wonders of Light", classname: "VII", subjectname: "Science", classid: 7, subjectid: 2, sessioncount: 2, unitplanjson: {} },
+  { unitplanid: "dummy-3", unitplantitle: "Understanding Heat: Transfer, Effects, and Applications", classname: "IX", subjectname: "General Science", classid: 9, subjectid: 1, sessioncount: 1, unitplanjson: {} },
+  { unitplanid: "dummy-4", unitplantitle: "Exploring the World of Plants: Structure, Functions, and Importance", classname: "VIII", subjectname: "General Science", classid: 8, subjectid: 1, sessioncount: 3, unitplanjson: {} },
+  { unitplanid: "dummy-5", unitplantitle: "Journey Through the Digestive System", classname: "VII", subjectname: "Science", classid: 7, subjectid: 2, sessioncount: 2, unitplanjson: {} },
+  { unitplanid: "dummy-6", unitplantitle: "The Solar System and Beyond", classname: "VI", subjectname: "Science", classid: 6, subjectid: 2, sessioncount: 1, unitplanjson: {} },
+];
 
 
 const LessonPlanAssistant = () => {
