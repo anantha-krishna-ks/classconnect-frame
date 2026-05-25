@@ -491,6 +491,56 @@ const LessonPlanAssistant = () => {
   </AlertDialogContent>
 </AlertDialog>
 
+{/* Edit Lesson Plan Dialog */}
+<Dialog open={isEditDialogOpen} onOpenChange={setEditDialogOpen}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Edit Lesson Plan</DialogTitle>
+    </DialogHeader>
+    <div className="space-y-4 py-2">
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Lesson Plan Title</label>
+        <Input
+          value={editForm.unitplantitle}
+          onChange={(e) => setEditForm({ ...editForm, unitplantitle: e.target.value })}
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Grade</label>
+        <Input
+          value={editForm.classname}
+          onChange={(e) => setEditForm({ ...editForm, classname: e.target.value })}
+        />
+      </div>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Subject</label>
+        <Input
+          value={editForm.subjectname}
+          onChange={(e) => setEditForm({ ...editForm, subjectname: e.target.value })}
+        />
+      </div>
+    </div>
+    <DialogFooter>
+      <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
+      <Button
+        onClick={() => {
+          if (!editingPlan) return;
+          setlessonPlans((prev) =>
+            prev.map((lp) =>
+              lp.unitplanid === editingPlan.unitplanid ? { ...lp, ...editForm } : lp
+            )
+          );
+          toast({ title: "Updated", description: "Lesson plan updated successfully." });
+          setEditDialogOpen(false);
+          setEditingPlan(null);
+        }}
+      >
+        Save Changes
+      </Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
   </div>
   );
 };
