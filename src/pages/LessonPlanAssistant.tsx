@@ -55,10 +55,13 @@ const LessonPlanAssistant = () => {
   const [isLoadingGrades, setIsLoadingGrades] = useState(false);
   const [isLoadingSubjects, setIsLoadingSubjects] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lessonPlans,setlessonPlans]=useState([]);
+  const [lessonPlans,setlessonPlans]=useState<any[]>(DUMMY_LESSON_PLANS);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState<any>(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<any>(null);
+  const [editForm, setEditForm] = useState({ unitplantitle: "", classname: "", subjectname: "" });
   
   useEffect(() => {
     const fetchGrades = async () => {
